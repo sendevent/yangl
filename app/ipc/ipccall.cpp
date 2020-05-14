@@ -1,0 +1,74 @@
+/*
+   Copyright (C) 2020 Denis Gofman - <sendevent@gmail.com>
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Library General Public
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Library General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
+*/
+
+#include "ipccall.h"
+
+#include "ipcbus.h"
+
+#include <QDebug>
+#include <QFile>
+#include <QFileInfo>
+#include <QProcess>
+#include <QThread>
+
+#define LOG qDebug() << Q_FUNC_INFO << QThread::currentThreadId()
+
+IPCCall::IPCCall(const QString &path, const QStringList &params, int timeout)
+    : m_id(QUuid::createUuid())
+    , m_appPath(path)
+    , m_params(params)
+    , m_timeout(timeout)
+{
+}
+
+IPCCall::Id IPCCall::id() const
+{
+    return m_id;
+}
+
+QString IPCCall::run()
+{
+    if (m_appPath.isEmpty() || !QFile::exists(m_appPath))
+        return setResult(QStringLiteral("File [%1] not found").arg(m_appPath));
+
+    QProcess proc;
+    proc.start(m_appPath, m_params, QIODevice::ReadOnly);
+    if (!proc.waitForStarted(m_timeout))
+        return setResult(
+                QStringLiteral("Start timeout (%1) reached for [%2]").arg(QString::number(m_timeout), m_appPath));
+
+    QString result;
+    while (proc.waitForReadyRead(m_timeout))
+        result += proc.readAllStandardOutput();
+
+    return setResult(result.trimmed());
+}
+
+QString IPCCall::result() const
+{
+    return m_result;
+}
+
+QString IPCCall::setResult(const QString &result)
+{
+    if (result != m_result) {
+        m_result = result;
+        emit ready(m_result);
+    }
+
+    return m_result;
+}

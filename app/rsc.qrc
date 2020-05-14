@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/icn">
+        <file>resources/online.png</file>
+        <file>resources/offline.png</file>
+    </qresource>
+</RCC>
