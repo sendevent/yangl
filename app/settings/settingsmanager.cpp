@@ -15,17 +15,36 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "nordvpnwraper.h"
+#include "settingsmanager.h"
 
-#include <QApplication>
+#include <QDebug>
+#include <QSettings>
+#include <QStandardPaths>
 
-int main(int argc, char *argv[])
+SettingsManager *SettingsManager::m_instance = nullptr;
+
+SettingsManager::SettingsManager(QObject *parent)
+    : QObject(parent)
+    , m_settings(new QSettings(
+              QString("%1/settings.conf").arg(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)),
+              QSettings::IniFormat, this))
 {
-    QApplication a(argc, argv);
-    a.setQuitOnLastWindowClosed(false);
+    qDebug() << "Config:" << m_settings->fileName();
+}
 
-    NordVpnWraper nordVpnWraper;
-    nordVpnWraper.start();
+SettingsManager *SettingsManager::instance()
+{
+    if (!m_instance)
+        m_instance = new SettingsManager();
+    return m_instance;
+}
 
-    return a.exec();
+QSettings *SettingsManager::storage()
+{
+    return m_settings;
+}
+
+/*static*/ void SettingsManager::sync()
+{
+    instance()->storage()->sync();
 }

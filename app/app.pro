@@ -1,5 +1,5 @@
 QT       += core gui concurrent
-
+TARGET = yangl
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
@@ -15,27 +15,33 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-INCLUDEPATH += ipc
+INCLUDEPATH += \
+    ipc \
+    settings
 
 SOURCES += \
     ipc/ipcbus.cpp \
     ipc/ipccall.cpp \
     main.cpp \
-    dialog.cpp \
     nordvpnwraper.cpp \
+    settings/appsettings.cpp \
+    settings/settingsdialog.cpp \
+    settings/settingsmanager.cpp \
     statechecker.cpp \
     trayicon.cpp
 
 HEADERS += \
-    dialog.h \
     ipc/ipcbus.h \
     ipc/ipccall.h \
     nordvpnwraper.h \
+    settings/appsettings.h \
+    settings/settingsdialog.h \
+    settings/settingsmanager.h \
     statechecker.h \
     trayicon.h
 
 FORMS += \
-    dialog.ui
+    settings/settingsdialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

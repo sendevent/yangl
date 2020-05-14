@@ -17,27 +17,21 @@
 
 #pragma once
 
-#include "statechecker.h"
+#include <QObject>
 
-#include <QDialog>
-#include <QSystemTrayIcon>
-
-QT_BEGIN_NAMESPACE
-namespace Ui {
-class Dialog;
-}
-QT_END_NAMESPACE
-
-class Dialog : public QDialog
+class QSettings;
+class SettingsManager : public QObject
 {
     Q_OBJECT
-
 public:
-    Dialog(QWidget *parent = nullptr);
-    ~Dialog();
+    static SettingsManager *instance();
 
-private slots:
+    QSettings *storage();
+
+    static void sync();
 
 private:
-    Ui::Dialog *ui;
+    SettingsManager(QObject *parent = nullptr);
+    static SettingsManager *m_instance;
+    QSettings *m_settings = nullptr;
 };
