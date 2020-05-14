@@ -12,29 +12,35 @@
    Library General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program. If not, see
-   <https://www.gnu.org/licenses/lgpl-3.0.html>.
+   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "dialog.h"
+#pragma once
 
-#include "ipcbus.h"
-#include "ui_dialog.h"
+#include "statechecker.h"
 
-#include <QDebug>
-#include <QIcon>
-#include <QMetaEnum>
+#include <QDialog>
+#include <QSystemTrayIcon>
 
-#define LOG qDebug() << Q_FUNC_INFO
-
-Dialog::Dialog(QWidget *parent)
-    : QDialog(parent)
-    , ui(new Ui::Dialog)
-{
-    ui->setupUi(this);
+namespace Ui {
+class SettingsDialog;
 }
 
-Dialog::~Dialog()
+class Dialog : public QDialog
 {
-    delete ui;
-}
+    Q_OBJECT
+
+public:
+    Dialog(QWidget *parent = nullptr);
+    ~Dialog() override;
+
+public slots:
+    void accept() override;
+
+private:
+    Ui::SettingsDialog *ui;
+
+    bool saveSettings();
+    bool saveMonitorSettings();
+    bool saveNVPNSettings();
+};

@@ -17,7 +17,9 @@
 
 #include "nordvpnwraper.h"
 
+#include "appsettings.h"
 #include "ipcbus.h"
+#include "settingsdialog.h"
 #include "statechecker.h"
 #include "trayicon.h"
 
@@ -28,7 +30,7 @@
 
 NordVpnWraper::NordVpnWraper(QObject *parent)
     : QObject(parent)
-    , m_bus(new IPCBus(QStringLiteral("/usr/bin/nordvpn"), this))
+    , m_bus(new IPCBus(AppSettings::Monitor.NVPNPath->read().toString(), this))
     , m_checker(new StateChecker(m_bus, this))
     , m_trayIcon(new TrayIcon(this))
     , m_menu(new QMenu)
@@ -46,7 +48,10 @@ void NordVpnWraper::start()
     loadSettings();
 }
 
-void NordVpnWraper::loadSettings() {}
+void NordVpnWraper::loadSettings()
+{
+    m_checker->setInterval(AppSettings::Monitor.Interval->read().toInt() * 1000);
+}
 
 void NordVpnWraper::saveSettings() {}
 
@@ -61,11 +66,19 @@ void NordVpnWraper::initMenu()
     m_actQuit = m_menu->addAction(tr("&Quit"), qApp, &QApplication::quit);
 }
 
-void NordVpnWraper::showSettingsEditor() {}
+void NordVpnWraper::showSettingsEditor()
+{
+    Dialog *dlg = new Dialog;
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->open();
+}
 
-void NordVpnWraper::performStatusCheck() {}
+void NordVpnWraper::performStatusCheck()
+{
+    m_checker->check();
+}
 
 void NordVpnWraper::toggleMonitoring()
 {
-    LOG << m_actRun->isChecked();
+    m_checker->setActive(m_actRun->isChecked());
 }
