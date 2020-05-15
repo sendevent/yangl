@@ -50,12 +50,13 @@ void StateChecker::setActive(bool active)
 
     if (m_timer->isActive() != active) {
 
-        if (active)
+        if (active) {
+            check();
             m_timer->start();
-        else
+        } else {
             m_timer->stop();
-
-        setState(State::Unknown);
+            setState(State::Unknown);
+        }
     }
 }
 
@@ -80,7 +81,6 @@ int StateChecker::inteval() const
 
 void StateChecker::check()
 {
-    LOG;
     IPCCall::Ptr statusCheck(new IPCCall(m_bus->applicationPath(), { QStringLiteral("status") }, 30000));
     connect(statusCheck.get(), &IPCCall::ready, this, &StateChecker::onQueryFinish);
 
@@ -102,7 +102,6 @@ void StateChecker::onQueryFinish(const QString &result)
 
 void StateChecker::nextQuery()
 {
-    LOG;
     if (m_query)
         return;
 
@@ -116,7 +115,6 @@ void StateChecker::nextQuery()
 
 void StateChecker::onTimeout()
 {
-    LOG;
     check();
 }
 
@@ -138,13 +136,10 @@ void StateChecker::updateState(const QString &from)
         const QString &name = pair.first().simplified();
         const QString &value = pair.last().simplified();
 
-        LOG << name << value;
-
         if (name == QStringLiteral("- - Status")) {
             const QMetaEnum me = QMetaEnum::fromType<StateChecker::State>();
             bool found(false);
             const int enumVal = me.keyToValue(qPrintable(value), &found);
-            LOG << found << enumVal;
             setState(found ? static_cast<StateChecker::State>(enumVal) : StateChecker::Unknown);
             return;
         }

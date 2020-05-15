@@ -42,11 +42,12 @@ public:
 
     void check();
 
-    void setActive(bool active);
     bool isActive() const;
-
-    void setInterval(int msecs);
     int inteval() const;
+
+public slots:
+    void setInterval(int msecs);
+    void setActive(bool active);
 
 signals:
     void stateChanged(StateChecker::State state);

@@ -37,7 +37,6 @@ private slots:
 
     void showSettingsEditor();
     void performStatusCheck();
-    void toggleMonitoring();
 
 private:
     IPCBus *m_bus;

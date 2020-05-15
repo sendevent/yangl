@@ -22,8 +22,13 @@
 #include "ui_settingsdialog.h"
 
 #include <QDebug>
+#include <QFileDialog>
+#include <QFileInfo>
 #include <QIcon>
+#include <QMessageBox>
 #include <QMetaEnum>
+#include <QPalette>
+#include <QStyle>
 
 #define LOG qDebug() << Q_FUNC_INFO
 #define WRN qWarning() << Q_FUNC_INFO
@@ -49,6 +54,25 @@ Dialog::~Dialog()
     delete ui;
 }
 
+void Dialog::on_btnOpen_clicked()
+{
+    const QString path = QFileDialog::getOpenFileName(this, tr("Select NordVPN binary"), ui->leNVPNPath->text(),
+                                                      QStringLiteral("*.*"));
+    if (!path.isEmpty())
+        ui->leNVPNPath->setText(path);
+}
+
+void Dialog::on_leNVPNPath_textChanged(const QString &text)
+{
+    ui->leNVPNPath->setToolTip(text);
+    QPalette p = ui->leNVPNPath->palette();
+    const QColor clr = isValidPath(text) ? ui->leNVPNPath->style()->standardPalette().color(QPalette::Base) : Qt::red;
+    if (p.color(QPalette::Base) != clr) {
+        p.setColor(QPalette::Base, clr);
+        ui->leNVPNPath->setPalette(p);
+    }
+}
+
 void Dialog::accept()
 {
     if (saveSettings())
@@ -62,7 +86,22 @@ bool Dialog::saveSettings()
 
 bool Dialog::saveMonitorSettings()
 {
-    NIY;
+    const QString &path = ui->leNVPNPath->text();
+    if (path != AppSettings::Monitor.NVPNPath->read().toString()) {
+        if (!isValidPath(path)) {
+            QMessageBox::critical(this, tr("NordVPN binary"), tr("Please, specefy valid path."));
+            ui->tabWidget->setCurrentIndex(0);
+            ui->leNVPNPath->setFocus();
+
+            return false;
+        }
+        QMessageBox::information(this, tr("NordVPN binary"), tr("Please, restart the application to apply changes."));
+    }
+
+    AppSettings::Monitor.NVPNPath->write(path);
+    AppSettings::Monitor.Interval->write(ui->spinBoxInterval->value());
+    AppSettings::Monitor.Active->write(ui->checkBoxAutoActive->isChecked());
+
     return true;
 }
 
@@ -70,4 +109,16 @@ bool Dialog::saveNVPNSettings()
 {
     NIY;
     return true;
+}
+
+bool Dialog::isValidPath(const QString &path) const
+{
+    if (path.isEmpty())
+        return false;
+
+    const QFileInfo info(path);
+    if (!info.exists())
+        return false;
+
+    return info.isExecutable();
 }
