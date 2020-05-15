@@ -28,7 +28,7 @@ class StateChecker : public QObject
 {
     Q_OBJECT
 public:
-    enum State
+    enum Status
     {
         Unknown = 0,
         Disconnected,
@@ -36,7 +36,29 @@ public:
         Connected,
         Disconnecting,
     };
-    Q_ENUM(State);
+    Q_ENUM(Status);
+
+    struct Info {
+        Status m_status;
+        QString m_server;
+        QString m_country;
+        QString m_city;
+        QString m_ip;
+        QString m_technology;
+        QString m_protocol;
+        QString m_traffic;
+        QString m_uptime;
+
+        void clear();
+        bool operator==(const Info &other) const;
+        bool operator!=(const Info &other) const;
+        QString toString() const;
+
+        static StateChecker::Info fromString(const QString &text);
+        static StateChecker::Status textToStatus(const QString &from);
+        static QString statusToText(StateChecker::Status from);
+        static QString parseUptime(const QString &from);
+    };
 
     explicit StateChecker(IPCBus *bus, QObject *parent = nullptr);
 
@@ -44,13 +66,14 @@ public:
 
     bool isActive() const;
     int inteval() const;
+    Info state() const;
 
 public slots:
     void setInterval(int msecs);
     void setActive(bool active);
 
 signals:
-    void stateChanged(StateChecker::State state);
+    void stateChanged(const StateChecker::Info &state);
 
 private slots:
     void onTimeout();
@@ -62,11 +85,12 @@ protected:
     IPCCall::Ptr m_query;
     QTimer *m_timer;
 
-    State m_state;
-    State state() const;
-    void setState(State state);
+    Info m_state;
+    void setState(const Info &state);
+    void setStatus(Status status);
 
     void nextQuery();
     void updateState(const QString &from);
 };
-Q_DECLARE_METATYPE(StateChecker::State)
+Q_DECLARE_METATYPE(StateChecker::Status)
+Q_DECLARE_METATYPE(StateChecker::Info)
