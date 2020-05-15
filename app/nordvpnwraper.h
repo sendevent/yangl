@@ -17,13 +17,14 @@
 
 #pragma once
 
+#include "trayicon.h"
+
 #include <QMenu>
 #include <QObject>
 #include <memory>
 
 class IPCBus;
 class StateChecker;
-class TrayIcon;
 class NordVpnWraper : public QObject
 {
     Q_OBJECT
@@ -37,6 +38,8 @@ private slots:
 
     void showSettingsEditor();
     void performStatusCheck();
+
+    void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
 private:
     IPCBus *m_bus;
