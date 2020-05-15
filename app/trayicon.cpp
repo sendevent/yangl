@@ -17,31 +17,37 @@
 
 #include "trayicon.h"
 
+#include <QApplication>
 #include <QDebug>
 #include <QMetaEnum>
 
 #define LOG qDebug() << Q_FUNC_INFO
 
 TrayIcon::TrayIcon(QObject *parent)
-    : QSystemTrayIcon(iconForState(StateChecker::Disconnected), parent)
+    : QSystemTrayIcon(iconForStatus(StateChecker::Status::Disconnected), parent)
 {
 }
 
-/*static*/ QIcon TrayIcon::iconForState(StateChecker::State state)
+/*static*/ QIcon TrayIcon::iconForState(const StateChecker::Info &state)
 {
-    static const QMap<StateChecker::State, QIcon> staticIcons = [] {
-        QMap<StateChecker::State, QIcon> icons;
-        QMetaEnum me = QMetaEnum::fromType<StateChecker::State>();
+    return iconForStatus(state.m_status);
+}
+
+/*static*/ QIcon TrayIcon::iconForStatus(const StateChecker::Status &status)
+{
+    static const QMap<StateChecker::Status, QIcon> staticIcons = [] {
+        QMap<StateChecker::Status, QIcon> icons;
+        QMetaEnum me = QMetaEnum::fromType<StateChecker::Status>();
         for (int i = 0; i < me.keyCount(); ++i) {
-            const StateChecker::State state = static_cast<StateChecker::State>(me.value(i));
+            const StateChecker::Status state = static_cast<StateChecker::Status>(me.value(i));
             switch (state) {
-            case StateChecker::State::Connected: {
+            case StateChecker::Status::Connected: {
                 icons.insert(state, QPixmap(":/icn/resources/online.png"));
                 break;
             }
-            case StateChecker::State::Disconnected:
-            case StateChecker::State::Connecting:
-            case StateChecker::State::Disconnecting:
+            case StateChecker::Status::Disconnected:
+            case StateChecker::Status::Connecting:
+            case StateChecker::Status::Disconnecting:
             default: {
                 icons.insert(state, QPixmap(":/icn/resources/offline.png"));
                 break;
@@ -51,11 +57,19 @@ TrayIcon::TrayIcon(QObject *parent)
         return icons;
     }();
 
-    return staticIcons[state];
+    return staticIcons[status];
 }
 
-void TrayIcon::setState(StateChecker::State state)
+void TrayIcon::setState(const StateChecker::Info &state)
 {
-    LOG << state;
-    setIcon(iconForState(state));
+    const QString description = state.toString();
+
+    if (m_state.m_status != state.m_status) {
+        QIcon icn = iconForStatus(state.m_status);
+        setIcon(icn);
+        showMessage(qApp->applicationDisplayName(), description /*, icn*/);
+    }
+
+    setToolTip(description);
+    m_state = state;
 }

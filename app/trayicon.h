@@ -28,8 +28,11 @@ public:
     TrayIcon(QObject *parent = nullptr);
 
 public slots:
-    void setState(StateChecker::State state);
+    void setState(const StateChecker::Info &state);
 
 private:
-    static QIcon iconForState(StateChecker::State state);
+    StateChecker::Info m_state;
+
+    static QIcon iconForState(const StateChecker::Info &state);
+    static QIcon iconForStatus(const StateChecker::Status &status);
 };
