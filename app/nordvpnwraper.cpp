@@ -37,6 +37,7 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
 {
     connect(m_checker, &StateChecker::stateChanged, m_trayIcon, &TrayIcon::setState);
     connect(qApp, &QApplication::aboutToQuit, this, &NordVpnWraper::saveSettings);
+    connect(m_trayIcon, &QSystemTrayIcon::activated, this, &NordVpnWraper::onTrayIconActivated);
 
     m_trayIcon->setVisible(true);
     m_trayIcon->setContextMenu(m_menu.get());
@@ -86,4 +87,18 @@ void NordVpnWraper::showSettingsEditor()
 void NordVpnWraper::performStatusCheck()
 {
     m_checker->check();
+}
+
+void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    switch (reason) {
+    case QSystemTrayIcon::Trigger:
+        performStatusCheck();
+        break;
+    case QSystemTrayIcon::MiddleClick:
+        qApp->quit();
+        break;
+    default:
+        break;
+    }
 }
