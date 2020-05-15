@@ -35,6 +35,8 @@ public:
     ~Dialog() override;
 
 public slots:
+    void on_btnOpen_clicked();
+    void on_leNVPNPath_textChanged(const QString &text);
     void accept() override;
 
 private:
@@ -43,4 +45,6 @@ private:
     bool saveSettings();
     bool saveMonitorSettings();
     bool saveNVPNSettings();
+
+    bool isValidPath(const QString &path) const;
 };
