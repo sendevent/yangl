@@ -22,13 +22,16 @@
 #include <QObject>
 #include <QPointer>
 #include <QSharedPointer>
+#include <QUuid>
 
 class QTextBrowser;
 class CLIAction : public QObject
 {
     Q_OBJECT
 public:
+    using Id = QUuid;
     using Ptr = QSharedPointer<CLIAction>;
+
     enum Scope
     {
         Builtin = 0,
@@ -36,6 +39,7 @@ public:
     };
 
     explicit CLIAction(const CLIAction::Scope scope, QObject *parent = nullptr);
+    Id id() const;
 
     CLIAction::Scope scope() const;
 
@@ -65,6 +69,7 @@ private slots:
     void onResult(const QString &result);
 
 private:
+    const CLIAction::Id m_id;
     const CLIAction::Scope m_scope;
     QString m_title;
     QString m_app;

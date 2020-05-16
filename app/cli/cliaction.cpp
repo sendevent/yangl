@@ -28,6 +28,7 @@
 
 CLIAction::CLIAction(const CLIAction::Scope scope, QObject *parent)
     : QObject(parent)
+    , m_id(QUuid::createUuid())
     , m_scope(scope)
     , m_title()
     , m_app()
@@ -35,6 +36,11 @@ CLIAction::CLIAction(const CLIAction::Scope scope, QObject *parent)
     , m_timeout(CLICall::DefaultTimeoutMSecs)
     , m_forceShow(false)
 {
+}
+
+CLIAction::Id CLIAction::id() const
+{
+    return m_id;
 }
 
 CLIAction::Scope CLIAction::scope() const
