@@ -17,39 +17,22 @@
 
 #pragma once
 
-#include <QObject>
-#include <QSharedPointer>
-#include <QStringList>
-#include <QUuid>
+#include "clicall.h"
 
-class IPCCall : public QObject
+#include <QObject>
+
+class CLIBus : public QObject
 {
     Q_OBJECT
-
 public:
-    using Id = QUuid;
-    using Ptr = QSharedPointer<IPCCall>;
+    explicit CLIBus(const QString &appPath, QObject *parent = nullptr);
 
-    explicit IPCCall(const QString &path, const QStringList &params, int timeout);
-    virtual ~IPCCall() = default;
+    void runQuery(const CLICall::Ptr &call);
 
-    Id id() const;
-
-    QString run();
-    QString result() const;
+    QString applicationPath() const;
 
 signals:
-    void ready(const QString &result) const;
-
-protected:
-    const Id m_id;
-    const QString m_appPath;
-    const QStringList m_params;
-    const int m_timeout;
-    QString m_result;
-
-    QString setResult(const QString &result);
 
 private:
-    Q_DISABLE_COPY_MOVE(IPCCall);
+    const QString m_appPath;
 };

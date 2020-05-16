@@ -17,22 +17,48 @@
 
 #pragma once
 
-#include "ipccall.h"
-
 #include <QObject>
 
-class IPCBus : public QObject
+class CLIAction : public QObject
 {
     Q_OBJECT
 public:
-    explicit IPCBus(const QString &appPath, QObject *parent = nullptr);
+    enum Scope
+    {
+        Builtin = 0,
+        User
+    };
 
-    void runQuery(const IPCCall::Ptr &call);
+    explicit CLIAction(const CLIAction::Scope scope, QObject *parent = nullptr);
 
-    QString applicationPath() const;
+    CLIAction::Scope scope() const;
+
+    QString title() const;
+    void setTitle(const QString &title);
+
+    QString app() const;
+    void setApp(const QString &app);
+
+    QStringList args() const;
+    void setArgs(const QStringList &args);
+
+    int timeout() const;
+    void setTimeout(int timeout);
+
+    bool forcedShow() const;
+    void setForcedShow(bool forced);
 
 signals:
+    void performed(const QString &result, bool ok);
+
+private slots:
+    void onResult(const QString &result);
 
 private:
-    const QString m_appPath;
+    const CLIAction::Scope m_scope;
+    QString m_title;
+    QString m_app;
+    QStringList m_args;
+    int m_timeout;
+    bool m_forceShow;
 };

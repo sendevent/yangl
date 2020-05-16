@@ -15,9 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "ipccall.h"
+#include "clicall.h"
 
-#include "ipcbus.h"
+#include "clibus.h"
 
 #include <QDebug>
 #include <QFile>
@@ -27,7 +27,7 @@
 
 #define LOG qDebug() << Q_FUNC_INFO << QThread::currentThreadId()
 
-IPCCall::IPCCall(const QString &path, const QStringList &params, int timeout)
+CLICall::CLICall(const QString &path, const QStringList &params, int timeout)
     : m_id(QUuid::createUuid())
     , m_appPath(path)
     , m_params(params)
@@ -35,12 +35,12 @@ IPCCall::IPCCall(const QString &path, const QStringList &params, int timeout)
 {
 }
 
-IPCCall::Id IPCCall::id() const
+CLICall::Id CLICall::id() const
 {
     return m_id;
 }
 
-QString IPCCall::run()
+QString CLICall::run()
 {
     if (m_appPath.isEmpty() || !QFile::exists(m_appPath))
         return setResult(QStringLiteral("File [%1] not found").arg(m_appPath));
@@ -58,12 +58,12 @@ QString IPCCall::run()
     return setResult(result.trimmed());
 }
 
-QString IPCCall::result() const
+QString CLICall::result() const
 {
     return m_result;
 }
 
-QString IPCCall::setResult(const QString &result)
+QString CLICall::setResult(const QString &result)
 {
     if (result != m_result) {
         m_result = result;

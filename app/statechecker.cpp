@@ -17,8 +17,8 @@
 
 #include "statechecker.h"
 
-#include "ipcbus.h"
-#include "ipccall.h"
+#include "clibus.h"
+#include "clicall.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -178,7 +178,7 @@ QString StateChecker::Info::toString() const
     return text;
 }
 
-StateChecker::StateChecker(IPCBus *bus, QObject *parent)
+StateChecker::StateChecker(CLIBus *bus, QObject *parent)
     : QObject(parent)
     , m_bus(bus)
     , m_query(nullptr)
@@ -228,8 +228,9 @@ int StateChecker::inteval() const
 
 void StateChecker::check()
 {
-    IPCCall::Ptr statusCheck(new IPCCall(m_bus->applicationPath(), { QStringLiteral("status") }, 30000));
-    connect(statusCheck.get(), &IPCCall::ready, this, &StateChecker::onQueryFinish);
+    CLICall::Ptr statusCheck(
+            new CLICall(m_bus->applicationPath(), { QStringLiteral("status") }, CLICall::DefaultTimeoutMSecs));
+    connect(statusCheck.get(), &CLICall::ready, this, &StateChecker::onQueryFinish);
 
     m_calls.enqueue(statusCheck);
 

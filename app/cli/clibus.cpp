@@ -15,43 +15,44 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#pragma once
+#include "clibus.h"
 
-#include "trayicon.h"
+#include <QDebug>
+#include <QRunnable>
+#include <QThreadPool>
 
-#include <QMenu>
-#include <QObject>
-#include <memory>
+#define LOG qDebug() << Q_FUNC_INFO << QThread::currentThreadId()
 
-class CLIBus;
-class StateChecker;
-class NordVpnWraper : public QObject
+class RunQureyTask : public QRunnable
 {
-    Q_OBJECT
 public:
-    explicit NordVpnWraper(QObject *parent = nullptr);
-
-    void start();
-
-private slots:
-    void saveSettings();
-
-    void showSettingsEditor();
-    void performStatusCheck();
-
-    void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
+    RunQureyTask(const CLICall::Ptr &call)
+        : m_call(call)
+    {
+    }
 
 private:
-    CLIBus *m_bus;
-    StateChecker *m_checker;
-    TrayIcon *m_trayIcon;
-    const std::unique_ptr<QMenu> m_menu;
-    QAction *m_actSettings;
-    QAction *m_actCheckState;
-    QAction *m_actRun;
-    QAction *m_actQuit;
+    CLICall::Ptr m_call;
 
-    void loadSettings();
-
-    void initMenu();
+    void run() override { m_call->run(); }
 };
+
+CLIBus::CLIBus(const QString &appPath, QObject *parent)
+    : QObject(parent)
+    , m_appPath(appPath)
+{
+}
+
+QString CLIBus::applicationPath() const
+{
+    return m_appPath;
+}
+
+void CLIBus::runQuery(const CLICall::Ptr &call)
+{
+    if (!call)
+        return;
+
+    RunQureyTask *task = new RunQureyTask(call);
+    QThreadPool::globalInstance()->start(task);
+}
