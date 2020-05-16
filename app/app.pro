@@ -16,12 +16,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 INCLUDEPATH += \
-    ipc \
+    cli \
     settings
 
 SOURCES += \
-    ipc/ipcbus.cpp \
-    ipc/ipccall.cpp \
+    cli/cliaction.cpp \
+    cli/clibus.cpp \
+    cli/clicall.cpp \
     main.cpp \
     nordvpnwraper.cpp \
     settings/appsettings.cpp \
@@ -31,8 +32,9 @@ SOURCES += \
     trayicon.cpp
 
 HEADERS += \
-    ipc/ipcbus.h \
-    ipc/ipccall.h \
+    cli/cliaction.h \
+    cli/clibus.h \
+    cli/clicall.h \
     nordvpnwraper.h \
     settings/appsettings.h \
     settings/settingsdialog.h \

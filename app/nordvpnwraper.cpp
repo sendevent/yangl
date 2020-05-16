@@ -18,7 +18,7 @@
 #include "nordvpnwraper.h"
 
 #include "appsettings.h"
-#include "ipcbus.h"
+#include "clibus.h"
 #include "settingsdialog.h"
 #include "statechecker.h"
 #include "trayicon.h"
@@ -30,7 +30,7 @@
 
 NordVpnWraper::NordVpnWraper(QObject *parent)
     : QObject(parent)
-    , m_bus(new IPCBus(AppSettings::Monitor.NVPNPath->read().toString(), this))
+    , m_bus(new CLIBus(AppSettings::Monitor.NVPNPath->read().toString(), this))
     , m_checker(new StateChecker(m_bus, this))
     , m_trayIcon(new TrayIcon(this))
     , m_menu(new QMenu)

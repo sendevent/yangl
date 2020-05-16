@@ -15,44 +15,42 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "ipcbus.h"
+#pragma once
 
-#include <QDebug>
-#include <QRunnable>
-#include <QThreadPool>
+#include <QObject>
+#include <QSharedPointer>
+#include <QStringList>
+#include <QUuid>
 
-#define LOG qDebug() << Q_FUNC_INFO << QThread::currentThreadId()
-
-class RunQureyTask : public QRunnable
+class CLICall : public QObject
 {
+    Q_OBJECT
+
 public:
-    RunQureyTask(const IPCCall::Ptr &call)
-        : m_call(call)
-    {
-    }
+    using Id = QUuid;
+    using Ptr = QSharedPointer<CLICall>;
+    static constexpr int DefaultTimeoutMSecs = 30000;
+
+    explicit CLICall(const QString &path, const QStringList &params, int timeout);
+    virtual ~CLICall() = default;
+
+    Id id() const;
+
+    QString run();
+    QString result() const;
+
+signals:
+    void ready(const QString &result) const;
+
+protected:
+    const Id m_id;
+    const QString m_appPath;
+    const QStringList m_params;
+    const int m_timeout;
+    QString m_result;
+
+    QString setResult(const QString &result);
 
 private:
-    IPCCall::Ptr m_call;
-
-    void run() override { m_call->run(); }
+    Q_DISABLE_COPY_MOVE(CLICall);
 };
-
-IPCBus::IPCBus(const QString &appPath, QObject *parent)
-    : QObject(parent)
-    , m_appPath(appPath)
-{
-}
-
-QString IPCBus::applicationPath() const
-{
-    return m_appPath;
-}
-
-void IPCBus::runQuery(const IPCCall::Ptr &call)
-{
-    if (!call)
-        return;
-
-    RunQureyTask *task = new RunQureyTask(call);
-    QThreadPool::globalInstance()->start(task);
-}
