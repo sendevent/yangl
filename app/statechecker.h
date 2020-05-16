@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "cliaction.h"
+#include "action.h"
 
 #include <QObject>
 #include <QQueue>
@@ -82,9 +82,9 @@ private slots:
 
 protected:
     CLIBus *m_bus;
-    CLIAction::Ptr m_act;
-    QQueue<CLIAction::Ptr> m_calls;
-    CLIAction::Ptr m_currAction;
+    Action::Ptr m_act;
+    QQueue<Action::Ptr> m_calls;
+    Action::Ptr m_currAction;
     QTimer *m_timer;
 
     Info m_state;

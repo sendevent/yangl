@@ -19,7 +19,7 @@
 #include "settingsdialog.h"
 
 #include "appsettings.h"
-#include "cliaction.h"
+#include "action.h"
 #include "ui_settingsdialog.h"
 
 #include <QDebug>
@@ -66,7 +66,7 @@ void Dialog::on_leNVPNPath_textChanged(const QString &text)
 {
     ui->leNVPNPath->setToolTip(text);
     QPalette p = ui->leNVPNPath->palette();
-    const QColor clr = CLIAction::isValidAppPath(text)
+    const QColor clr = Action::isValidAppPath(text)
             ? ui->leNVPNPath->style()->standardPalette().color(QPalette::Base)
             : Qt::red;
     if (p.color(QPalette::Base) != clr) {
@@ -90,7 +90,7 @@ bool Dialog::saveMonitorSettings()
 {
     const QString &path = ui->leNVPNPath->text();
     if (path != AppSettings::Monitor.NVPNPath->read().toString()) {
-        if (!CLIAction::isValidAppPath(path)) {
+        if (!Action::isValidAppPath(path)) {
             QMessageBox::critical(this, tr("NordVPN binary"), tr("Please, specefy valid path."));
             ui->tabWidget->setCurrentIndex(0);
             ui->leNVPNPath->setFocus();
