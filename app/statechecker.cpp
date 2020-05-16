@@ -181,7 +181,7 @@ QString StateChecker::Info::toString() const
 StateChecker::StateChecker(CLIBus *bus, QObject *parent)
     : QObject(parent)
     , m_bus(bus)
-    , m_act(new CLIAction(CLIAction::Builtin/*, this*/))
+    , m_act(new Action(Action::Builtin/*, this*/))
     , m_currAction(nullptr)
     , m_timer(new QTimer(this))
     , m_state()
@@ -189,7 +189,7 @@ StateChecker::StateChecker(CLIBus *bus, QObject *parent)
     m_act->setApp(m_bus->applicationPath());
     m_act->setArgs({ "status" });
     m_act->setForcedShow(true);
-    connect(m_act.get(), &CLIAction::performed, this, &StateChecker::onQueryFinish);
+    connect(m_act.get(), &Action::performed, this, &StateChecker::onQueryFinish);
 
     qRegisterMetaType<StateChecker::Info>("StateChecker::Info");
     qRegisterMetaType<StateChecker::Status>("StateChecker::Status");

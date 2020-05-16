@@ -17,10 +17,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 INCLUDEPATH += \
     cli \
-    settings
+    settings \
+    actions
 
 SOURCES += \
-    cli/cliaction.cpp \
+    actions/action.cpp \
+    actions/actionstorage.cpp \
     cli/clibus.cpp \
     cli/clicall.cpp \
     main.cpp \
@@ -32,7 +34,8 @@ SOURCES += \
     trayicon.cpp
 
 HEADERS += \
-    cli/cliaction.h \
+    actions/action.h \
+    actions/actionstorage.h \
     cli/clibus.h \
     cli/clicall.h \
     nordvpnwraper.h \

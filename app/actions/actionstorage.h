@@ -15,27 +15,14 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#pragma once
+#ifndef ACTIONSTORAGE_H
+#define ACTIONSTORAGE_H
 
-#include "clicall.h"
 
-#include <QObject>
-
-class Action;
-class CLIBus : public QObject
+class ActionStorage
 {
-    Q_OBJECT
 public:
-    explicit CLIBus(const QString &appPath, QObject *parent = nullptr);
-
-    QString applicationPath() const;
-
-    bool performAction(Action *action);
-
-signals:
-
-private:
-    const QString m_appPath;
-
-    void runQuery(CLICall *call);
+    ActionStorage();
 };
+
+#endif // ACTIONSTORAGE_H

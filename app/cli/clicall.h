@@ -42,7 +42,7 @@ signals:
     void ready(const QString &result) const;
 
 protected:
-    friend class CLIAction;
+    friend class Action;
     explicit CLICall(const QString &path, const QStringList &params, int timeout, QObject *parent = nullptr);
 
     const QString m_appPath;

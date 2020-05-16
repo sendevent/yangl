@@ -17,7 +17,7 @@
 
 #include "clibus.h"
 
-#include "cliaction.h"
+#include "action.h"
 
 #include <QDebug>
 #include <QRunnable>
@@ -50,7 +50,7 @@ QString CLIBus::applicationPath() const
     return m_appPath;
 }
 
-bool CLIBus::performAction(CLIAction *action)
+bool CLIBus::performAction(Action *action)
 {
     if (!action)
         return false;

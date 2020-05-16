@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "cliaction.h"
+#include "action.h"
 
 #include "clicall.h"
 
@@ -26,7 +26,7 @@
 
 #define LOG qDebug() << Q_FUNC_INFO
 
-CLIAction::CLIAction(const CLIAction::Scope scope, QObject *parent)
+Action::Action(const Action::Scope scope, QObject *parent)
     : QObject(parent)
     , m_id(QUuid::createUuid())
     , m_scope(scope)
@@ -38,83 +38,83 @@ CLIAction::CLIAction(const CLIAction::Scope scope, QObject *parent)
 {
 }
 
-CLIAction::Id CLIAction::id() const
+Action::Id Action::id() const
 {
     return m_id;
 }
 
-CLIAction::Scope CLIAction::scope() const
+Action::Scope Action::scope() const
 {
     return m_scope;
 }
 
-QString CLIAction::title() const
+QString Action::title() const
 {
     return m_title;
 }
 
-void CLIAction::setTitle(const QString &title)
+void Action::setTitle(const QString &title)
 {
     if (title != m_title)
         m_title = title;
 }
 
-QString CLIAction::app() const
+QString Action::app() const
 {
     return m_app;
 }
 
-void CLIAction::setApp(const QString &app)
+void Action::setApp(const QString &app)
 {
     if (app != m_app)
         m_app = app;
 }
 
-QStringList CLIAction::args() const
+QStringList Action::args() const
 {
     return m_args;
 }
 
-void CLIAction::setArgs(const QStringList &args)
+void Action::setArgs(const QStringList &args)
 {
     if (args != m_args)
         m_args = args;
 }
 
-int CLIAction::timeout() const
+int Action::timeout() const
 {
     return m_timeout;
 }
 
-void CLIAction::setTimeout(int timeout)
+void Action::setTimeout(int timeout)
 {
     if (timeout != m_timeout)
         m_timeout = timeout;
 }
 
-bool CLIAction::forcedShow() const
+bool Action::forcedShow() const
 {
     return m_forceShow;
 }
 
-void CLIAction::setForcedShow(bool forced)
+void Action::setForcedShow(bool forced)
 {
     if (forced != m_forceShow)
         m_forceShow = forced;
 }
 
-CLICall *CLIAction::createRequest()
+CLICall *Action::createRequest()
 {
     if (!isValidAppPath(app()))
         return {};
 
     auto call = new CLICall(app(), args(), timeout(), this);
-    connect(call, &CLICall::ready, this, &CLIAction::onResult);
+    connect(call, &CLICall::ready, this, &Action::onResult);
 
     return call;
 }
 
-/*static*/ bool CLIAction::isValidAppPath(const QString &path)
+/*static*/ bool Action::isValidAppPath(const QString &path)
 {
     if (path.isEmpty())
         return false;
@@ -126,7 +126,7 @@ CLICall *CLIAction::createRequest()
     return info.isExecutable();
 }
 
-void CLIAction::onResult(const QString &result)
+void Action::onResult(const QString &result)
 {
     QString exitCode(tr("Unknown"));
     QString errors(tr("No errors"));
