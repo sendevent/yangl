@@ -22,7 +22,6 @@
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
-#include <QProcess>
 #include <QThread>
 
 #define LOG qDebug() << Q_FUNC_INFO << QThread::currentThreadId()
@@ -32,6 +31,10 @@ CLICall::CLICall(const QString &path, const QStringList &params, int timeout)
     , m_appPath(path)
     , m_params(params)
     , m_timeout(timeout)
+    , m_result()
+    , m_errors()
+    , m_exitCode(0)
+    , m_exitStatus(QProcess::NormalExit)
 {
 }
 
@@ -71,4 +74,19 @@ QString CLICall::setResult(const QString &result)
     }
 
     return m_result;
+}
+
+QString CLICall::errors() const
+{
+    return m_errors;
+}
+
+int CLICall::exitCode() const
+{
+    return m_exitCode;
+}
+
+QProcess::ExitStatus CLICall::exitStatus() const
+{
+    return m_exitStatus;
 }

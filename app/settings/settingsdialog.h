@@ -45,6 +45,4 @@ private:
     bool saveSettings();
     bool saveMonitorSettings();
     bool saveNVPNSettings();
-
-    bool isValidPath(const QString &path) const;
 };

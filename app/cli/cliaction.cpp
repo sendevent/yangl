@@ -19,6 +19,10 @@
 
 #include "clicall.h"
 
+#include <QApplication>
+#include <QFileInfo>
+#include <QTextBrowser>
+
 CLIAction::CLIAction(const CLIAction::Scope scope, QObject *parent)
     : QObject(parent)
     , m_scope(scope)
@@ -90,4 +94,55 @@ void CLIAction::setForcedShow(bool forced)
         m_forceShow = forced;
 }
 
-void CLIAction::onResult(const QString &result) {}
+CLICall::Ptr CLIAction::createRequest()
+{
+    if (!isValidAppPath(app()))
+        return {};
+
+    CLICall::Ptr call(new CLICall(app(), args(), timeout()));
+    connect(call.get(), &CLICall::ready, this, &CLIAction::onResult);
+    return call;
+}
+
+/*static*/ bool CLIAction::isValidAppPath(const QString &path)
+{
+    if (path.isEmpty())
+        return false;
+
+    const QFileInfo info(path);
+    if (!info.exists())
+        return false;
+
+    return info.isExecutable();
+}
+
+void CLIAction::onResult(const QString &result)
+{
+    QString exitCode(tr("Unknown"));
+    QString errors(tr("No errors"));
+
+    bool hasErrors(false);
+    if (auto call = qobject_cast<CLICall *>(sender())) {
+        exitCode = call->exitCode();
+        const QString &errReport = call->errors();
+        errors = errReport.isEmpty() ? errors : errReport;
+        hasErrors = call->exitCode() != 0 || call->exitStatus() != QProcess::NormalExit || !errReport.isEmpty();
+    }
+
+    if (hasErrors || forcedShow()) {
+        QTextBrowser *display = new QTextBrowser;
+        display->setAttribute(Qt::WA_DeleteOnClose);
+        display->setWindowTitle(QStringLiteral("%1 — %2").arg(qApp->applicationDisplayName(), title()));
+        display->setReadOnly(true);
+        display->append(tr("Call to \"%1\" [%2]<br>"
+                           "Result<br>"
+                           "%3<br>"
+                           "Exit code: %4<br>"
+                           "Errors:<br>"
+                           "%5")
+                                .arg(app(), args().join(" "), result, errors));
+        display->show();
+    }
+
+    emit performed(result, !hasErrors);
+}

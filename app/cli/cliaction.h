@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "clicall.h"
+
 #include <QObject>
 
 class CLIAction : public QObject
@@ -47,6 +49,10 @@ public:
 
     bool forcedShow() const;
     void setForcedShow(bool forced);
+
+    CLICall::Ptr createRequest();
+
+    static bool isValidAppPath(const QString &path);
 
 signals:
     void performed(const QString &result, bool ok);
