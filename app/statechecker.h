@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "clicall.h"
+#include "cliaction.h"
 
 #include <QObject>
 #include <QQueue>
@@ -61,6 +61,7 @@ public:
     };
 
     explicit StateChecker(CLIBus *bus, QObject *parent = nullptr);
+    ~StateChecker() override;
 
     void check();
 
@@ -77,10 +78,11 @@ signals:
 
 private slots:
     void onTimeout();
-    void onQueryFinish(const QString &result);
+    void onQueryFinish(const QString &result, bool ok);
 
 protected:
     CLIBus *m_bus;
+    CLIAction *m_act;
     QQueue<CLICall::Ptr> m_calls;
     CLICall::Ptr m_query;
     QTimer *m_timer;

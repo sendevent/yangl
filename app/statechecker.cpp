@@ -181,16 +181,28 @@ QString StateChecker::Info::toString() const
 StateChecker::StateChecker(CLIBus *bus, QObject *parent)
     : QObject(parent)
     , m_bus(bus)
+    , m_act(new CLIAction(CLIAction::Builtin, this))
     , m_query(nullptr)
     , m_timer(new QTimer(this))
     , m_state()
 {
+    m_act->setApp(m_bus->applicationPath());
+    m_act->setArgs({ "status" });
+    m_act->setForcedShow(true);
+    connect(m_act, &CLIAction::performed, this, &StateChecker::onQueryFinish);
+
     qRegisterMetaType<StateChecker::Info>("StateChecker::Info");
     qRegisterMetaType<StateChecker::Status>("StateChecker::Status");
 
     setInterval(DefaultIntervalMs);
     connect(m_timer, &QTimer::timeout, this, &StateChecker::onTimeout);
     setStatus(StateChecker::Status::Unknown);
+}
+
+StateChecker::~StateChecker()
+{
+    setActive(false);
+    m_calls.clear();
 }
 
 void StateChecker::setActive(bool active)
@@ -228,18 +240,16 @@ int StateChecker::inteval() const
 
 void StateChecker::check()
 {
-    CLICall::Ptr statusCheck(
-            new CLICall(m_bus->applicationPath(), { QStringLiteral("status") }, CLICall::DefaultTimeoutMSecs));
-    connect(statusCheck.get(), &CLICall::ready, this, &StateChecker::onQueryFinish);
-
-    m_calls.enqueue(statusCheck);
-
-    nextQuery();
+    if (const CLICall::Ptr &statusCheck = m_act->createRequest()) {
+        m_calls.enqueue(statusCheck);
+        nextQuery();
+    }
 }
 
-void StateChecker::onQueryFinish(const QString &result)
+void StateChecker::onQueryFinish(const QString &result, bool ok)
 {
-    QtConcurrent::run(this, &StateChecker::updateState, result);
+    if (ok)
+        QtConcurrent::run(this, &StateChecker::updateState, result);
 
     m_query.clear();
     nextQuery();
@@ -265,8 +275,7 @@ void StateChecker::onTimeout()
 
 void StateChecker::updateState(const QString &from)
 {
-    Info updatedState = Info::fromString(from);
-    setState(updatedState);
+    setState(Info::fromString(from));
 }
 
 StateChecker::Info StateChecker::state() const
