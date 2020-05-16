@@ -47,7 +47,7 @@ CLICall::Id CLICall::id() const
 QString CLICall::run()
 {
     if (m_appPath.isEmpty() || !QFile::exists(m_appPath))
-        return setResult(QStringLiteral("File [%1] not found").arg(m_appPath));
+        return setResult({}, QStringLiteral("File [%1] not found").arg(m_appPath));
 
     QProcess proc;
     proc.start(m_appPath, m_params, QIODevice::ReadOnly);
@@ -62,13 +62,15 @@ QString CLICall::run()
 
     if (!proc.waitForStarted(m_timeout))
         return setResult(
-                QStringLiteral("Start timeout (%1) reached for [%2]").arg(QString::number(m_timeout), m_appPath));
+                {}, QStringLiteral("Start timeout (%1) reached for [%2]").arg(QString::number(m_timeout), m_appPath));
 
-    QString result;
-    while (proc.waitForReadyRead(m_timeout))
+    QString result, errors;
+    while (proc.waitForReadyRead(m_timeout)) {
         result += proc.readAllStandardOutput();
+        errors += proc.readAllStandardError();
+    }
 
-    return setResult(result.trimmed());
+    return setResult(result.trimmed(), errors.trimmed());
 }
 
 QString CLICall::result() const
@@ -76,8 +78,11 @@ QString CLICall::result() const
     return m_result;
 }
 
-QString CLICall::setResult(const QString &result)
+QString CLICall::setResult(const QString &result, const QString &errors)
 {
+    if (errors != m_errors)
+        m_errors = errors;
+
     if (result != m_result) {
         m_result = result;
         emit ready(m_result);

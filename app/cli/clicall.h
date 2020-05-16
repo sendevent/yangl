@@ -57,7 +57,7 @@ protected:
     int m_exitCode;
     QProcess::ExitStatus m_exitStatus;
 
-    QString setResult(const QString &result);
+    QString setResult(const QString &result, const QString &errors);
 
 private:
     CLICall(QObject *parent = nullptr) = delete;
