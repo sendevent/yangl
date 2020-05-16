@@ -20,8 +20,11 @@
 #include "clicall.h"
 
 #include <QApplication>
+#include <QDebug>
 #include <QFileInfo>
 #include <QTextBrowser>
+
+#define LOG qDebug() << Q_FUNC_INFO
 
 CLIAction::CLIAction(const CLIAction::Scope scope, QObject *parent)
     : QObject(parent)
@@ -94,13 +97,14 @@ void CLIAction::setForcedShow(bool forced)
         m_forceShow = forced;
 }
 
-CLICall::Ptr CLIAction::createRequest()
+CLICall *CLIAction::createRequest()
 {
     if (!isValidAppPath(app()))
         return {};
 
-    CLICall::Ptr call(new CLICall(app(), args(), timeout()));
-    connect(call.get(), &CLICall::ready, this, &CLIAction::onResult);
+    auto call = new CLICall(app(), args(), timeout(), this);
+    connect(call, &CLICall::ready, this, &CLIAction::onResult);
+
     return call;
 }
 
@@ -123,10 +127,11 @@ void CLIAction::onResult(const QString &result)
 
     bool hasErrors(false);
     if (auto call = qobject_cast<CLICall *>(sender())) {
-        exitCode = call->exitCode();
+        exitCode = QString::number(call->exitCode(), 16);
         const QString &errReport = call->errors();
         errors = errReport.isEmpty() ? errors : errReport;
         hasErrors = call->exitCode() != 0 || call->exitStatus() != QProcess::NormalExit || !errReport.isEmpty();
+        call->deleteLater();
     }
 
     if (hasErrors || forcedShow()) {

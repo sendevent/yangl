@@ -31,10 +31,11 @@ public:
     QString applicationPath() const;
 
     bool performAction(CLIAction *action);
-    void runQuery(const CLICall::Ptr &call);
 
 signals:
 
 private:
     const QString m_appPath;
+
+    void runQuery(CLICall *call);
 };

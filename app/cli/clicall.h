@@ -29,11 +29,9 @@ class CLICall : public QObject
 
 public:
     using Id = QUuid;
-    using Ptr = QSharedPointer<CLICall>;
     static constexpr int DefaultTimeoutMSecs = 30000;
 
-    explicit CLICall(const QString &path, const QStringList &params, int timeout);
-    virtual ~CLICall() = default;
+    ~CLICall() = default;
 
     Id id() const;
 
@@ -48,6 +46,9 @@ signals:
     void ready(const QString &result) const;
 
 protected:
+    friend class CLIAction;
+    explicit CLICall(const QString &path, const QStringList &params, int timeout, QObject *parent = nullptr);
+
     const Id m_id;
     const QString m_appPath;
     const QStringList m_params;
@@ -59,5 +60,7 @@ protected:
     QString setResult(const QString &result);
 
 private:
+    CLICall(QObject *parent = nullptr) = delete;
+
     Q_DISABLE_COPY_MOVE(CLICall);
 };

@@ -181,15 +181,15 @@ QString StateChecker::Info::toString() const
 StateChecker::StateChecker(CLIBus *bus, QObject *parent)
     : QObject(parent)
     , m_bus(bus)
-    , m_act(new CLIAction(CLIAction::Builtin, this))
-    , m_query(nullptr)
+    , m_act(new CLIAction(CLIAction::Builtin/*, this*/))
+    , m_currAction(nullptr)
     , m_timer(new QTimer(this))
     , m_state()
 {
     m_act->setApp(m_bus->applicationPath());
     m_act->setArgs({ "status" });
     m_act->setForcedShow(true);
-    connect(m_act, &CLIAction::performed, this, &StateChecker::onQueryFinish);
+    connect(m_act.get(), &CLIAction::performed, this, &StateChecker::onQueryFinish);
 
     qRegisterMetaType<StateChecker::Info>("StateChecker::Info");
     qRegisterMetaType<StateChecker::Status>("StateChecker::Status");
@@ -240,10 +240,8 @@ int StateChecker::inteval() const
 
 void StateChecker::check()
 {
-    if (const CLICall::Ptr &statusCheck = m_act->createRequest()) {
-        m_calls.enqueue(statusCheck);
-        nextQuery();
-    }
+    m_calls.enqueue(m_act);
+    nextQuery();
 }
 
 void StateChecker::onQueryFinish(const QString &result, bool ok)
@@ -251,21 +249,21 @@ void StateChecker::onQueryFinish(const QString &result, bool ok)
     if (ok)
         QtConcurrent::run(this, &StateChecker::updateState, result);
 
-    m_query.clear();
+    m_currAction.clear();
     nextQuery();
 }
 
 void StateChecker::nextQuery()
 {
-    if (m_query)
+    if (m_currAction)
         return;
 
     if (m_calls.isEmpty())
         return;
 
-    m_query = m_calls.dequeue();
+    m_currAction = m_calls.dequeue();
 
-    m_bus->runQuery(m_query);
+    m_bus->performAction(m_currAction.get());
 }
 
 void StateChecker::onTimeout()
