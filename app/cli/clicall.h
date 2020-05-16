@@ -18,6 +18,7 @@
 #pragma once
 
 #include <QObject>
+#include <QProcess>
 #include <QSharedPointer>
 #include <QStringList>
 #include <QUuid>
@@ -38,6 +39,10 @@ public:
 
     QString run();
     QString result() const;
+    QString errors() const;
+
+    int exitCode() const;
+    QProcess::ExitStatus exitStatus() const;
 
 signals:
     void ready(const QString &result) const;
@@ -47,7 +52,9 @@ protected:
     const QString m_appPath;
     const QStringList m_params;
     const int m_timeout;
-    QString m_result;
+    QString m_result, m_errors;
+    int m_exitCode;
+    QProcess::ExitStatus m_exitStatus;
 
     QString setResult(const QString &result);
 
