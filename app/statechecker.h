@@ -82,9 +82,9 @@ private slots:
 
 protected:
     CLIBus *m_bus;
-    CLIAction *m_act;
-    QQueue<CLICall::Ptr> m_calls;
-    CLICall::Ptr m_query;
+    CLIAction::Ptr m_act;
+    QQueue<CLIAction::Ptr> m_calls;
+    CLIAction::Ptr m_currAction;
     QTimer *m_timer;
 
     Info m_state;

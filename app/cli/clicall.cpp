@@ -26,8 +26,9 @@
 
 #define LOG qDebug() << Q_FUNC_INFO << QThread::currentThreadId()
 
-CLICall::CLICall(const QString &path, const QStringList &params, int timeout)
-    : m_id(QUuid::createUuid())
+CLICall::CLICall(const QString &path, const QStringList &params, int timeout, QObject *parent)
+    : QObject(parent)
+    , m_id(QUuid::createUuid())
     , m_appPath(path)
     , m_params(params)
     , m_timeout(timeout)
@@ -50,6 +51,15 @@ QString CLICall::run()
 
     QProcess proc;
     proc.start(m_appPath, m_params, QIODevice::ReadOnly);
+
+    connect(
+            &proc, qOverload<int, QProcess::ExitStatus>(&QProcess::finished), this,
+            [this](int exitCode, QProcess::ExitStatus exitStatus) {
+                m_exitCode = exitCode;
+                m_exitStatus = exitStatus;
+            },
+            Qt::DirectConnection);
+
     if (!proc.waitForStarted(m_timeout))
         return setResult(
                 QStringLiteral("Start timeout (%1) reached for [%2]").arg(QString::number(m_timeout), m_appPath));

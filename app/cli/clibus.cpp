@@ -28,13 +28,13 @@
 class RunQureyTask : public QRunnable
 {
 public:
-    RunQureyTask(const CLICall::Ptr &call)
+    RunQureyTask(CLICall *call)
         : m_call(call)
     {
     }
 
 private:
-    CLICall::Ptr m_call;
+    CLICall *m_call;
 
     void run() override { m_call->run(); }
 };
@@ -55,7 +55,7 @@ bool CLIBus::performAction(CLIAction *action)
     if (!action)
         return false;
 
-    if (const CLICall::Ptr &call = action->createRequest()) {
+    if (auto call = action->createRequest()) {
         runQuery(call);
         return true;
     }
@@ -63,7 +63,7 @@ bool CLIBus::performAction(CLIAction *action)
     return false;
 }
 
-void CLIBus::runQuery(const CLICall::Ptr &call)
+void CLIBus::runQuery(CLICall *call)
 {
     if (!call)
         return;

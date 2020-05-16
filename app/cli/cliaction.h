@@ -21,12 +21,14 @@
 
 #include <QObject>
 #include <QPointer>
+#include <QSharedPointer>
 
 class QTextBrowser;
 class CLIAction : public QObject
 {
     Q_OBJECT
 public:
+    using Ptr = QSharedPointer<CLIAction>;
     enum Scope
     {
         Builtin = 0,
@@ -52,7 +54,7 @@ public:
     bool forcedShow() const;
     void setForcedShow(bool forced);
 
-    CLICall::Ptr createRequest();
+    CLICall *createRequest();
 
     static bool isValidAppPath(const QString &path);
 
