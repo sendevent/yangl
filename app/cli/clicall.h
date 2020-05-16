@@ -21,19 +21,15 @@
 #include <QProcess>
 #include <QSharedPointer>
 #include <QStringList>
-#include <QUuid>
 
 class CLICall : public QObject
 {
     Q_OBJECT
 
 public:
-    using Id = QUuid;
     static constexpr int DefaultTimeoutMSecs = 30000;
 
     ~CLICall() = default;
-
-    Id id() const;
 
     QString run();
     QString result() const;
@@ -49,7 +45,6 @@ protected:
     friend class CLIAction;
     explicit CLICall(const QString &path, const QStringList &params, int timeout, QObject *parent = nullptr);
 
-    const Id m_id;
     const QString m_appPath;
     const QStringList m_params;
     const int m_timeout;

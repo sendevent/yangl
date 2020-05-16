@@ -28,7 +28,6 @@
 
 CLICall::CLICall(const QString &path, const QStringList &params, int timeout, QObject *parent)
     : QObject(parent)
-    , m_id(QUuid::createUuid())
     , m_appPath(path)
     , m_params(params)
     , m_timeout(timeout)
@@ -37,11 +36,6 @@ CLICall::CLICall(const QString &path, const QStringList &params, int timeout, QO
     , m_exitCode(0)
     , m_exitStatus(QProcess::NormalExit)
 {
-}
-
-CLICall::Id CLICall::id() const
-{
-    return m_id;
 }
 
 QString CLICall::run()
