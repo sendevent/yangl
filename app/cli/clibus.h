@@ -21,15 +21,17 @@
 
 #include <QObject>
 
+class CLIAction;
 class CLIBus : public QObject
 {
     Q_OBJECT
 public:
     explicit CLIBus(const QString &appPath, QObject *parent = nullptr);
 
-    void runQuery(const CLICall::Ptr &call);
-
     QString applicationPath() const;
+
+    bool performAction(CLIAction *action);
+    void runQuery(const CLICall::Ptr &call);
 
 signals:
 

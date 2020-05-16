@@ -20,7 +20,9 @@
 #include "clicall.h"
 
 #include <QObject>
+#include <QPointer>
 
+class QTextBrowser;
 class CLIAction : public QObject
 {
     Q_OBJECT
@@ -67,4 +69,5 @@ private:
     QStringList m_args;
     int m_timeout;
     bool m_forceShow;
+    QPointer<QTextBrowser> m_display;
 };

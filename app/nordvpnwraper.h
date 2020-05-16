@@ -34,7 +34,7 @@ public:
     void start();
 
 private slots:
-    void saveSettings();
+    void prepareQuit();
 
     void showSettingsEditor();
     void performStatusCheck();

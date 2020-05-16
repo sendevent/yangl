@@ -130,18 +130,21 @@ void CLIAction::onResult(const QString &result)
     }
 
     if (hasErrors || forcedShow()) {
-        QTextBrowser *display = new QTextBrowser;
-        display->setAttribute(Qt::WA_DeleteOnClose);
-        display->setWindowTitle(QStringLiteral("%1 — %2").arg(qApp->applicationDisplayName(), title()));
-        display->setReadOnly(true);
-        display->append(tr("Call to \"%1\" [%2]<br>"
-                           "Result<br>"
-                           "%3<br>"
-                           "Exit code: %4<br>"
-                           "Errors:<br>"
-                           "%5")
-                                .arg(app(), args().join(" "), result, errors));
-        display->show();
+        if (!m_display) {
+            m_display = new QTextBrowser;
+            m_display->setAttribute(Qt::WA_DeleteOnClose);
+            m_display->setReadOnly(true);
+        }
+
+        m_display->setWindowTitle(QStringLiteral("%1 — %2").arg(qApp->applicationDisplayName(), title()));
+        m_display->append(tr("Call to <b>%1</b> [%2]<br>"
+                             "<b>Result:</b><br>"
+                             "%3<br>"
+                             "<b>Exit code:</b> %4<br>"
+                             "<b>Errors:</b><br>"
+                             "%5")
+                                  .arg(app(), args().join(" "), result, exitCode, errors));
+        m_display->show();
     }
 
     emit performed(result, !hasErrors);

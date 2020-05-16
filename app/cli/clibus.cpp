@@ -17,6 +17,8 @@
 
 #include "clibus.h"
 
+#include "cliaction.h"
+
 #include <QDebug>
 #include <QRunnable>
 #include <QThreadPool>
@@ -46,6 +48,19 @@ CLIBus::CLIBus(const QString &appPath, QObject *parent)
 QString CLIBus::applicationPath() const
 {
     return m_appPath;
+}
+
+bool CLIBus::performAction(CLIAction *action)
+{
+    if (!action)
+        return false;
+
+    if (const CLICall::Ptr &call = action->createRequest()) {
+        runQuery(call);
+        return true;
+    }
+
+    return false;
 }
 
 void CLIBus::runQuery(const CLICall::Ptr &call)
