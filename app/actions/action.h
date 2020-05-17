@@ -49,8 +49,8 @@ public:
     virtual ~Action() = default;
     Id id() const;
 
-    virtual Action::ActScope actionScope() const = 0;
-    virtual KnownAction type() const = 0;
+    virtual Action::ActScope actionScope() const;
+    virtual KnownAction type() const;
 
     QString title() const;
     void setTitle(const QString &title);
@@ -82,10 +82,14 @@ protected slots:
     virtual void onResult(const QString &result);
 
 protected:
-    explicit Action(QObject *parent = nullptr);
+    explicit Action(Action::ActScope scope, KnownAction type, QObject *parent = nullptr);
     friend class ActionStorage;
+    friend class ActionsFactory;
 
     const Action::Id m_id;
+    const Action::ActScope m_scope;
+    const KnownAction m_type;
+
     QString m_title;
     QString m_app;
     QStringList m_args;

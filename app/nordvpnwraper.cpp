@@ -58,18 +58,19 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
 void NordVpnWraper::start()
 {
     createMenu();
+    const bool wasActive = m_checker->isActive();
+
     loadSettings();
     m_actions->initActions();
     populateActions();
+
+    m_actRun->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());
 }
 
 void NordVpnWraper::loadSettings()
 {
-    const bool wasActive = m_checker->isActive();
     m_actRun->setChecked(false);
-
     m_checker->setInterval(AppSettings::Monitor.Interval->read().toInt() * 1000);
-    m_actRun->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());
 }
 
 void NordVpnWraper::prepareQuit()
@@ -102,7 +103,7 @@ void NordVpnWraper::showSettingsEditor()
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     connect(dlg, &QDialog::finished, this, [this](int result) {
         if (result == QDialog::Accepted) {
-            loadSettings();
+            start();
         }
     });
     dlg->open();

@@ -22,13 +22,7 @@ INCLUDEPATH += \
 
 SOURCES += \
     actions/action.cpp \
-    actions/actionaccount.cpp \
-    actions/actionconnect.cpp \
-    actions/actiondisconnect.cpp \
-    actions/actiongroups.cpp \
-    actions/actionsettings.cpp \
     actions/actionsfactory.cpp \
-    actions/actionstatus.cpp \
     actions/actionstorage.cpp \
     cli/clibus.cpp \
     cli/clicall.cpp \
@@ -42,13 +36,7 @@ SOURCES += \
 
 HEADERS += \
     actions/action.h \
-    actions/actionaccount.h \
-    actions/actionconnect.h \
-    actions/actiondisconnect.h \
-    actions/actiongroups.h \
-    actions/actionsettings.h \
     actions/actionsfactory.h \
-    actions/actionstatus.h \
     actions/actionstorage.h \
     actions/actiontypes.h \
     cli/clibus.h \

@@ -17,9 +17,7 @@
 
 #include "actionstorage.h"
 
-#include "actionconnect.h"
 #include "actionsfactory.h"
-#include "actionstatus.h"
 
 #include <QDebug>
 
