@@ -26,9 +26,11 @@
 
 #define LOG qDebug() << Q_FUNC_INFO
 
-Action::Action(QObject *parent)
+Action::Action(Action::ActScope scope, KnownAction type, QObject *parent)
     : QObject(parent)
     , m_id(QUuid::createUuid())
+    , m_scope(scope)
+    , m_type(type)
     , m_title()
     , m_app()
     , m_args()
@@ -36,6 +38,16 @@ Action::Action(QObject *parent)
     , m_forceShow(false)
     , m_menuPlace(MenuPlace::NoMenu)
 {
+}
+
+Action::ActScope Action::actionScope() const
+{
+    return m_scope;
+}
+
+KnownAction Action::type() const
+{
+    return m_type;
 }
 
 Action::Id Action::id() const

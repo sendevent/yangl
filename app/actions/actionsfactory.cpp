@@ -17,28 +17,67 @@
 
 #include "actionsfactory.h"
 
-#include "actionaccount.h"
-#include "actionconnect.h"
-#include "actiondisconnect.h"
-#include "actiongroups.h"
-#include "actionsettings.h"
-#include "actionstatus.h"
+#include "appsettings.h"
 
-/*static*/ Action::Ptr ActionsFactory::createAction(KnownAction action)
+/*static*/ Action::Ptr ActionsFactory::createAction(KnownAction actionType)
 {
-    switch (action) {
-    case KnownAction::CheckStatus:
-        return Action::Ptr(new ActionStatus());
-    case KnownAction::Connect:
-        return Action::Ptr(new ActionConnect());
-    case KnownAction::Disconnect:
-        return Action::Ptr(new ActionDisconnect());
-    case KnownAction::Settings:
-        return Action::Ptr(new ActionSettings());
-    case KnownAction::Account:
-        return Action::Ptr(new ActionAccount());
-    case KnownAction::Groups:
-        return Action::Ptr(new ActionGroups());
+    const QString &appPath = AppSettings::Monitor.NVPNPath->read().toString();
+
+    switch (actionType) {
+    case KnownAction::CheckStatus: {
+        Action::Ptr action(new Action(Action::ActScope::Builtin, KnownAction::CheckStatus));
+        action->m_title = QObject::tr("Check status");
+        action->m_app = appPath;
+        action->m_args.append("status");
+        action->m_forceShow = true;
+        action->m_menuPlace = Action::MenuPlace::Common;
+        return action;
+    }
+    case KnownAction::Connect: {
+        Action::Ptr action(new Action(Action::ActScope::Builtin, KnownAction::Connect));
+        action->m_title = QObject::tr("Connect");
+        action->m_app = appPath;
+        action->m_args.append("c");
+        action->m_forceShow = false;
+        action->m_menuPlace = Action::MenuPlace::Common;
+        return action;
+    }
+    case KnownAction::Disconnect: {
+        Action::Ptr action(new Action(Action::ActScope::Builtin, KnownAction::Disconnect));
+        action->m_title = QObject::tr("Disonnect");
+        action->m_app = appPath;
+        action->m_args.append("disconnect");
+        action->m_forceShow = false;
+        action->m_menuPlace = Action::MenuPlace::Own;
+        return action;
+    }
+    case KnownAction::Settings: {
+        Action::Ptr action(new Action(Action::ActScope::Builtin, KnownAction::Settings));
+        action->m_title = QObject::tr("Show used settings");
+        action->m_app = appPath;
+        action->m_args.append("settings");
+        action->m_forceShow = true;
+        action->m_menuPlace = Action::MenuPlace::Own;
+        return action;
+    }
+    case KnownAction::Account: {
+        Action::Ptr action(new Action(Action::ActScope::Builtin, KnownAction::Account));
+        action->m_title = QObject::tr("Account details");
+        action->m_app = appPath;
+        action->m_args.append("account");
+        action->m_forceShow = true;
+        action->m_menuPlace = Action::MenuPlace::Own;
+        return action;
+    }
+    case KnownAction::Groups: {
+        Action::Ptr action(new Action(Action::ActScope::Builtin, KnownAction::Groups));
+        action->m_title = QObject::tr("List server groups");
+        action->m_app = appPath;
+        action->m_args.append("groups");
+        action->m_forceShow = true;
+        action->m_menuPlace = Action::MenuPlace::Own;
+        return action;
+    }
     default:
         return nullptr;
     }
