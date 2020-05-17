@@ -20,10 +20,13 @@
 #include "action.h"
 
 #include <QHash>
+#include <QJsonObject>
 #include <QObject>
 
 class ActionStorage : public QObject
 {
+    Q_OBJECT
+
 public:
     ActionStorage(QObject *parent = nullptr);
     ~ActionStorage() = default;
@@ -37,9 +40,13 @@ public:
 
     void initActions();
 
+private slots:
+    void onActionChanged();
+
 private:
     QHash<int, Action::Ptr> m_builtinActions;
     QHash<Action::Id, Action::Ptr> m_userActions;
+    QJsonObject m_json;
 
     void initBuiltinActions();
     void loadUserActions();
@@ -49,4 +56,6 @@ private:
 
     bool builtinActionShowForced(KnownAction action, bool defaultValue) const;
     Action::MenuPlace builtinActionMenuPlace(KnownAction action, Action::MenuPlace defaultPlace);
+
+    QJsonObject actionToJson(Action *action) const;
 };
