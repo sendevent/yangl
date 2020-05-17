@@ -15,33 +15,16 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#pragma once
+#include "actionstatus.h"
 
-#include "action.h"
+#include "appsettings.h"
 
-#include <QHash>
-#include <QObject>
-
-class ActionStorage : public QObject
+ActionStatus::ActionStatus(QObject *parent)
+    : Action(parent)
 {
-public:
-    ActionStorage(QObject *parent = nullptr);
-    ~ActionStorage() = default;
-
-    QList<Action::Ptr> knownActions() const;
-    QList<Action::Ptr> userActions() const;
-    QList<Action::Ptr> allActions() const;
-
-    Action::Ptr action(int knownAction) const;
-    Action::Ptr action(const Action::Id &userAction) const;
-
-    void initActions();
-
-private:
-    QHash<int, Action::Ptr> m_builtinActions;
-    QHash<Action::Id, Action::Ptr> m_userActions;
-
-    void initBuiltinActions();
-    void loadUserActions();
-    void saveUserActions();
-};
+    m_title = tr("Check Status");
+    m_app = AppSettings::Monitor.NVPNPath->read().toString();
+    m_args.append("status");
+    m_forceShow = true;
+    m_menuPlace = MenuPlace::Common;
+}

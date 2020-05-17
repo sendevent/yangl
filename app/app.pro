@@ -22,6 +22,7 @@ INCLUDEPATH += \
 
 SOURCES += \
     actions/action.cpp \
+    actions/actionstatus.cpp \
     actions/actionstorage.cpp \
     cli/clibus.cpp \
     cli/clicall.cpp \
@@ -35,7 +36,9 @@ SOURCES += \
 
 HEADERS += \
     actions/action.h \
+    actions/actionstatus.h \
     actions/actionstorage.h \
+    actions/actiontypes.h \
     cli/clibus.h \
     cli/clicall.h \
     nordvpnwraper.h \

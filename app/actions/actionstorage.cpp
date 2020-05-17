@@ -17,7 +17,62 @@
 
 #include "actionstorage.h"
 
-ActionStorage::ActionStorage()
-{
+#include "actionstatus.h"
 
+#include <QDebug>
+
+#define LOG qDebug() << Q_FUNC_INFO
+#define NIY qWarning() << Q_FUNC_INFO << "Not implemented yet"
+
+ActionStorage::ActionStorage(QObject *parent)
+    : QObject(parent)
+{
+}
+
+QList<Action::Ptr> ActionStorage::knownActions() const
+{
+    return m_builtinActions.values();
+}
+
+QList<Action::Ptr> ActionStorage::userActions() const
+{
+    return m_userActions.values();
+}
+
+QList<Action::Ptr> ActionStorage::allActions() const
+{
+    return knownActions() + userActions();
+}
+
+Action::Ptr ActionStorage::action(int knownAction) const
+{
+    return m_builtinActions.value(knownAction, nullptr);
+}
+
+Action::Ptr ActionStorage::action(const Action::Id &userAction) const
+{
+    return m_userActions.value(userAction, nullptr);
+}
+
+void ActionStorage::initActions()
+{
+    initBuiltinActions();
+    loadUserActions();
+}
+
+void ActionStorage::initBuiltinActions()
+{
+    m_builtinActions.clear();
+
+    m_builtinActions[KnownAction::CheckStatus] = Action::Ptr(new ActionStatus);
+}
+
+void ActionStorage::loadUserActions()
+{
+    NIY;
+}
+
+void ActionStorage::saveUserActions()
+{
+    NIY;
 }

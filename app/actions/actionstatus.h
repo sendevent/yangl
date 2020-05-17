@@ -19,29 +19,13 @@
 
 #include "action.h"
 
-#include <QHash>
-#include <QObject>
-
-class ActionStorage : public QObject
+class ActionStatus : public Action
 {
+    Q_OBJECT
 public:
-    ActionStorage(QObject *parent = nullptr);
-    ~ActionStorage() = default;
+    explicit ActionStatus(QObject *parent = nullptr);
+    ~ActionStatus() = default;
 
-    QList<Action::Ptr> knownActions() const;
-    QList<Action::Ptr> userActions() const;
-    QList<Action::Ptr> allActions() const;
-
-    Action::Ptr action(int knownAction) const;
-    Action::Ptr action(const Action::Id &userAction) const;
-
-    void initActions();
-
-private:
-    QHash<int, Action::Ptr> m_builtinActions;
-    QHash<Action::Id, Action::Ptr> m_userActions;
-
-    void initBuiltinActions();
-    void loadUserActions();
-    void saveUserActions();
+    Action::ActScope actionScope() const override { return Action::ActScope::Builtin; }
+    KnownAction type() const override { return KnownAction::CheckStatus; }
 };

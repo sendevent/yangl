@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "clicall.h"
+#include "actiontypes.h"
 
 #include <QObject>
 #include <QPointer>
@@ -25,6 +25,7 @@
 #include <QUuid>
 
 class QTextBrowser;
+class CLICall;
 class Action : public QObject
 {
     Q_OBJECT
@@ -32,16 +33,24 @@ public:
     using Id = QUuid;
     using Ptr = QSharedPointer<Action>;
 
-    enum Scope
+    enum ActScope
     {
         Builtin = 0,
-        User
+        User,
     };
 
-    explicit Action(const Action::Scope scope, QObject *parent = nullptr);
+    enum MenuPlace
+    {
+        NoMenu = 0,
+        Common,
+        Own
+    };
+
+    virtual ~Action() = default;
     Id id() const;
 
-    Action::Scope scope() const;
+    virtual Action::ActScope actionScope() const = 0;
+    virtual KnownAction type() const = 0;
 
     QString title() const;
     void setTitle(const QString &title);
@@ -62,19 +71,26 @@ public:
 
     static bool isValidAppPath(const QString &path);
 
+    bool isAnchorable() const;
+    void setAnchor(MenuPlace place);
+    MenuPlace menuPlace() const;
+
 signals:
     void performed(const QString &result, bool ok);
 
-private slots:
-    void onResult(const QString &result);
+protected slots:
+    virtual void onResult(const QString &result);
 
-private:
+protected:
+    explicit Action(QObject *parent = nullptr);
+    friend class ActionStorage;
+
     const Action::Id m_id;
-    const Action::Scope m_scope;
     QString m_title;
     QString m_app;
     QStringList m_args;
     int m_timeout;
     bool m_forceShow;
     QPointer<QTextBrowser> m_display;
+    MenuPlace m_menuPlace;
 };

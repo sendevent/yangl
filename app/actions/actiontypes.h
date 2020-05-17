@@ -17,31 +17,8 @@
 
 #pragma once
 
-#include "action.h"
-
-#include <QHash>
-#include <QObject>
-
-class ActionStorage : public QObject
+enum KnownAction
 {
-public:
-    ActionStorage(QObject *parent = nullptr);
-    ~ActionStorage() = default;
-
-    QList<Action::Ptr> knownActions() const;
-    QList<Action::Ptr> userActions() const;
-    QList<Action::Ptr> allActions() const;
-
-    Action::Ptr action(int knownAction) const;
-    Action::Ptr action(const Action::Id &userAction) const;
-
-    void initActions();
-
-private:
-    QHash<int, Action::Ptr> m_builtinActions;
-    QHash<Action::Id, Action::Ptr> m_userActions;
-
-    void initBuiltinActions();
-    void loadUserActions();
-    void saveUserActions();
+    Unknown = 0,
+    CheckStatus,
 };
