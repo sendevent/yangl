@@ -155,23 +155,35 @@ void NordVpnWraper::populateActions()
         }
     }
 
+    auto makeConnection = [this](const Action::Ptr &action, QMenu *menu, QAction *before) {
+        QAction *qAct = menu->addAction(action->title());
+        qAct->setData(QVariant::fromValue(action.get()));
+        menu->insertAction(before, qAct);
+        connect(qAct, &QAction::triggered, this, &NordVpnWraper::onActionTriggered);
+    };
+
     QAction *insertBefore = m_actSeparatorNVPN;
-    for (const auto &act : quickActions) {
-        QAction *qAct = m_menuMonitor->addAction(act->title());
-        qAct->setData(QVariant::fromValue(act.get()));
-        m_menuMonitor->insertAction(insertBefore, qAct);
-    }
+    for (const auto &act : quickActions)
+        makeConnection(act, m_menuMonitor.get(), insertBefore);
 
     m_menuNordVpn->clear();
     insertBefore = m_actSeparatorUser;
-    for (const auto &act : nvpnActions) {
-        QAction *qAct = m_menuMonitor->addAction(act->title());
-        qAct->setData(QVariant::fromValue(act.get()));
-        m_menuNordVpn->insertAction(insertBefore, qAct);
-    }
+    for (const auto &act : nvpnActions)
+        makeConnection(act, m_menuNordVpn.get(), insertBefore);
+
+    insertBefore = m_actSeparatorExit;
+    m_menuUser->clear();
+    for (const auto &act : customActions)
+        makeConnection(act, m_menuUser.get(), insertBefore);
 
     m_menuNordVpn->setDisabled(m_menuNordVpn->actions().isEmpty());
     m_menuUser->setDisabled(m_menuUser->actions().isEmpty());
+}
 
-    //    m_menuMonitor->insertMenu() QMenu *menuNVPNActions = new QMenu(m_menuMonitor);
+void NordVpnWraper::onActionTriggered()
+{
+    if (auto qAction = qobject_cast<QAction *>(sender()))
+        if (auto action = qAction->data().value<Action *>()) {
+            m_bus->performAction(action);
+        }
 }

@@ -42,6 +42,8 @@ private slots:
 
     void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
+    void onActionTriggered();
+
 private:
     CLIBus *m_bus;
     ActionStorage *m_actions;
