@@ -162,6 +162,14 @@ void NordVpnWraper::populateActions()
         m_menuMonitor->insertAction(insertBefore, qAct);
     }
 
+    m_menuNordVpn->clear();
+    insertBefore = m_actSeparatorUser;
+    for (const auto &act : nvpnActions) {
+        QAction *qAct = m_menuMonitor->addAction(act->title());
+        qAct->setData(QVariant::fromValue(act.get()));
+        m_menuNordVpn->insertAction(insertBefore, qAct);
+    }
+
     m_menuNordVpn->setDisabled(m_menuNordVpn->actions().isEmpty());
     m_menuUser->setDisabled(m_menuUser->actions().isEmpty());
 

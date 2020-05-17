@@ -17,13 +17,14 @@
 
 #pragma once
 
-enum KnownAction
+#include "action.h"
+
+class ActionDisconnect : public Action
 {
-    Unknown = 0,
+    Q_OBJECT
+public:
+    ActionDisconnect(QObject *parent = nullptr);
 
-    CheckStatus,
-    Connect,
-    Disconnect,
-
-    Last
+    Action::ActScope actionScope() const override { return Action::ActScope::Builtin; }
+    KnownAction type() const override { return KnownAction::Disconnect; }
 };

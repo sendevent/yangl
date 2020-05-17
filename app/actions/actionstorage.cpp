@@ -17,6 +17,8 @@
 
 #include "actionstorage.h"
 
+#include "actionconnect.h"
+#include "actionsfactory.h"
 #include "actionstatus.h"
 
 #include <QDebug>
@@ -64,7 +66,9 @@ void ActionStorage::initBuiltinActions()
 {
     m_builtinActions.clear();
 
-    m_builtinActions[KnownAction::CheckStatus] = Action::Ptr(new ActionStatus);
+    for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i)
+        if (Action *action = ActionsFactory::createAction(static_cast<KnownAction>(i)))
+            m_builtinActions[action->type()] = Action::Ptr(action);
 }
 
 void ActionStorage::loadUserActions()
