@@ -20,6 +20,7 @@
 #include "actionaccount.h"
 #include "actionconnect.h"
 #include "actiondisconnect.h"
+#include "actiongroups.h"
 #include "actionsettings.h"
 #include "actionstatus.h"
 
@@ -36,6 +37,8 @@
         return Action::Ptr(new ActionSettings());
     case KnownAction::Account:
         return Action::Ptr(new ActionAccount());
+    case KnownAction::Groups:
+        return Action::Ptr(new ActionGroups());
     default:
         return nullptr;
     }
