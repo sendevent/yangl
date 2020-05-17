@@ -143,13 +143,14 @@ void Action::onResult(const QString &result)
         }
 
         m_display->setWindowTitle(QStringLiteral("%1 — %2").arg(qApp->applicationDisplayName(), title()));
-        m_display->append(tr("Call to <b>%1</b> [%2]<br>"
-                             "<b>Result:</b><br>"
-                             "%3<br>"
-                             "<b>Exit code:</b> %4<br>"
-                             "<b>Errors:</b><br>"
-                             "%5")
-                                  .arg(app(), args().join(" "), result, exitCode, errors));
+        m_display->append(
+                tr("%1 %2:<br>"
+                   "<b>Result:</b><br>"
+                   "%3<br>"
+                   "<b>Exit code:</b> %4<br>"
+                   "<b>Errors:</b><br>"
+                   "%5")
+                        .arg(app(), args().join(" "), QString(result).replace("\n", "<br>"), exitCode, errors));
         m_display->show();
     }
 
