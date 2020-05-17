@@ -24,6 +24,7 @@
 #include <memory>
 
 class CLIBus;
+class ActionStorage;
 class StateChecker;
 class NordVpnWraper : public QObject
 {
@@ -43,15 +44,22 @@ private slots:
 
 private:
     CLIBus *m_bus;
+    ActionStorage *m_actions;
     StateChecker *m_checker;
     TrayIcon *m_trayIcon;
-    const std::unique_ptr<QMenu> m_menu;
+    std::unique_ptr<QMenu> m_menuMonitor;
     QAction *m_actSettings;
-    QAction *m_actCheckState;
     QAction *m_actRun;
+    QAction *m_actSeparatorQuick;
+    QAction *m_actSeparatorNVPN;
+    std::unique_ptr<QMenu> m_menuNordVpn;
+    QAction *m_actSeparatorUser;
+    std::unique_ptr<QMenu> m_menuUser;
+    QAction *m_actSeparatorExit;
     QAction *m_actQuit;
 
     void loadSettings();
 
-    void initMenu();
+    void createMenu();
+    void populateActions();
 };

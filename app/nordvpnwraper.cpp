@@ -17,6 +17,7 @@
 
 #include "nordvpnwraper.h"
 
+#include "actionstorage.h"
 #include "appsettings.h"
 #include "clibus.h"
 #include "settingsdialog.h"
@@ -25,28 +26,41 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QVariant>
 
 #define LOG qDebug() << Q_FUNC_INFO
 
 NordVpnWraper::NordVpnWraper(QObject *parent)
     : QObject(parent)
     , m_bus(new CLIBus(AppSettings::Monitor.NVPNPath->read().toString(), this))
-    , m_checker(new StateChecker(m_bus, this))
+    , m_actions(new ActionStorage(this))
+    , m_checker(new StateChecker(m_bus, m_actions, this))
     , m_trayIcon(new TrayIcon(this))
-    , m_menu(new QMenu)
+    , m_menuMonitor(new QMenu(tr("Monitor")))
+    , m_actSettings(nullptr)
+    , m_actRun(nullptr)
+    , m_actSeparatorQuick(nullptr)
+    , m_actSeparatorNVPN(nullptr)
+    , m_menuNordVpn(new QMenu(tr("NordVPN")))
+    , m_actSeparatorUser(nullptr)
+    , m_menuUser(new QMenu(tr("Extra")))
+    , m_actSeparatorExit(nullptr)
+    , m_actQuit(nullptr)
 {
     connect(m_checker, &StateChecker::stateChanged, m_trayIcon, &TrayIcon::setState);
     connect(qApp, &QApplication::aboutToQuit, this, &NordVpnWraper::prepareQuit);
     connect(m_trayIcon, &QSystemTrayIcon::activated, this, &NordVpnWraper::onTrayIconActivated);
 
     m_trayIcon->setVisible(true);
-    m_trayIcon->setContextMenu(m_menu.get());
+    m_trayIcon->setContextMenu(m_menuMonitor.get());
 }
 
 void NordVpnWraper::start()
 {
-    initMenu();
+    createMenu();
     loadSettings();
+    m_actions->initActions();
+    populateActions();
 }
 
 void NordVpnWraper::loadSettings()
@@ -64,16 +78,22 @@ void NordVpnWraper::prepareQuit()
     disconnect(m_checker);
 }
 
-void NordVpnWraper::initMenu()
+void NordVpnWraper::createMenu()
 {
-    m_actSettings = m_menu->addAction(tr("Show &settings"), this, &NordVpnWraper::showSettingsEditor);
-    m_actCheckState = m_menu->addAction(tr("&Check status"), this, &NordVpnWraper::performStatusCheck);
-    m_actRun = m_menu->addAction(tr("&Run"));
+    m_menuMonitor->clear();
+
+    m_actSettings = m_menuMonitor->addAction(tr("Show &settings"), this, &NordVpnWraper::showSettingsEditor);
+    m_actRun = m_menuMonitor->addAction(tr("&Run"));
     m_actRun->setCheckable(true);
     connect(m_actRun, &QAction::toggled, m_checker, &StateChecker::setActive);
 
-    m_menu->addSeparator();
-    m_actQuit = m_menu->addAction(tr("&Quit"), qApp, &QApplication::quit);
+    m_actSeparatorQuick = m_menuMonitor->addSeparator();
+    m_actSeparatorNVPN = m_menuMonitor->addSeparator();
+    m_menuMonitor->addMenu(m_menuNordVpn.get());
+    m_actSeparatorUser = m_menuMonitor->addSeparator();
+    m_menuMonitor->addMenu(m_menuUser.get());
+    m_actSeparatorExit = m_menuMonitor->addSeparator();
+    m_actQuit = m_menuMonitor->addAction(tr("&Quit"), qApp, &QApplication::quit);
 }
 
 void NordVpnWraper::showSettingsEditor()
@@ -105,4 +125,45 @@ void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason
     default:
         break;
     }
+}
+
+void NordVpnWraper::populateActions()
+{
+    QVector<Action::Ptr> quickActions, customActions, nvpnActions;
+
+    for (const auto &act : m_actions->allActions()) {
+        if (!act->isAnchorable())
+            continue;
+
+        switch (act->menuPlace()) {
+        case Action::MenuPlace::Own: {
+            switch (act->actionScope()) {
+            case Action::ActScope::User: {
+                customActions.append(act);
+                break;
+            }
+            default: {
+                nvpnActions.append(act);
+                break;
+            }
+            }
+            break;
+        }
+        default:
+            quickActions.append(act);
+            break;
+        }
+    }
+
+    QAction *insertBefore = m_actSeparatorNVPN;
+    for (const auto &act : quickActions) {
+        QAction *qAct = m_menuMonitor->addAction(act->title());
+        qAct->setData(QVariant::fromValue(act.get()));
+        m_menuMonitor->insertAction(insertBefore, qAct);
+    }
+
+    m_menuNordVpn->setDisabled(m_menuNordVpn->actions().isEmpty());
+    m_menuUser->setDisabled(m_menuUser->actions().isEmpty());
+
+    //    m_menuMonitor->insertMenu() QMenu *menuNVPNActions = new QMenu(m_menuMonitor);
 }

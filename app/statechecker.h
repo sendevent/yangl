@@ -23,6 +23,7 @@
 #include <QQueue>
 
 class CLIBus;
+class ActionStorage;
 class QTimer;
 class StateChecker : public QObject
 {
@@ -60,7 +61,7 @@ public:
         static QString parseUptime(const QString &from);
     };
 
-    explicit StateChecker(CLIBus *bus, QObject *parent = nullptr);
+    explicit StateChecker(CLIBus *bus, ActionStorage *actions, QObject *parent = nullptr);
     ~StateChecker() override;
 
     void check();
@@ -82,7 +83,7 @@ private slots:
 
 protected:
     CLIBus *m_bus;
-    Action::Ptr m_act;
+    ActionStorage *m_actions;
     QQueue<Action::Ptr> m_calls;
     Action::Ptr m_currAction;
     QTimer *m_timer;

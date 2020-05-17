@@ -26,26 +26,21 @@
 
 #define LOG qDebug() << Q_FUNC_INFO
 
-Action::Action(const Action::Scope scope, QObject *parent)
+Action::Action(QObject *parent)
     : QObject(parent)
     , m_id(QUuid::createUuid())
-    , m_scope(scope)
     , m_title()
     , m_app()
     , m_args()
     , m_timeout(CLICall::DefaultTimeoutMSecs)
     , m_forceShow(false)
+    , m_menuPlace(MenuPlace::NoMenu)
 {
 }
 
 Action::Id Action::id() const
 {
     return m_id;
-}
-
-Action::Scope Action::scope() const
-{
-    return m_scope;
 }
 
 QString Action::title() const
@@ -109,7 +104,7 @@ CLICall *Action::createRequest()
         return {};
 
     auto call = new CLICall(app(), args(), timeout(), this);
-    connect(call, &CLICall::ready, this, &Action::onResult);
+    this->QObject::connect(call, &CLICall::ready, this, &Action::onResult);
 
     return call;
 }
@@ -159,4 +154,20 @@ void Action::onResult(const QString &result)
     }
 
     emit performed(result, !hasErrors);
+}
+
+bool Action::isAnchorable() const
+{
+    return menuPlace() != MenuPlace::NoMenu;
+}
+
+Action::MenuPlace Action::menuPlace() const
+{
+    return m_menuPlace;
+}
+
+void Action::setAnchor(MenuPlace place)
+{
+    if (place != menuPlace())
+        m_menuPlace = place;
 }

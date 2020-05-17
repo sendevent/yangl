@@ -17,6 +17,8 @@
 
 #include "statechecker.h"
 
+#include "actionstatus.h"
+#include "actionstorage.h"
 #include "clibus.h"
 #include "clicall.h"
 
@@ -178,19 +180,14 @@ QString StateChecker::Info::toString() const
     return text;
 }
 
-StateChecker::StateChecker(CLIBus *bus, QObject *parent)
+StateChecker::StateChecker(CLIBus *bus, ActionStorage *actions, QObject *parent)
     : QObject(parent)
     , m_bus(bus)
-    , m_act(new Action(Action::Builtin/*, this*/))
+    , m_actions(actions)
     , m_currAction(nullptr)
     , m_timer(new QTimer(this))
     , m_state()
 {
-    m_act->setApp(m_bus->applicationPath());
-    m_act->setArgs({ "status" });
-    m_act->setForcedShow(true);
-    connect(m_act.get(), &Action::performed, this, &StateChecker::onQueryFinish);
-
     qRegisterMetaType<StateChecker::Info>("StateChecker::Info");
     qRegisterMetaType<StateChecker::Status>("StateChecker::Status");
 
@@ -240,8 +237,11 @@ int StateChecker::inteval() const
 
 void StateChecker::check()
 {
-    m_calls.enqueue(m_act);
-    nextQuery();
+    if (auto statusAct = m_actions->action(KnownAction::CheckStatus)) {
+        connect(statusAct.get(), &Action::performed, this, &StateChecker::onQueryFinish, Qt::UniqueConnection);
+        m_calls.enqueue(statusAct);
+        nextQuery();
+    }
 }
 
 void StateChecker::onQueryFinish(const QString &result, bool ok)
