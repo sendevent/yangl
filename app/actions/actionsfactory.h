@@ -17,13 +17,16 @@
 
 #pragma once
 
-enum KnownAction
+#include "actiontypes.h"
+
+class Action;
+class ActionsFactory
 {
-    Unknown = 0,
+public:
+    static Action *createAction(KnownAction action);
 
-    CheckStatus,
-    Connect,
-    Disconnect,
-
-    Last
+private:
+    ActionsFactory() = delete;
+    ActionsFactory(const ActionsFactory &other) = delete;
+    ActionsFactory(const ActionsFactory &&other) = delete;
 };

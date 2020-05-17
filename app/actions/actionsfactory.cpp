@@ -15,15 +15,22 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#pragma once
+#include "actionsfactory.h"
 
-enum KnownAction
+#include "actionconnect.h"
+#include "actiondisconnect.h"
+#include "actionstatus.h"
+
+/*static*/ Action *ActionsFactory::createAction(KnownAction action)
 {
-    Unknown = 0,
-
-    CheckStatus,
-    Connect,
-    Disconnect,
-
-    Last
-};
+    switch (action) {
+    case KnownAction::CheckStatus:
+        return new ActionStatus();
+    case KnownAction::Connect:
+        return new ActionConnect();
+    case KnownAction::Disconnect:
+        return new ActionDisconnect();
+    default:
+        return nullptr;
+    }
+}

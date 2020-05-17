@@ -15,15 +15,16 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#pragma once
+#include "actiondisconnect.h"
 
-enum KnownAction
+#include "appsettings.h"
+
+ActionDisconnect::ActionDisconnect(QObject *parent)
+    : Action(parent)
 {
-    Unknown = 0,
-
-    CheckStatus,
-    Connect,
-    Disconnect,
-
-    Last
-};
+    m_title = tr("Disconnect");
+    m_app = AppSettings::Monitor.NVPNPath->read().toString();
+    m_args.append("disconnect");
+    m_forceShow = false;
+    m_menuPlace = MenuPlace::Own;
+}

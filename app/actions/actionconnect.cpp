@@ -15,15 +15,16 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#pragma once
+#include "actionconnect.h"
 
-enum KnownAction
+#include "appsettings.h"
+
+ActionConnect::ActionConnect(QObject *parent)
+    : Action(parent)
 {
-    Unknown = 0,
-
-    CheckStatus,
-    Connect,
-    Disconnect,
-
-    Last
-};
+    m_title = tr("Connect");
+    m_app = AppSettings::Monitor.NVPNPath->read().toString();
+    m_args.append("c");
+    m_forceShow = false;
+    m_menuPlace = MenuPlace::Own;
+}
