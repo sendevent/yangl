@@ -17,6 +17,7 @@
 
 #include "actionsfactory.h"
 
+#include "actionaccount.h"
 #include "actionconnect.h"
 #include "actiondisconnect.h"
 #include "actionsettings.h"
@@ -33,6 +34,8 @@
         return Action::Ptr(new ActionDisconnect());
     case KnownAction::Settings:
         return Action::Ptr(new ActionSettings());
+    case KnownAction::Account:
+        return Action::Ptr(new ActionAccount());
     default:
         return nullptr;
     }

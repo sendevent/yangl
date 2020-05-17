@@ -15,17 +15,16 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#pragma once
+#include "actionaccount.h"
 
-enum KnownAction
+#include "appsettings.h"
+
+ActionAccount::ActionAccount(QObject *parent)
+    : Action(parent)
 {
-    Unknown = 0,
-
-    CheckStatus,
-    Connect,
-    Disconnect,
-    Settings,
-    Account,
-
-    Last
-};
+    m_title = tr("Account");
+    m_app = AppSettings::Monitor.NVPNPath->read().toString();
+    m_args.append("account");
+    m_forceShow = true;
+    m_menuPlace = MenuPlace::Own;
+}
