@@ -17,13 +17,12 @@
 
 #pragma once
 
-#include "actiontypes.h"
+#include "action.h"
 
-class Action;
 class ActionsFactory
 {
 public:
-    static Action *createAction(KnownAction action);
+    static Action::Ptr createAction(KnownAction action);
 
 private:
     ActionsFactory() = delete;

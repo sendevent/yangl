@@ -19,17 +19,20 @@
 
 #include "actionconnect.h"
 #include "actiondisconnect.h"
+#include "actionsettings.h"
 #include "actionstatus.h"
 
-/*static*/ Action *ActionsFactory::createAction(KnownAction action)
+/*static*/ Action::Ptr ActionsFactory::createAction(KnownAction action)
 {
     switch (action) {
     case KnownAction::CheckStatus:
-        return new ActionStatus();
+        return Action::Ptr(new ActionStatus());
     case KnownAction::Connect:
-        return new ActionConnect();
+        return Action::Ptr(new ActionConnect());
     case KnownAction::Disconnect:
-        return new ActionDisconnect();
+        return Action::Ptr(new ActionDisconnect());
+    case KnownAction::Settings:
+        return Action::Ptr(new ActionSettings());
     default:
         return nullptr;
     }
