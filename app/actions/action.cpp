@@ -17,6 +17,7 @@
 
 #include "action.h"
 
+#include "actionstorage.h"
 #include "clicall.h"
 
 #include <QApplication>
@@ -26,9 +27,10 @@
 
 #define LOG qDebug() << Q_FUNC_INFO
 
-Action::Action(Action::ActScope scope, KnownAction type, QObject *parent)
+Action::Action(Action::ActScope scope, KnownAction type, ActionStorage *parent)
     : QObject(parent)
     , m_id(QUuid::createUuid())
+    , m_storage(parent)
     , m_scope(scope)
     , m_type(type)
     , m_title()
@@ -38,6 +40,12 @@ Action::Action(Action::ActScope scope, KnownAction type, QObject *parent)
     , m_forceShow(false)
     , m_menuPlace(MenuPlace::NoMenu)
 {
+    connect(this, &Action::titleChanged, this, &Action::changed);
+    connect(this, &Action::appChanged, this, &Action::changed);
+    connect(this, &Action::argsChanged, this, &Action::changed);
+    connect(this, &Action::timeoutChanged, this, &Action::changed);
+    connect(this, &Action::forcedShowChanged, this, &Action::changed);
+    connect(this, &Action::anchorChanged, this, &Action::changed);
 }
 
 Action::ActScope Action::actionScope() const
@@ -62,8 +70,10 @@ QString Action::title() const
 
 void Action::setTitle(const QString &title)
 {
-    if (title != m_title)
+    if (title != m_title) {
         m_title = title;
+        emit titleChanged(m_title);
+    }
 }
 
 QString Action::app() const
@@ -73,8 +83,10 @@ QString Action::app() const
 
 void Action::setApp(const QString &app)
 {
-    if (app != m_app)
+    if (app != m_app) {
         m_app = app;
+        emit appChanged(m_app);
+    }
 }
 
 QStringList Action::args() const
@@ -84,8 +96,10 @@ QStringList Action::args() const
 
 void Action::setArgs(const QStringList &args)
 {
-    if (args != m_args)
+    if (args != m_args) {
         m_args = args;
+        emit argsChanged(m_args);
+    }
 }
 
 int Action::timeout() const
@@ -95,8 +109,10 @@ int Action::timeout() const
 
 void Action::setTimeout(int timeout)
 {
-    if (timeout != m_timeout)
+    if (timeout != m_timeout) {
         m_timeout = timeout;
+        emit timeoutChanged(m_timeout);
+    }
 }
 
 bool Action::forcedShow() const
@@ -106,8 +122,10 @@ bool Action::forcedShow() const
 
 void Action::setForcedShow(bool forced)
 {
-    if (forced != m_forceShow)
+    if (forced != m_forceShow) {
         m_forceShow = forced;
+        emit forcedShowChanged(m_forceShow);
+    }
 }
 
 CLICall *Action::createRequest()
@@ -181,6 +199,8 @@ Action::MenuPlace Action::menuPlace() const
 
 void Action::setAnchor(MenuPlace place)
 {
-    if (place != menuPlace())
+    if (place != menuPlace()) {
         m_menuPlace = place;
+        emit anchorChanged(m_menuPlace);
+    }
 }

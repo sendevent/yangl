@@ -20,6 +20,7 @@
 #include "appsettings.h"
 
 #include <QDebug>
+#include <QJsonArray>
 
 #define LOG qDebug() << Q_FUNC_INFO
 #define NIY qWarning() << Q_FUNC_INFO << "Not implemented yet"
@@ -64,9 +65,12 @@ void ActionStorage::initBuiltinActions()
 {
     m_builtinActions.clear();
 
-    for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i)
-        if (const Action::Ptr &action = createBuiltinAction(static_cast<KnownAction>(i)))
+    for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i) {
+        if (const Action::Ptr &action = createBuiltinAction(static_cast<KnownAction>(i))) {
             m_builtinActions[action->type()] = action;
+            action->setForcedShow(true);
+        }
+    }
 }
 
 void ActionStorage::loadUserActions()
@@ -77,18 +81,6 @@ void ActionStorage::loadUserActions()
 void ActionStorage::saveUserActions()
 {
     NIY;
-}
-
-bool ActionStorage::builtinActionShowForced(KnownAction action, bool defaultValue) const
-{
-    NIY << action;
-    return defaultValue;
-}
-
-Action::MenuPlace ActionStorage::builtinActionMenuPlace(KnownAction action, Action::MenuPlace defaultPlace)
-{
-    NIY << action;
-    return defaultPlace;
 }
 
 Action::Ptr ActionStorage::createBuiltinAction(KnownAction actionType)
@@ -154,5 +146,47 @@ Action::Ptr ActionStorage::createBuiltinAction(KnownAction actionType)
     action->setArgs(args);
     action->setForcedShow(forceShow);
     action->setAnchor(menuPlace);
+
+    connect(action.get(), &Action::changed, this, &ActionStorage::onActionChanged);
+
     return action;
+}
+
+void ActionStorage::onActionChanged()
+{
+    if (auto action = qobject_cast<Action *>(sender())) {
+        const QString name = (action->actionScope() == Action::ActScope::Builtin)
+                ? QString::number(action->actionScope())
+                : action->id().toString();
+
+        const QString actName = QString::number(action->type());
+        m_json[actName] = actionToJson(action);
+    }
+}
+
+QJsonObject ActionStorage::actionToJson(Action *action) const
+{
+    if (!action)
+        return {};
+
+    return {
+        { "app", action->app() },
+        { "title", action->title() },
+        { "args", QJsonArray::fromStringList(action->args()) },
+        { "forcedDisplay", action->forcedShow() },
+        { "anchor", action->menuPlace() },
+    };
+}
+
+bool ActionStorage::builtinActionShowForced(KnownAction action, bool defaultValue) const
+{
+    const QString actName = QString::number(action);
+    return m_json[actName].toObject()["forcedDisplay"].toBool(defaultValue);
+}
+
+Action::MenuPlace ActionStorage::builtinActionMenuPlace(KnownAction action, Action::MenuPlace defaultPlace)
+{
+    const QString actName = QString::number(action);
+    const int res = m_json[actName].toObject()["anchor"].toInt(static_cast<int>(defaultPlace));
+    return static_cast<Action::MenuPlace>(res);
 }

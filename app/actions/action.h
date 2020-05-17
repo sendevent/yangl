@@ -26,6 +26,7 @@
 
 class QTextBrowser;
 class CLICall;
+class ActionStorage;
 class Action : public QObject
 {
     Q_OBJECT
@@ -77,15 +78,25 @@ public:
 
 signals:
     void performed(const QString &result, bool ok);
+    void changed();
+
+    void titleChanged(const QString &title) const;
+    void appChanged(const QString &app) const;
+    void argsChanged(const QStringList &args) const;
+    void timeoutChanged(int timeout) const;
+    void forcedShowChanged(bool forced) const;
+    void anchorChanged(MenuPlace place) const;
 
 protected slots:
     virtual void onResult(const QString &result);
 
 protected:
-    explicit Action(Action::ActScope scope, KnownAction type, QObject *parent = nullptr);
     friend class ActionStorage;
 
+    explicit Action(Action::ActScope scope, KnownAction type, ActionStorage *parent = nullptr);
+
     const Action::Id m_id;
+    const ActionStorage *m_storage;
     const Action::ActScope m_scope;
     const KnownAction m_type;
 
