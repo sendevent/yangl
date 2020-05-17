@@ -67,8 +67,8 @@ void ActionStorage::initBuiltinActions()
     m_builtinActions.clear();
 
     for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i)
-        if (Action *action = ActionsFactory::createAction(static_cast<KnownAction>(i)))
-            m_builtinActions[action->type()] = Action::Ptr(action);
+        if (const Action::Ptr &action = ActionsFactory::createAction(static_cast<KnownAction>(i)))
+            m_builtinActions[action->type()] = action;
 }
 
 void ActionStorage::loadUserActions()
