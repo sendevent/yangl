@@ -26,5 +26,5 @@ ActionConnect::ActionConnect(QObject *parent)
     m_app = AppSettings::Monitor.NVPNPath->read().toString();
     m_args.append("c");
     m_forceShow = false;
-    m_menuPlace = MenuPlace::Own;
+    m_menuPlace = MenuPlace::Common;
 }

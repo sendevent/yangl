@@ -25,6 +25,7 @@ SOURCES += \
     actions/actionaccount.cpp \
     actions/actionconnect.cpp \
     actions/actiondisconnect.cpp \
+    actions/actiongroups.cpp \
     actions/actionsettings.cpp \
     actions/actionsfactory.cpp \
     actions/actionstatus.cpp \
@@ -44,6 +45,7 @@ HEADERS += \
     actions/actionaccount.h \
     actions/actionconnect.h \
     actions/actiondisconnect.h \
+    actions/actiongroups.h \
     actions/actionsettings.h \
     actions/actionsfactory.h \
     actions/actionstatus.h \

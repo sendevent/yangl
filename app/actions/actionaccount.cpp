@@ -22,7 +22,7 @@
 ActionAccount::ActionAccount(QObject *parent)
     : Action(parent)
 {
-    m_title = tr("Account");
+    m_title = tr("Account details");
     m_app = AppSettings::Monitor.NVPNPath->read().toString();
     m_args.append("account");
     m_forceShow = true;

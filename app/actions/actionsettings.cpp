@@ -22,7 +22,7 @@
 ActionSettings::ActionSettings(QObject *parent)
     : Action(parent)
 {
-    m_title = tr("Settings");
+    m_title = tr("Show used settings");
     m_app = AppSettings::Monitor.NVPNPath->read().toString();
     m_args.append("settings");
     m_forceShow = true;

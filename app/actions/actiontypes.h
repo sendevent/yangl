@@ -26,6 +26,7 @@ enum KnownAction
     Disconnect,
     Settings,
     Account,
+    Groups,
 
     Last
 };

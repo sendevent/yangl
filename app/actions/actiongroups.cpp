@@ -15,16 +15,16 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "actionstatus.h"
+#include "actiongroups.h"
 
 #include "appsettings.h"
 
-ActionStatus::ActionStatus(QObject *parent)
+ActionGroups::ActionGroups(QObject *parent)
     : Action(parent)
 {
-    m_title = tr("Check status");
+    m_title = tr("List server groups");
     m_app = AppSettings::Monitor.NVPNPath->read().toString();
-    m_args.append("status");
+    m_args.append("groups");
     m_forceShow = true;
-    m_menuPlace = MenuPlace::Common;
+    m_menuPlace = MenuPlace::Own;
 }

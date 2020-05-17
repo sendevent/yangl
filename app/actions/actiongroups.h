@@ -15,16 +15,16 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "actionstatus.h"
+#pragma once
 
-#include "appsettings.h"
+#include "action.h"
 
-ActionStatus::ActionStatus(QObject *parent)
-    : Action(parent)
+class ActionGroups : public Action
 {
-    m_title = tr("Check status");
-    m_app = AppSettings::Monitor.NVPNPath->read().toString();
-    m_args.append("status");
-    m_forceShow = true;
-    m_menuPlace = MenuPlace::Common;
-}
+    Q_OBJECT
+public:
+    ActionGroups(QObject *parent = nullptr);
+
+    Action::ActScope actionScope() const override { return Action::ActScope::Builtin; }
+    KnownAction type() const override { return KnownAction::Groups; }
+};
