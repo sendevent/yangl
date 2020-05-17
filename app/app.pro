@@ -22,6 +22,7 @@ INCLUDEPATH += \
 
 SOURCES += \
     actions/action.cpp \
+    actions/actionaccount.cpp \
     actions/actionconnect.cpp \
     actions/actiondisconnect.cpp \
     actions/actionsettings.cpp \
@@ -40,6 +41,7 @@ SOURCES += \
 
 HEADERS += \
     actions/action.h \
+    actions/actionaccount.h \
     actions/actionconnect.h \
     actions/actiondisconnect.h \
     actions/actionsettings.h \
