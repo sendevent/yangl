@@ -17,8 +17,9 @@
 
 #include "statechecker.h"
 
-#include "ipcbus.h"
-#include "ipccall.h"
+#include "actionstorage.h"
+#include "clibus.h"
+#include "clicall.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -178,10 +179,11 @@ QString StateChecker::Info::toString() const
     return text;
 }
 
-StateChecker::StateChecker(IPCBus *bus, QObject *parent)
+StateChecker::StateChecker(CLIBus *bus, ActionStorage *actions, QObject *parent)
     : QObject(parent)
     , m_bus(bus)
-    , m_query(nullptr)
+    , m_actions(actions)
+    , m_currAction(nullptr)
     , m_timer(new QTimer(this))
     , m_state()
 {
@@ -191,6 +193,12 @@ StateChecker::StateChecker(IPCBus *bus, QObject *parent)
     setInterval(DefaultIntervalMs);
     connect(m_timer, &QTimer::timeout, this, &StateChecker::onTimeout);
     setStatus(StateChecker::Status::Unknown);
+}
+
+StateChecker::~StateChecker()
+{
+    setActive(false);
+    m_calls.clear();
 }
 
 void StateChecker::setActive(bool active)
@@ -228,33 +236,33 @@ int StateChecker::inteval() const
 
 void StateChecker::check()
 {
-    IPCCall::Ptr statusCheck(new IPCCall(m_bus->applicationPath(), { QStringLiteral("status") }, 30000));
-    connect(statusCheck.get(), &IPCCall::ready, this, &StateChecker::onQueryFinish);
-
-    m_calls.enqueue(statusCheck);
-
-    nextQuery();
+    if (auto statusAct = m_actions->action(KnownAction::CheckStatus)) {
+        connect(statusAct.get(), &Action::performed, this, &StateChecker::onQueryFinish, Qt::UniqueConnection);
+        m_calls.enqueue(statusAct);
+        nextQuery();
+    }
 }
 
-void StateChecker::onQueryFinish(const QString &result)
+void StateChecker::onQueryFinish(const QString &result, bool ok)
 {
-    QtConcurrent::run(this, &StateChecker::updateState, result);
+    if (ok)
+        QtConcurrent::run(this, &StateChecker::updateState, result);
 
-    m_query.clear();
+    m_currAction.clear();
     nextQuery();
 }
 
 void StateChecker::nextQuery()
 {
-    if (m_query)
+    if (m_currAction)
         return;
 
     if (m_calls.isEmpty())
         return;
 
-    m_query = m_calls.dequeue();
+    m_currAction = m_calls.dequeue();
 
-    m_bus->runQuery(m_query);
+    m_bus->performAction(m_currAction.get());
 }
 
 void StateChecker::onTimeout()
@@ -264,8 +272,7 @@ void StateChecker::onTimeout()
 
 void StateChecker::updateState(const QString &from)
 {
-    Info updatedState = Info::fromString(from);
-    setState(updatedState);
+    setState(Info::fromString(from));
 }
 
 StateChecker::Info StateChecker::state() const

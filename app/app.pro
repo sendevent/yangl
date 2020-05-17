@@ -2,7 +2,7 @@ QT       += core gui concurrent
 TARGET = yangl
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++11
+CONFIG += c++14
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -16,12 +16,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 INCLUDEPATH += \
-    ipc \
-    settings
+    cli \
+    settings \
+    actions
 
 SOURCES += \
-    ipc/ipcbus.cpp \
-    ipc/ipccall.cpp \
+    actions/action.cpp \
+    actions/actionstorage.cpp \
+    cli/clibus.cpp \
+    cli/clicall.cpp \
     main.cpp \
     nordvpnwraper.cpp \
     settings/appsettings.cpp \
@@ -31,8 +34,11 @@ SOURCES += \
     trayicon.cpp
 
 HEADERS += \
-    ipc/ipcbus.h \
-    ipc/ipccall.h \
+    actions/action.h \
+    actions/actionstorage.h \
+    actions/actiontypes.h \
+    cli/clibus.h \
+    cli/clicall.h \
     nordvpnwraper.h \
     settings/appsettings.h \
     settings/settingsdialog.h \

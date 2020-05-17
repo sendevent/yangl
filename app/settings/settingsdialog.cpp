@@ -19,11 +19,11 @@
 #include "settingsdialog.h"
 
 #include "appsettings.h"
+#include "action.h"
 #include "ui_settingsdialog.h"
 
 #include <QDebug>
 #include <QFileDialog>
-#include <QFileInfo>
 #include <QIcon>
 #include <QMessageBox>
 #include <QMetaEnum>
@@ -66,7 +66,9 @@ void Dialog::on_leNVPNPath_textChanged(const QString &text)
 {
     ui->leNVPNPath->setToolTip(text);
     QPalette p = ui->leNVPNPath->palette();
-    const QColor clr = isValidPath(text) ? ui->leNVPNPath->style()->standardPalette().color(QPalette::Base) : Qt::red;
+    const QColor clr = Action::isValidAppPath(text)
+            ? ui->leNVPNPath->style()->standardPalette().color(QPalette::Base)
+            : Qt::red;
     if (p.color(QPalette::Base) != clr) {
         p.setColor(QPalette::Base, clr);
         ui->leNVPNPath->setPalette(p);
@@ -88,7 +90,7 @@ bool Dialog::saveMonitorSettings()
 {
     const QString &path = ui->leNVPNPath->text();
     if (path != AppSettings::Monitor.NVPNPath->read().toString()) {
-        if (!isValidPath(path)) {
+        if (!Action::isValidAppPath(path)) {
             QMessageBox::critical(this, tr("NordVPN binary"), tr("Please, specefy valid path."));
             ui->tabWidget->setCurrentIndex(0);
             ui->leNVPNPath->setFocus();
@@ -109,16 +111,4 @@ bool Dialog::saveNVPNSettings()
 {
     NIY;
     return true;
-}
-
-bool Dialog::isValidPath(const QString &path) const
-{
-    if (path.isEmpty())
-        return false;
-
-    const QFileInfo info(path);
-    if (!info.exists())
-        return false;
-
-    return info.isExecutable();
 }
