@@ -64,7 +64,7 @@ void TrayIcon::setState(const StateChecker::Info &state)
 {
     const QString description = state.toString();
 
-    if (m_state.m_status != state.m_status) {
+    if (m_state.m_status != state.m_status && !qApp->isSavingSession()) {
         QIcon icn = iconForStatus(state.m_status);
         setIcon(icn);
         showMessage(qApp->applicationDisplayName(), description /*, icn*/);

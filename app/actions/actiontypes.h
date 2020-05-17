@@ -17,22 +17,16 @@
 
 #pragma once
 
-#include "ipccall.h"
-
-#include <QObject>
-
-class IPCBus : public QObject
+enum KnownAction
 {
-    Q_OBJECT
-public:
-    explicit IPCBus(const QString &appPath, QObject *parent = nullptr);
+    Unknown = 0,
 
-    void runQuery(const IPCCall::Ptr &call);
+    CheckStatus,
+    Connect,
+    Disconnect,
+    Settings,
+    Account,
+    Groups,
 
-    QString applicationPath() const;
-
-signals:
-
-private:
-    const QString m_appPath;
+    Last
 };

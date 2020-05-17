@@ -15,44 +15,27 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "ipcbus.h"
+#pragma once
 
-#include <QDebug>
-#include <QRunnable>
-#include <QThreadPool>
+#include "clicall.h"
 
-#define LOG qDebug() << Q_FUNC_INFO << QThread::currentThreadId()
+#include <QObject>
 
-class RunQureyTask : public QRunnable
+class Action;
+class CLIBus : public QObject
 {
+    Q_OBJECT
 public:
-    RunQureyTask(const IPCCall::Ptr &call)
-        : m_call(call)
-    {
-    }
+    explicit CLIBus(const QString &appPath, QObject *parent = nullptr);
+
+    QString applicationPath() const;
+
+    bool performAction(Action *action);
+
+signals:
 
 private:
-    IPCCall::Ptr m_call;
+    const QString m_appPath;
 
-    void run() override { m_call->run(); }
+    void runQuery(CLICall *call);
 };
-
-IPCBus::IPCBus(const QString &appPath, QObject *parent)
-    : QObject(parent)
-    , m_appPath(appPath)
-{
-}
-
-QString IPCBus::applicationPath() const
-{
-    return m_appPath;
-}
-
-void IPCBus::runQuery(const IPCCall::Ptr &call)
-{
-    if (!call)
-        return;
-
-    RunQureyTask *task = new RunQureyTask(call);
-    QThreadPool::globalInstance()->start(task);
-}

@@ -17,12 +17,13 @@
 
 #pragma once
 
-#include "ipccall.h"
+#include "action.h"
 
 #include <QObject>
 #include <QQueue>
 
-class IPCBus;
+class CLIBus;
+class ActionStorage;
 class QTimer;
 class StateChecker : public QObject
 {
@@ -60,7 +61,8 @@ public:
         static QString parseUptime(const QString &from);
     };
 
-    explicit StateChecker(IPCBus *bus, QObject *parent = nullptr);
+    explicit StateChecker(CLIBus *bus, ActionStorage *actions, QObject *parent = nullptr);
+    ~StateChecker() override;
 
     void check();
 
@@ -77,12 +79,13 @@ signals:
 
 private slots:
     void onTimeout();
-    void onQueryFinish(const QString &result);
+    void onQueryFinish(const QString &result, bool ok);
 
 protected:
-    IPCBus *m_bus;
-    QQueue<IPCCall::Ptr> m_calls;
-    IPCCall::Ptr m_query;
+    CLIBus *m_bus;
+    ActionStorage *m_actions;
+    QQueue<Action::Ptr> m_calls;
+    Action::Ptr m_currAction;
     QTimer *m_timer;
 
     Info m_state;

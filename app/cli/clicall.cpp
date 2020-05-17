@@ -15,60 +15,87 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "ipccall.h"
+#include "clicall.h"
 
-#include "ipcbus.h"
+#include "clibus.h"
 
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
-#include <QProcess>
 #include <QThread>
 
 #define LOG qDebug() << Q_FUNC_INFO << QThread::currentThreadId()
 
-IPCCall::IPCCall(const QString &path, const QStringList &params, int timeout)
-    : m_id(QUuid::createUuid())
+CLICall::CLICall(const QString &path, const QStringList &params, int timeout, QObject *parent)
+    : QObject(parent)
     , m_appPath(path)
     , m_params(params)
     , m_timeout(timeout)
+    , m_result()
+    , m_errors()
+    , m_exitCode(0)
+    , m_exitStatus(QProcess::NormalExit)
 {
 }
 
-IPCCall::Id IPCCall::id() const
-{
-    return m_id;
-}
-
-QString IPCCall::run()
+QString CLICall::run()
 {
     if (m_appPath.isEmpty() || !QFile::exists(m_appPath))
-        return setResult(QStringLiteral("File [%1] not found").arg(m_appPath));
+        return setResult({}, QStringLiteral("File [%1] not found").arg(m_appPath));
 
     QProcess proc;
     proc.start(m_appPath, m_params, QIODevice::ReadOnly);
+
+    connect(
+            &proc, qOverload<int, QProcess::ExitStatus>(&QProcess::finished), this,
+            [this](int exitCode, QProcess::ExitStatus exitStatus) {
+                m_exitCode = exitCode;
+                m_exitStatus = exitStatus;
+            },
+            Qt::DirectConnection);
+
     if (!proc.waitForStarted(m_timeout))
         return setResult(
-                QStringLiteral("Start timeout (%1) reached for [%2]").arg(QString::number(m_timeout), m_appPath));
+                {}, QStringLiteral("Start timeout (%1) reached for [%2]").arg(QString::number(m_timeout), m_appPath));
 
-    QString result;
-    while (proc.waitForReadyRead(m_timeout))
+    QString result, errors;
+    while (proc.waitForReadyRead(m_timeout)) {
         result += proc.readAllStandardOutput();
+        errors += proc.readAllStandardError();
+    }
 
-    return setResult(result.trimmed());
+    return setResult(result.trimmed(), errors.trimmed());
 }
 
-QString IPCCall::result() const
+QString CLICall::result() const
 {
     return m_result;
 }
 
-QString IPCCall::setResult(const QString &result)
+QString CLICall::setResult(const QString &result, const QString &errors)
 {
+    if (errors != m_errors)
+        m_errors = errors;
+
     if (result != m_result) {
         m_result = result;
         emit ready(m_result);
     }
 
     return m_result;
+}
+
+QString CLICall::errors() const
+{
+    return m_errors;
+}
+
+int CLICall::exitCode() const
+{
+    return m_exitCode;
+}
+
+QProcess::ExitStatus CLICall::exitStatus() const
+{
+    return m_exitStatus;
 }

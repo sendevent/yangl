@@ -18,38 +18,44 @@
 #pragma once
 
 #include <QObject>
+#include <QProcess>
 #include <QSharedPointer>
 #include <QStringList>
-#include <QUuid>
 
-class IPCCall : public QObject
+class CLICall : public QObject
 {
     Q_OBJECT
 
 public:
-    using Id = QUuid;
-    using Ptr = QSharedPointer<IPCCall>;
+    static constexpr int DefaultTimeoutMSecs = 30000;
 
-    explicit IPCCall(const QString &path, const QStringList &params, int timeout);
-    virtual ~IPCCall() = default;
-
-    Id id() const;
+    ~CLICall() = default;
 
     QString run();
     QString result() const;
+    QString errors() const;
+
+    int exitCode() const;
+    QProcess::ExitStatus exitStatus() const;
 
 signals:
     void ready(const QString &result) const;
 
 protected:
-    const Id m_id;
+    friend class Action;
+    explicit CLICall(const QString &path, const QStringList &params, int timeout, QObject *parent = nullptr);
+
     const QString m_appPath;
     const QStringList m_params;
     const int m_timeout;
-    QString m_result;
+    QString m_result, m_errors;
+    int m_exitCode;
+    QProcess::ExitStatus m_exitStatus;
 
-    QString setResult(const QString &result);
+    QString setResult(const QString &result, const QString &errors);
 
 private:
-    Q_DISABLE_COPY_MOVE(IPCCall);
+    CLICall(QObject *parent = nullptr) = delete;
+
+    Q_DISABLE_COPY_MOVE(CLICall);
 };
