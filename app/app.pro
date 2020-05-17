@@ -22,7 +22,6 @@ INCLUDEPATH += \
 
 SOURCES += \
     actions/action.cpp \
-    actions/actionsfactory.cpp \
     actions/actionstorage.cpp \
     cli/clibus.cpp \
     cli/clicall.cpp \
@@ -36,7 +35,6 @@ SOURCES += \
 
 HEADERS += \
     actions/action.h \
-    actions/actionsfactory.h \
     actions/actionstorage.h \
     actions/actiontypes.h \
     cli/clibus.h \

@@ -68,7 +68,7 @@ private:
     GroupMonitor(const GroupMonitor &) = delete;
     GroupMonitor &operator=(const GroupMonitor &) = delete;
 
-    static const QString localName() { return "MainWindow"; }
+    static const QString localName() { return "Monitor"; }
 };
 
 class GroupNVPN : public OptionsGroup
@@ -80,7 +80,7 @@ private:
     GroupNVPN(const GroupNVPN &) = delete;
     GroupNVPN &operator=(const GroupNVPN &) = delete;
 
-    static const QString localName() { return "TrayIcon"; }
+    static const QString localName() { return "NordVpn"; }
 };
 
 class AppSettings
