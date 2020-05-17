@@ -17,7 +17,7 @@
 
 #include "actionstorage.h"
 
-#include "actionsfactory.h"
+#include "appsettings.h"
 
 #include <QDebug>
 
@@ -65,7 +65,7 @@ void ActionStorage::initBuiltinActions()
     m_builtinActions.clear();
 
     for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i)
-        if (const Action::Ptr &action = ActionsFactory::createAction(static_cast<KnownAction>(i)))
+        if (const Action::Ptr &action = createBuiltinAction(static_cast<KnownAction>(i)))
             m_builtinActions[action->type()] = action;
 }
 
@@ -77,4 +77,82 @@ void ActionStorage::loadUserActions()
 void ActionStorage::saveUserActions()
 {
     NIY;
+}
+
+bool ActionStorage::builtinActionShowForced(KnownAction action, bool defaultValue) const
+{
+    NIY << action;
+    return defaultValue;
+}
+
+Action::MenuPlace ActionStorage::builtinActionMenuPlace(KnownAction action, Action::MenuPlace defaultPlace)
+{
+    NIY << action;
+    return defaultPlace;
+}
+
+Action::Ptr ActionStorage::createBuiltinAction(KnownAction actionType)
+{
+    const QString &appPath = AppSettings::Monitor.NVPNPath->read().toString();
+    const Action::ActScope scope = Action::ActScope::Builtin;
+
+    QString title;
+    QStringList args;
+    bool forceShow = true;
+    Action::MenuPlace menuPlace = Action::MenuPlace::Own;
+
+    switch (actionType) {
+    case KnownAction::CheckStatus: {
+        title = QObject::tr("Check status");
+        args.append("status");
+        forceShow = builtinActionShowForced(actionType, true);
+        menuPlace = builtinActionMenuPlace(actionType, Action::MenuPlace::Common);
+        break;
+    }
+    case KnownAction::Connect: {
+        title = QObject::tr("Connect");
+        args.append("c");
+        forceShow = builtinActionShowForced(actionType, false);
+        menuPlace = builtinActionMenuPlace(actionType, Action::MenuPlace::Common);
+        break;
+    }
+    case KnownAction::Disconnect: {
+        title = QObject::tr("Disonnect");
+        args.append("disconnect");
+        forceShow = builtinActionShowForced(actionType, false);
+        menuPlace = builtinActionMenuPlace(actionType, Action::MenuPlace::Own);
+        break;
+    }
+    case KnownAction::Settings: {
+        title = QObject::tr("Show used settings");
+        args.append("settings");
+        forceShow = builtinActionShowForced(actionType, true);
+        menuPlace = builtinActionMenuPlace(actionType, Action::MenuPlace::Own);
+        break;
+    }
+    case KnownAction::Account: {
+        title = QObject::tr("Account details");
+        args.append("account");
+        forceShow = builtinActionShowForced(actionType, true);
+        menuPlace = builtinActionMenuPlace(actionType, Action::MenuPlace::Own);
+        break;
+    }
+    case KnownAction::Groups: {
+        title = QObject::tr("List server groups");
+        args.append("groups");
+        forceShow = builtinActionShowForced(actionType, true);
+        menuPlace = builtinActionMenuPlace(actionType, Action::MenuPlace::Own);
+        break;
+    }
+    default:
+        return nullptr;
+    }
+
+    Action::Ptr action(new Action(scope, actionType, this));
+    action->setApp(appPath);
+    action->setTitle(title);
+    action->setArgs(args);
+    action->setForcedShow(forceShow);
+    action->setAnchor(menuPlace);
+    return action;
 }

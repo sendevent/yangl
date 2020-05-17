@@ -84,7 +84,6 @@ protected slots:
 protected:
     explicit Action(Action::ActScope scope, KnownAction type, QObject *parent = nullptr);
     friend class ActionStorage;
-    friend class ActionsFactory;
 
     const Action::Id m_id;
     const Action::ActScope m_scope;

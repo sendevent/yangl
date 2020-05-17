@@ -44,4 +44,9 @@ private:
     void initBuiltinActions();
     void loadUserActions();
     void saveUserActions();
+
+    Action::Ptr createBuiltinAction(KnownAction actionType);
+
+    bool builtinActionShowForced(KnownAction action, bool defaultValue) const;
+    Action::MenuPlace builtinActionMenuPlace(KnownAction action, Action::MenuPlace defaultPlace);
 };
