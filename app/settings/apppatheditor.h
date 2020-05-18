@@ -18,21 +18,25 @@
 #pragma once
 
 #include <QObject>
+#include <QWidget>
 
-class QSettings;
-class SettingsManager : public QObject
+class QLineEdit;
+class QToolButton;
+class AppPathEditor : public QWidget
 {
     Q_OBJECT
 public:
-    static SettingsManager *instance();
+    explicit AppPathEditor(QWidget *parent = nullptr);
 
-    QSettings *storage();
+    QString text() const;
+    void setText(const QString &text);
+signals:
 
-    static void sync();
-    static QString dirPath();
+private slots:
+    void onAppPathChanged(const QString &text);
+    void onOpenFileClicked();
 
 private:
-    SettingsManager(QObject *parent = nullptr);
-    static SettingsManager *m_instance;
-    QSettings *m_settings = nullptr;
+    QLineEdit *m_pathEdit;
+    QToolButton *m_openFileButton;
 };

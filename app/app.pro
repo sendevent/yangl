@@ -22,11 +22,15 @@ INCLUDEPATH += \
 
 SOURCES += \
     actions/action.cpp \
+    actions/actionjson.cpp \
     actions/actionstorage.cpp \
     cli/clibus.cpp \
     cli/clicall.cpp \
     main.cpp \
     nordvpnwraper.cpp \
+    settings/actioneditor.cpp \
+    settings/actionstab.cpp \
+    settings/apppatheditor.cpp \
     settings/appsettings.cpp \
     settings/settingsdialog.cpp \
     settings/settingsmanager.cpp \
@@ -35,11 +39,15 @@ SOURCES += \
 
 HEADERS += \
     actions/action.h \
+    actions/actionjson.h \
     actions/actionstorage.h \
     actions/actiontypes.h \
     cli/clibus.h \
     cli/clicall.h \
     nordvpnwraper.h \
+    settings/actioneditor.h \
+    settings/actionstab.h \
+    settings/apppatheditor.h \
     settings/appsettings.h \
     settings/settingsdialog.h \
     settings/settingsmanager.h \
@@ -47,6 +55,8 @@ HEADERS += \
     trayicon.h
 
 FORMS += \
+    settings/actioneditor.ui \
+    settings/actionstab.ui \
     settings/settingsdialog.ui
 
 # Default rules for deployment.

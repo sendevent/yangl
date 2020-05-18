@@ -27,9 +27,9 @@
 
 #define LOG qDebug() << Q_FUNC_INFO
 
-Action::Action(Action::ActScope scope, KnownAction type, ActionStorage *parent)
+Action::Action(Action::ActScope scope, KnownAction type, ActionStorage *parent, const Action::Id &id)
     : QObject(parent)
-    , m_id(QUuid::createUuid())
+    , m_id(id.isNull() ? QUuid::createUuid() : id)
     , m_storage(parent)
     , m_scope(scope)
     , m_type(type)
