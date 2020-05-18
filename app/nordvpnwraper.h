@@ -52,10 +52,7 @@ private:
     std::unique_ptr<QMenu> m_menuMonitor;
     QAction *m_actSettings;
     QAction *m_actRun;
-    QAction *m_actSeparatorQuick;
-    QAction *m_actSeparatorNVPN;
     std::unique_ptr<QMenu> m_menuNordVpn;
-    QAction *m_actSeparatorUser;
     std::unique_ptr<QMenu> m_menuUser;
     QAction *m_actSeparatorExit;
     QAction *m_actQuit;

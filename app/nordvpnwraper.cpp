@@ -39,20 +39,18 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
     , m_menuMonitor(new QMenu(tr("Monitor")))
     , m_actSettings(nullptr)
     , m_actRun(nullptr)
-    , m_actSeparatorQuick(nullptr)
-    , m_actSeparatorNVPN(nullptr)
     , m_menuNordVpn(new QMenu(tr("NordVPN")))
-    , m_actSeparatorUser(nullptr)
     , m_menuUser(new QMenu(tr("Extra")))
     , m_actSeparatorExit(nullptr)
     , m_actQuit(nullptr)
 {
+    m_trayIcon->setContextMenu(m_menuMonitor.get());
+
     connect(m_checker, &StateChecker::stateChanged, m_trayIcon, &TrayIcon::setState);
     connect(qApp, &QApplication::aboutToQuit, this, &NordVpnWraper::prepareQuit);
     connect(m_trayIcon, &QSystemTrayIcon::activated, this, &NordVpnWraper::onTrayIconActivated);
 
     m_trayIcon->setVisible(true);
-    m_trayIcon->setContextMenu(m_menuMonitor.get());
 }
 
 void NordVpnWraper::start()
@@ -78,24 +76,6 @@ void NordVpnWraper::prepareQuit()
 {
     disconnect(m_trayIcon);
     disconnect(m_checker);
-}
-
-void NordVpnWraper::createMenu()
-{
-    m_menuMonitor->clear();
-
-    m_actSettings = m_menuMonitor->addAction(tr("Show &settings"), this, &NordVpnWraper::showSettingsEditor);
-    m_actRun = m_menuMonitor->addAction(tr("&Run"));
-    m_actRun->setCheckable(true);
-    connect(m_actRun, &QAction::toggled, m_checker, &StateChecker::setActive);
-
-    m_actSeparatorQuick = m_menuMonitor->addSeparator();
-    m_actSeparatorNVPN = m_menuMonitor->addSeparator();
-    m_menuMonitor->addMenu(m_menuNordVpn.get());
-    m_actSeparatorUser = m_menuMonitor->addSeparator();
-    m_menuMonitor->addMenu(m_menuUser.get());
-    m_actSeparatorExit = m_menuMonitor->addSeparator();
-    m_actQuit = m_menuMonitor->addAction(tr("&Quit"), qApp, &QApplication::quit);
 }
 
 void NordVpnWraper::showSettingsEditor()
@@ -129,8 +109,30 @@ void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason
     }
 }
 
+void NordVpnWraper::createMenu()
+{
+    m_menuMonitor->clear();
+    m_menuMonitor->adjustSize();
+
+    m_actSettings = m_menuMonitor->addAction(tr("Show &settings"), this, &NordVpnWraper::showSettingsEditor);
+    m_actRun = m_menuMonitor->addAction(tr("&Active"));
+    m_actRun->setCheckable(true);
+    connect(m_actRun, &QAction::toggled, m_checker, &StateChecker::setActive);
+
+    m_menuMonitor->addSeparator();
+    m_menuMonitor->addMenu(m_menuNordVpn.get());
+    m_menuMonitor->addMenu(m_menuUser.get());
+    m_menuMonitor->addSeparator();
+
+    m_actSeparatorExit = m_menuMonitor->addSeparator();
+    m_actQuit = m_menuMonitor->addAction(tr("&Quit"), qApp, &QApplication::quit);
+}
+
 void NordVpnWraper::populateActions()
 {
+    m_menuNordVpn->clear();
+    m_menuUser->clear();
+
     QVector<Action::Ptr> quickActions, customActions, nvpnActions;
 
     for (const auto &act : m_actions->allActions()) {
@@ -164,19 +166,14 @@ void NordVpnWraper::populateActions()
         connect(qAct, &QAction::triggered, this, &NordVpnWraper::onActionTriggered);
     };
 
-    QAction *insertBefore = m_actSeparatorNVPN;
     for (const auto &act : quickActions)
-        makeConnection(act, m_menuMonitor.get(), insertBefore);
+        makeConnection(act, m_menuMonitor.get(), m_actSeparatorExit);
 
-    m_menuNordVpn->clear();
-    insertBefore = m_actSeparatorUser;
     for (const auto &act : nvpnActions)
-        makeConnection(act, m_menuNordVpn.get(), insertBefore);
+        makeConnection(act, m_menuNordVpn.get(), {});
 
-    insertBefore = m_actSeparatorExit;
-    m_menuUser->clear();
     for (const auto &act : customActions)
-        makeConnection(act, m_menuUser.get(), insertBefore);
+        makeConnection(act, m_menuUser.get(), {});
 
     m_menuNordVpn->setDisabled(m_menuNordVpn->actions().isEmpty());
     m_menuUser->setDisabled(m_menuUser->actions().isEmpty());
