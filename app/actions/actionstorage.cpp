@@ -61,6 +61,29 @@ void ActionStorage::initActions()
     loadUserActions();
 }
 
+Action::Ptr ActionStorage::createUserAction()
+{
+    Action::Ptr action(new Action(Action::ActScope::User, KnownAction::Unknown, this));
+    action->setApp(AppSettings::Monitor.NVPNPath->read().toString());
+    action->setArgs({});
+    action->setForcedShow(true);
+    action->setAnchor(Action::MenuPlace::Own);
+
+    connect(action.get(), &Action::changed, this, &ActionStorage::onActionChanged);
+
+    m_userActions.insert(action->id(), action);
+
+    return action;
+}
+
+bool ActionStorage::removeUserAction(const Action::Ptr &action)
+{
+    if (!action)
+        return false;
+
+    return m_userActions.remove(action->id());
+}
+
 void ActionStorage::initBuiltinActions()
 {
     m_builtinActions.clear();

@@ -38,7 +38,10 @@ public:
     Action::Ptr action(int knownAction) const;
     Action::Ptr action(const Action::Id &userAction) const;
 
-    void initActions();
+    void initBuiltinActions();
+
+    Action::Ptr createUserAction();
+    bool removeUserAction(const Action::Ptr &action);
 
 private slots:
     void onActionChanged();
@@ -48,7 +51,7 @@ private:
     QHash<Action::Id, Action::Ptr> m_userActions;
     QJsonObject m_json;
 
-    void initBuiltinActions();
+    void initActions();
     void loadUserActions();
     void saveUserActions();
 

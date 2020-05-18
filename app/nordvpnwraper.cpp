@@ -61,7 +61,7 @@ void NordVpnWraper::start()
     const bool wasActive = m_checker->isActive();
 
     loadSettings();
-    m_actions->initActions();
+    m_actions->initBuiltinActions();
     populateActions();
 
     m_actRun->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());

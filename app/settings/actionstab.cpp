@@ -18,15 +18,20 @@
 #include "actionstab.h"
 
 #include "actioneditor.h"
+#include "actionstorage.h"
 #include "ui_actionstab.h"
 
 ActionsTab::ActionsTab(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ActionsTab)
     , m_actions()
+    , m_actStorage(nullptr)
 {
     ui->setupUi(this);
     ui->buttonRemove->setEnabled(false);
+
+    connect(ui->buttonAdd, &QPushButton::clicked, this, &ActionsTab::onAddRequested);
+    connect(ui->buttonRemove, &QPushButton::clicked, this, &ActionsTab::onRemoveRequested);
 }
 
 ActionsTab::~ActionsTab()
@@ -34,8 +39,9 @@ ActionsTab::~ActionsTab()
     delete ui;
 }
 
-void ActionsTab::setActions(const QList<Action::Ptr> &actions, Action::ActScope scope)
+void ActionsTab::setActions(ActionStorage *actStorage, Action::ActScope scope)
 {
+    m_actStorage = actStorage;
     while (ui->toolBox->count()) {
         const int pos = ui->toolBox->count() - 1;
         auto last = ui->toolBox->widget(pos);
@@ -43,19 +49,50 @@ void ActionsTab::setActions(const QList<Action::Ptr> &actions, Action::ActScope 
         delete last;
     }
 
-    m_actions = actions;
     if (scope == Action::ActScope::Builtin) {
         ui->buttonAdd->hide();
         ui->buttonRemove->hide();
         delete ui->buttonsLayout;
-    } else
+        m_actions = m_actStorage->knownActions();
+    } else {
         ui->buttonRemove->setEnabled(m_actions.size());
+        m_actions = m_actStorage->userActions();
+    }
 
-    for (auto act : m_actions) {
-        ActionEditor *editor = new ActionEditor(act.get());
-        connect(editor, &ActionEditor::titleChanged, this, [this, editor](const QString &title) {
-            ui->toolBox->setItemText(ui->toolBox->indexOf(editor), title);
-        });
-        ui->toolBox->addItem(editor, act->title());
+    for (auto act : m_actions)
+        addAction(act);
+}
+
+void ActionsTab::addAction(const Action::Ptr &action)
+{
+    if (!action)
+        return;
+
+    ActionEditor *editor = new ActionEditor(action);
+    connect(editor, &ActionEditor::titleChanged, this,
+            [this, editor](const QString &title) { ui->toolBox->setItemText(ui->toolBox->indexOf(editor), title); });
+    ui->toolBox->addItem(editor, action->title());
+    ui->buttonRemove->setEnabled(m_actions.size());
+}
+
+void ActionsTab::onAddRequested()
+{
+    if (Action::Ptr action = m_actStorage->createUserAction()) {
+        action->setTitle(tr("Custom#%1").arg(m_actions.size() + 1));
+        m_actions.append(action);
+        addAction(action);
+    }
+}
+
+void ActionsTab::onRemoveRequested()
+{
+    if (auto editor = qobject_cast<ActionEditor *>(ui->toolBox->currentWidget())) {
+        if (m_actStorage->removeUserAction(editor->getAction())) {
+            const int id = ui->toolBox->currentIndex();
+            ui->toolBox->removeItem(id);
+            editor->deleteLater();
+            m_actions.removeAt(id);
+            ui->buttonRemove->setEnabled(m_actions.size());
+        }
     }
 }

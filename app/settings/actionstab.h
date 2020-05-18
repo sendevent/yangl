@@ -26,6 +26,7 @@ namespace Ui {
 class ActionsTab;
 }
 
+class ActionStorage;
 class ActionsTab : public QWidget
 {
     Q_OBJECT
@@ -34,9 +35,16 @@ public:
     explicit ActionsTab(QWidget *parent = nullptr);
     ~ActionsTab();
 
-    void setActions(const QList<Action::Ptr> &actions, Action::ActScope scope);
+    void setActions(ActionStorage *actStorage, Action::ActScope scope);
+
+private slots:
+    void onAddRequested();
+    void onRemoveRequested();
 
 private:
     Ui::ActionsTab *ui;
     QList<Action::Ptr> m_actions;
+    ActionStorage *m_actStorage;
+
+    void addAction(const Action::Ptr &action);
 };

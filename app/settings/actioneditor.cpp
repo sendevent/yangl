@@ -20,7 +20,7 @@
 #include "action.h"
 #include "ui_actioneditor.h"
 
-ActionEditor::ActionEditor(Action *act, QWidget *parent)
+ActionEditor::ActionEditor(const Action::Ptr &act, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ActionEditor)
     , m_act(nullptr)
@@ -39,7 +39,12 @@ ActionEditor::~ActionEditor()
     delete ui;
 }
 
-void ActionEditor::setupAction(Action *action)
+Action::Ptr ActionEditor::getAction() const
+{
+    return m_act;
+}
+
+void ActionEditor::setupAction(const Action::Ptr &action)
 {
     m_act = action;
     if (!m_act)
