@@ -17,27 +17,39 @@
 
 #include "actionstorage.h"
 
+#include "actionjson.h"
 #include "appsettings.h"
+#include "settingsmanager.h"
 
 #include <QDebug>
-#include <QJsonArray>
+#include <QFile>
 
 #define LOG qDebug() << Q_FUNC_INFO
-#define NIY qWarning() << Q_FUNC_INFO << "Not implemented yet"
+#define WRN qWarning() << Q_FUNC_INFO
+#define NIY WRN << "Not implemented yet"
 
 ActionStorage::ActionStorage(QObject *parent)
     : QObject(parent)
+    , m_json(new ActionJson)
 {
+}
+
+QList<Action::Ptr> ActionStorage::sortActionsByTitle(const QList<Action::Ptr> &actions) const
+{
+    QList<Action::Ptr> sorted(actions);
+    std::sort(sorted.begin(), sorted.end(),
+              [](const Action::Ptr &a, const Action::Ptr &b) { return a->title() < b->title(); });
+    return sorted;
 }
 
 QList<Action::Ptr> ActionStorage::knownActions() const
 {
-    return m_builtinActions.values();
+    return sortActionsByTitle(m_builtinActions.values());
 }
 
 QList<Action::Ptr> ActionStorage::userActions() const
 {
-    return m_userActions.values();
+    return sortActionsByTitle(m_userActions.values());
 }
 
 QList<Action::Ptr> ActionStorage::allActions() const
@@ -55,32 +67,52 @@ Action::Ptr ActionStorage::action(const Action::Id &userAction) const
     return m_userActions.value(userAction, nullptr);
 }
 
-void ActionStorage::initActions()
+void ActionStorage::load()
 {
-    initBuiltinActions();
-    loadUserActions();
+    const bool jsonLoaded = m_json->load();
+    initActions(jsonLoaded);
+    if (!jsonLoaded)
+        m_json->save();
 }
 
-void ActionStorage::initBuiltinActions()
+Action::Ptr ActionStorage::createUserAction()
+{
+    Action::Ptr action(new Action(Action::ActScope::User, KnownAction::Unknown, this));
+    action->setApp(AppSettings::Monitor.NVPNPath->read().toString());
+    action->setArgs({});
+    action->setForcedShow(true);
+    action->setAnchor(Action::MenuPlace::Own);
+
+    m_userActions.insert(action->id(), action);
+    m_json->putAction(action.get());
+
+    return action;
+}
+
+bool ActionStorage::removeUserAction(const Action::Ptr &action)
+{
+    if (!action)
+        return false;
+
+    const bool res = m_userActions.remove(action->id());
+    if (res)
+        m_json->popAction(action.get());
+    return res;
+}
+
+void ActionStorage::initActions(bool updateFromJson)
 {
     m_builtinActions.clear();
 
     for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i) {
         if (const Action::Ptr &action = createBuiltinAction(static_cast<KnownAction>(i))) {
             m_builtinActions[action->type()] = action;
-            action->setForcedShow(true);
+            if (updateFromJson)
+                m_json->updateAction(action.get());
+            else
+                m_json->putAction(action.get());
         }
     }
-}
-
-void ActionStorage::loadUserActions()
-{
-    NIY;
-}
-
-void ActionStorage::saveUserActions()
-{
-    NIY;
 }
 
 Action::Ptr ActionStorage::createBuiltinAction(KnownAction actionType)
@@ -97,43 +129,43 @@ Action::Ptr ActionStorage::createBuiltinAction(KnownAction actionType)
     case KnownAction::CheckStatus: {
         title = QObject::tr("Check status");
         args.append("status");
-        forceShow = builtinActionShowForced(actionType, true);
-        menuPlace = builtinActionMenuPlace(actionType, Action::MenuPlace::Common);
+        forceShow = true;
+        menuPlace = Action::MenuPlace::Common;
         break;
     }
     case KnownAction::Connect: {
         title = QObject::tr("Connect");
         args.append("c");
-        forceShow = builtinActionShowForced(actionType, false);
-        menuPlace = builtinActionMenuPlace(actionType, Action::MenuPlace::Common);
+        forceShow = false;
+        menuPlace = Action::MenuPlace::Common;
         break;
     }
     case KnownAction::Disconnect: {
         title = QObject::tr("Disonnect");
         args.append("disconnect");
-        forceShow = builtinActionShowForced(actionType, false);
-        menuPlace = builtinActionMenuPlace(actionType, Action::MenuPlace::Own);
+        forceShow = false;
+        menuPlace = Action::MenuPlace::Own;
         break;
     }
     case KnownAction::Settings: {
         title = QObject::tr("Show used settings");
         args.append("settings");
-        forceShow = builtinActionShowForced(actionType, true);
-        menuPlace = builtinActionMenuPlace(actionType, Action::MenuPlace::Own);
+        forceShow = true;
+        menuPlace = Action::MenuPlace::Own;
         break;
     }
     case KnownAction::Account: {
         title = QObject::tr("Account details");
         args.append("account");
-        forceShow = builtinActionShowForced(actionType, true);
-        menuPlace = builtinActionMenuPlace(actionType, Action::MenuPlace::Own);
+        forceShow = true;
+        menuPlace = Action::MenuPlace::Own;
         break;
     }
     case KnownAction::Groups: {
         title = QObject::tr("List server groups");
         args.append("groups");
-        forceShow = builtinActionShowForced(actionType, true);
-        menuPlace = builtinActionMenuPlace(actionType, Action::MenuPlace::Own);
+        forceShow = true;
+        menuPlace = Action::MenuPlace::Own;
         break;
     }
     default:
@@ -147,46 +179,64 @@ Action::Ptr ActionStorage::createBuiltinAction(KnownAction actionType)
     action->setForcedShow(forceShow);
     action->setAnchor(menuPlace);
 
-    connect(action.get(), &Action::changed, this, &ActionStorage::onActionChanged);
-
     return action;
 }
 
-void ActionStorage::onActionChanged()
+bool ActionStorage::updateActions(const QList<Action::Ptr> &actions, Action::ActScope scope)
 {
-    if (auto action = qobject_cast<Action *>(sender())) {
-        const QString name = (action->actionScope() == Action::ActScope::Builtin)
-                ? QString::number(action->actionScope())
-                : action->id().toString();
+    const bool isBuiltin = scope == Action::ActScope::Builtin;
+    return isBuiltin ? updateBuiltinActions(actions) : updateUserActions(actions);
+}
 
-        const QString actName = QString::number(action->type());
-        m_json[actName] = actionToJson(action);
+void ActionStorage::save()
+{
+    for (const auto &action : m_builtinActions)
+        m_json->putAction(action.get());
+
+    for (const auto &action : m_userActions)
+        m_json->putAction(action.get());
+
+    return m_json->save();
+}
+
+bool ActionStorage::updateBuiltinActions(const QList<Action::Ptr> &actions)
+{
+    QList<int> savedActions;
+    for (auto action : actions) {
+        const int actType = action->type();
+        if (m_builtinActions.contains(actType))
+            m_builtinActions[actType].swap(action);
+        else
+            m_builtinActions.insert(actType, action);
+        savedActions.append(actType);
     }
+
+    for (const auto key : m_builtinActions.keys()) {
+        if (!savedActions.contains(key)) {
+            m_builtinActions.remove(key);
+        }
+    }
+
+    return true;
 }
 
-QJsonObject ActionStorage::actionToJson(Action *action) const
+bool ActionStorage::updateUserActions(const QList<Action::Ptr> &actions)
 {
-    if (!action)
-        return {};
+    QList<Action::Id> savedActions;
+    for (auto action : actions) {
+        const Action::Id actType = action->id();
+        if (m_userActions.contains(actType))
+            m_userActions[actType].swap(action);
+        else
+            m_userActions.insert(actType, action);
+        savedActions.append(actType);
+    }
 
-    return {
-        { "app", action->app() },
-        { "title", action->title() },
-        { "args", QJsonArray::fromStringList(action->args()) },
-        { "forcedDisplay", action->forcedShow() },
-        { "anchor", action->menuPlace() },
-    };
-}
+    for (const auto key : m_userActions.keys()) {
+        if (!savedActions.contains(key)) {
+            m_userActions.remove(key);
+        }
+    }
 
-bool ActionStorage::builtinActionShowForced(KnownAction action, bool defaultValue) const
-{
-    const QString actName = QString::number(action);
-    return m_json[actName].toObject()["forcedDisplay"].toBool(defaultValue);
-}
-
-Action::MenuPlace ActionStorage::builtinActionMenuPlace(KnownAction action, Action::MenuPlace defaultPlace)
-{
-    const QString actName = QString::number(action);
-    const int res = m_json[actName].toObject()["anchor"].toInt(static_cast<int>(defaultPlace));
-    return static_cast<Action::MenuPlace>(res);
+    return true;
 }

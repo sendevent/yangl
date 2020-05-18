@@ -17,22 +17,32 @@
 
 #pragma once
 
-#include <QObject>
+#include "action.h"
 
-class QSettings;
-class SettingsManager : public QObject
+#include <QWidget>
+
+namespace Ui {
+class ActionEditor;
+}
+
+class ActionEditor : public QWidget
 {
     Q_OBJECT
+
 public:
-    static SettingsManager *instance();
+    explicit ActionEditor(const Action::Ptr &act, QWidget *parent = nullptr);
+    ~ActionEditor();
 
-    QSettings *storage();
+    Action::Ptr getAction() const;
 
-    static void sync();
-    static QString dirPath();
+    bool apply();
+
+signals:
+    void titleChanged(const QString &text) const;
 
 private:
-    SettingsManager(QObject *parent = nullptr);
-    static SettingsManager *m_instance;
-    QSettings *m_settings = nullptr;
+    Ui::ActionEditor *ui;
+    Action::Ptr m_act;
+
+    void setupAction(const Action::Ptr &action);
 };

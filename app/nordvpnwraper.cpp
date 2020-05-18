@@ -61,7 +61,7 @@ void NordVpnWraper::start()
     const bool wasActive = m_checker->isActive();
 
     loadSettings();
-    m_actions->initActions();
+    m_actions->load();
     populateActions();
 
     m_actRun->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());
@@ -71,6 +71,7 @@ void NordVpnWraper::loadSettings()
 {
     m_actRun->setChecked(false);
     m_checker->setInterval(AppSettings::Monitor.Interval->read().toInt() * 1000);
+    m_trayIcon->setMessageDuration(AppSettings::Monitor.MessageDuration->read().toInt() * 1000);
 }
 
 void NordVpnWraper::prepareQuit()
@@ -99,7 +100,7 @@ void NordVpnWraper::createMenu()
 
 void NordVpnWraper::showSettingsEditor()
 {
-    Dialog *dlg = new Dialog;
+    Dialog *dlg = new Dialog(m_actions);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     connect(dlg, &QDialog::finished, this, [this](int result) {
         if (result == QDialog::Accepted) {

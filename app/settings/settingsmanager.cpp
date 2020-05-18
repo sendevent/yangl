@@ -23,11 +23,15 @@
 
 SettingsManager *SettingsManager::m_instance = nullptr;
 
+/*static*/ QString SettingsManager::dirPath()
+{
+    static const QString path = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    return path;
+}
+
 SettingsManager::SettingsManager(QObject *parent)
     : QObject(parent)
-    , m_settings(new QSettings(
-              QString("%1/settings.conf").arg(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)),
-              QSettings::IniFormat, this))
+    , m_settings(new QSettings(QString("%1/settings.conf").arg(dirPath()), QSettings::IniFormat, this))
 {
     qDebug() << "Config:" << m_settings->fileName();
 }

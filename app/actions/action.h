@@ -93,7 +93,8 @@ protected slots:
 protected:
     friend class ActionStorage;
 
-    explicit Action(Action::ActScope scope, KnownAction type, ActionStorage *parent = nullptr);
+    explicit Action(Action::ActScope scope, KnownAction type, ActionStorage *parent = nullptr,
+                    const Action::Id &id = {});
 
     const Action::Id m_id;
     const ActionStorage *m_storage;
@@ -108,3 +109,5 @@ protected:
     QPointer<QTextBrowser> m_display;
     MenuPlace m_menuPlace;
 };
+
+Q_DECLARE_METATYPE(Action::MenuPlace);

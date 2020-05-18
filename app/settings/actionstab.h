@@ -17,22 +17,37 @@
 
 #pragma once
 
-#include <QObject>
+#include "action.h"
 
-class QSettings;
-class SettingsManager : public QObject
+#include <QList>
+#include <QWidget>
+
+namespace Ui {
+class ActionsTab;
+}
+
+class ActionStorage;
+class ActionsTab : public QWidget
 {
     Q_OBJECT
+
 public:
-    static SettingsManager *instance();
+    explicit ActionsTab(QWidget *parent = nullptr);
+    ~ActionsTab();
 
-    QSettings *storage();
+    void setActions(ActionStorage *actStorage, Action::ActScope scope);
 
-    static void sync();
-    static QString dirPath();
+    bool save();
+
+private slots:
+    void onAddRequested();
+    void onRemoveRequested();
 
 private:
-    SettingsManager(QObject *parent = nullptr);
-    static SettingsManager *m_instance;
-    QSettings *m_settings = nullptr;
+    Ui::ActionsTab *ui;
+    QList<Action::Ptr> m_actions;
+    ActionStorage *m_actStorage;
+    Action::ActScope m_scope;
+
+    void addAction(const Action::Ptr &action);
 };

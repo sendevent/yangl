@@ -18,10 +18,11 @@
 #pragma once
 
 #include "action.h"
+#include "actionjson.h"
 
 #include <QHash>
-#include <QJsonObject>
 #include <QObject>
+#include <memory>
 
 class ActionStorage : public QObject
 {
@@ -29,7 +30,6 @@ class ActionStorage : public QObject
 
 public:
     ActionStorage(QObject *parent = nullptr);
-    ~ActionStorage() = default;
 
     QList<Action::Ptr> knownActions() const;
     QList<Action::Ptr> userActions() const;
@@ -38,24 +38,24 @@ public:
     Action::Ptr action(int knownAction) const;
     Action::Ptr action(const Action::Id &userAction) const;
 
-    void initActions();
+    void load();
+    void save();
 
-private slots:
-    void onActionChanged();
+    Action::Ptr createUserAction();
+    bool removeUserAction(const Action::Ptr &action);
+    bool updateActions(const QList<Action::Ptr> &actions, Action::ActScope scope);
 
 private:
     QHash<int, Action::Ptr> m_builtinActions;
     QHash<Action::Id, Action::Ptr> m_userActions;
-    QJsonObject m_json;
+    const std::unique_ptr<ActionJson> m_json;
 
-    void initBuiltinActions();
-    void loadUserActions();
-    void saveUserActions();
+    void initActions(bool updateFromJson);
 
     Action::Ptr createBuiltinAction(KnownAction actionType);
 
-    bool builtinActionShowForced(KnownAction action, bool defaultValue) const;
-    Action::MenuPlace builtinActionMenuPlace(KnownAction action, Action::MenuPlace defaultPlace);
+    bool updateBuiltinActions(const QList<Action::Ptr> &actions);
+    bool updateUserActions(const QList<Action::Ptr> &actions);
 
-    QJsonObject actionToJson(Action *action) const;
+    QList<Action::Ptr> sortActionsByTitle(const QList<Action::Ptr> &actions) const;
 };
