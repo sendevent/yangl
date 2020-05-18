@@ -26,12 +26,9 @@
 
 #include <QApplication>
 #include <QDebug>
-#include <QFileDialog>
 #include <QIcon>
 #include <QMessageBox>
 #include <QMetaEnum>
-#include <QPalette>
-#include <QStyle>
 
 #define LOG qDebug() << Q_FUNC_INFO
 #define WRN qWarning() << Q_FUNC_INFO
@@ -60,26 +57,6 @@ Dialog::Dialog(ActionStorage *actStorage, QWidget *parent)
 Dialog::~Dialog()
 {
     delete ui;
-}
-
-void Dialog::on_btnOpen_clicked()
-{
-    const QString path = QFileDialog::getOpenFileName(this, tr("Select NordVPN binary"), ui->leNVPNPath->text(),
-                                                      QStringLiteral("*.*"));
-    if (!path.isEmpty())
-        ui->leNVPNPath->setText(path);
-}
-
-void Dialog::on_leNVPNPath_textChanged(const QString &text)
-{
-    ui->leNVPNPath->setToolTip(text);
-    QPalette p = ui->leNVPNPath->palette();
-    const QColor clr =
-            Action::isValidAppPath(text) ? ui->leNVPNPath->style()->standardPalette().color(QPalette::Base) : Qt::red;
-    if (p.color(QPalette::Base) != clr) {
-        p.setColor(QPalette::Base, clr);
-        ui->leNVPNPath->setPalette(p);
-    }
 }
 
 void Dialog::accept()

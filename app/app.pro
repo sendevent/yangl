@@ -29,6 +29,7 @@ SOURCES += \
     nordvpnwraper.cpp \
     settings/actioneditor.cpp \
     settings/actionstab.cpp \
+    settings/apppatheditor.cpp \
     settings/appsettings.cpp \
     settings/settingsdialog.cpp \
     settings/settingsmanager.cpp \
@@ -44,6 +45,7 @@ HEADERS += \
     nordvpnwraper.h \
     settings/actioneditor.h \
     settings/actionstab.h \
+    settings/apppatheditor.h \
     settings/appsettings.h \
     settings/settingsdialog.h \
     settings/settingsmanager.h \
