@@ -61,12 +61,10 @@ void NordVpnWraper::start()
     const bool wasActive = m_checker->isActive();
 
     loadSettings();
-    m_actions->initBuiltinActions();
+    m_actions->load();
     populateActions();
 
     m_actRun->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());
-
-    showSettingsEditor();
 }
 
 void NordVpnWraper::loadSettings()

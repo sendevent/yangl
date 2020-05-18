@@ -116,5 +116,5 @@ bool ActionsTab::save()
         }
     }
 
-    return m_actStorage->save(actions, m_scope);
+    return m_actStorage->updateActions(actions, m_scope);
 }
