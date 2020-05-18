@@ -17,6 +17,8 @@
 
 #include "trayicon.h"
 
+#include "appsettings.h"
+
 #include <QApplication>
 #include <QDebug>
 #include <QMetaEnum>
@@ -25,6 +27,7 @@
 
 TrayIcon::TrayIcon(QObject *parent)
     : QSystemTrayIcon(iconForStatus(StateChecker::Status::Disconnected), parent)
+    , m_isFirstChange(true)
 {
 }
 
@@ -60,6 +63,11 @@ TrayIcon::TrayIcon(QObject *parent)
     return staticIcons[status];
 }
 
+void TrayIcon::setMessageDuration(int durationSecs)
+{
+    m_duration = durationSecs;
+}
+
 void TrayIcon::setState(const StateChecker::Info &state)
 {
     const QString description = state.toString();
@@ -67,9 +75,19 @@ void TrayIcon::setState(const StateChecker::Info &state)
     if (m_state.m_status != state.m_status && !qApp->isSavingSession()) {
         QIcon icn = iconForStatus(state.m_status);
         setIcon(icn);
-        showMessage(qApp->applicationDisplayName(), description /*, icn*/);
+
+        bool skeepMessage(false);
+        if (m_isFirstChange && state.m_status == StateChecker::Status::Connected)
+            if (AppSettings::Monitor.Active->read().toBool()
+                && AppSettings::Monitor.IgnoreFirstConnected->read().toBool())
+                skeepMessage = true;
+
+        if (!skeepMessage)
+            showMessage(qApp->applicationDisplayName(), description, {}, m_duration);
     }
 
     setToolTip(description);
+
     m_state = state;
+    m_isFirstChange = false;
 }

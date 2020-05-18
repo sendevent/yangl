@@ -73,6 +73,7 @@ void NordVpnWraper::loadSettings()
 {
     m_actRun->setChecked(false);
     m_checker->setInterval(AppSettings::Monitor.Interval->read().toInt() * 1000);
+    m_trayIcon->setMessageDuration(AppSettings::Monitor.MessageDuration->read().toInt() * 1000);
 }
 
 void NordVpnWraper::prepareQuit()

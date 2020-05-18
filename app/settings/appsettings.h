@@ -59,10 +59,12 @@ class GroupMonitor : public OptionsGroup
 public:
     GroupMonitor();
 
-    const AppSetting *SettingsDialog = Options[0];
-    const AppSetting *NVPNPath = Options[1];
-    const AppSetting *Active = Options[2];
-    const AppSetting *Interval = Options[3];
+    const AppSetting *NVPNPath = Options[0];
+    const AppSetting *Interval = Options[1];
+    const AppSetting *MessageDuration = Options[2];
+    const AppSetting *Active = Options[3];
+    const AppSetting *IgnoreFirstConnected = Options[4];
+    const AppSetting *SettingsDialog = Options[5];
 
 private:
     GroupMonitor(const GroupMonitor &) = delete;
