@@ -15,8 +15,9 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#ifndef ACTIONEDITOR_H
-#define ACTIONEDITOR_H
+#pragma once
+
+#include "action.h"
 
 #include <QWidget>
 
@@ -24,23 +25,22 @@ namespace Ui {
 class ActionEditor;
 }
 
-class Action;
 class ActionEditor : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit ActionEditor(Action *act, QWidget *parent = nullptr);
+    explicit ActionEditor(const Action::Ptr &act, QWidget *parent = nullptr);
     ~ActionEditor();
+
+    Action::Ptr getAction() const;
 
 signals:
     void titleChanged(const QString &text) const;
 
 private:
     Ui::ActionEditor *ui;
-    Action *m_act;
+    Action::Ptr m_act;
 
-    void setupAction(Action *action);
+    void setupAction(const Action::Ptr &action);
 };
-
-#endif // ACTIONEDITOR_H

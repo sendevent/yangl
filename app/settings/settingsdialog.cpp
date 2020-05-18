@@ -53,8 +53,8 @@ Dialog::Dialog(ActionStorage *actStorage, QWidget *parent)
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &Dialog::accept);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &Dialog::reject);
 
-    ui->tabNordVpn->setActions(m_actStorage->knownActions(), Action::ActScope::Builtin);
-    ui->tabCustom->setActions(m_actStorage->userActions(), Action::ActScope::User);
+    ui->tabNordVpn->setActions(m_actStorage, Action::ActScope::Builtin);
+    ui->tabCustom->setActions(m_actStorage, Action::ActScope::User);
 }
 
 Dialog::~Dialog()
