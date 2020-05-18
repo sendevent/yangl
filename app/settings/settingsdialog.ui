@@ -6,12 +6,9 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>358</width>
-    <height>180</height>
+    <width>388</width>
+    <height>490</height>
    </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="1" column="0">
@@ -77,60 +74,50 @@
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="label_3">
+        <widget class="QCheckBox" name="checkBoxAutoActive">
          <property name="text">
-          <string>Activate on app start:</string>
+          <string>Activate on app start</string>
          </property>
         </widget>
        </item>
        <item row="2" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="checkBoxAutoActive">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabNVPN">
+     <widget class="ActionsTab" name="tabNordVpn">
       <attribute name="title">
-       <string>NordVPN</string>
+       <string>NordVpn</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_3"/>
+     </widget>
+     <widget class="ActionsTab" name="tabCustom">
+      <attribute name="title">
+       <string>Custom</string>
       </attribute>
      </widget>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ActionsTab</class>
+   <extends>QWidget</extends>
+   <header>actionstab.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

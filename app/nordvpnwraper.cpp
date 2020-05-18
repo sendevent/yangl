@@ -65,6 +65,8 @@ void NordVpnWraper::start()
     populateActions();
 
     m_actRun->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());
+
+    showSettingsEditor();
 }
 
 void NordVpnWraper::loadSettings()
@@ -99,7 +101,7 @@ void NordVpnWraper::createMenu()
 
 void NordVpnWraper::showSettingsEditor()
 {
-    Dialog *dlg = new Dialog;
+    Dialog *dlg = new Dialog(m_actions);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     connect(dlg, &QDialog::finished, this, [this](int result) {
         if (result == QDialog::Accepted) {

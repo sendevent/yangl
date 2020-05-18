@@ -27,6 +27,8 @@ SOURCES += \
     cli/clicall.cpp \
     main.cpp \
     nordvpnwraper.cpp \
+    settings/actioneditor.cpp \
+    settings/actionstab.cpp \
     settings/appsettings.cpp \
     settings/settingsdialog.cpp \
     settings/settingsmanager.cpp \
@@ -40,6 +42,8 @@ HEADERS += \
     cli/clibus.h \
     cli/clicall.h \
     nordvpnwraper.h \
+    settings/actioneditor.h \
+    settings/actionstab.h \
     settings/appsettings.h \
     settings/settingsdialog.h \
     settings/settingsmanager.h \
@@ -47,6 +51,8 @@ HEADERS += \
     trayicon.h
 
 FORMS += \
+    settings/actioneditor.ui \
+    settings/actionstab.ui \
     settings/settingsdialog.ui
 
 # Default rules for deployment.

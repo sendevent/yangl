@@ -15,36 +15,32 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#pragma once
+#ifndef ACTIONEDITOR_H
+#define ACTIONEDITOR_H
 
-#include "statechecker.h"
-
-#include <QDialog>
-#include <QSystemTrayIcon>
+#include <QWidget>
 
 namespace Ui {
-class SettingsDialog;
+class ActionEditor;
 }
 
-class ActionStorage;
-class Dialog : public QDialog
+class Action;
+class ActionEditor : public QWidget
 {
     Q_OBJECT
 
 public:
-    Dialog(ActionStorage *actionStorage, QWidget *parent = nullptr);
-    ~Dialog() override;
+    explicit ActionEditor(Action *act, QWidget *parent = nullptr);
+    ~ActionEditor();
 
-public slots:
-    void on_btnOpen_clicked();
-    void on_leNVPNPath_textChanged(const QString &text);
-    void accept() override;
+signals:
+    void titleChanged(const QString &text) const;
 
 private:
-    Ui::SettingsDialog *ui;
-    ActionStorage *m_actStorage;
+    Ui::ActionEditor *ui;
+    Action *m_act;
 
-    bool saveSettings();
-    bool saveMonitorSettings();
-    bool saveNVPNSettings();
+    void setupAction(Action *action);
 };
+
+#endif // ACTIONEDITOR_H
