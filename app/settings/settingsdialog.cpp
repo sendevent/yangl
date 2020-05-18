@@ -99,5 +99,8 @@ bool Dialog::saveMonitorSettings()
 
 bool Dialog::saveActions()
 {
-    return ui->tabNordVpn->save() && ui->tabCustom->save();
+    const bool saved = ui->tabNordVpn->save() && ui->tabCustom->save();
+    if (saved)
+        m_actStorage->save();
+    return saved;
 }

@@ -17,22 +17,30 @@
 
 #pragma once
 
-#include <QObject>
+#include <QJsonObject>
 
-class QSettings;
-class SettingsManager : public QObject
+class Action;
+class QIODevice;
+class ActionJson
 {
-    Q_OBJECT
 public:
-    static SettingsManager *instance();
+    ActionJson();
 
-    QSettings *storage();
+    static QString filePath();
 
-    static void sync();
-    static QString dirPath();
+    bool load();
+    bool load(QIODevice *in);
+    void save();
+    void save(QIODevice *out);
+
+    void putAction(const Action *action);
+    void popAction(const Action *action);
+    bool updateAction(Action *action);
 
 private:
-    SettingsManager(QObject *parent = nullptr);
-    static SettingsManager *m_instance;
-    QSettings *m_settings = nullptr;
+    QJsonObject m_json;
+
+    QString collectionKey(const Action *action) const;
+    QString actionKey(const Action *action) const;
+    QJsonObject actionToJson(const Action *action) const;
 };
