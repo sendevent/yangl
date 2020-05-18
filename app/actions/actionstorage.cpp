@@ -213,3 +213,9 @@ Action::MenuPlace ActionStorage::builtinActionMenuPlace(KnownAction action, Acti
     const int res = m_json[actName].toObject()["anchor"].toInt(static_cast<int>(defaultPlace));
     return static_cast<Action::MenuPlace>(res);
 }
+
+bool ActionStorage::save(const QList<Action::Ptr> actions, Action::ActScope scope)
+{
+    NIY;
+    return true;
+}

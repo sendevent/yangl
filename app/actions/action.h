@@ -108,3 +108,5 @@ protected:
     QPointer<QTextBrowser> m_display;
     MenuPlace m_menuPlace;
 };
+
+Q_DECLARE_METATYPE(Action::MenuPlace);

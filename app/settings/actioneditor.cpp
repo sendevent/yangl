@@ -20,6 +20,10 @@
 #include "action.h"
 #include "ui_actioneditor.h"
 
+#include <QDebug>
+
+#define LOG qDebug() << Q_FUNC_INFO
+
 ActionEditor::ActionEditor(const Action::Ptr &act, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ActionEditor)
@@ -61,8 +65,7 @@ void ActionEditor::setupAction(const Action::Ptr &action)
     ui->comboBoxMenu->clear();
     ui->comboBoxMenu->addItem(tr("Hide"), Action::MenuPlace::NoMenu);
     ui->comboBoxMenu->addItem(tr("Monitor"), Action::MenuPlace::Common);
-    ui->comboBoxMenu->addItem(isCustom ? tr("Custom") : tr("NordVPN"),
-                              isCustom ? Action::MenuPlace::Common : Action::MenuPlace::Own);
+    ui->comboBoxMenu->addItem(isCustom ? tr("Custom") : tr("NordVPN"), Action::MenuPlace::Own);
     ui->comboBoxMenu->setCurrentIndex(m_act->menuPlace());
 
     if (m_act->actionScope() == Action::ActScope::Builtin) {
@@ -71,4 +74,21 @@ void ActionEditor::setupAction(const Action::Ptr &action)
             ui->formLayout->removeWidget(wgt);
         }
     }
+}
+
+bool ActionEditor::apply()
+{
+    if (m_act) {
+        m_act->setTitle(ui->leTitle->text().trimmed());
+        const QString &app = ui->leApplication->text().trimmed();
+        if (!Action::isValidAppPath(app))
+            return false; // TODO: ask
+        m_act->setApp(app);
+        m_act->setArgs(ui->leArguments->text().split(" ")); // TODO: obey quotes
+        m_act->setTimeout(ui->spinBoxTimeout->value());
+        m_act->setForcedShow(ui->checkBoxForceShow->isChecked());
+        m_act->setAnchor(ui->comboBoxMenu->currentData().value<Action::MenuPlace>());
+    }
+
+    return true;
 }

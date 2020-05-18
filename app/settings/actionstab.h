@@ -37,6 +37,8 @@ public:
 
     void setActions(ActionStorage *actStorage, Action::ActScope scope);
 
+    bool save();
+
 private slots:
     void onAddRequested();
     void onRemoveRequested();
@@ -45,6 +47,7 @@ private:
     Ui::ActionsTab *ui;
     QList<Action::Ptr> m_actions;
     ActionStorage *m_actStorage;
+    Action::ActScope m_scope;
 
     void addAction(const Action::Ptr &action);
 };

@@ -84,7 +84,6 @@
       <attribute name="title">
        <string>NordVpn</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_3"/>
      </widget>
      <widget class="ActionsTab" name="tabCustom">
       <attribute name="title">
