@@ -44,5 +44,5 @@ private:
 
     bool saveSettings();
     bool saveMonitorSettings();
-    bool saveNVPNSettings();
+    bool saveActions();
 };

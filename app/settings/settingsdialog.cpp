@@ -67,7 +67,7 @@ void Dialog::accept()
 
 bool Dialog::saveSettings()
 {
-    return saveMonitorSettings() && saveNVPNSettings();
+    return saveMonitorSettings() && saveActions();
 }
 
 bool Dialog::saveMonitorSettings()
@@ -91,8 +91,7 @@ bool Dialog::saveMonitorSettings()
     return true;
 }
 
-bool Dialog::saveNVPNSettings()
+bool Dialog::saveActions()
 {
-    NIY;
-    return true;
+    return ui->tabNordVpn->save() && ui->tabCustom->save();
 }

@@ -21,11 +21,18 @@
 #include "actionstorage.h"
 #include "ui_actionstab.h"
 
+#include <QDebug>
+
+#define LOG qDebug() << Q_FUNC_INFO
+#define WRN qWarning() << Q_FUNC_INFO
+#define NIY WRN << "Not implemented yet!"
+
 ActionsTab::ActionsTab(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ActionsTab)
     , m_actions()
     , m_actStorage(nullptr)
+    , m_scope(Action::ActScope::Builtin)
 {
     ui->setupUi(this);
     ui->buttonRemove->setEnabled(false);
@@ -41,6 +48,7 @@ ActionsTab::~ActionsTab()
 
 void ActionsTab::setActions(ActionStorage *actStorage, Action::ActScope scope)
 {
+    m_scope = scope;
     m_actStorage = actStorage;
     while (ui->toolBox->count()) {
         const int pos = ui->toolBox->count() - 1;
@@ -95,4 +103,18 @@ void ActionsTab::onRemoveRequested()
             ui->buttonRemove->setEnabled(m_actions.size());
         }
     }
+}
+
+bool ActionsTab::save()
+{
+    QList<Action::Ptr> actions;
+    for (int i = 0; i < ui->toolBox->count(); ++i) {
+        if (auto editor = qobject_cast<ActionEditor *>(ui->toolBox->widget(i))) {
+            if (!editor->apply())
+                return false;
+            actions.append(editor->getAction());
+        }
+    }
+
+    return m_actStorage->save(actions, m_scope);
 }

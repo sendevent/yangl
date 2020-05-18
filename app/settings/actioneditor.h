@@ -35,6 +35,8 @@ public:
 
     Action::Ptr getAction() const;
 
+    bool apply();
+
 signals:
     void titleChanged(const QString &text) const;
 

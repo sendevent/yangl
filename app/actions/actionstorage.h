@@ -42,6 +42,7 @@ public:
 
     Action::Ptr createUserAction();
     bool removeUserAction(const Action::Ptr &action);
+    bool save(const QList<Action::Ptr> actions, Action::ActScope scope);
 
 private slots:
     void onActionChanged();
