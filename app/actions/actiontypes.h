@@ -28,5 +28,16 @@ enum KnownAction
     Account,
     Groups,
 
+    Pause05,
+    Pause30,
+    Pause60,
+    PauseCustom,
+
+    Rate5,
+    Rate4,
+    Rate3,
+    Rate2,
+    Rate1,
+
     Last
 };
