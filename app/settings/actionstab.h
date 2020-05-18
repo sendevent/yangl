@@ -17,34 +17,26 @@
 
 #pragma once
 
-#include "statechecker.h"
+#include "action.h"
 
-#include <QDialog>
-#include <QSystemTrayIcon>
+#include <QList>
+#include <QWidget>
 
 namespace Ui {
-class SettingsDialog;
+class ActionsTab;
 }
 
-class ActionStorage;
-class Dialog : public QDialog
+class ActionsTab : public QWidget
 {
     Q_OBJECT
 
 public:
-    Dialog(ActionStorage *actionStorage, QWidget *parent = nullptr);
-    ~Dialog() override;
+    explicit ActionsTab(QWidget *parent = nullptr);
+    ~ActionsTab();
 
-public slots:
-    void on_btnOpen_clicked();
-    void on_leNVPNPath_textChanged(const QString &text);
-    void accept() override;
+    void setActions(const QList<Action::Ptr> &actions, Action::ActScope scope);
 
 private:
-    Ui::SettingsDialog *ui;
-    ActionStorage *m_actStorage;
-
-    bool saveSettings();
-    bool saveMonitorSettings();
-    bool saveNVPNSettings();
+    Ui::ActionsTab *ui;
+    QList<Action::Ptr> m_actions;
 };
