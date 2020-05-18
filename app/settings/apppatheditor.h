@@ -17,32 +17,26 @@
 
 #pragma once
 
-#include "statechecker.h"
+#include <QObject>
+#include <QWidget>
 
-#include <QDialog>
-#include <QSystemTrayIcon>
-
-namespace Ui {
-class SettingsDialog;
-}
-
-class ActionStorage;
-class Dialog : public QDialog
+class QLineEdit;
+class QToolButton;
+class AppPathEditor : public QWidget
 {
     Q_OBJECT
-
 public:
-    Dialog(ActionStorage *actionStorage, QWidget *parent = nullptr);
-    ~Dialog() override;
+    explicit AppPathEditor(QWidget *parent = nullptr);
 
-public slots:
-    void accept() override;
+    QString text() const;
+    void setText(const QString &text);
+signals:
+
+private slots:
+    void onAppPathChanged(const QString &text);
+    void onOpenFileClicked();
 
 private:
-    Ui::SettingsDialog *ui;
-    ActionStorage *m_actStorage;
-
-    bool saveSettings();
-    bool saveMonitorSettings();
-    bool saveNVPNSettings();
+    QLineEdit *m_pathEdit;
+    QToolButton *m_openFileButton;
 };

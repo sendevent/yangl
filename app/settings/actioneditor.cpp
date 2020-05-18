@@ -66,10 +66,9 @@ void ActionEditor::setupAction(const Action::Ptr &action)
     ui->comboBoxMenu->setCurrentIndex(m_act->menuPlace());
 
     if (m_act->actionScope() == Action::ActScope::Builtin) {
-        ui->labelApp->hide();
-        ui->leApplication->hide();
-        ui->btnApplication->hide();
-        ui->formLayout->removeWidget(ui->labelApp);
-        ui->formLayout->removeWidget(ui->hLayoutApp->widget());
+        for (auto wgt : std::initializer_list<QWidget *> { ui->labelApp, ui->leApplication }) {
+            wgt->hide();
+            ui->formLayout->removeWidget(wgt);
+        }
     }
 }

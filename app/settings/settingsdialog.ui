@@ -36,22 +36,7 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QLineEdit" name="leNVPNPath">
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="btnOpen">
-           <property name="text">
-            <string>...</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="AppPathEditor" name="leNVPNPath" native="true"/>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_2">
@@ -115,6 +100,12 @@
    <class>ActionsTab</class>
    <extends>QWidget</extends>
    <header>actionstab.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AppPathEditor</class>
+   <extends>QWidget</extends>
+   <header>apppatheditor.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
