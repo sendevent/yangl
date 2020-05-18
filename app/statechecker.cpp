@@ -154,7 +154,7 @@ bool StateChecker::Info::operator!=(const Info &other) const
 QString StateChecker::Info::toString() const
 {
     QString text;
-    text.append(tr("Status <b>%1</b>").arg(statusToText(m_status)));
+    text.append(tr("<b>%1</b>").arg(statusToText(m_status)));
 
     if (m_status != StateChecker::Status::Connected && m_status != StateChecker::Status::Connecting)
         return text;
@@ -167,7 +167,7 @@ QString StateChecker::Info::toString() const
     };
 
     if (!m_uptime.isEmpty())
-        text = add(m_uptime, ": ");
+        text = add(m_uptime, " ");
     text = add(m_server);
     text = add(m_city, " — ");
     text = add(m_country, ", ");
