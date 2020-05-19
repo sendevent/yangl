@@ -37,6 +37,8 @@ public:
     void popAction(const Action *action);
     bool updateAction(Action *action);
 
+    QVector<QString> customActionIds() const;
+
 private:
     QJsonObject m_json;
 

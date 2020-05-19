@@ -125,12 +125,12 @@ void NordVpnWraper::onActionTriggered(Action *action)
         case Pause60:
         case PauseCustom: {
             pause(actType);
-            break;
+            return;
         }
         default:
-            m_bus->performAction(action);
             break;
         }
+        m_bus->performAction(action);
     }
 }
 

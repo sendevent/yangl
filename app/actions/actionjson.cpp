@@ -190,3 +190,12 @@ QJsonObject ActionJson::actionToJson(const Action *action) const
         { Json.Action.Anchor, action->menuPlace() },
     };
 }
+
+QVector<QString> ActionJson::customActionIds() const
+{
+    QVector<QString> keys;
+    const QJsonObject &collection = m_json[Json.CustomCollection].toObject();
+    for (const QString &key : collection.keys())
+        keys.append(key);
+    return keys;
+}
