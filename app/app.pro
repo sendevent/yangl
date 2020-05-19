@@ -27,6 +27,7 @@ SOURCES += \
     cli/clibus.cpp \
     cli/clicall.cpp \
     main.cpp \
+    menuholder.cpp \
     nordvpnwraper.cpp \
     settings/actioneditor.cpp \
     settings/actionstab.cpp \
@@ -44,6 +45,7 @@ HEADERS += \
     actions/actiontypes.h \
     cli/clibus.h \
     cli/clicall.h \
+    menuholder.h \
     nordvpnwraper.h \
     settings/actioneditor.h \
     settings/actionstab.h \
