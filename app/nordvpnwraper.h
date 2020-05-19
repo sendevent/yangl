@@ -58,4 +58,6 @@ private:
     void loadSettings();
 
     void pause(KnownAction action);
+
+    void updateActions(bool connected);
 };
