@@ -52,7 +52,7 @@ private:
 
     void initActions(bool updateFromJson);
 
-    Action::Ptr createBuiltinAction(KnownAction actionType);
+    Action::Ptr createAction(KnownAction actionType, const QString &id = {});
 
     bool updateBuiltinActions(const QList<Action::Ptr> &actions);
     bool updateUserActions(const QList<Action::Ptr> &actions);

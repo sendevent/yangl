@@ -44,7 +44,6 @@ QString CLICall::run()
         return setResult({}, QStringLiteral("File [%1] not found").arg(m_appPath));
 
     QProcess proc;
-    proc.start(m_appPath, m_params, QIODevice::ReadOnly);
 
     connect(
             &proc, qOverload<int, QProcess::ExitStatus>(&QProcess::finished), this,
@@ -53,6 +52,8 @@ QString CLICall::run()
                 m_exitStatus = exitStatus;
             },
             Qt::DirectConnection);
+
+    proc.start(m_appPath, m_params, QIODevice::ReadOnly);
 
     if (!proc.waitForStarted(m_timeout))
         return setResult(

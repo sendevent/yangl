@@ -107,20 +107,33 @@ void ActionStorage::initActions(bool updateFromJson)
     m_builtinActions.clear();
 
     for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i) {
-        if (const Action::Ptr &action = createBuiltinAction(static_cast<KnownAction>(i))) {
-            m_builtinActions[action->type()] = action;
+        if (const Action::Ptr &action = createAction(static_cast<KnownAction>(i))) {
+            m_builtinActions.insert(action->type(), action);
             if (updateFromJson)
                 m_json->updateAction(action.get());
             else
                 m_json->putAction(action.get());
         }
     }
+
+    if (!updateFromJson)
+        return;
+
+    m_userActions.clear();
+    for (const QString &id : m_json->customActionIds()) {
+        if (!id.isEmpty()) {
+            if (const Action::Ptr &action = createAction(Unknown, id)) {
+                m_json->updateAction(action.get());
+                m_userActions.insert(action->id(), action);
+            }
+        }
+    }
 }
 
-Action::Ptr ActionStorage::createBuiltinAction(KnownAction actionType)
+Action::Ptr ActionStorage::createAction(KnownAction actionType, const QString &id)
 {
     const QString &appPath = AppSettings::Monitor.NVPNPath->read().toString();
-    const Action::ActScope scope = Action::ActScope::Builtin;
+    Action::ActScope scope = Action::ActScope::Builtin;
 
     QString title;
     QStringList args;
@@ -221,10 +234,11 @@ Action::Ptr ActionStorage::createBuiltinAction(KnownAction actionType)
         break;
     }
     default:
-        return nullptr;
+        scope = Action::ActScope::User;
+        break;
     }
 
-    Action::Ptr action(new Action(scope, actionType, this));
+    Action::Ptr action(new Action(scope, actionType, this, id.isEmpty() ? Action::Id() : Action::Id::fromString(id)));
     action->setApp(appPath);
     action->setTitle(title);
     action->setArgs(args);
