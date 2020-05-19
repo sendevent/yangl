@@ -17,45 +17,38 @@
 
 #pragma once
 
-#include "trayicon.h"
+#include "action.h"
 
+#include <QMenu>
 #include <QObject>
+#include <memory>
 
-class CLIBus;
-class ActionStorage;
-class StateChecker;
-class MenuHolder;
-class QTimer;
-class NordVpnWraper : public QObject
+class MenuHolder : public QObject
 {
     Q_OBJECT
 public:
-    explicit NordVpnWraper(QObject *parent = nullptr);
+    explicit MenuHolder(QObject *parent = nullptr);
 
-    void start();
+    QMenu *createMenu(const QList<Action::Ptr> &actions);
+
+    QAction *getActRun() const;
+    QAction *getActShowSettings() const;
+    QAction *getActQuit() const;
+
+signals:
+    void actionTriggered(Action *action);
 
 private slots:
-    void prepareQuit();
-
-    void showSettingsEditor();
-    void performStatusCheck();
-
-    void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
-
-    void onActionTriggered(Action *action);
-    void onStatusChanged(StateChecker::Status status);
-    void onPauseTimer();
+    void onActionTriggered();
 
 private:
-    CLIBus *m_bus;
-    ActionStorage *m_actions;
-    StateChecker *m_checker;
-    TrayIcon *m_trayIcon;
-    MenuHolder *m_menuHolder;
-    QTimer *m_pauseTimer;
-    int m_paused;
+    std::unique_ptr<QMenu> m_menuMonitor;
+    QAction *m_actSettings;
+    QAction *m_actRun;
+    std::unique_ptr<QMenu> m_menuNordVpn;
+    std::unique_ptr<QMenu> m_menuUser;
+    QAction *m_actSeparatorExit;
+    QAction *m_actQuit;
 
-    void loadSettings();
-
-    void pause(KnownAction action);
+    void populateActions(const QList<Action::Ptr> &actions);
 };
