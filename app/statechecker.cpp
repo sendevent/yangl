@@ -283,6 +283,9 @@ StateChecker::Info StateChecker::state() const
 void StateChecker::setState(const StateChecker::Info &state)
 {
     if (this->state() != state) {
+        if (m_state.m_status != state.m_status)
+            emit statusChanged(state.m_status);
+
         m_state = state;
         emit stateChanged(m_state);
     }

@@ -38,7 +38,7 @@ public:
     Action::Ptr action(int knownAction) const;
     Action::Ptr action(const Action::Id &userAction) const;
 
-    void load();
+    QList<Action::Ptr> load();
     void save();
 
     Action::Ptr createUserAction();

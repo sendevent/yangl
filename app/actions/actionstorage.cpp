@@ -67,12 +67,14 @@ Action::Ptr ActionStorage::action(const Action::Id &userAction) const
     return m_userActions.value(userAction, nullptr);
 }
 
-void ActionStorage::load()
+QList<Action::Ptr> ActionStorage::load()
 {
     const bool jsonLoaded = m_json->load();
     initActions(jsonLoaded);
     if (!jsonLoaded)
         m_json->save();
+
+    return allActions();
 }
 
 Action::Ptr ActionStorage::createUserAction()

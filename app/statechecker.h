@@ -76,6 +76,7 @@ public slots:
 
 signals:
     void stateChanged(const StateChecker::Info &state);
+    void statusChanged(const StateChecker::Status status);
 
 private slots:
     void onTimeout();
