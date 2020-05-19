@@ -159,25 +159,21 @@ void NordVpnWraper::pause(KnownAction action)
         return;
     }
 
-    LOG << "requested pause:" << duration;
     if (!duration)
         return;
 
     m_paused = duration * TimeQuantMs;
 
     if (auto disconnect = m_actions->action(KnownAction::Disconnect)) {
-        LOG << "disconnecting...";
         onActionTriggered(disconnect.get());
         m_pauseTimer->start(OneSecondMs);
-        LOG << "timer started for" << OneSecondMs << m_paused;
     }
 }
 
 void NordVpnWraper::onPauseTimer()
 {
-    LOG << 1 << m_paused;
     m_paused -= OneSecondMs;
-    LOG << 2 << m_paused;
+
     if (m_paused <= 0) {
         m_pauseTimer->stop();
         const StateChecker::Info &currentState = m_checker->state();
@@ -207,4 +203,52 @@ void NordVpnWraper::onStatusChanged(StateChecker::Status status)
     default:
         break;
     }
+
+    updateActions(connected);
+}
+
+void NordVpnWraper::updateActions(bool connected)
+{
+    std::function<void(QMenu *)> manageMenuActionsEnablement;
+    manageMenuActionsEnablement = [connected, &manageMenuActionsEnablement, this](QMenu *menu) {
+        if (!menu)
+            return;
+
+        for (auto qAction : menu->actions()) {
+            if (auto subMenu = qAction->menu()) {
+                manageMenuActionsEnablement(subMenu);
+                continue;
+            }
+
+            if (auto action = qAction->data().value<Action *>()) {
+                switch (action->type()) {
+                case KnownAction::Rate1:
+                case KnownAction::Rate2:
+                case KnownAction::Rate3:
+                case KnownAction::Rate4:
+                case KnownAction::Rate5:
+                case KnownAction::Connect: {
+                    qAction->setEnabled(!connected);
+                    break;
+                }
+                case KnownAction::Disconnect: {
+                    qAction->setEnabled(connected);
+                    break;
+                }
+                case KnownAction::Pause05:
+                case KnownAction::Pause30:
+                case KnownAction::Pause60:
+                case KnownAction::PauseCustom: {
+                    qAction->setEnabled(connected && !m_pauseTimer->isActive());
+                    break;
+                }
+                default:
+                    break;
+                }
+            }
+        }
+    };
+
+    if (auto rootMenu = m_trayIcon->contextMenu())
+        manageMenuActionsEnablement(rootMenu);
 }

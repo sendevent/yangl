@@ -197,7 +197,6 @@ StateChecker::StateChecker(CLIBus *bus, ActionStorage *actions, QObject *parent)
 
 StateChecker::~StateChecker()
 {
-    //    setActive(false);
     m_calls.clear();
 }
 
@@ -295,10 +294,10 @@ void StateChecker::setStatus(StateChecker::Status status)
 {
     if (m_state.m_status != status) {
         Info state;
-        if (status != Unknown) {
+        if (status != Unknown)
             state = m_state;
-            state.m_status = status;
-        }
+
+        state.m_status = status;
         setState(state);
     }
 }
