@@ -19,13 +19,13 @@
 
 #include "trayicon.h"
 
-#include <QMenu>
 #include <QObject>
-#include <memory>
 
 class CLIBus;
 class ActionStorage;
 class StateChecker;
+class MenuHolder;
+class QTimer;
 class NordVpnWraper : public QObject
 {
     Q_OBJECT
@@ -42,26 +42,22 @@ private slots:
 
     void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
-    void onActionTriggered();
+    void onActionTriggered(Action *action);
+    void onStatusChanged(StateChecker::Status status);
+    void onPauseTimer();
 
 private:
     CLIBus *m_bus;
     ActionStorage *m_actions;
     StateChecker *m_checker;
     TrayIcon *m_trayIcon;
-    std::unique_ptr<QMenu> m_menuMonitor;
-    QAction *m_actSettings;
-    QAction *m_actRun;
-    QAction *m_actSeparatorQuick;
-    QAction *m_actSeparatorNVPN;
-    std::unique_ptr<QMenu> m_menuNordVpn;
-    QAction *m_actSeparatorUser;
-    std::unique_ptr<QMenu> m_menuUser;
-    QAction *m_actSeparatorExit;
-    QAction *m_actQuit;
+    MenuHolder *m_menuHolder;
+    QTimer *m_pauseTimer;
+    int m_paused;
 
     void loadSettings();
 
-    void createMenu();
-    void populateActions();
+    void pause(KnownAction action);
+
+    void updateActions(bool connected);
 };

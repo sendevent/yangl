@@ -67,12 +67,14 @@ Action::Ptr ActionStorage::action(const Action::Id &userAction) const
     return m_userActions.value(userAction, nullptr);
 }
 
-void ActionStorage::load()
+QList<Action::Ptr> ActionStorage::load()
 {
     const bool jsonLoaded = m_json->load();
     initActions(jsonLoaded);
     if (!jsonLoaded)
         m_json->save();
+
+    return allActions();
 }
 
 Action::Ptr ActionStorage::createUserAction()
@@ -168,6 +170,56 @@ Action::Ptr ActionStorage::createBuiltinAction(KnownAction actionType)
         menuPlace = Action::MenuPlace::Own;
         break;
     }
+    case KnownAction::Pause05: {
+        title = QObject::tr("Pause for 5m");
+        menuPlace = Action::MenuPlace::Common;
+        break;
+    }
+    case KnownAction::Pause30: {
+        title = QObject::tr("Pause for 30m");
+        menuPlace = Action::MenuPlace::Common;
+        break;
+    }
+    case KnownAction::Pause60: {
+        title = QObject::tr("Pause for 1h");
+        menuPlace = Action::MenuPlace::Common;
+        break;
+    }
+    case KnownAction::PauseCustom: {
+        title = QObject::tr("Pause for ?");
+        menuPlace = Action::MenuPlace::Common;
+        break;
+    }
+    case KnownAction::Rate5: {
+        title = QObject::tr("Rate ★★★★★");
+        args.append("rate 5");
+        menuPlace = Action::MenuPlace::Own;
+        break;
+    }
+    case KnownAction::Rate4: {
+        title = QObject::tr("Rate ★★★★☆");
+        args.append("rate 4");
+        menuPlace = Action::MenuPlace::Own;
+        break;
+    }
+    case KnownAction::Rate3: {
+        title = QObject::tr("Rate ★★★☆☆");
+        args.append("rate 3");
+        menuPlace = Action::MenuPlace::Own;
+        break;
+    }
+    case KnownAction::Rate2: {
+        title = QObject::tr("Rate ★★☆☆☆");
+        menuPlace = Action::MenuPlace::Own;
+        args.append("rate 2");
+        break;
+    }
+    case KnownAction::Rate1: {
+        title = QObject::tr("Rate ★☆☆☆☆");
+        menuPlace = Action::MenuPlace::Own;
+        args.append("rate 1");
+        break;
+    }
     default:
         return nullptr;
     }
@@ -211,11 +263,9 @@ bool ActionStorage::updateBuiltinActions(const QList<Action::Ptr> &actions)
         savedActions.append(actType);
     }
 
-    for (const auto key : m_builtinActions.keys()) {
-        if (!savedActions.contains(key)) {
+    for (const auto key : m_builtinActions.keys())
+        if (!savedActions.contains(key))
             m_builtinActions.remove(key);
-        }
-    }
 
     return true;
 }
@@ -232,11 +282,9 @@ bool ActionStorage::updateUserActions(const QList<Action::Ptr> &actions)
         savedActions.append(actType);
     }
 
-    for (const auto key : m_userActions.keys()) {
-        if (!savedActions.contains(key)) {
+    for (const auto key : m_userActions.keys())
+        if (!savedActions.contains(key))
             m_userActions.remove(key);
-        }
-    }
 
     return true;
 }

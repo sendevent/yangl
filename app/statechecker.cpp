@@ -154,7 +154,7 @@ bool StateChecker::Info::operator!=(const Info &other) const
 QString StateChecker::Info::toString() const
 {
     QString text;
-    text.append(tr("Status <b>%1</b>").arg(statusToText(m_status)));
+    text.append(tr("<b>%1</b>").arg(statusToText(m_status)));
 
     if (m_status != StateChecker::Status::Connected && m_status != StateChecker::Status::Connecting)
         return text;
@@ -167,7 +167,7 @@ QString StateChecker::Info::toString() const
     };
 
     if (!m_uptime.isEmpty())
-        text = add(m_uptime, ": ");
+        text = add(m_uptime, " ");
     text = add(m_server);
     text = add(m_city, " — ");
     text = add(m_country, ", ");
@@ -197,7 +197,6 @@ StateChecker::StateChecker(CLIBus *bus, ActionStorage *actions, QObject *parent)
 
 StateChecker::~StateChecker()
 {
-    //    setActive(false);
     m_calls.clear();
 }
 
@@ -283,6 +282,9 @@ StateChecker::Info StateChecker::state() const
 void StateChecker::setState(const StateChecker::Info &state)
 {
     if (this->state() != state) {
+        if (m_state.m_status != state.m_status)
+            emit statusChanged(state.m_status);
+
         m_state = state;
         emit stateChanged(m_state);
     }
@@ -292,10 +294,10 @@ void StateChecker::setStatus(StateChecker::Status status)
 {
     if (m_state.m_status != status) {
         Info state;
-        if (status != Unknown) {
+        if (status != Unknown)
             state = m_state;
-            state.m_status = status;
-        }
+
+        state.m_status = status;
         setState(state);
     }
 }

@@ -17,27 +17,38 @@
 
 #pragma once
 
-enum KnownAction
+#include "action.h"
+
+#include <QMenu>
+#include <QObject>
+#include <memory>
+
+class MenuHolder : public QObject
 {
-    Unknown = 0,
+    Q_OBJECT
+public:
+    explicit MenuHolder(QObject *parent = nullptr);
 
-    CheckStatus,
-    Connect,
-    Disconnect,
-    Settings,
-    Account,
-    Groups,
+    QMenu *createMenu(const QList<Action::Ptr> &actions);
 
-    Pause05,
-    Pause30,
-    Pause60,
-    PauseCustom,
+    QAction *getActRun() const;
+    QAction *getActShowSettings() const;
+    QAction *getActQuit() const;
 
-    Rate5,
-    Rate4,
-    Rate3,
-    Rate2,
-    Rate1,
+signals:
+    void actionTriggered(Action *action);
 
-    Last
+private slots:
+    void onActionTriggered();
+
+private:
+    std::unique_ptr<QMenu> m_menuMonitor;
+    QAction *m_actSettings;
+    QAction *m_actRun;
+    std::unique_ptr<QMenu> m_menuNordVpn;
+    std::unique_ptr<QMenu> m_menuUser;
+    QAction *m_actSeparatorExit;
+    QAction *m_actQuit;
+
+    void populateActions(const QList<Action::Ptr> &actions);
 };
