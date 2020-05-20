@@ -1,9 +1,10 @@
-QT += testlib
-QT -= gui
-
-CONFIG += qt console warn_on depend_includepath testcase
-CONFIG -= app_bundle
+include(tests_all_sources.pri)
 
 TEMPLATE = app
 
-SOURCES +=  tst_dummy.cpp
+SOURCES +=  \
+    main.cpp \
+    tst_action.cpp
+
+HEADERS += \
+    tst_action.h
