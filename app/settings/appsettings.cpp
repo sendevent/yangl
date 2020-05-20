@@ -18,6 +18,7 @@
 #include "appsettings.h"
 
 #include "settingsmanager.h"
+#include "statechecker.h"
 
 #include <QSettings>
 #include <QStandardPaths>
@@ -63,7 +64,7 @@ GroupMonitor::GroupMonitor()
     : OptionsGroup(localName(),
                    {
                            new AppSetting(QString("%1/NVPNPath").arg(localName()), QStringLiteral("/usr/bin/nordvpn")),
-                           new AppSetting(QString("%1/Interval").arg(localName()), 1),
+                           new AppSetting(QString("%1/Interval").arg(localName()), StateChecker::DefaultIntervalMs),
                            new AppSetting(QString("%1/MessageDuration").arg(localName()), 10),
                            new AppSetting(QString("%1/Active").arg(localName()), false),
                            new AppSetting(QString("%1/IgnoreFirstConnected").arg(localName()), true),

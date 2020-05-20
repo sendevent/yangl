@@ -20,6 +20,7 @@
 #include <QDebug>
 #include <QMetaEnum>
 
+#define LOG qDebug() << Q_FUNC_INFO
 #define WRN qWarning() << Q_FUNC_INFO
 
 /*static*/ int NordVpnInfo::MetaIdClass = -1;
@@ -31,6 +32,8 @@ NordVpnInfo::NordVpnInfo()
         NordVpnInfo::MetaIdClass = qRegisterMetaType<NordVpnInfo>();
     if (-1 == NordVpnInfo::MetaIdEnum)
         NordVpnInfo::MetaIdEnum = qRegisterMetaType<NordVpnInfo::Status>();
+
+    clear();
 }
 
 void NordVpnInfo::clear()
@@ -54,7 +57,7 @@ NordVpnInfo::Status NordVpnInfo::status() const
 void NordVpnInfo::setStatus(NordVpnInfo::Status status)
 {
     if (status != m_status)
-        m_status = this->status();
+        m_status = status;
 }
 
 bool NordVpnInfo::operator==(const NordVpnInfo &other) const
@@ -86,7 +89,7 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
         const QString &name = pair.first().simplified();
         const QString &value = pair.last().simplified();
 
-        if (name == QStringLiteral("- - Status"))
+        if (name.endsWith(QStringLiteral("Status")))
             updatedState.m_status = textToStatus(value);
         else if (name == QStringLiteral("Current server"))
             updatedState.m_server = value;

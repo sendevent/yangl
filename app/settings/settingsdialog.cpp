@@ -34,6 +34,8 @@
 #define WRN qWarning() << Q_FUNC_INFO
 #define NIY WRN << "Not implemented yet!"
 
+static constexpr int OneSecondMs = 1000;
+
 Dialog::Dialog(ActionStorage *actStorage, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::SettingsDialog)
@@ -46,7 +48,7 @@ Dialog::Dialog(ActionStorage *actStorage, QWidget *parent)
     connect(ui->checkBoxAutoActive, &QCheckBox::toggled, ui->cbIgnoreFirstConnected, &QCheckBox::setEnabled);
 
     ui->leNVPNPath->setText(AppSettings::Monitor.NVPNPath->read().toString());
-    ui->spinBoxInterval->setValue(AppSettings::Monitor.Interval->read().toInt());
+    ui->spinBoxInterval->setValue(AppSettings::Monitor.Interval->read().toInt() / OneSecondMs);
     ui->spinBoxMsgDuration->setValue(AppSettings::Monitor.MessageDuration->read().toInt());
     ui->checkBoxAutoActive->setChecked(AppSettings::Monitor.Active->read().toBool());
     ui->cbIgnoreFirstConnected->setChecked(AppSettings::Monitor.IgnoreFirstConnected->read().toBool());
@@ -90,7 +92,7 @@ bool Dialog::saveMonitorSettings()
 
     AppSettings::Monitor.NVPNPath->write(path);
     AppSettings::Monitor.MessageDuration->write(ui->spinBoxMsgDuration->value());
-    AppSettings::Monitor.Interval->write(ui->spinBoxInterval->value());
+    AppSettings::Monitor.Interval->write(ui->spinBoxInterval->value() * OneSecondMs);
     AppSettings::Monitor.Active->write(ui->checkBoxAutoActive->isChecked());
     AppSettings::Monitor.IgnoreFirstConnected->write(ui->cbIgnoreFirstConnected->isChecked());
 

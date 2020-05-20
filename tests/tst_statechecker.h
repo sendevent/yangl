@@ -15,31 +15,31 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "tst_action.h"
-#include "tst_actionjson.h"
-#include "tst_actionstorage.h"
-#include "tst_clicall.h"
-#include "tst_clicaller.h"
-#include "tst_statechecker.h"
+#pragma once
 
-#include <QtTest>
+#include "actionstorage.h"
+#include "clicaller.h"
+#include "statechecker.h"
 
-int main(int argc, char **argv)
+#include <QObject>
+#include <QSharedPointer>
+
+class tst_StateChecker : public QObject
 {
-    QApplication app(argc, argv); // init standard paths
+    Q_OBJECT
+public:
+    explicit tst_StateChecker(QObject *parent = nullptr);
 
-    int status = 0;
-    auto ASSERT_TEST = [&status, argc, argv](QObject *obj) {
-        status |= QTest::qExec(obj, argc, argv);
-        delete obj;
-    };
+private slots:
+    void init();
 
-    //    ASSERT_TEST(new tst_Action());
-    //    ASSERT_TEST(new tst_ActionJson());
-    //    ASSERT_TEST(new tst_CLICall());
-    //    ASSERT_TEST(new tst_CLICaller());
-    //    ASSERT_TEST(new tst_ActionStorage());
-    ASSERT_TEST(new tst_StateChecker());
+    void test_active();
+    void test_interval();
+    void test_check_status_change();
 
-    return status;
-}
+private:
+    const std::unique_ptr<CLICaller> m_caller;
+    const std::unique_ptr<ActionStorage> m_storage;
+    QSharedPointer<StateChecker> m_checker;
+    void test_check(NordVpnInfo::Status targetStatus);
+};

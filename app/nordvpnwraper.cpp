@@ -40,7 +40,7 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
     : QObject(parent)
     , m_bus(new CLICaller(this))
     , m_actions(new ActionStorage(this))
-    , m_checker(new StateChecker(m_bus, m_actions, this))
+    , m_checker(new StateChecker(m_bus, m_actions, AppSettings::Monitor.Interval->read().toInt(), this))
     , m_trayIcon(new TrayIcon(this))
     , m_menuHolder(new MenuHolder(this))
     , m_pauseTimer(new QTimer(this))
@@ -74,7 +74,7 @@ void NordVpnWraper::start()
 
 void NordVpnWraper::loadSettings()
 {
-    m_checker->setInterval(AppSettings::Monitor.Interval->read().toInt() * 1000);
+    m_checker->setInterval(AppSettings::Monitor.Interval->read().toInt());
     m_trayIcon->setMessageDuration(AppSettings::Monitor.MessageDuration->read().toInt() * 1000);
 }
 
