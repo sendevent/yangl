@@ -31,9 +31,7 @@
 #define LOG qDebug() << Q_FUNC_INFO << QThread::currentThreadId()
 #define WRN qWarning() << Q_FUNC_INFO << QThread::currentThreadId()
 
-static const int DefaultIntervalMs = 1000;
-
-StateChecker::StateChecker(CLICaller *bus, ActionStorage *actions, QObject *parent)
+StateChecker::StateChecker(CLICaller *bus, ActionStorage *actions, int intervalMs, QObject *parent)
     : QObject(parent)
     , m_bus(bus)
     , m_actions(actions)
@@ -41,7 +39,7 @@ StateChecker::StateChecker(CLICaller *bus, ActionStorage *actions, QObject *pare
     , m_timer(new QTimer(this))
     , m_state()
 {
-    setInterval(DefaultIntervalMs);
+    setInterval(intervalMs);
     connect(m_timer, &QTimer::timeout, this, &StateChecker::onTimeout);
     setStatus(NordVpnInfo::Status::Unknown);
 }
