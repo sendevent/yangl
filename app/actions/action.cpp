@@ -189,17 +189,17 @@ void Action::onResult(const QString &result)
 
 bool Action::isAnchorable() const
 {
-    return menuPlace() != MenuPlace::NoMenu;
+    return anchor() != MenuPlace::NoMenu;
 }
 
-Action::MenuPlace Action::menuPlace() const
+Action::MenuPlace Action::anchor() const
 {
     return m_menuPlace;
 }
 
 void Action::setAnchor(MenuPlace place)
 {
-    if (place != menuPlace()) {
+    if (place != anchor()) {
         m_menuPlace = place;
         emit anchorChanged(m_menuPlace);
     }

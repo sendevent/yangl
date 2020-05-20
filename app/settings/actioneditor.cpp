@@ -63,10 +63,10 @@ void ActionEditor::setupAction(const Action::Ptr &action)
     ui->checkBoxForceShow->setChecked(m_act->forcedShow());
 
     ui->comboBoxMenu->clear();
-    ui->comboBoxMenu->addItem(tr("Hide"), Action::MenuPlace::NoMenu);
-    ui->comboBoxMenu->addItem(tr("Monitor"), Action::MenuPlace::Common);
-    ui->comboBoxMenu->addItem(isCustom ? tr("Custom") : tr("NordVPN"), Action::MenuPlace::Own);
-    ui->comboBoxMenu->setCurrentIndex(m_act->menuPlace());
+    ui->comboBoxMenu->addItem(tr("Hide"), static_cast<int>(Action::MenuPlace::NoMenu));
+    ui->comboBoxMenu->addItem(tr("Monitor"), static_cast<int>(Action::MenuPlace::Common));
+    ui->comboBoxMenu->addItem(isCustom ? tr("Custom") : tr("NordVPN"), static_cast<int>(Action::MenuPlace::Own));
+    ui->comboBoxMenu->setCurrentIndex(static_cast<int>(m_act->anchor()));
 
     if (m_act->actionScope() == Action::ActScope::Builtin) {
         for (auto wgt : std::initializer_list<QWidget *> { ui->labelApp, ui->leApplication }) {

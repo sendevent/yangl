@@ -79,7 +79,7 @@ void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
         if (!act->isAnchorable())
             continue;
 
-        switch (act->menuPlace()) {
+        switch (act->anchor()) {
         case Action::MenuPlace::Own: {
             switch (act->actionScope()) {
             case Action::ActScope::User: {

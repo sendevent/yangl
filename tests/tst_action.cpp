@@ -43,7 +43,7 @@ void tst_Action::checkAction(const Action::Ptr &action, KnownAction expectedType
     QVERIFY(action->args().isEmpty());
     QCOMPARE(action->timeout(), CLICall::DefaultTimeoutMSecs);
     QVERIFY(!action->forcedShow());
-    QCOMPARE(action->menuPlace(), Action::MenuPlace::NoMenu);
+    QCOMPARE(action->anchor(), Action::MenuPlace::NoMenu);
 }
 
 void tst_Action::testCreate_Builtin()
@@ -106,7 +106,7 @@ void tst_Action::testSetApp()
 
 void tst_Action::testSetArgs()
 {
-    static const QStringList testValue { "a", "b", "c" };
+    static const QStringList testValue { "-a", "\"b c d\"", "e" };
     const Action::Ptr action(new tst_Action(Action::ActScope::User, KnownAction::Unknown));
     QSignalSpy spy(action.get(), &Action::argsChanged);
 
@@ -157,9 +157,9 @@ void tst_Action::testSetAnchor()
 
     action->setAnchor(testValue);
 
-    QCOMPARE(action->menuPlace(), testValue);
+    QCOMPARE(action->anchor(), testValue);
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
     QVERIFY(arguments.at(0).type() == QVariant::UserType);
-    QVERIFY(arguments.at(0) == testValue);
+    QVERIFY(arguments.at(0) == static_cast<int>(testValue));
 }
