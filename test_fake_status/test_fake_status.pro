@@ -17,10 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp
 
-message($${DESTDIR})
 DESTDIR=$${DESTDIR}../tests
-message($${DESTDIR})
-
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
