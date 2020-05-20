@@ -18,7 +18,7 @@
 #include "statechecker.h"
 
 #include "actionstorage.h"
-#include "clibus.h"
+#include "clicaller.h"
 #include "clicall.h"
 
 #include <QDateTime>
@@ -179,7 +179,7 @@ QString StateChecker::Info::toString() const
     return text;
 }
 
-StateChecker::StateChecker(CLIBus *bus, ActionStorage *actions, QObject *parent)
+StateChecker::StateChecker(CLICaller *bus, ActionStorage *actions, QObject *parent)
     : QObject(parent)
     , m_bus(bus)
     , m_actions(actions)

@@ -22,11 +22,11 @@
 #include <QObject>
 
 class Action;
-class CLIBus : public QObject
+class CLICaller : public QObject
 {
     Q_OBJECT
 public:
-    explicit CLIBus(QObject *parent = nullptr);
+    explicit CLICaller(QObject *parent = nullptr);
 
     bool performAction(Action *action);
 
