@@ -26,31 +26,31 @@
 #define LOG qDebug() << Q_FUNC_INFO
 
 TrayIcon::TrayIcon(QObject *parent)
-    : QSystemTrayIcon(iconForStatus(StateChecker::Status::Disconnected), parent)
+    : QSystemTrayIcon(iconForStatus(NordVpnInfo::Status::Disconnected), parent)
     , m_isFirstChange(true)
 {
 }
 
-/*static*/ QIcon TrayIcon::iconForState(const StateChecker::Info &state)
+/*static*/ QIcon TrayIcon::iconForState(const NordVpnInfo &state)
 {
-    return iconForStatus(state.m_status);
+    return iconForStatus(state.status());
 }
 
-/*static*/ QIcon TrayIcon::iconForStatus(const StateChecker::Status &status)
+/*static*/ QIcon TrayIcon::iconForStatus(const NordVpnInfo::Status &status)
 {
-    static const QMap<StateChecker::Status, QIcon> staticIcons = [] {
-        QMap<StateChecker::Status, QIcon> icons;
-        QMetaEnum me = QMetaEnum::fromType<StateChecker::Status>();
+    static const QMap<NordVpnInfo::Status, QIcon> staticIcons = [] {
+        QMap<NordVpnInfo::Status, QIcon> icons;
+        QMetaEnum me = QMetaEnum::fromType<NordVpnInfo::Status>();
         for (int i = 0; i < me.keyCount(); ++i) {
-            const StateChecker::Status state = static_cast<StateChecker::Status>(me.value(i));
+            const NordVpnInfo::Status state = static_cast<NordVpnInfo::Status>(me.value(i));
             switch (state) {
-            case StateChecker::Status::Connected: {
+            case NordVpnInfo::Status::Connected: {
                 icons.insert(state, QPixmap(":/icn/resources/online.png"));
                 break;
             }
-            case StateChecker::Status::Disconnected:
-            case StateChecker::Status::Connecting:
-            case StateChecker::Status::Disconnecting:
+            case NordVpnInfo::Status::Disconnected:
+            case NordVpnInfo::Status::Connecting:
+            case NordVpnInfo::Status::Disconnecting:
             default: {
                 icons.insert(state, QPixmap(":/icn/resources/offline.png"));
                 break;
@@ -68,16 +68,16 @@ void TrayIcon::setMessageDuration(int durationSecs)
     m_duration = durationSecs;
 }
 
-void TrayIcon::setState(const StateChecker::Info &state)
+void TrayIcon::setState(const NordVpnInfo &state)
 {
     const QString description = state.toString();
 
-    if (m_state.m_status != state.m_status && !qApp->isSavingSession()) {
-        QIcon icn = iconForStatus(state.m_status);
+    if (m_state.status() != state.status() && !qApp->isSavingSession()) {
+        QIcon icn = iconForStatus(state.status());
         setIcon(icn);
 
         bool skeepMessage(false);
-        if (m_isFirstChange && state.m_status == StateChecker::Status::Connected)
+        if (m_isFirstChange && state.status() == NordVpnInfo::Status::Connected)
             if (AppSettings::Monitor.Active->read().toBool()
                 && AppSettings::Monitor.IgnoreFirstConnected->read().toBool())
                 skeepMessage = true;

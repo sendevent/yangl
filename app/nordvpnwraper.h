@@ -43,7 +43,7 @@ private slots:
     void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
     void onActionTriggered(Action *action);
-    void onStatusChanged(StateChecker::Status status);
+    void onStatusChanged(NordVpnInfo::Status status);
     void onPauseTimer();
 
 private:

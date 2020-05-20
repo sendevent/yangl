@@ -28,6 +28,7 @@ SOURCES += \
     cli/clicaller.cpp \
     main.cpp \
     menuholder.cpp \
+    nordvpninfo.cpp \
     nordvpnwraper.cpp \
     settings/actioneditor.cpp \
     settings/actionstab.cpp \
@@ -46,6 +47,7 @@ HEADERS += \
     cli/clicall.h \
     cli/clicaller.h \
     menuholder.h \
+    nordvpninfo.h \
     nordvpnwraper.h \
     settings/actioneditor.h \
     settings/actionstab.h \

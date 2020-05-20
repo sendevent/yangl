@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);
 
-    qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
+    qRegisterMetaType<QProcess::ExitStatus>();
 
     NordVpnWraper nordVpnWraper;
     nordVpnWraper.start();

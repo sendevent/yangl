@@ -20,6 +20,7 @@ SOURCES += \
     $$APP_PRO_ROOT/settings/settingsdialog.cpp \
     $$APP_PRO_ROOT/settings/settingsmanager.cpp \
     $$APP_PRO_ROOT/statechecker.cpp \
+    $$APP_PRO_ROOT/nordvpninfo.cpp \
     $$APP_PRO_ROOT/trayicon.cpp
 
 HEADERS += $$APP_PRO_ROOT\
@@ -38,6 +39,7 @@ HEADERS += $$APP_PRO_ROOT\
     $$APP_PRO_ROOT/settings/settingsdialog.h \
     $$APP_PRO_ROOT/settings/settingsmanager.h \
     $$APP_PRO_ROOT/statechecker.h \
+    $$APP_PRO_ROOT/nordvpninfo.h \
     $$APP_PRO_ROOT/trayicon.h
 
 FORMS += \

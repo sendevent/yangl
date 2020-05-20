@@ -18,6 +18,7 @@
 #pragma once
 
 #include "action.h"
+#include "nordvpninfo.h"
 
 #include <QObject>
 #include <QQueue>
@@ -29,54 +30,22 @@ class StateChecker : public QObject
 {
     Q_OBJECT
 public:
-    enum Status
-    {
-        Unknown = 0,
-        Disconnected,
-        Connecting,
-        Connected,
-        Disconnecting,
-    };
-    Q_ENUM(Status);
-
-    struct Info {
-        Status m_status;
-        QString m_server;
-        QString m_country;
-        QString m_city;
-        QString m_ip;
-        QString m_technology;
-        QString m_protocol;
-        QString m_traffic;
-        QString m_uptime;
-
-        void clear();
-        bool operator==(const Info &other) const;
-        bool operator!=(const Info &other) const;
-        QString toString() const;
-
-        static StateChecker::Info fromString(const QString &text);
-        static StateChecker::Status textToStatus(const QString &from);
-        static QString statusToText(StateChecker::Status from);
-        static QString parseUptime(const QString &from);
-    };
-
     explicit StateChecker(CLICaller *bus, ActionStorage *actions, QObject *parent = nullptr);
     ~StateChecker() override;
 
     void check();
 
     bool isActive() const;
-    int inteval() const;
-    Info state() const;
+    int interval() const;
+    NordVpnInfo state() const;
 
 public slots:
     void setInterval(int msecs);
     void setActive(bool active);
 
 signals:
-    void stateChanged(const StateChecker::Info &state);
-    void statusChanged(const StateChecker::Status status);
+    void stateChanged(const NordVpnInfo &state);
+    void statusChanged(const NordVpnInfo::Status status);
 
 private slots:
     void onTimeout();
@@ -89,12 +58,10 @@ protected:
     Action::Ptr m_currAction;
     QTimer *m_timer;
 
-    Info m_state;
-    void setState(const Info &state);
-    void setStatus(Status status);
+    NordVpnInfo m_state;
+    void setState(const NordVpnInfo &state);
+    void setStatus(NordVpnInfo::Status status);
 
     void nextQuery();
     void updateState(const QString &from);
 };
-Q_DECLARE_METATYPE(StateChecker::Status)
-Q_DECLARE_METATYPE(StateChecker::Info)
