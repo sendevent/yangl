@@ -15,27 +15,16 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "tst_action.h"
-#include "tst_actionjson.h"
-#include "tst_clicall.h"
-#include "tst_clicaller.h"
+#pragma once
 
-#include <QtTest>
+#include <QObject>
 
-int main(int argc, char **argv)
+class tst_CLICaller : public QObject
 {
-    QApplication app(argc, argv); // init standard paths
+    Q_OBJECT
+public:
+    explicit tst_CLICaller() = default;
 
-    int status = 0;
-    auto ASSERT_TEST = [&status, argc, argv](QObject *obj) {
-        status |= QTest::qExec(obj, argc, argv);
-        delete obj;
-    };
-
-    ASSERT_TEST(new tst_Action());
-    ASSERT_TEST(new tst_ActionJson());
-    ASSERT_TEST(new tst_CLICall());
-    ASSERT_TEST(new tst_CLICaller());
-
-    return status;
-}
+private slots:
+    void test_performAction();
+};
