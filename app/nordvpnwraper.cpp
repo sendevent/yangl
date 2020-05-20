@@ -38,7 +38,7 @@ static constexpr int TimeQuantMs = 60 * OneSecondMs;
 
 NordVpnWraper::NordVpnWraper(QObject *parent)
     : QObject(parent)
-    , m_bus(new CLIBus(AppSettings::Monitor.NVPNPath->read().toString(), this))
+    , m_bus(new CLIBus(this))
     , m_actions(new ActionStorage(this))
     , m_checker(new StateChecker(m_bus, m_actions, this))
     , m_trayIcon(new TrayIcon(this))

@@ -15,23 +15,19 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#pragma once
-
-#include "clicall.h"
+#ifndef TST_CLIBUS_H
+#define TST_CLIBUS_H
 
 #include <QObject>
 
-class Action;
-class CLIBus : public QObject
+class tst_CLIBus : public QObject
 {
     Q_OBJECT
 public:
-    explicit CLIBus(QObject *parent = nullptr);
-
-    bool performAction(Action *action);
+    explicit tst_CLIBus(QObject *parent = nullptr);
 
 signals:
 
-private:
-    void runQuery(CLICall *call);
 };
+
+#endif // TST_CLIBUS_H
