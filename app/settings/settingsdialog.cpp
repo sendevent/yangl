@@ -58,10 +58,13 @@ Dialog::Dialog(ActionStorage *actStorage, QWidget *parent)
 
     ui->tabNordVpn->setActions(m_actStorage, Action::ActScope::Builtin);
     ui->tabCustom->setActions(m_actStorage, Action::ActScope::User);
+
+    restoreGeometry(AppSettings::Monitor.SettingsDialog->read().toByteArray());
 }
 
 Dialog::~Dialog()
 {
+    AppSettings::Monitor.SettingsDialog->write(saveGeometry());
     delete ui;
 }
 
