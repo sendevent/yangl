@@ -39,15 +39,9 @@ private:
     void run() override { m_call->run(); }
 };
 
-CLIBus::CLIBus(const QString &appPath, QObject *parent)
+CLIBus::CLIBus(QObject *parent)
     : QObject(parent)
-    , m_appPath(appPath)
 {
-}
-
-QString CLIBus::applicationPath() const
-{
-    return m_appPath;
 }
 
 bool CLIBus::performAction(Action *action)
