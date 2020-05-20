@@ -27,6 +27,9 @@
 
 #define LOG qDebug() << Q_FUNC_INFO
 
+/*static*/ const QString Action::GroupKeyBuiltin { QStringLiteral("builtin") };
+/*static*/ const QString Action::GroupKeyCustom { QStringLiteral("custom") };
+
 Action::Action(Action::ActScope scope, KnownAction type, ActionStorage *parent, const Action::Id &id)
     : QObject(parent)
     , m_id(id.isNull() ? QUuid::createUuid() : id)
@@ -203,4 +206,14 @@ void Action::setAnchor(MenuPlace place)
         m_menuPlace = place;
         emit anchorChanged(m_menuPlace);
     }
+}
+
+QString Action::groupKey() const
+{
+    return actionScope() == Action::ActScope::Builtin ? GroupKeyBuiltin : GroupKeyCustom;
+}
+
+QString Action::key() const
+{
+    return actionScope() == Action::ActScope::Builtin ? QString::number(type()) : id().toString();
 }
