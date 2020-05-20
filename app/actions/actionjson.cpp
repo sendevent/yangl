@@ -187,7 +187,7 @@ QJsonObject ActionJson::actionToJson(const Action *action) const
         { Json.Action.Title, action->title() },
         { Json.Action.Args, QJsonArray::fromStringList(action->args()) },
         { Json.Action.Display, action->forcedShow() },
-        { Json.Action.Anchor, action->menuPlace() },
+        { Json.Action.Anchor, static_cast<const int>(action->anchor()) },
     };
 }
 

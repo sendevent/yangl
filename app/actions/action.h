@@ -34,13 +34,13 @@ public:
     using Id = QUuid;
     using Ptr = QSharedPointer<Action>;
 
-    enum ActScope
+    enum class ActScope
     {
         Builtin = 0,
         User,
     };
 
-    enum MenuPlace
+    enum class MenuPlace
     {
         NoMenu = 0,
         Common,
@@ -74,7 +74,7 @@ public:
 
     bool isAnchorable() const;
     void setAnchor(MenuPlace place);
-    MenuPlace menuPlace() const;
+    Action::MenuPlace anchor() const;
 
 signals:
     void performed(const QString &result, bool ok);
