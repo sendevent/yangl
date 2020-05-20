@@ -19,10 +19,9 @@
 
 #include "actionjson.h"
 #include "appsettings.h"
-#include "settingsmanager.h"
 
 #include <QDebug>
-#include <QFile>
+#include <QFileInfo>
 
 #define LOG qDebug() << Q_FUNC_INFO
 #define WRN qWarning() << Q_FUNC_INFO
@@ -67,14 +66,49 @@ Action::Ptr ActionStorage::action(const Action::Id &userAction) const
     return m_userActions.value(userAction, nullptr);
 }
 
-QList<Action::Ptr> ActionStorage::load()
+QList<Action::Ptr> ActionStorage::load(const QString &from)
 {
-    const bool jsonLoaded = m_json->load();
+    QString usedPath = from.isEmpty() ? ActionJson::jsonFilePath() : from;
+    QFile in(usedPath);
+    if (!in.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        WRN << "failed opening file:" << usedPath << in.errorString();
+        return {};
+    }
+
+    return load(&in);
+}
+
+QList<Action::Ptr> ActionStorage::load(QIODevice *from)
+{
+    const bool jsonLoaded = m_json->load(from);
     initActions(jsonLoaded);
     if (!jsonLoaded)
-        m_json->save();
+        m_json->save(from);
 
     return allActions();
+}
+
+void ActionStorage::save(const QString &to)
+{
+    QString usedPath = to.isEmpty() ? ActionJson::jsonFilePath() : to;
+    QFile out(usedPath);
+    if (!out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        WRN << "failed opening file:" << usedPath << out.errorString();
+        return;
+    }
+
+    save(&out);
+}
+
+void ActionStorage::save(QIODevice(*to))
+{
+    for (const auto &action : m_builtinActions)
+        m_json->putAction(action.get());
+
+    for (const auto &action : m_userActions)
+        m_json->putAction(action.get());
+
+    return m_json->save(to);
 }
 
 Action::Ptr ActionStorage::createUserAction()
@@ -252,17 +286,6 @@ bool ActionStorage::updateActions(const QList<Action::Ptr> &actions, Action::Act
 {
     const bool isBuiltin = scope == Action::ActScope::Builtin;
     return isBuiltin ? updateBuiltinActions(actions) : updateUserActions(actions);
-}
-
-void ActionStorage::save()
-{
-    for (const auto &action : m_builtinActions)
-        m_json->putAction(action.get());
-
-    for (const auto &action : m_userActions)
-        m_json->putAction(action.get());
-
-    return m_json->save();
 }
 
 bool ActionStorage::updateBuiltinActions(const QList<Action::Ptr> &actions)

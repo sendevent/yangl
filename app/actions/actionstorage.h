@@ -38,12 +38,16 @@ public:
     Action::Ptr action(int knownAction) const;
     Action::Ptr action(const Action::Id &userAction) const;
 
-    QList<Action::Ptr> load();
-    void save();
+    QList<Action::Ptr> load(const QString &from = {});
+    QList<Action::Ptr> load(QIODevice *from);
+    void save(const QString &to = {});
+    void save(QIODevice *from);
 
     Action::Ptr createUserAction();
     bool removeUserAction(const Action::Ptr &action);
     bool updateActions(const QList<Action::Ptr> &actions, Action::ActScope scope);
+
+    static QString jsonFilePath();
 
 private:
     QHash<int, Action::Ptr> m_builtinActions;
