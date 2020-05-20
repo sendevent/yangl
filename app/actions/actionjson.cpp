@@ -21,7 +21,9 @@
 #include "settingsmanager.h"
 
 #include <QDebug>
+#include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
 
@@ -29,9 +31,6 @@
 #define WRN qWarning() << Q_FUNC_INFO
 
 static const struct {
-    const QString BuiltinCollection { QStringLiteral("builtin") };
-    const QString CustomCollection { QStringLiteral("custom") };
-
     const struct {
         const QString App { QStringLiteral("app") };
         const QString Title { QStringLiteral("title") };
@@ -44,20 +43,13 @@ static const struct {
 
 ActionJson::ActionJson() {}
 
-/*static*/ QString ActionJson::filePath()
+bool ActionJson::load(const QString &from)
 {
-    static const QString jsonPath = QString("%1/actions.json").arg(SettingsManager::dirPath());
-    return jsonPath;
-}
-
-bool ActionJson::load()
-{
-    static const QString jsonFilePath(filePath());
     m_json = {};
 
-    QFile in(jsonFilePath);
+    QFile in(from);
     if (!in.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        WRN << "failed opening file" << jsonFilePath << in.errorString();
+        WRN << "failed opening file" << from << in.errorString();
         return false;
     }
 
@@ -84,13 +76,11 @@ bool ActionJson::load(QIODevice *in)
     return true;
 }
 
-void ActionJson::save()
+void ActionJson::save(const QString &to)
 {
-    static const QString jsonFilePath(filePath());
-
-    QFile out(jsonFilePath);
+    QFile out(to);
     if (!out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
-        WRN << "failed opening file" << jsonFilePath << out.errorString();
+        WRN << "failed opening file" << to << out.errorString();
         return;
     }
 
@@ -114,9 +104,9 @@ void ActionJson::putAction(const Action *action)
     if (!action)
         return;
 
-    const QString &collectionKey = this->collectionKey(action);
+    const QString &collectionKey = action->groupKey();
     QJsonObject collection = m_json[collectionKey].toObject();
-    collection[actionKey(action)] = actionToJson(action);
+    collection[action->key()] = actionToJson(action);
     m_json[collectionKey] = collection;
 }
 
@@ -125,9 +115,9 @@ void ActionJson::popAction(const Action *action)
     if (!action)
         return;
 
-    const QString &collectionKey = this->collectionKey(action);
+    const QString &collectionKey = action->groupKey();
     QJsonObject collection = m_json[collectionKey].toObject();
-    collection.remove(actionKey(action));
+    collection.remove(action->key());
     m_json[collectionKey] = collection;
 }
 
@@ -136,9 +126,9 @@ bool ActionJson::updateAction(Action *action)
     if (!action)
         return false;
 
-    const QString &collectionKey = this->collectionKey(action);
+    const QString &collectionKey = action->groupKey();
     const QJsonObject &collection = m_json[collectionKey].toObject();
-    const QJsonObject &actionJson = collection[actionKey(action)].toObject();
+    const QJsonObject &actionJson = collection[action->key()].toObject();
     if (actionJson.isEmpty())
         return false;
 
@@ -157,26 +147,6 @@ bool ActionJson::updateAction(Action *action)
     return true;
 }
 
-QString ActionJson::collectionKey(const Action *action) const
-{
-    QString key;
-    if (action) {
-        const bool isBuiltint = action->actionScope() == Action::ActScope::Builtin;
-        key = isBuiltint ? Json.BuiltinCollection : Json.CustomCollection;
-    }
-    return key;
-}
-
-QString ActionJson::actionKey(const Action *action) const
-{
-    QString key;
-    if (action) {
-        const bool isBuiltint = action->actionScope() == Action::ActScope::Builtin;
-        key = isBuiltint ? QString::number(action->type()) : action->id().toString();
-    }
-    return key;
-}
-
 QJsonObject ActionJson::actionToJson(const Action *action) const
 {
     if (!action)
@@ -187,15 +157,27 @@ QJsonObject ActionJson::actionToJson(const Action *action) const
         { Json.Action.Title, action->title() },
         { Json.Action.Args, QJsonArray::fromStringList(action->args()) },
         { Json.Action.Display, action->forcedShow() },
-        { Json.Action.Anchor, action->menuPlace() },
+        { Json.Action.Anchor, static_cast<int>(action->anchor()) },
     };
 }
 
 QVector<QString> ActionJson::customActionIds() const
 {
     QVector<QString> keys;
-    const QJsonObject &collection = m_json[Json.CustomCollection].toObject();
+    const QJsonObject &collection = m_json[Action::GroupKeyCustom].toObject();
     for (const QString &key : collection.keys())
         keys.append(key);
     return keys;
+}
+
+/*static*/ QString ActionJson::jsonFilePath()
+{
+    static QString jsonPath;
+    if (jsonPath.isEmpty()) {
+        jsonPath = QString("%1/actions.json").arg(SettingsManager::dirPath());
+        QDir dir = QFileInfo(jsonPath).absoluteDir();
+        if (!dir.exists())
+            dir.mkpath(dir.absolutePath());
+    }
+    return jsonPath;
 }

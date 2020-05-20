@@ -30,13 +30,13 @@ public:
     void setMessageDuration(int durationSecs);
 
 public slots:
-    void setState(const StateChecker::Info &state);
+    void setState(const NordVpnInfo &state);
 
 private:
-    StateChecker::Info m_state;
+    NordVpnInfo m_state;
     bool m_isFirstChange;
     int m_duration;
 
-    static QIcon iconForState(const StateChecker::Info &state);
-    static QIcon iconForStatus(const StateChecker::Status &status);
+    static QIcon iconForState(const NordVpnInfo &state);
+    static QIcon iconForStatus(const NordVpnInfo::Status &status);
 };

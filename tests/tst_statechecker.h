@@ -17,25 +17,29 @@
 
 #pragma once
 
-#include "clicall.h"
+#include "actionstorage.h"
+#include "clicaller.h"
+#include "statechecker.h"
 
 #include <QObject>
+#include <QSharedPointer>
 
-class Action;
-class CLIBus : public QObject
+class tst_StateChecker : public QObject
 {
     Q_OBJECT
 public:
-    explicit CLIBus(const QString &appPath, QObject *parent = nullptr);
+    explicit tst_StateChecker(QObject *parent = nullptr);
 
-    QString applicationPath() const;
+private slots:
+    void init();
 
-    bool performAction(Action *action);
-
-signals:
+    void test_active();
+    void test_interval();
+    void test_check_status_change();
 
 private:
-    const QString m_appPath;
-
-    void runQuery(CLICall *call);
+    const std::unique_ptr<CLICaller> m_caller;
+    const std::unique_ptr<ActionStorage> m_storage;
+    QSharedPointer<StateChecker> m_checker;
+    void test_check(NordVpnInfo::Status targetStatus);
 };

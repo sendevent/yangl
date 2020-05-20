@@ -1,9 +1,22 @@
-QT += testlib
-QT -= gui
-
-CONFIG += qt console warn_on depend_includepath testcase
-CONFIG -= app_bundle
 
 TEMPLATE = app
+TARGET = yangl_tests
 
-SOURCES +=  tst_dummy.cpp
+SOURCES +=  \
+    main.cpp \
+    tst_action.cpp \
+    tst_actionjson.cpp \
+    tst_actionstorage.cpp \
+    tst_clicall.cpp \
+    tst_clicaller.cpp \
+    tst_statechecker.cpp
+
+HEADERS += \
+    tst_action.h \
+    tst_actionjson.h \
+    tst_actionstorage.h \
+    tst_clicall.h \
+    tst_clicaller.h \
+    tst_statechecker.h
+
+include(tests_all_sources.pri)

@@ -18,83 +18,54 @@
 #pragma once
 
 #include "action.h"
+#include "nordvpninfo.h"
 
 #include <QObject>
 #include <QQueue>
 
-class CLIBus;
+class CLICaller;
 class ActionStorage;
 class QTimer;
 class StateChecker : public QObject
 {
     Q_OBJECT
 public:
-    enum Status
-    {
-        Unknown = 0,
-        Disconnected,
-        Connecting,
-        Connected,
-        Disconnecting,
-    };
-    Q_ENUM(Status);
+    static constexpr int DefaultIntervalMs = 1000;
 
-    struct Info {
-        Status m_status;
-        QString m_server;
-        QString m_country;
-        QString m_city;
-        QString m_ip;
-        QString m_technology;
-        QString m_protocol;
-        QString m_traffic;
-        QString m_uptime;
-
-        void clear();
-        bool operator==(const Info &other) const;
-        bool operator!=(const Info &other) const;
-        QString toString() const;
-
-        static StateChecker::Info fromString(const QString &text);
-        static StateChecker::Status textToStatus(const QString &from);
-        static QString statusToText(StateChecker::Status from);
-        static QString parseUptime(const QString &from);
-    };
-
-    explicit StateChecker(CLIBus *bus, ActionStorage *actions, QObject *parent = nullptr);
+    explicit StateChecker(CLICaller *bus, ActionStorage *actions, int intervalMs, QObject *parent = nullptr);
     ~StateChecker() override;
 
     void check();
 
     bool isActive() const;
-    int inteval() const;
-    Info state() const;
+    int interval() const;
+    NordVpnInfo state() const;
 
 public slots:
     void setInterval(int msecs);
     void setActive(bool active);
 
 signals:
-    void stateChanged(const StateChecker::Info &state);
-    void statusChanged(const StateChecker::Status status);
+    void stateChanged(const NordVpnInfo &state);
+    void statusChanged(const NordVpnInfo::Status status);
 
 private slots:
     void onTimeout();
     void onQueryFinish(const QString &result, bool ok);
 
 protected:
-    CLIBus *m_bus;
+    CLICaller *m_bus;
     ActionStorage *m_actions;
     QQueue<Action::Ptr> m_calls;
     Action::Ptr m_currAction;
     QTimer *m_timer;
 
-    Info m_state;
-    void setState(const Info &state);
-    void setStatus(Status status);
+    NordVpnInfo m_state;
+    void setState(const NordVpnInfo &state);
+    void setStatus(NordVpnInfo::Status status);
 
     void nextQuery();
     void updateState(const QString &from);
+
+    friend class tst_StateChecker;
 };
-Q_DECLARE_METATYPE(StateChecker::Status)
-Q_DECLARE_METATYPE(StateChecker::Info)

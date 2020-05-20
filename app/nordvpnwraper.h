@@ -21,7 +21,7 @@
 
 #include <QObject>
 
-class CLIBus;
+class CLICaller;
 class ActionStorage;
 class StateChecker;
 class MenuHolder;
@@ -43,11 +43,11 @@ private slots:
     void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
     void onActionTriggered(Action *action);
-    void onStatusChanged(StateChecker::Status status);
+    void onStatusChanged(NordVpnInfo::Status status);
     void onPauseTimer();
 
 private:
-    CLIBus *m_bus;
+    CLICaller *m_bus;
     ActionStorage *m_actions;
     StateChecker *m_checker;
     TrayIcon *m_trayIcon;

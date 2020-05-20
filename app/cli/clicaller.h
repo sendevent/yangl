@@ -17,30 +17,21 @@
 
 #pragma once
 
-#include <QJsonObject>
+#include "clicall.h"
+
+#include <QObject>
 
 class Action;
-class QIODevice;
-class ActionJson
+class CLICaller : public QObject
 {
+    Q_OBJECT
 public:
-    ActionJson();
+    explicit CLICaller(QObject *parent = nullptr);
 
-    bool load(const QString &from);
-    bool load(QIODevice *in);
-    void save(const QString &to);
-    void save(QIODevice *out);
+    bool performAction(Action *action);
 
-    void putAction(const Action *action);
-    void popAction(const Action *action);
-    bool updateAction(Action *action);
-
-    QVector<QString> customActionIds() const;
-
-    static QString jsonFilePath();
+signals:
 
 private:
-    QJsonObject m_json;
-
-    QJsonObject actionToJson(const Action *action) const;
+    void runQuery(CLICall *call);
 };

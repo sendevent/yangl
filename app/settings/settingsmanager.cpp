@@ -18,6 +18,8 @@
 #include "settingsmanager.h"
 
 #include <QDebug>
+#include <QDir>
+#include <QFileInfo>
 #include <QSettings>
 #include <QStandardPaths>
 
@@ -25,7 +27,14 @@ SettingsManager *SettingsManager::m_instance = nullptr;
 
 /*static*/ QString SettingsManager::dirPath()
 {
-    static const QString path = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    static QString path;
+
+    if (path.isEmpty()) {
+        path = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+        QDir dir = QFileInfo(path).absoluteDir();
+        if (!dir.exists())
+            dir.mkpath(dir.absolutePath());
+    }
     return path;
 }
 

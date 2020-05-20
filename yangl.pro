@@ -1,5 +1,11 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    app \
-    tests
+    app
+
+!CONFIG(no_tests) {
+message("adding tests")
+SUBDIRS += test_fake_status tests
+tests.depends += test_fake_status
+app.depends += tests
+}
