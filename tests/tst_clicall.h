@@ -15,21 +15,16 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "tst_action.h"
-#include "tst_clicall.h"
+#pragma once
 
-#include <QtTest>
+#include <QObject>
 
-int main(int argc, char **argv)
+class tst_CLICall : public QObject
 {
-    int status = 0;
-    auto ASSERT_TEST = [&status, argc, argv](QObject *obj) {
-        status |= QTest::qExec(obj, argc, argv);
-        delete obj;
-    };
+    Q_OBJECT
+public:
+    tst_CLICall(QObject *parent = nullptr);
 
-    //    ASSERT_TEST(new tst_Action());
-    ASSERT_TEST(new tst_CLICall());
-
-    return status;
-}
+private slots:
+    void testCall();
+};
