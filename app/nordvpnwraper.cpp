@@ -19,7 +19,7 @@
 
 #include "actionstorage.h"
 #include "appsettings.h"
-#include "clibus.h"
+#include "clicaller.h"
 #include "menuholder.h"
 #include "settingsdialog.h"
 #include "statechecker.h"
@@ -38,9 +38,9 @@ static constexpr int TimeQuantMs = 60 * OneSecondMs;
 
 NordVpnWraper::NordVpnWraper(QObject *parent)
     : QObject(parent)
-    , m_bus(new CLIBus(AppSettings::Monitor.NVPNPath->read().toString(), this))
+    , m_bus(new CLICaller(this))
     , m_actions(new ActionStorage(this))
-    , m_checker(new StateChecker(m_bus, m_actions, this))
+    , m_checker(new StateChecker(m_bus, m_actions, AppSettings::Monitor.Interval->read().toInt(), this))
     , m_trayIcon(new TrayIcon(this))
     , m_menuHolder(new MenuHolder(this))
     , m_pauseTimer(new QTimer(this))
@@ -74,7 +74,7 @@ void NordVpnWraper::start()
 
 void NordVpnWraper::loadSettings()
 {
-    m_checker->setInterval(AppSettings::Monitor.Interval->read().toInt() * 1000);
+    m_checker->setInterval(AppSettings::Monitor.Interval->read().toInt());
     m_trayIcon->setMessageDuration(AppSettings::Monitor.MessageDuration->read().toInt() * 1000);
 }
 
@@ -176,9 +176,9 @@ void NordVpnWraper::onPauseTimer()
 
     if (m_paused <= 0) {
         m_pauseTimer->stop();
-        const StateChecker::Info &currentState = m_checker->state();
-        if (currentState.m_status == StateChecker::Status::Unknown
-            || currentState.m_status == StateChecker::Status::Disconnected) {
+        const NordVpnInfo &currentState = m_checker->state();
+        if (currentState.status() == NordVpnInfo::Status::Unknown
+            || currentState.status() == NordVpnInfo::Status::Disconnected) {
             if (auto connect = m_actions->action(KnownAction::Connect)) {
                 onActionTriggered(connect.get());
             }
@@ -187,12 +187,12 @@ void NordVpnWraper::onPauseTimer()
     }
 }
 
-void NordVpnWraper::onStatusChanged(StateChecker::Status status)
+void NordVpnWraper::onStatusChanged(NordVpnInfo::Status status)
 {
     bool connected = false;
 
     switch (status) {
-    case StateChecker::Status::Connected: {
+    case NordVpnInfo::Status::Connected: {
         connected = true;
         if (m_pauseTimer->isActive()) {
             m_pauseTimer->stop();

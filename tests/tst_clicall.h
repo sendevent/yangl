@@ -15,38 +15,16 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include <QtTest>
+#pragma once
 
-// add necessary includes here
+#include <QObject>
 
-class dummy : public QObject
+class tst_CLICall : public QObject
 {
     Q_OBJECT
-
 public:
-    dummy();
-    ~dummy();
+    tst_CLICall(QObject *parent = nullptr);
 
 private slots:
-    void test_case1();
-
+    void testCall();
 };
-
-dummy::dummy()
-{
-
-}
-
-dummy::~dummy()
-{
-
-}
-
-void dummy::test_case1()
-{
-
-}
-
-QTEST_APPLESS_MAIN(dummy)
-
-#include "tst_dummy.moc"

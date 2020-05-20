@@ -17,30 +17,14 @@
 
 #pragma once
 
-#include <QJsonObject>
+#include <QObject>
 
-class Action;
-class QIODevice;
-class ActionJson
+class tst_CLICaller : public QObject
 {
+    Q_OBJECT
 public:
-    ActionJson();
+    explicit tst_CLICaller() = default;
 
-    bool load(const QString &from);
-    bool load(QIODevice *in);
-    void save(const QString &to);
-    void save(QIODevice *out);
-
-    void putAction(const Action *action);
-    void popAction(const Action *action);
-    bool updateAction(Action *action);
-
-    QVector<QString> customActionIds() const;
-
-    static QString jsonFilePath();
-
-private:
-    QJsonObject m_json;
-
-    QJsonObject actionToJson(const Action *action) const;
+private slots:
+    void test_performAction();
 };

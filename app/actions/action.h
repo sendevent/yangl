@@ -34,13 +34,13 @@ public:
     using Id = QUuid;
     using Ptr = QSharedPointer<Action>;
 
-    enum ActScope
+    enum class ActScope
     {
         Builtin = 0,
         User,
     };
 
-    enum MenuPlace
+    enum class MenuPlace
     {
         NoMenu = 0,
         Common,
@@ -74,7 +74,13 @@ public:
 
     bool isAnchorable() const;
     void setAnchor(MenuPlace place);
-    MenuPlace menuPlace() const;
+    Action::MenuPlace anchor() const;
+
+    static const QString GroupKeyBuiltin;
+    static const QString GroupKeyCustom;
+
+    QString groupKey() const;
+    QString key() const;
 
 signals:
     void performed(const QString &result, bool ok);
@@ -85,7 +91,7 @@ signals:
     void argsChanged(const QStringList &args) const;
     void timeoutChanged(int timeout) const;
     void forcedShowChanged(bool forced) const;
-    void anchorChanged(MenuPlace place) const;
+    void anchorChanged(Action::MenuPlace place) const;
 
 protected slots:
     virtual void onResult(const QString &result);

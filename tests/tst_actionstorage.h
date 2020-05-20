@@ -17,30 +17,32 @@
 
 #pragma once
 
-#include <QJsonObject>
+#include "tst_action.h"
 
-class Action;
-class QIODevice;
-class ActionJson
+#include <QObject>
+
+class ActionStorage;
+class tst_ActionStorage : public QObject
 {
+    Q_OBJECT
 public:
-    ActionJson();
-
-    bool load(const QString &from);
-    bool load(QIODevice *in);
-    void save(const QString &to);
-    void save(QIODevice *out);
-
-    void putAction(const Action *action);
-    void popAction(const Action *action);
-    bool updateAction(Action *action);
-
-    QVector<QString> customActionIds() const;
-
-    static QString jsonFilePath();
+    explicit tst_ActionStorage(QObject *parent = nullptr);
 
 private:
-    QJsonObject m_json;
+    QList<Action::Ptr> populateUserActions(ActionStorage *storage, int count);
 
-    QJsonObject actionToJson(const Action *action) const;
+private slots:
+    void init();
+    void cleanup();
+
+    void test_builtinActions();
+    void test_userActions();
+    void test_allActions();
+    void test_actionBuiltin();
+    void test_actionUser();
+    void test_saveAndLoad();
+    void test_createUserAction();
+    void test_removeUserAction();
+    void test_updateActionsBuiltin();
+    void test_updateActionsUser();
 };

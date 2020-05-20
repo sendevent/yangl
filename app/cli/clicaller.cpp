@@ -15,7 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "clibus.h"
+#include "clicaller.h"
 
 #include "action.h"
 
@@ -25,10 +25,10 @@
 
 #define LOG qDebug() << Q_FUNC_INFO << QThread::currentThreadId()
 
-class RunQureyTask : public QRunnable
+class RunCallTask : public QRunnable
 {
 public:
-    RunQureyTask(CLICall *call)
+    RunCallTask(CLICall *call)
         : m_call(call)
     {
     }
@@ -39,18 +39,12 @@ private:
     void run() override { m_call->run(); }
 };
 
-CLIBus::CLIBus(const QString &appPath, QObject *parent)
+CLICaller::CLICaller(QObject *parent)
     : QObject(parent)
-    , m_appPath(appPath)
 {
 }
 
-QString CLIBus::applicationPath() const
-{
-    return m_appPath;
-}
-
-bool CLIBus::performAction(Action *action)
+bool CLICaller::performAction(Action *action)
 {
     if (!action)
         return false;
@@ -63,11 +57,11 @@ bool CLIBus::performAction(Action *action)
     return false;
 }
 
-void CLIBus::runQuery(CLICall *call)
+void CLICaller::runQuery(CLICall *call)
 {
     if (!call)
         return;
 
-    RunQureyTask *task = new RunQureyTask(call);
+    RunCallTask *task = new RunCallTask(call);
     QThreadPool::globalInstance()->start(task);
 }

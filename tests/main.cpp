@@ -15,32 +15,31 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#pragma once
+#include "tst_action.h"
+#include "tst_actionjson.h"
+#include "tst_actionstorage.h"
+#include "tst_clicall.h"
+#include "tst_clicaller.h"
+#include "tst_statechecker.h"
 
-#include <QJsonObject>
+#include <QtTest>
 
-class Action;
-class QIODevice;
-class ActionJson
+int main(int argc, char **argv)
 {
-public:
-    ActionJson();
+    QApplication app(argc, argv); // init standard paths
 
-    bool load(const QString &from);
-    bool load(QIODevice *in);
-    void save(const QString &to);
-    void save(QIODevice *out);
+    int status = 0;
+    auto ASSERT_TEST = [&status, argc, argv](QObject *obj) {
+        status |= QTest::qExec(obj, argc, argv);
+        delete obj;
+    };
 
-    void putAction(const Action *action);
-    void popAction(const Action *action);
-    bool updateAction(Action *action);
+    ASSERT_TEST(new tst_Action());
+    ASSERT_TEST(new tst_ActionJson());
+    ASSERT_TEST(new tst_CLICall());
+    ASSERT_TEST(new tst_CLICaller());
+    ASSERT_TEST(new tst_ActionStorage());
+    ASSERT_TEST(new tst_StateChecker());
 
-    QVector<QString> customActionIds() const;
-
-    static QString jsonFilePath();
-
-private:
-    QJsonObject m_json;
-
-    QJsonObject actionToJson(const Action *action) const;
-};
+    return status;
+}
