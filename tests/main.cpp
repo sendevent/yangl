@@ -17,6 +17,7 @@
 
 #include "tst_action.h"
 #include "tst_actionjson.h"
+#include "tst_actionstorage.h"
 #include "tst_clicall.h"
 #include "tst_clicaller.h"
 
@@ -36,6 +37,7 @@ int main(int argc, char **argv)
     ASSERT_TEST(new tst_ActionJson());
     ASSERT_TEST(new tst_CLICall());
     ASSERT_TEST(new tst_CLICaller());
+    ASSERT_TEST(new tst_ActionStorage());
 
     return status;
 }

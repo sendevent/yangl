@@ -21,7 +21,9 @@
 #include "settingsmanager.h"
 
 #include <QDebug>
+#include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
 
@@ -41,20 +43,13 @@ static const struct {
 
 ActionJson::ActionJson() {}
 
-/*static*/ QString ActionJson::filePath()
+bool ActionJson::load(const QString &from)
 {
-    static const QString jsonPath = QString("%1/actions.json").arg(SettingsManager::dirPath());
-    return jsonPath;
-}
-
-bool ActionJson::load()
-{
-    static const QString jsonFilePath(filePath());
     m_json = {};
 
-    QFile in(jsonFilePath);
+    QFile in(from);
     if (!in.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        WRN << "failed opening file" << jsonFilePath << in.errorString();
+        WRN << "failed opening file" << from << in.errorString();
         return false;
     }
 
@@ -81,13 +76,11 @@ bool ActionJson::load(QIODevice *in)
     return true;
 }
 
-void ActionJson::save()
+void ActionJson::save(const QString &to)
 {
-    static const QString jsonFilePath(filePath());
-
-    QFile out(jsonFilePath);
+    QFile out(to);
     if (!out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
-        WRN << "failed opening file" << jsonFilePath << out.errorString();
+        WRN << "failed opening file" << to << out.errorString();
         return;
     }
 
@@ -175,4 +168,16 @@ QVector<QString> ActionJson::customActionIds() const
     for (const QString &key : collection.keys())
         keys.append(key);
     return keys;
+}
+
+/*static*/ QString ActionJson::jsonFilePath()
+{
+    static QString jsonPath;
+    if (jsonPath.isEmpty()) {
+        jsonPath = QString("%1/actions.json").arg(SettingsManager::dirPath());
+        QDir dir = QFileInfo(jsonPath).absoluteDir();
+        if (!dir.exists())
+            dir.mkpath(dir.absolutePath());
+    }
+    return jsonPath;
 }
