@@ -19,7 +19,7 @@
 
 #include "actionstorage.h"
 #include "appsettings.h"
-#include "clibus.h"
+#include "clicaller.h"
 #include "menuholder.h"
 #include "settingsdialog.h"
 #include "statechecker.h"
@@ -38,7 +38,7 @@ static constexpr int TimeQuantMs = 60 * OneSecondMs;
 
 NordVpnWraper::NordVpnWraper(QObject *parent)
     : QObject(parent)
-    , m_bus(new CLIBus(this))
+    , m_bus(new CLICaller(this))
     , m_actions(new ActionStorage(this))
     , m_checker(new StateChecker(m_bus, m_actions, this))
     , m_trayIcon(new TrayIcon(this))

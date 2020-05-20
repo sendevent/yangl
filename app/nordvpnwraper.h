@@ -21,7 +21,7 @@
 
 #include <QObject>
 
-class CLIBus;
+class CLICaller;
 class ActionStorage;
 class StateChecker;
 class MenuHolder;
@@ -47,7 +47,7 @@ private slots:
     void onPauseTimer();
 
 private:
-    CLIBus *m_bus;
+    CLICaller *m_bus;
     ActionStorage *m_actions;
     StateChecker *m_checker;
     TrayIcon *m_trayIcon;

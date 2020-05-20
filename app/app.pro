@@ -24,8 +24,8 @@ SOURCES += \
     actions/action.cpp \
     actions/actionjson.cpp \
     actions/actionstorage.cpp \
-    cli/clibus.cpp \
     cli/clicall.cpp \
+    cli/clicaller.cpp \
     main.cpp \
     menuholder.cpp \
     nordvpnwraper.cpp \
@@ -43,8 +43,8 @@ HEADERS += \
     actions/actionjson.h \
     actions/actionstorage.h \
     actions/actiontypes.h \
-    cli/clibus.h \
     cli/clicall.h \
+    cli/clicaller.h \
     menuholder.h \
     nordvpnwraper.h \
     settings/actioneditor.h \
