@@ -9,7 +9,7 @@ SOURCES += \
     $$APP_PRO_ROOT/actions/action.cpp \
     $$APP_PRO_ROOT/actions/actionjson.cpp \
     $$APP_PRO_ROOT/actions/actionstorage.cpp \
-    $$APP_PRO_ROOT/cli/clibus.cpp \
+    $$APP_PRO_ROOT/cli/clicaller.cpp \
     $$APP_PRO_ROOT/cli/clicall.cpp \
     $$APP_PRO_ROOT/menuholder.cpp \
     $$APP_PRO_ROOT/nordvpnwraper.cpp \
@@ -27,7 +27,7 @@ HEADERS += $$APP_PRO_ROOT\
     $$APP_PRO_ROOT/actions/actionjson.h \
     $$APP_PRO_ROOT/actions/actionstorage.h \
     $$APP_PRO_ROOT/actions/actiontypes.h \
-    $$APP_PRO_ROOT/cli/clibus.h \
+    $$APP_PRO_ROOT/cli/clicaller.h \
     $$APP_PRO_ROOT/cli/clicall.h \
     $$APP_PRO_ROOT/menuholder.h \
     $$APP_PRO_ROOT/nordvpnwraper.h \
