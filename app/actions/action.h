@@ -85,7 +85,7 @@ signals:
     void argsChanged(const QStringList &args) const;
     void timeoutChanged(int timeout) const;
     void forcedShowChanged(bool forced) const;
-    void anchorChanged(MenuPlace place) const;
+    void anchorChanged(Action::MenuPlace place) const;
 
 protected slots:
     virtual void onResult(const QString &result);

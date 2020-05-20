@@ -15,38 +15,30 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include <QtTest>
+#pragma once
 
-// add necessary includes here
+#include "action.h"
 
-class dummy : public QObject
+class ActionStorage;
+class tst_Action : public Action
 {
     Q_OBJECT
-
 public:
-    dummy();
-    ~dummy();
+    tst_Action(Action::ActScope scope = Action::ActScope::Builtin, KnownAction action = KnownAction::Unknown,
+               ActionStorage *parent = nullptr, const Action::Id &id = {});
+    ~tst_Action() = default;
 
 private slots:
-    void test_case1();
+    void testCreate_Builtin();
+    void testCreate_Custom();
 
+    void checkAction(const Action::Ptr &action, KnownAction expectedType, Action::ActScope expectedScope,
+                     const Action::Id &expectedId = {}) const;
+
+    void testSetTitle();
+    void testSetApp();
+    void testSetArgs();
+    void testSetTimeout();
+    void testSetForcedShow();
+    void testSetAnchor();
 };
-
-dummy::dummy()
-{
-
-}
-
-dummy::~dummy()
-{
-
-}
-
-void dummy::test_case1()
-{
-
-}
-
-QTEST_APPLESS_MAIN(dummy)
-
-#include "tst_dummy.moc"
