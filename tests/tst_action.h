@@ -28,6 +28,8 @@ public:
                ActionStorage *parent = nullptr, const Action::Id &id = {});
     ~tst_Action() = default;
 
+private:
+    static int MetaIdMenuPlace;
 private slots:
     void testCreate_Builtin();
     void testCreate_Custom();

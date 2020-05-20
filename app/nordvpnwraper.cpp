@@ -176,9 +176,9 @@ void NordVpnWraper::onPauseTimer()
 
     if (m_paused <= 0) {
         m_pauseTimer->stop();
-        const StateChecker::Info &currentState = m_checker->state();
-        if (currentState.m_status == StateChecker::Status::Unknown
-            || currentState.m_status == StateChecker::Status::Disconnected) {
+        const NordVpnInfo &currentState = m_checker->state();
+        if (currentState.status() == NordVpnInfo::Status::Unknown
+            || currentState.status() == NordVpnInfo::Status::Disconnected) {
             if (auto connect = m_actions->action(KnownAction::Connect)) {
                 onActionTriggered(connect.get());
             }
@@ -187,12 +187,12 @@ void NordVpnWraper::onPauseTimer()
     }
 }
 
-void NordVpnWraper::onStatusChanged(StateChecker::Status status)
+void NordVpnWraper::onStatusChanged(NordVpnInfo::Status status)
 {
     bool connected = false;
 
     switch (status) {
-    case StateChecker::Status::Connected: {
+    case NordVpnInfo::Status::Connected: {
         connected = true;
         if (m_pauseTimer->isActive()) {
             m_pauseTimer->stop();

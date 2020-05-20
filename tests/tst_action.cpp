@@ -21,10 +21,13 @@
 
 #include <QtTest>
 
+/*static*/ int tst_Action::MetaIdMenuPlace = -1;
+
 tst_Action::tst_Action(Action::ActScope scope, KnownAction action, ActionStorage *parent, const Action::Id &id)
     : Action(scope, action, parent, id)
 {
-    qRegisterMetaType<Action::MenuPlace>("Action::MenuPlace");
+    if (-1 == tst_Action::MetaIdMenuPlace)
+        tst_Action::MetaIdMenuPlace = qRegisterMetaType<Action::MenuPlace>();
 }
 
 void tst_Action::checkAction(const Action::Ptr &action, KnownAction expectedType, Action::ActScope expectedScope,
