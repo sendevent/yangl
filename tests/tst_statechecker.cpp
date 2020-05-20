@@ -34,6 +34,7 @@ tst_StateChecker::tst_StateChecker(QObject *parent)
     statusSink = statusSink.replace(qAppName(), "test_fake_status");
     action->setApp(statusSink);
     action->setArgs({ "" });
+    action->setForcedShow(false);
 }
 
 void tst_StateChecker::init()

@@ -34,11 +34,11 @@ int main(int argc, char **argv)
         delete obj;
     };
 
-    //    ASSERT_TEST(new tst_Action());
-    //    ASSERT_TEST(new tst_ActionJson());
-    //    ASSERT_TEST(new tst_CLICall());
-    //    ASSERT_TEST(new tst_CLICaller());
-    //    ASSERT_TEST(new tst_ActionStorage());
+    ASSERT_TEST(new tst_Action());
+    ASSERT_TEST(new tst_ActionJson());
+    ASSERT_TEST(new tst_CLICall());
+    ASSERT_TEST(new tst_CLICaller());
+    ASSERT_TEST(new tst_ActionStorage());
     ASSERT_TEST(new tst_StateChecker());
 
     return status;

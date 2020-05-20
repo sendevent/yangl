@@ -1,4 +1,3 @@
-include(tests_all_sources.pri)
 
 TEMPLATE = app
 TARGET = yangl_tests
@@ -19,3 +18,5 @@ HEADERS += \
     tst_clicall.h \
     tst_clicaller.h \
     tst_statechecker.h
+
+include(tests_all_sources.pri)
