@@ -76,6 +76,12 @@ public:
     void setAnchor(MenuPlace place);
     Action::MenuPlace anchor() const;
 
+    static const QString GroupKeyBuiltin;
+    static const QString GroupKeyCustom;
+
+    QString groupKey() const;
+    QString key() const;
+
 signals:
     void performed(const QString &result, bool ok);
     void changed();

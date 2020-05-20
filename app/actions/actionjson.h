@@ -42,7 +42,5 @@ public:
 private:
     QJsonObject m_json;
 
-    QString collectionKey(const Action *action) const;
-    QString actionKey(const Action *action) const;
     QJsonObject actionToJson(const Action *action) const;
 };

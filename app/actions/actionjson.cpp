@@ -29,9 +29,6 @@
 #define WRN qWarning() << Q_FUNC_INFO
 
 static const struct {
-    const QString BuiltinCollection { QStringLiteral("builtin") };
-    const QString CustomCollection { QStringLiteral("custom") };
-
     const struct {
         const QString App { QStringLiteral("app") };
         const QString Title { QStringLiteral("title") };
@@ -114,9 +111,9 @@ void ActionJson::putAction(const Action *action)
     if (!action)
         return;
 
-    const QString &collectionKey = this->collectionKey(action);
+    const QString &collectionKey = action->groupKey();
     QJsonObject collection = m_json[collectionKey].toObject();
-    collection[actionKey(action)] = actionToJson(action);
+    collection[action->key()] = actionToJson(action);
     m_json[collectionKey] = collection;
 }
 
@@ -125,9 +122,9 @@ void ActionJson::popAction(const Action *action)
     if (!action)
         return;
 
-    const QString &collectionKey = this->collectionKey(action);
+    const QString &collectionKey = action->groupKey();
     QJsonObject collection = m_json[collectionKey].toObject();
-    collection.remove(actionKey(action));
+    collection.remove(action->key());
     m_json[collectionKey] = collection;
 }
 
@@ -136,9 +133,9 @@ bool ActionJson::updateAction(Action *action)
     if (!action)
         return false;
 
-    const QString &collectionKey = this->collectionKey(action);
+    const QString &collectionKey = action->groupKey();
     const QJsonObject &collection = m_json[collectionKey].toObject();
-    const QJsonObject &actionJson = collection[actionKey(action)].toObject();
+    const QJsonObject &actionJson = collection[action->key()].toObject();
     if (actionJson.isEmpty())
         return false;
 
@@ -157,26 +154,6 @@ bool ActionJson::updateAction(Action *action)
     return true;
 }
 
-QString ActionJson::collectionKey(const Action *action) const
-{
-    QString key;
-    if (action) {
-        const bool isBuiltint = action->actionScope() == Action::ActScope::Builtin;
-        key = isBuiltint ? Json.BuiltinCollection : Json.CustomCollection;
-    }
-    return key;
-}
-
-QString ActionJson::actionKey(const Action *action) const
-{
-    QString key;
-    if (action) {
-        const bool isBuiltint = action->actionScope() == Action::ActScope::Builtin;
-        key = isBuiltint ? QString::number(action->type()) : action->id().toString();
-    }
-    return key;
-}
-
 QJsonObject ActionJson::actionToJson(const Action *action) const
 {
     if (!action)
@@ -187,14 +164,14 @@ QJsonObject ActionJson::actionToJson(const Action *action) const
         { Json.Action.Title, action->title() },
         { Json.Action.Args, QJsonArray::fromStringList(action->args()) },
         { Json.Action.Display, action->forcedShow() },
-        { Json.Action.Anchor, static_cast<const int>(action->anchor()) },
+        { Json.Action.Anchor, static_cast<int>(action->anchor()) },
     };
 }
 
 QVector<QString> ActionJson::customActionIds() const
 {
     QVector<QString> keys;
-    const QJsonObject &collection = m_json[Json.CustomCollection].toObject();
+    const QJsonObject &collection = m_json[Action::GroupKeyCustom].toObject();
     for (const QString &key : collection.keys())
         keys.append(key);
     return keys;
