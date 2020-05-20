@@ -24,7 +24,7 @@ class tst_Action : public Action
 {
     Q_OBJECT
 public:
-    tst_Action(Action::ActScope scope = Action::ActScope::Builtin, KnownAction action = KnownAction::Unknown,
+    tst_Action(Action::ActScope scope = Action::ActScope::User, KnownAction action = KnownAction::Unknown,
                ActionStorage *parent = nullptr, const Action::Id &id = {});
     ~tst_Action() = default;
 
