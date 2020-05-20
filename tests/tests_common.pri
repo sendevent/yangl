@@ -8,7 +8,7 @@ APP_PRO_ROOT=$$PWD/../app
 
 INCLUDEPATH += $$APP_PRO_ROOT
 
-CONFIG(debug,debug|release): CONFIG+=autorun_app_tests
+#CONFIG(debug,debug|release): CONFIG+=autorun_app_tests
 
 autorun_app_tests {
 DESTDIR = ./
