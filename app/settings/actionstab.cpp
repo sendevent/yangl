@@ -32,7 +32,7 @@ ActionsTab::ActionsTab(QWidget *parent)
     , ui(new Ui::ActionsTab)
     , m_actions()
     , m_actStorage(nullptr)
-    , m_scope(Action::ActScope::Builtin)
+    , m_scope(Action::Scope::Builtin)
 {
     ui->setupUi(this);
     ui->buttonRemove->setEnabled(false);
@@ -46,7 +46,7 @@ ActionsTab::~ActionsTab()
     delete ui;
 }
 
-void ActionsTab::setActions(ActionStorage *actStorage, Action::ActScope scope)
+void ActionsTab::setActions(ActionStorage *actStorage, Action::Scope scope)
 {
     m_scope = scope;
     m_actStorage = actStorage;
@@ -57,7 +57,7 @@ void ActionsTab::setActions(ActionStorage *actStorage, Action::ActScope scope)
         delete last;
     }
 
-    if (scope == Action::ActScope::Builtin) {
+    if (scope == Action::Scope::Builtin) {
         ui->buttonAdd->hide();
         ui->buttonRemove->hide();
         delete ui->buttonsLayout;

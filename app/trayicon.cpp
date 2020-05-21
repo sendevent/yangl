@@ -83,7 +83,7 @@ void TrayIcon::setState(const NordVpnInfo &state)
                 skeepMessage = true;
 
         if (!skeepMessage)
-            showMessage(qApp->applicationDisplayName(), description, {}, m_duration);
+            showMessage(qApp->applicationDisplayName(), description, iconForState(state), m_duration);
     }
 
     setToolTip(description);
