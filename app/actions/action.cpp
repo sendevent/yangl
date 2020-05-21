@@ -25,8 +25,6 @@
 #include <QFileInfo>
 #include <QTextBrowser>
 
-#define LOG qDebug() << Q_FUNC_INFO
-
 /*static*/ const QString Action::GroupKeyBuiltin { QStringLiteral("builtin") };
 /*static*/ const QString Action::GroupKeyCustom { QStringLiteral("custom") };
 

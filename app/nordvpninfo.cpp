@@ -17,11 +17,9 @@
 
 #include "nordvpninfo.h"
 
-#include <QDebug>
-#include <QMetaEnum>
+#include "common.h"
 
-#define LOG qDebug() << Q_FUNC_INFO
-#define WRN qWarning() << Q_FUNC_INFO
+#include <QMetaEnum>
 
 /*static*/ int NordVpnInfo::MetaIdClass = -1;
 /*static*/ int NordVpnInfo::MetaIdEnum = -1;

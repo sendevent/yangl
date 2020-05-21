@@ -46,6 +46,7 @@ HEADERS += \
     actions/actiontypes.h \
     cli/clicall.h \
     cli/clicaller.h \
+    common.h \
     menuholder.h \
     nordvpninfo.h \
     nordvpnwraper.h \
