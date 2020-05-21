@@ -18,11 +18,8 @@
 #include "actioneditor.h"
 
 #include "action.h"
+#include "common.h"
 #include "ui_actioneditor.h"
-
-#include <QDebug>
-
-#define LOG qDebug() << Q_FUNC_INFO
 
 ActionEditor::ActionEditor(const Action::Ptr &act, QWidget *parent)
     : QWidget(parent)
@@ -59,7 +56,7 @@ void ActionEditor::setupAction(const Action::Ptr &action)
     ui->leTitle->setText(m_act->title());
     ui->leApplication->setText(m_act->app());
     ui->leArguments->setText(m_act->args().join(" "));
-    ui->spinBoxTimeout->setValue(m_act->timeout() / 1000);
+    ui->spinBoxTimeout->setValue(m_act->timeout() / yangl::OneSecondMs);
     ui->checkBoxForceShow->setChecked(m_act->forcedShow());
 
     ui->comboBoxMenu->clear();

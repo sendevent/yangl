@@ -19,13 +19,9 @@
 
 #include "actionjson.h"
 #include "appsettings.h"
+#include "common.h"
 
-#include <QDebug>
 #include <QFileInfo>
-
-#define LOG qDebug() << Q_FUNC_INFO
-#define WRN qWarning() << Q_FUNC_INFO
-#define NIY WRN << "Not implemented yet"
 
 ActionStorage::ActionStorage(QObject *parent)
     : QObject(parent)

@@ -20,10 +20,7 @@
 #include "appsettings.h"
 
 #include <QApplication>
-#include <QDebug>
 #include <QMetaEnum>
-
-#define LOG qDebug() << Q_FUNC_INFO
 
 TrayIcon::TrayIcon(QObject *parent)
     : QSystemTrayIcon(iconForStatus(NordVpnInfo::Status::Disconnected), parent)

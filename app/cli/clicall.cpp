@@ -18,20 +18,13 @@
 #include "clicall.h"
 
 #include "clicaller.h"
+#include "common.h"
 
 #include <QDateTime>
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
 #include <QThread>
-
-#define LOG qDebug() << now() << Q_FUNC_INFO << QThread::currentThreadId()
-
-static QString now()
-{
-    QDateTime d = QDateTime::currentDateTime();
-    return d.toString("hh:mm:ss.zzz");
-}
 
 CLICall::CLICall(const QString &path, const QStringList &params, int timeout, QObject *parent)
     : QObject(parent)

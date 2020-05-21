@@ -30,7 +30,7 @@ class StateChecker : public QObject
 {
     Q_OBJECT
 public:
-    static constexpr int DefaultIntervalMs = 1000;
+    static const int DefaultIntervalMs;
 
     explicit StateChecker(CLICaller *bus, ActionStorage *actions, int intervalMs, QObject *parent = nullptr);
     ~StateChecker() override;

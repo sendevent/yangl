@@ -15,50 +15,31 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "clicaller.h"
+#pragma once
 
-#include "action.h"
+#include <QDateTime>
+#include <QDebug>
 
-#include <QRunnable>
-#include <QThreadPool>
+#ifndef LOG
+#define LOG qDebug() << yangl::now() << Q_FUNC_INFO
+#endif // LOG
 
-class RunCallTask : public QRunnable
+#ifndef WRN
+#define WRN qWarning() << yangl::now() << Q_FUNC_INFO
+#endif // WRN
+
+#ifndef NIY
+#define NIY WRN << "Not implemented yet"
+#endif // NIY
+
+namespace yangl {
+
+static constexpr int OneSecondMs { 1000 };
+
+static QString now()
 {
-public:
-    RunCallTask(CLICall *call)
-        : m_call(call)
-    {
-    }
-
-private:
-    CLICall *m_call;
-
-    void run() override { m_call->run(); }
-};
-
-CLICaller::CLICaller(QObject *parent)
-    : QObject(parent)
-{
+    QDateTime d = QDateTime::currentDateTime();
+    return d.toString("hh:mm:ss.zzz");
 }
 
-bool CLICaller::performAction(Action *action)
-{
-    if (!action)
-        return false;
-
-    if (auto call = action->createRequest()) {
-        runQuery(call);
-        return true;
-    }
-
-    return false;
-}
-
-void CLICaller::runQuery(CLICall *call)
-{
-    if (!call)
-        return;
-
-    RunCallTask *task = new RunCallTask(call);
-    QThreadPool::globalInstance()->start(task);
-}
+} // ns yangl

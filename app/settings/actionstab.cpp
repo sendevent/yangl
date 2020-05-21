@@ -21,12 +21,6 @@
 #include "actionstorage.h"
 #include "ui_actionstab.h"
 
-#include <QDebug>
-
-#define LOG qDebug() << Q_FUNC_INFO
-#define WRN qWarning() << Q_FUNC_INFO
-#define NIY WRN << "Not implemented yet!"
-
 ActionsTab::ActionsTab(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ActionsTab)

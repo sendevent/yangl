@@ -18,17 +18,14 @@
 #include "actionjson.h"
 
 #include "action.h"
+#include "common.h"
 #include "settingsmanager.h"
 
-#include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
-
-#define LOG qDebug() << Q_FUNC_INFO
-#define WRN qWarning() << Q_FUNC_INFO
 
 static const struct {
     const struct {
