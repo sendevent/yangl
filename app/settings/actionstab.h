@@ -35,7 +35,7 @@ public:
     explicit ActionsTab(QWidget *parent = nullptr);
     ~ActionsTab();
 
-    void setActions(ActionStorage *actStorage, Action::ActScope scope);
+    void setActions(ActionStorage *actStorage, Action::Scope scope);
 
     bool save();
 
@@ -47,7 +47,7 @@ private:
     Ui::ActionsTab *ui;
     QList<Action::Ptr> m_actions;
     ActionStorage *m_actStorage;
-    Action::ActScope m_scope;
+    Action::Scope m_scope;
 
     void addAction(const Action::Ptr &action);
 };

@@ -30,7 +30,7 @@
 /*static*/ const QString Action::GroupKeyBuiltin { QStringLiteral("builtin") };
 /*static*/ const QString Action::GroupKeyCustom { QStringLiteral("custom") };
 
-Action::Action(Action::ActScope scope, KnownAction type, ActionStorage *parent, const Action::Id &id)
+Action::Action(Action::Scope scope, KnownAction type, ActionStorage *parent, const Action::Id &id)
     : QObject(parent)
     , m_id(id.isNull() ? QUuid::createUuid() : id)
     , m_storage(parent)
@@ -51,7 +51,7 @@ Action::Action(Action::ActScope scope, KnownAction type, ActionStorage *parent, 
     connect(this, &Action::anchorChanged, this, &Action::changed);
 }
 
-Action::ActScope Action::actionScope() const
+Action::Scope Action::scope() const
 {
     return m_scope;
 }
@@ -210,10 +210,10 @@ void Action::setAnchor(MenuPlace place)
 
 QString Action::groupKey() const
 {
-    return actionScope() == Action::ActScope::Builtin ? GroupKeyBuiltin : GroupKeyCustom;
+    return scope() == Action::Scope::Builtin ? GroupKeyBuiltin : GroupKeyCustom;
 }
 
 QString Action::key() const
 {
-    return actionScope() == Action::ActScope::Builtin ? QString::number(type()) : id().toString();
+    return scope() == Action::Scope::Builtin ? QString::number(type()) : id().toString();
 }

@@ -106,7 +106,7 @@ void tst_ActionStorage::test_allActions()
     QVERIFY(allActions.size() == userActions.size() + knownActions.size());
 
     for (const auto &actionHandled : allActions) {
-        if (actionHandled->actionScope() == Action::ActScope::Builtin)
+        if (actionHandled->scope() == Action::Scope::Builtin)
             QVERIFY(knownActions.indexOf(actionHandled) >= 0);
         else
             QVERIFY(userActions.indexOf(actionHandled) >= 0);
@@ -161,7 +161,7 @@ void tst_ActionStorage::test_saveAndLoad()
         QCOMPARE(storage.userActions().size(), UserActionCount);
 
         for (const Action::Ptr &action : storage.allActions()) {
-            if (action->actionScope() == Action::ActScope::Builtin)
+            if (action->scope() == Action::Scope::Builtin)
                 action->setTitle(QString("BuiltinAction_%1").arg(action->type()));
             else
                 action->setTitle(QString("UserAction_%1").arg(action->id().toString()));
@@ -178,7 +178,7 @@ void tst_ActionStorage::test_saveAndLoad()
         QCOMPARE(allActions.size(), KnownAction::Last - 1 + UserActionCount);
 
         for (const Action::Ptr &action : allActions) {
-            if (action->actionScope() == Action::ActScope::Builtin)
+            if (action->scope() == Action::Scope::Builtin)
                 QCOMPARE(action->title(), QString("BuiltinAction_%1").arg(action->type()));
             else
                 QCOMPARE(action->title(), QString("UserAction_%1").arg(action->id().toString()));
@@ -230,7 +230,7 @@ void tst_ActionStorage::test_updateActionsBuiltin()
         action->setTitle(QString("BuiltinAction_%1").arg(action->type()));
     }
 
-    storage.updateActions(actions, Action::ActScope::Builtin);
+    storage.updateActions(actions, Action::Scope::Builtin);
 
     for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i) {
         const Action::Ptr &action = storage.action(i);
@@ -255,7 +255,7 @@ void tst_ActionStorage::test_updateActionsUser()
         action->setTitle(QString("UserAction_%1").arg(action->id().toString()));
     }
 
-    storage.updateActions(userActions, Action::ActScope::User);
+    storage.updateActions(userActions, Action::Scope::User);
 
     for (int i = 0; i < UserActionCount; ++i) {
         const Action::Ptr &action = storage.action(userActions.at(i)->id());

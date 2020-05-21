@@ -68,4 +68,5 @@ protected:
     void updateState(const QString &from);
 
     friend class tst_StateChecker;
+    friend class NordVpnWraper;
 };
