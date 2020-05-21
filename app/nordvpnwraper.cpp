@@ -50,6 +50,7 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
     connect(m_menuHolder, &MenuHolder::actionTriggered, this, &NordVpnWraper::onActionTriggered);
     connect(m_pauseTimer, &QTimer::timeout, this, &NordVpnWraper::onPauseTimer);
 
+    m_trayIcon->setContextMenu(m_menuHolder->createMenu(m_actions->load()));
     m_trayIcon->setVisible(true);
 }
 
@@ -59,8 +60,6 @@ void NordVpnWraper::start()
     const bool wasActive = m_checker->isActive();
 
     loadSettings();
-
-    m_trayIcon->setContextMenu(m_menuHolder->createMenu(m_actions->load()));
 
     if (auto actRun = m_menuHolder->getActRun()) {
         connect(actRun, &QAction::toggled, m_checker, &StateChecker::setActive);
