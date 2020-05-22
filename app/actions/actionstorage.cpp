@@ -98,7 +98,7 @@ void ActionStorage::save(const QString &to)
 
 void ActionStorage::save(QIODevice(*to))
 {
-    //    m_json->clear();
+    m_json->clear();
 
     for (const auto &action : m_builtinActions)
         m_json->putAction(action.get());
@@ -117,21 +117,7 @@ Action::Ptr ActionStorage::createUserAction()
     action->setForcedShow(true);
     action->setAnchor(Action::MenuPlace::Own);
 
-    m_userActions.insert(action->id(), action);
-    m_json->putAction(action.get());
-
     return action;
-}
-
-bool ActionStorage::removeUserAction(const Action::Ptr &action)
-{
-    if (!action)
-        return false;
-
-    const bool res = m_userActions.remove(action->id());
-    if (res)
-        m_json->popAction(action.get());
-    return res;
 }
 
 void ActionStorage::initActions(bool updateFromJson)
