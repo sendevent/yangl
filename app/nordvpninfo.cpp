@@ -87,7 +87,7 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
         const QString &name = pair.first().simplified();
         const QString &value = pair.last().simplified();
 
-        if (name.endsWith(QStringLiteral("Status")))
+        if (name == QStringLiteral("Status"))
             updatedState.m_status = textToStatus(value);
         else if (name == QStringLiteral("Current server"))
             updatedState.m_server = value;
