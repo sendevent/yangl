@@ -98,7 +98,7 @@ void ActionStorage::save(const QString &to)
 
 void ActionStorage::save(QIODevice(*to))
 {
-    m_json->clear();
+    //    m_json->clear();
 
     for (const auto &action : m_builtinActions)
         m_json->putAction(action.get());
