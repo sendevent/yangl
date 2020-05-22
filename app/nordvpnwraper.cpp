@@ -62,15 +62,16 @@ void NordVpnWraper::start()
 
     loadSettings();
 
-    m_trayIcon->setContextMenu(m_menuHolder->createMenu(m_actions->load()));
+    const QList<Action::Ptr> &actions = m_actions->load();
+    QMenu *menu = m_menuHolder->createMenu(actions);
+    m_trayIcon->setContextMenu(menu);
 
-    if (auto actRun = m_menuHolder->getActRun()) {
-        connect(actRun, &QAction::toggled, m_checker, &StateChecker::setActive, Qt::UniqueConnection);
-        actRun->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());
-    }
+    connect(m_menuHolder->getActRun(), &QAction::toggled, m_checker, &StateChecker::setActive, Qt::UniqueConnection);
     connect(m_menuHolder->getActShowSettings(), &QAction::triggered, this, &NordVpnWraper::showSettingsEditor,
             Qt::UniqueConnection);
     connect(m_menuHolder->getActQuit(), &QAction::triggered, qApp, &QApplication::quit, Qt::UniqueConnection);
+
+    m_menuHolder->getActRun()->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());
 }
 
 void NordVpnWraper::loadSettings()
