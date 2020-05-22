@@ -26,6 +26,8 @@
 #include <QFileInfo>
 #include <QThread>
 
+/*static*/ constexpr int CLICall::DefaultTimeoutMSecs;
+
 CLICall::CLICall(const QString &path, const QStringList &params, int timeout, QObject *parent)
     : QObject(parent)
     , m_appPath(path)
