@@ -65,7 +65,7 @@ void NordVpnWraper::start()
     m_trayIcon->setContextMenu(m_menuHolder->createMenu(m_actions->load()));
 
     if (auto actRun = m_menuHolder->getActRun()) {
-        connect(actRun, &QAction::toggled, m_checker, &StateChecker::setActive);
+        connect(actRun, &QAction::toggled, m_checker, &StateChecker::setActive, Qt::UniqueConnection);
         actRun->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());
     }
     connect(m_menuHolder->getActShowSettings(), &QAction::triggered, this, &NordVpnWraper::showSettingsEditor,

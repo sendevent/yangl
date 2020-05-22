@@ -42,7 +42,6 @@ private slots:
     void test_actionUser();
     void test_saveAndLoad();
     void test_createUserAction();
-    void test_removeUserAction();
     void test_updateActionsBuiltin();
     void test_updateActionsUser();
 };
