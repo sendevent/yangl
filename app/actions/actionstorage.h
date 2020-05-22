@@ -45,7 +45,7 @@ public:
 
     Action::Ptr createUserAction();
     bool removeUserAction(const Action::Ptr &action);
-    bool updateActions(const QList<Action::Ptr> &actions, Action::ActScope scope);
+    bool updateActions(const QList<Action::Ptr> &actions, Action::Scope scope);
 
     static QString jsonFilePath();
 

@@ -19,13 +19,9 @@
 
 #include "actionjson.h"
 #include "appsettings.h"
+#include "common.h"
 
-#include <QDebug>
 #include <QFileInfo>
-
-#define LOG qDebug() << Q_FUNC_INFO
-#define WRN qWarning() << Q_FUNC_INFO
-#define NIY WRN << "Not implemented yet"
 
 ActionStorage::ActionStorage(QObject *parent)
     : QObject(parent)
@@ -113,7 +109,7 @@ void ActionStorage::save(QIODevice(*to))
 
 Action::Ptr ActionStorage::createUserAction()
 {
-    Action::Ptr action(new Action(Action::ActScope::User, KnownAction::Unknown, this));
+    Action::Ptr action(new Action(Action::Scope::User, KnownAction::Unknown, this));
     action->setApp(AppSettings::Monitor.NVPNPath->read().toString());
     action->setArgs({});
     action->setForcedShow(true);
@@ -167,7 +163,7 @@ void ActionStorage::initActions(bool updateFromJson)
 Action::Ptr ActionStorage::createAction(KnownAction actionType, const QString &id)
 {
     const QString &appPath = AppSettings::Monitor.NVPNPath->read().toString();
-    Action::ActScope scope = Action::ActScope::Builtin;
+    Action::Scope scope = Action::Scope::Builtin;
 
     QString title;
     QStringList args;
@@ -268,7 +264,7 @@ Action::Ptr ActionStorage::createAction(KnownAction actionType, const QString &i
         break;
     }
     default:
-        scope = Action::ActScope::User;
+        scope = Action::Scope::User;
         break;
     }
 
@@ -282,9 +278,9 @@ Action::Ptr ActionStorage::createAction(KnownAction actionType, const QString &i
     return action;
 }
 
-bool ActionStorage::updateActions(const QList<Action::Ptr> &actions, Action::ActScope scope)
+bool ActionStorage::updateActions(const QList<Action::Ptr> &actions, Action::Scope scope)
 {
-    const bool isBuiltin = scope == Action::ActScope::Builtin;
+    const bool isBuiltin = scope == Action::Scope::Builtin;
     return isBuiltin ? updateBuiltinActions(actions) : updateUserActions(actions);
 }
 

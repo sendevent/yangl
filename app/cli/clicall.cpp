@@ -18,6 +18,7 @@
 #include "clicall.h"
 
 #include "clicaller.h"
+#include "common.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -25,13 +26,7 @@
 #include <QFileInfo>
 #include <QThread>
 
-#define LOG qDebug() << now() << Q_FUNC_INFO << QThread::currentThreadId()
-
-static QString now()
-{
-    QDateTime d = QDateTime::currentDateTime();
-    return d.toString("hh:mm:ss.zzz");
-}
+/*static*/ constexpr int CLICall::DefaultTimeoutMSecs;
 
 CLICall::CLICall(const QString &path, const QStringList &params, int timeout, QObject *parent)
     : QObject(parent)
@@ -47,7 +42,6 @@ CLICall::CLICall(const QString &path, const QStringList &params, int timeout, QO
 
 QString CLICall::run()
 {
-    LOG << m_appPath << m_params;
     if (m_appPath.isEmpty() || !QFile::exists(m_appPath))
         return setResult({}, QStringLiteral("File [%1] not found").arg(m_appPath));
 
@@ -83,7 +77,6 @@ QString CLICall::result() const
 
 QString CLICall::setResult(const QString &result, const QString &errors)
 {
-    LOG << result << errors << exitCode() << exitStatus();
     if (errors != m_errors)
         m_errors = errors;
 

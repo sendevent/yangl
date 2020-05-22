@@ -26,7 +26,7 @@
 
 void tst_CLICaller::test_performAction()
 {
-    Action::Ptr action(new tst_Action(Action::ActScope::User, KnownAction::Unknown));
+    Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown));
     action->setApp("/usr/bin/ls");
     action->setArgs({ "-la" });
 

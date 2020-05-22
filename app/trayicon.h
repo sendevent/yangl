@@ -28,6 +28,9 @@ public:
     TrayIcon(QObject *parent = nullptr);
 
     void setMessageDuration(int durationSecs);
+    static QIcon iconForState(const NordVpnInfo &state);
+    static QIcon iconForStatus(const NordVpnInfo::Status &status);
+    int duration() const { return m_duration; }
 
 public slots:
     void setState(const NordVpnInfo &state);
@@ -36,7 +39,4 @@ private:
     NordVpnInfo m_state;
     bool m_isFirstChange;
     int m_duration;
-
-    static QIcon iconForState(const NordVpnInfo &state);
-    static QIcon iconForStatus(const NordVpnInfo::Status &status);
 };

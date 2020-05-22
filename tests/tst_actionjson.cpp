@@ -43,7 +43,7 @@ void tst_ActionJson::test_filePath()
 
 void tst_ActionJson::test_load()
 {
-    const Action::Ptr action(new tst_Action(Action::ActScope::User, KnownAction::Unknown, nullptr, TestId));
+    const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown, nullptr, TestId));
 
     QByteArray inputString(TestJson.toUtf8());
     QBuffer in(&inputString);
@@ -68,7 +68,7 @@ void tst_ActionJson::test_load()
 
 void tst_ActionJson::test_save()
 {
-    const Action::Ptr action(new tst_Action(Action::ActScope::User, KnownAction::Unknown, nullptr, TestId));
+    const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown, nullptr, TestId));
     action->setApp("/usr/bin/ls");
     action->setArgs({ "-la" });
 

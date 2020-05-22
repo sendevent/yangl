@@ -17,6 +17,8 @@
 
 #include "settingsmanager.h"
 
+#include "common.h"
+
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
@@ -42,7 +44,7 @@ SettingsManager::SettingsManager(QObject *parent)
     : QObject(parent)
     , m_settings(new QSettings(QString("%1/settings.conf").arg(dirPath()), QSettings::IniFormat, this))
 {
-    qDebug() << "Config:" << m_settings->fileName();
+    qDebug() << yangl::now() << "Config:" << m_settings->fileName();
 }
 
 SettingsManager *SettingsManager::instance()

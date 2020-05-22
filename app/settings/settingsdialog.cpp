@@ -22,19 +22,13 @@
 #include "actioneditor.h"
 #include "actionstorage.h"
 #include "appsettings.h"
+#include "common.h"
 #include "ui_settingsdialog.h"
 
 #include <QApplication>
-#include <QDebug>
 #include <QIcon>
 #include <QMessageBox>
 #include <QMetaEnum>
-
-#define LOG qDebug() << Q_FUNC_INFO
-#define WRN qWarning() << Q_FUNC_INFO
-#define NIY WRN << "Not implemented yet!"
-
-static constexpr int OneSecondMs = 1000;
 
 Dialog::Dialog(ActionStorage *actStorage, QWidget *parent)
     : QDialog(parent)
@@ -48,16 +42,17 @@ Dialog::Dialog(ActionStorage *actStorage, QWidget *parent)
     connect(ui->checkBoxAutoActive, &QCheckBox::toggled, ui->cbIgnoreFirstConnected, &QCheckBox::setEnabled);
 
     ui->leNVPNPath->setText(AppSettings::Monitor.NVPNPath->read().toString());
-    ui->spinBoxInterval->setValue(AppSettings::Monitor.Interval->read().toInt() / OneSecondMs);
+    ui->spinBoxInterval->setValue(AppSettings::Monitor.Interval->read().toInt() / yangl::OneSecondMs);
     ui->spinBoxMsgDuration->setValue(AppSettings::Monitor.MessageDuration->read().toInt());
     ui->checkBoxAutoActive->setChecked(AppSettings::Monitor.Active->read().toBool());
     ui->cbIgnoreFirstConnected->setChecked(AppSettings::Monitor.IgnoreFirstConnected->read().toBool());
+    ui->checkBoxMessagePlainText->setChecked(AppSettings::Monitor.MessagePlainText->read().toBool());
 
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &Dialog::accept);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &Dialog::reject);
 
-    ui->tabNordVpn->setActions(m_actStorage, Action::ActScope::Builtin);
-    ui->tabCustom->setActions(m_actStorage, Action::ActScope::User);
+    ui->tabNordVpn->setActions(m_actStorage, Action::Scope::Builtin);
+    ui->tabCustom->setActions(m_actStorage, Action::Scope::User);
 
     restoreGeometry(AppSettings::Monitor.SettingsDialog->read().toByteArray());
 }
@@ -95,9 +90,10 @@ bool Dialog::saveMonitorSettings()
 
     AppSettings::Monitor.NVPNPath->write(path);
     AppSettings::Monitor.MessageDuration->write(ui->spinBoxMsgDuration->value());
-    AppSettings::Monitor.Interval->write(ui->spinBoxInterval->value() * OneSecondMs);
+    AppSettings::Monitor.Interval->write(ui->spinBoxInterval->value() * yangl::OneSecondMs);
     AppSettings::Monitor.Active->write(ui->checkBoxAutoActive->isChecked());
     AppSettings::Monitor.IgnoreFirstConnected->write(ui->cbIgnoreFirstConnected->isChecked());
+    AppSettings::Monitor.MessagePlainText->write(ui->checkBoxMessagePlainText->isChecked());
 
     return true;
 }

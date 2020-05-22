@@ -17,37 +17,29 @@
 
 #pragma once
 
-#include "action.h"
+#include <QDateTime>
+#include <QDebug>
 
-#include <QList>
-#include <QWidget>
+#ifndef LOG
+#define LOG qDebug() << yangl::now() << Q_FUNC_INFO
+#endif // LOG
 
-namespace Ui {
-class ActionsTab;
+#ifndef WRN
+#define WRN qWarning() << yangl::now() << Q_FUNC_INFO
+#endif // WRN
+
+#ifndef NIY
+#define NIY WRN << "Not implemented yet"
+#endif // NIY
+
+namespace yangl {
+
+static constexpr int OneSecondMs { 1000 };
+
+static QString now()
+{
+    QDateTime d = QDateTime::currentDateTime();
+    return d.toString("hh:mm:ss.zzz");
 }
 
-class ActionStorage;
-class ActionsTab : public QWidget
-{
-    Q_OBJECT
-
-public:
-    explicit ActionsTab(QWidget *parent = nullptr);
-    ~ActionsTab();
-
-    void setActions(ActionStorage *actStorage, Action::Scope scope);
-
-    bool save();
-
-private slots:
-    void onAddRequested();
-    void onRemoveRequested();
-
-private:
-    Ui::ActionsTab *ui;
-    QList<Action::Ptr> m_actions;
-    ActionStorage *m_actStorage;
-    Action::Scope m_scope;
-
-    void addAction(const Action::Ptr &action);
-};
+} // ns yangl
