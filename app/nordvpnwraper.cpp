@@ -57,6 +57,7 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
 void NordVpnWraper::start()
 {
     LOG;
+    //    m_trayIcon->showMessage("title", "msg", QIcon(":/icn/resources/offline.png"));
     const bool wasActive = m_checker->isActive();
 
     loadSettings();
