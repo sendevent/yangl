@@ -40,6 +40,11 @@ static const struct {
 
 ActionJson::ActionJson() {}
 
+void ActionJson::clear()
+{
+    m_json = {};
+}
+
 bool ActionJson::load(const QString &from)
 {
     m_json = {};

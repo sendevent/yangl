@@ -44,6 +44,7 @@ QList<Action::Ptr> tst_ActionStorage::populateUserActions(ActionStorage *storage
     QList<Action::Ptr> userActions;
     for (int i = 0; i < count; ++i)
         userActions.append(storage->createUserAction());
+    storage->updateActions(userActions, Action::Scope::User);
     return userActions;
 }
 
@@ -197,25 +198,6 @@ void tst_ActionStorage::test_createUserAction()
 
     /*const QList<Action::Ptr> &userActions =*/populateUserActions(&storage, UserActionCount);
     QCOMPARE(storage.userActions().size(), UserActionCount);
-}
-
-void tst_ActionStorage::test_removeUserAction()
-{
-    static constexpr int UserActionCount = 3;
-
-    ActionStorage storage;
-    storage.load();
-
-    QCOMPARE(storage.userActions().size(), 0);
-
-    const QList<Action::Ptr> &userActions = populateUserActions(&storage, UserActionCount);
-    QCOMPARE(storage.userActions().size(), UserActionCount);
-
-    for (const Action::Ptr &action : userActions)
-        QVERIFY(storage.removeUserAction(action));
-
-    for (const Action::Ptr &action : userActions)
-        QCOMPARE(storage.action(action->id()), nullptr);
 }
 
 void tst_ActionStorage::test_updateActionsBuiltin()
