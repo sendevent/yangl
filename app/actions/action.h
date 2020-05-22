@@ -34,7 +34,7 @@ public:
     using Id = QUuid;
     using Ptr = QSharedPointer<Action>;
 
-    enum class ActScope
+    enum class Scope
     {
         Builtin = 0,
         User,
@@ -50,7 +50,7 @@ public:
     virtual ~Action() = default;
     Id id() const;
 
-    virtual Action::ActScope actionScope() const;
+    virtual Action::Scope scope() const;
     virtual KnownAction type() const;
 
     QString title() const;
@@ -99,12 +99,11 @@ protected slots:
 protected:
     friend class ActionStorage;
 
-    explicit Action(Action::ActScope scope, KnownAction type, ActionStorage *parent = nullptr,
-                    const Action::Id &id = {});
+    explicit Action(Action::Scope scope, KnownAction type, ActionStorage *parent = nullptr, const Action::Id &id = {});
 
     const Action::Id m_id;
     const ActionStorage *m_storage;
-    const Action::ActScope m_scope;
+    const Action::Scope m_scope;
     const KnownAction m_type;
 
     QString m_title;

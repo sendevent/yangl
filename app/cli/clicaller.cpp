@@ -19,11 +19,8 @@
 
 #include "action.h"
 
-#include <QDebug>
 #include <QRunnable>
 #include <QThreadPool>
-
-#define LOG qDebug() << Q_FUNC_INFO << QThread::currentThreadId()
 
 class RunCallTask : public QRunnable
 {

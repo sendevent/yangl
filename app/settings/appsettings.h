@@ -65,6 +65,7 @@ public:
     const AppSetting *Active = Options[3];
     const AppSetting *IgnoreFirstConnected = Options[4];
     const AppSetting *SettingsDialog = Options[5];
+    const AppSetting *MessagePlainText = Options[6];
 
 private:
     GroupMonitor(const GroupMonitor &) = delete;

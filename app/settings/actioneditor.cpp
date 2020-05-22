@@ -18,11 +18,8 @@
 #include "actioneditor.h"
 
 #include "action.h"
+#include "common.h"
 #include "ui_actioneditor.h"
-
-#include <QDebug>
-
-#define LOG qDebug() << Q_FUNC_INFO
 
 ActionEditor::ActionEditor(const Action::Ptr &act, QWidget *parent)
     : QWidget(parent)
@@ -54,12 +51,12 @@ void ActionEditor::setupAction(const Action::Ptr &action)
     if (!m_act)
         return;
 
-    const bool isCustom = m_act->actionScope() == Action::ActScope::User;
+    const bool isCustom = m_act->scope() == Action::Scope::User;
 
     ui->leTitle->setText(m_act->title());
     ui->leApplication->setText(m_act->app());
     ui->leArguments->setText(m_act->args().join(" "));
-    ui->spinBoxTimeout->setValue(m_act->timeout() / 1000);
+    ui->spinBoxTimeout->setValue(m_act->timeout() / yangl::OneSecondMs);
     ui->checkBoxForceShow->setChecked(m_act->forcedShow());
 
     ui->comboBoxMenu->clear();
@@ -68,7 +65,7 @@ void ActionEditor::setupAction(const Action::Ptr &action)
     ui->comboBoxMenu->addItem(isCustom ? tr("Custom") : tr("NordVPN"), static_cast<int>(Action::MenuPlace::Own));
     ui->comboBoxMenu->setCurrentIndex(static_cast<int>(m_act->anchor()));
 
-    if (m_act->actionScope() == Action::ActScope::Builtin) {
+    if (m_act->scope() == Action::Scope::Builtin) {
         for (auto wgt : std::initializer_list<QWidget *> { ui->labelApp, ui->leApplication }) {
             wgt->hide();
             ui->formLayout->removeWidget(wgt);

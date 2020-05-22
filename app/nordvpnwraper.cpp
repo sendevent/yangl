@@ -20,21 +20,18 @@
 #include "actionstorage.h"
 #include "appsettings.h"
 #include "clicaller.h"
+#include "common.h"
 #include "menuholder.h"
 #include "settingsdialog.h"
 #include "statechecker.h"
 #include "trayicon.h"
 
 #include <QApplication>
-#include <QDebug>
 #include <QInputDialog>
 #include <QTimer>
 #include <QVariant>
 
-#define LOG qDebug() << Q_FUNC_INFO
-
-static constexpr int OneSecondMs = 1000;
-static constexpr int TimeQuantMs = 60 * OneSecondMs;
+static constexpr int TimeQuantMs = 60 * yangl::OneSecondMs;
 
 NordVpnWraper::NordVpnWraper(QObject *parent)
     : QObject(parent)
@@ -53,16 +50,17 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
     connect(m_menuHolder, &MenuHolder::actionTriggered, this, &NordVpnWraper::onActionTriggered);
     connect(m_pauseTimer, &QTimer::timeout, this, &NordVpnWraper::onPauseTimer);
 
+    m_trayIcon->setContextMenu(m_menuHolder->createMenu(m_actions->load()));
     m_trayIcon->setVisible(true);
 }
 
 void NordVpnWraper::start()
 {
+    LOG;
+    //    m_trayIcon->showMessage("title", "msg", QIcon(":/icn/resources/offline.png"));
     const bool wasActive = m_checker->isActive();
 
     loadSettings();
-
-    m_trayIcon->setContextMenu(m_menuHolder->createMenu(m_actions->load()));
 
     if (auto actRun = m_menuHolder->getActRun()) {
         connect(actRun, &QAction::toggled, m_checker, &StateChecker::setActive);
@@ -75,7 +73,7 @@ void NordVpnWraper::start()
 void NordVpnWraper::loadSettings()
 {
     m_checker->setInterval(AppSettings::Monitor.Interval->read().toInt());
-    m_trayIcon->setMessageDuration(AppSettings::Monitor.MessageDuration->read().toInt() * 1000);
+    m_trayIcon->setMessageDuration(AppSettings::Monitor.MessageDuration->read().toInt() * yangl::OneSecondMs);
 }
 
 void NordVpnWraper::prepareQuit()
@@ -166,13 +164,13 @@ void NordVpnWraper::pause(KnownAction action)
 
     if (auto disconnect = m_actions->action(KnownAction::Disconnect)) {
         onActionTriggered(disconnect.get());
-        m_pauseTimer->start(OneSecondMs);
+        m_pauseTimer->start(yangl::OneSecondMs);
     }
 }
 
 void NordVpnWraper::onPauseTimer()
 {
-    m_paused -= OneSecondMs;
+    m_paused -= yangl::OneSecondMs;
 
     if (m_paused <= 0) {
         m_pauseTimer->stop();

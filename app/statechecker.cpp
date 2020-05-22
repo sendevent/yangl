@@ -20,16 +20,15 @@
 #include "actionstorage.h"
 #include "clicall.h"
 #include "clicaller.h"
+#include "common.h"
 
 #include <QDateTime>
-#include <QDebug>
 #include <QFuture>
 #include <QThread>
 #include <QTimer>
 #include <QtConcurrent>
 
-#define LOG qDebug() << Q_FUNC_INFO << QThread::currentThreadId()
-#define WRN qWarning() << Q_FUNC_INFO << QThread::currentThreadId()
+/*static*/ const int StateChecker::DefaultIntervalMs = yangl::OneSecondMs;
 
 StateChecker::StateChecker(CLICaller *bus, ActionStorage *actions, int intervalMs, QObject *parent)
     : QObject(parent)
