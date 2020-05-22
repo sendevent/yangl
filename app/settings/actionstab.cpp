@@ -89,13 +89,11 @@ void ActionsTab::onAddRequested()
 void ActionsTab::onRemoveRequested()
 {
     if (auto editor = qobject_cast<ActionEditor *>(ui->toolBox->currentWidget())) {
-        if (m_actStorage->removeUserAction(editor->getAction())) {
-            const int id = ui->toolBox->currentIndex();
-            ui->toolBox->removeItem(id);
-            editor->deleteLater();
-            m_actions.removeAt(id);
-            ui->buttonRemove->setEnabled(m_actions.size());
-        }
+        const int id = ui->toolBox->currentIndex();
+        ui->toolBox->removeItem(id);
+        editor->deleteLater();
+        m_actions.removeAt(id);
+        ui->buttonRemove->setEnabled(m_actions.size());
     }
 }
 

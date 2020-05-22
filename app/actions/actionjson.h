@@ -26,6 +26,8 @@ class ActionJson
 public:
     ActionJson();
 
+    void clear();
+
     bool load(const QString &from);
     bool load(QIODevice *in);
     void save(const QString &to);
