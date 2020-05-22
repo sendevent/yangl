@@ -44,7 +44,7 @@ SettingsManager::SettingsManager(QObject *parent)
     : QObject(parent)
     , m_settings(new QSettings(QString("%1/settings.conf").arg(dirPath()), QSettings::IniFormat, this))
 {
-    qDebug() << yangl::now() << "Config:" << m_settings->fileName();
+    LOG << "Config:" << m_settings->fileName();
 }
 
 SettingsManager *SettingsManager::instance()

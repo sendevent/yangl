@@ -2,5 +2,8 @@
     <qresource prefix="/icn">
         <file>resources/online.png</file>
         <file>resources/offline.png</file>
+        <file>resources/sub_toffline.png</file>
+        <file>resources/sub_toonline.png</file>
+        <file>resources/sub_unknown.png</file>
     </qresource>
 </RCC>
