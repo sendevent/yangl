@@ -22,6 +22,7 @@
 #include "tst_clicaller.h"
 #include "tst_statechecker.h"
 
+#include <QApplication>
 #include <QtTest>
 
 int main(int argc, char **argv)
