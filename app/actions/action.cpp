@@ -19,6 +19,7 @@
 
 #include "actionstorage.h"
 #include "clicall.h"
+#include "common.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -154,12 +155,12 @@ CLICall *Action::createRequest()
 
 void Action::onResult(const QString &result)
 {
-    QString exitCode(tr("Unknown"));
-    QString errors(tr("No errors"));
+    int exitCode(0);
+    QString errors;
 
     bool hasErrors(false);
     if (auto call = qobject_cast<CLICall *>(sender())) {
-        exitCode = QString::number(call->exitCode(), 16);
+        exitCode = call->exitCode();
         const QString &errReport = call->errors();
         errors = errReport.isEmpty() ? errors : errReport;
         hasErrors = call->exitCode() != 0 || call->exitStatus() != QProcess::NormalExit || !errReport.isEmpty();
@@ -174,14 +175,15 @@ void Action::onResult(const QString &result)
         }
 
         m_display->setWindowTitle(QStringLiteral("%1 — %2").arg(qApp->applicationDisplayName(), title()));
-        m_display->append(
-                tr("%1 %2:<br>"
-                   "<b>Result:</b><br>"
-                   "%3<br>"
-                   "<b>Exit code:</b> %4<br>"
-                   "<b>Errors:</b><br>"
-                   "%5")
-                        .arg(app(), args().join(" "), QString(result).replace("\n", "<br>"), exitCode, errors));
+        QString info = QString("%1 %2 %3:<br>").arg(yangl::now(), app(), args().join(QChar(' ')));
+        if (!result.isEmpty())
+            info.append(QString("<b>Result:</b><br>%1<br>").arg(QString(result).replace("\n", "<br>")));
+        if (exitCode)
+            info.append(QString("<b>Exit code:</b> %1<br>").arg(exitCode));
+        if (!errors.isEmpty())
+            info.append(QString("<b>Errors:</b> %1<br>").arg(errors));
+
+        m_display->append(info);
         m_display->show();
     }
 
