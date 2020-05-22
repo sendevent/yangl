@@ -18,13 +18,86 @@
 #include "trayicon.h"
 
 #include "appsettings.h"
+#include "common.h"
 
 #include <QApplication>
 #include <QMetaEnum>
+#include <QPainter>
+#include <QPixmap>
 #include <QTextDocumentFragment>
 
+struct IconInfo {
+    QString m_base;
+    QString m_sub;
+    NordVpnInfo::Status m_status;
+};
+
+/*static*/ IconInfo infoPixmaps(const NordVpnInfo::Status forStatus)
+{
+    static const QMap<NordVpnInfo::Status, IconInfo> staticIcons = [] {
+        QMap<NordVpnInfo::Status, IconInfo> icons;
+        QMetaEnum me = QMetaEnum::fromType<NordVpnInfo::Status>();
+        for (int i = 0; i < me.keyCount(); ++i) {
+            IconInfo info;
+            info.m_status = static_cast<NordVpnInfo::Status>(i);
+            const NordVpnInfo::Status state = static_cast<NordVpnInfo::Status>(me.value(i));
+            switch (state) {
+            case NordVpnInfo::Status::Connected:
+                info.m_base = QStringLiteral(":/icn/resources/online.png");
+                //                info.m_sub = QStringLiteral(":/icn/resources/sub_online.png");
+                break;
+            case NordVpnInfo::Status::Disconnected:
+                info.m_base = QStringLiteral(":/icn/resources/offline.png");
+                //                info.m_sub = QStringLiteral(":/icn/resources/sub_offline.png");
+                break;
+            case NordVpnInfo::Status::Connecting:
+                info.m_base = QStringLiteral(":/icn/resources/offline.png");
+                info.m_sub = QStringLiteral(":/icn/resources/sub_toonline.png");
+                break;
+            case NordVpnInfo::Status::Disconnecting:
+                info.m_base = QStringLiteral(":/icn/resources/offline.png");
+                info.m_sub = QStringLiteral(":/icn/resources/sub_toffline.png");
+                break;
+            default:
+                info.m_base = QStringLiteral(":/icn/resources/offline.png");
+                info.m_sub = QStringLiteral(":/icn/resources/sub_unknown.png");
+                break;
+            }
+            icons.insert(info.m_status, info);
+        }
+        return icons;
+    }();
+
+    return staticIcons.value(forStatus);
+}
+
+QIcon generateIcon(const NordVpnInfo::Status forStatus)
+{
+    const IconInfo &info = infoPixmaps(forStatus);
+    QPixmap base(info.m_base);
+
+    if (!info.m_sub.isEmpty()) {
+        const QRect baseRect(base.rect());
+        QPixmap sub = QPixmap(info.m_sub)
+                              .scaled(baseRect.width() / 2, baseRect.height() / 2, Qt::KeepAspectRatio,
+                                      Qt::SmoothTransformation);
+        const QRect subRect = sub.rect();
+        QRect targetRect(subRect);
+        targetRect.moveTopLeft(base.rect().center());
+
+        QPainter p(&base);
+        p.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 13, 0)
+        p.setRenderHint(QPainter::LosslessImageRendering);
+#endif
+        p.drawPixmap(targetRect, sub, subRect);
+    }
+    base.save(QString("./pm_%1.png").arg(static_cast<int>(forStatus)));
+    return QIcon(base);
+}
+
 TrayIcon::TrayIcon(QObject *parent)
-    : QSystemTrayIcon(iconForStatus(NordVpnInfo::Status::Disconnected), parent)
+    : QSystemTrayIcon(iconForStatus(NordVpnInfo::Status::Unknown), parent)
     , m_isFirstChange(true)
 {
 }
@@ -41,19 +114,7 @@ TrayIcon::TrayIcon(QObject *parent)
         QMetaEnum me = QMetaEnum::fromType<NordVpnInfo::Status>();
         for (int i = 0; i < me.keyCount(); ++i) {
             const NordVpnInfo::Status state = static_cast<NordVpnInfo::Status>(me.value(i));
-            switch (state) {
-            case NordVpnInfo::Status::Connected: {
-                icons.insert(state, QPixmap(":/icn/resources/online.png"));
-                break;
-            }
-            case NordVpnInfo::Status::Disconnected:
-            case NordVpnInfo::Status::Connecting:
-            case NordVpnInfo::Status::Disconnecting:
-            default: {
-                icons.insert(state, QPixmap(":/icn/resources/offline.png"));
-                break;
-            }
-            }
+            icons.insert(state, generateIcon(state));
         }
         return icons;
     }();

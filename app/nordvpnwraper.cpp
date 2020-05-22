@@ -107,7 +107,6 @@ void NordVpnWraper::performStatusCheck()
 
 void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    LOG << reason;
     KnownAction invokeMe(KnownAction::Unknown);
     switch (reason) {
     case QSystemTrayIcon::Trigger:

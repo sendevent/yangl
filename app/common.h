@@ -20,12 +20,16 @@
 #include <QDateTime>
 #include <QDebug>
 
+#ifndef YANGL_LOG_PREFIX
+#define YANGL_LOG_PREFIX qPrintable(yangl::now()) << Q_FUNC_INFO
+#endif // YANGL_LOG_PREFIX
+
 #ifndef LOG
-#define LOG qDebug() << yangl::now() << Q_FUNC_INFO
+#define LOG qDebug() << YANGL_LOG_PREFIX
 #endif // LOG
 
 #ifndef WRN
-#define WRN qWarning() << yangl::now() << Q_FUNC_INFO
+#define WRN qWarning() << YANGL_LOG_PREFIX
 #endif // WRN
 
 #ifndef NIY
@@ -39,7 +43,7 @@ static constexpr int OneSecondMs { 1000 };
 static QString now()
 {
     QDateTime d = QDateTime::currentDateTime();
-    return d.toString("hh:mm:ss.zzz");
+    return d.toString("hh:mm:ss.zzz:");
 }
 
 } // ns yangl
