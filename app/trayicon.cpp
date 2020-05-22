@@ -21,6 +21,7 @@
 
 #include <QApplication>
 #include <QMetaEnum>
+#include <QTextDocumentFragment>
 
 TrayIcon::TrayIcon(QObject *parent)
     : QSystemTrayIcon(iconForStatus(NordVpnInfo::Status::Disconnected), parent)
@@ -67,7 +68,9 @@ void TrayIcon::setMessageDuration(int durationSecs)
 
 void TrayIcon::setState(const NordVpnInfo &state)
 {
-    const QString description = state.toString();
+    const QString description = AppSettings::Monitor.MessagePlainText->read().toBool()
+            ? QTextDocumentFragment::fromHtml(state.toString()).toPlainText()
+            : state.toString();
 
     if (m_state.status() != state.status() && !qApp->isSavingSession()) {
         QIcon icn = iconForStatus(state.status());

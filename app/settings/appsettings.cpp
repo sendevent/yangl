@@ -69,6 +69,7 @@ GroupMonitor::GroupMonitor()
                            new AppSetting(QString("%1/Active").arg(localName()), false),
                            new AppSetting(QString("%1/IgnoreFirstConnected").arg(localName()), true),
                            new AppSetting(QString("%1/EditorGeometry").arg(localName())),
+                           new AppSetting(QString("%1/MsgPlainText").arg(localName()), false),
                    },
                    {})
 {

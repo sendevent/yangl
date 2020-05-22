@@ -46,6 +46,7 @@ Dialog::Dialog(ActionStorage *actStorage, QWidget *parent)
     ui->spinBoxMsgDuration->setValue(AppSettings::Monitor.MessageDuration->read().toInt());
     ui->checkBoxAutoActive->setChecked(AppSettings::Monitor.Active->read().toBool());
     ui->cbIgnoreFirstConnected->setChecked(AppSettings::Monitor.IgnoreFirstConnected->read().toBool());
+    ui->checkBoxMessagePlainText->setChecked(AppSettings::Monitor.MessagePlainText->read().toBool());
 
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &Dialog::accept);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &Dialog::reject);
@@ -92,6 +93,7 @@ bool Dialog::saveMonitorSettings()
     AppSettings::Monitor.Interval->write(ui->spinBoxInterval->value() * yangl::OneSecondMs);
     AppSettings::Monitor.Active->write(ui->checkBoxAutoActive->isChecked());
     AppSettings::Monitor.IgnoreFirstConnected->write(ui->cbIgnoreFirstConnected->isChecked());
+    AppSettings::Monitor.MessagePlainText->write(ui->checkBoxMessagePlainText->isChecked());
 
     return true;
 }
