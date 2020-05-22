@@ -39,5 +39,8 @@ enum KnownAction
     Rate2,
     Rate1,
 
+    SetNotifyOff,
+    SetNotifyOn,
+
     Last
 };
