@@ -61,9 +61,17 @@ QString CLICall::run()
         return setResult(
                 {}, QStringLiteral("Start timeout (%1) reached for [%2]").arg(QString::number(m_timeout), m_appPath));
 
+    auto stripSpinner = [](QString &in) {
+        static const QString spinnerString("-\\|/ \r");
+        while (!in.isEmpty() && spinnerString.contains(in.at(0)))
+            in.remove(0, 1);
+        return in;
+    };
+
     QString result, errors;
     while (proc.waitForReadyRead(m_timeout)) {
-        result += proc.readAllStandardOutput();
+        QString in(proc.readAllStandardOutput());
+        result += stripSpinner(in);
         errors += proc.readAllStandardError();
     }
 

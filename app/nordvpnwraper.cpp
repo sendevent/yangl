@@ -42,6 +42,7 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
     , m_menuHolder(new MenuHolder(this))
     , m_pauseTimer(new QTimer(this))
     , m_paused(0)
+    , m_settingsShown(false)
 {
     connect(qApp, &QApplication::aboutToQuit, this, &NordVpnWraper::prepareQuit);
     connect(m_checker, &StateChecker::stateChanged, m_trayIcon, &TrayIcon::setState);
@@ -57,17 +58,19 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
 void NordVpnWraper::start()
 {
     LOG;
-    //    m_trayIcon->showMessage("title", "msg", QIcon(":/icn/resources/offline.png"));
     const bool wasActive = m_checker->isActive();
 
     loadSettings();
+
+    m_trayIcon->setContextMenu(m_menuHolder->createMenu(m_actions->load()));
 
     if (auto actRun = m_menuHolder->getActRun()) {
         connect(actRun, &QAction::toggled, m_checker, &StateChecker::setActive);
         actRun->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());
     }
-    connect(m_menuHolder->getActShowSettings(), &QAction::triggered, this, &NordVpnWraper::showSettingsEditor);
-    connect(m_menuHolder->getActQuit(), &QAction::triggered, qApp, &QApplication::quit);
+    connect(m_menuHolder->getActShowSettings(), &QAction::triggered, this, &NordVpnWraper::showSettingsEditor,
+            Qt::UniqueConnection);
+    connect(m_menuHolder->getActQuit(), &QAction::triggered, qApp, &QApplication::quit, Qt::UniqueConnection);
 }
 
 void NordVpnWraper::loadSettings()
@@ -87,10 +90,12 @@ void NordVpnWraper::showSettingsEditor()
     Dialog *dlg = new Dialog(m_actions);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     connect(dlg, &QDialog::finished, this, [this](int result) {
+        m_settingsShown = false;
         if (result == QDialog::Accepted) {
             start();
         }
     });
+    m_settingsShown = true;
     dlg->open();
 }
 
@@ -101,16 +106,41 @@ void NordVpnWraper::performStatusCheck()
 
 void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason)
 {
+    LOG << reason;
+    KnownAction invokeMe(KnownAction::Unknown);
     switch (reason) {
     case QSystemTrayIcon::Trigger:
-        performStatusCheck();
-        break;
-    case QSystemTrayIcon::MiddleClick:
-        qApp->quit();
-        break;
-    default:
+        if (!m_settingsShown)
+            showSettingsEditor();
+        return;
+    case QSystemTrayIcon::MiddleClick: {
+        switch (m_checker->state().status()) {
+        case NordVpnInfo::Status::Connected: {
+            invokeMe = KnownAction::Disconnect;
+            break;
+        }
+        case NordVpnInfo::Status::Disconnected: {
+            invokeMe = KnownAction::Connect;
+            break;
+        }
+        case NordVpnInfo::Status::Unknown: {
+            invokeMe = KnownAction::CheckStatus;
+            break;
+        }
+        default:
+            return;
+        }
         break;
     }
+    default:
+        return;
+    }
+
+    if (invokeMe == KnownAction::Unknown)
+        return;
+
+    if (const Action::Ptr &action = m_actions->action(invokeMe))
+        onActionTriggered(action.get());
 }
 
 void NordVpnWraper::onActionTriggered(Action *action)

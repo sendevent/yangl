@@ -98,6 +98,8 @@ void ActionStorage::save(const QString &to)
 
 void ActionStorage::save(QIODevice(*to))
 {
+    //    m_json->clear();
+
     for (const auto &action : m_builtinActions)
         m_json->putAction(action.get());
 
@@ -263,6 +265,18 @@ Action::Ptr ActionStorage::createAction(KnownAction actionType, const QString &i
         args.append("rate 1");
         break;
     }
+    case KnownAction::SetNotifyOff: {
+        title = QObject::tr("Notify OFF");
+        menuPlace = Action::MenuPlace::Own;
+        args.append("set notify 0");
+        break;
+    }
+    case KnownAction::SetNotifyOn: {
+        title = QObject::tr("Notify ON");
+        menuPlace = Action::MenuPlace::Own;
+        args.append("set notify 1");
+        break;
+    }
     default:
         scope = Action::Scope::User;
         break;
@@ -307,17 +321,19 @@ bool ActionStorage::updateUserActions(const QList<Action::Ptr> &actions)
 {
     QList<Action::Id> savedActions;
     for (auto action : actions) {
-        const Action::Id actType = action->id();
-        if (m_userActions.contains(actType))
-            m_userActions[actType].swap(action);
-        else
-            m_userActions.insert(actType, action);
-        savedActions.append(actType);
+        const Action::Id &actId = action->id();
+        if (m_userActions.contains(actId)) {
+            m_userActions[actId].swap(action);
+        } else {
+            m_userActions.insert(actId, action);
+        }
+        savedActions.append(actId);
     }
 
     for (const auto key : m_userActions.keys())
-        if (!savedActions.contains(key))
+        if (!savedActions.contains(key)) {
             m_userActions.remove(key);
+        }
 
     return true;
 }
