@@ -55,6 +55,16 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
     m_trayIcon->setVisible(true);
 }
 
+CLICaller *NordVpnWraper::bus() const
+{
+    return m_bus;
+}
+
+ActionStorage *NordVpnWraper::storate() const
+{
+    return m_actions;
+}
+
 void NordVpnWraper::start()
 {
     LOG;

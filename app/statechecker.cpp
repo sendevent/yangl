@@ -22,9 +22,6 @@
 #include "clicaller.h"
 #include "common.h"
 
-#include <QDateTime>
-#include <QFuture>
-#include <QThread>
 #include <QTimer>
 #include <QtConcurrent>
 

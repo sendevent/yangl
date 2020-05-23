@@ -29,6 +29,8 @@ SOURCES += \
     menuholder.cpp \
     nordvpninfo.cpp \
     nordvpnwraper.cpp \
+    serverschartview.cpp \
+    serverslistmanager.cpp \
     settings/actioneditor.cpp \
     settings/actionstab.cpp \
     settings/apppatheditor.cpp \
@@ -49,6 +51,8 @@ HEADERS += \
     menuholder.h \
     nordvpninfo.h \
     nordvpnwraper.h \
+    serverschartview.h \
+    serverslistmanager.h \
     settings/actioneditor.h \
     settings/actionstab.h \
     settings/apppatheditor.h \
@@ -59,6 +63,7 @@ HEADERS += \
     trayicon.h
 
 FORMS += \
+    serverschartview.ui \
     settings/actioneditor.ui \
     settings/actionstab.ui \
     settings/settingsdialog.ui

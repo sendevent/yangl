@@ -34,6 +34,9 @@ public:
 
     void start();
 
+    CLICaller *bus() const;
+    ActionStorage *storate() const;
+
 private slots:
     void prepareQuit();
 
