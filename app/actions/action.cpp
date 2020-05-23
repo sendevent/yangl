@@ -29,10 +29,9 @@
 /*static*/ const QString Action::GroupKeyBuiltin { QStringLiteral("builtin") };
 /*static*/ const QString Action::GroupKeyCustom { QStringLiteral("custom") };
 
-Action::Action(Action::Scope scope, KnownAction type, ActionStorage *parent, const Action::Id &id)
+Action::Action(Action::Scope scope, KnownAction type, QObject *parent, const Action::Id &id)
     : QObject(parent)
     , m_id(id.isNull() ? QUuid::createUuid() : id)
-    , m_storage(parent)
     , m_scope(scope)
     , m_type(type)
     , m_title()

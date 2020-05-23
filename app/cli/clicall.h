@@ -29,6 +29,7 @@ class CLICall : public QObject
 public:
     static constexpr int DefaultTimeoutMSecs = 30000;
 
+    explicit CLICall(const QString &path, const QStringList &params, int timeout, QObject *parent = nullptr);
     ~CLICall() = default;
 
     QString run();
@@ -37,14 +38,12 @@ public:
 
     int exitCode() const;
     QProcess::ExitStatus exitStatus() const;
+    bool success() const;
 
 signals:
     void ready(const QString &result) const;
 
 protected:
-    friend class Action;
-    explicit CLICall(const QString &path, const QStringList &params, int timeout, QObject *parent = nullptr);
-
     const QString m_appPath;
     const QStringList m_params;
     const int m_timeout;
