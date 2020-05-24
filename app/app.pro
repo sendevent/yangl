@@ -1,4 +1,4 @@
-QT       += core gui concurrent qml quick quickwidgets
+QT       += core gui concurrent qml quick quickwidgets location
 TARGET = yangl
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

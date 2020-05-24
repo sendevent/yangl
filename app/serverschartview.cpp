@@ -21,6 +21,7 @@
 #include "nordvpnwraper.h"
 #include "ui_serverschartview.h"
 
+#include <QItemSelectionModel>
 #include <QStandardItemModel>
 
 ServersChartView::ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent)
@@ -32,17 +33,30 @@ ServersChartView::ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent
 {
     ui->setupUi(this);
 
+    setWindowTitle(tr("Yet Another NordVPN GUI for Linux"));
+
     ui->splitter->setStretchFactor(0, 0);
     ui->splitter->setStretchFactor(1, 1);
 
     connect(m_listManager, &ServersListManager::ready, this, &ServersChartView::onGotServers);
 
     ui->treeView->setModel(m_serversModel);
+
+    connect(ui->treeView->selectionModel(), &QItemSelectionModel::currentChanged, this,
+            &ServersChartView::onCurrentTreeItemChanged);
+
+    requestServersList();
 }
 
 ServersChartView::~ServersChartView()
 {
     delete ui;
+}
+
+void ServersChartView::requestServersList()
+{
+    if (m_listManager->reload())
+        setControlsEnabled(false);
 }
 
 void ServersChartView::setControlsEnabled(bool enabled)
@@ -54,8 +68,7 @@ void ServersChartView::setControlsEnabled(bool enabled)
 
 void ServersChartView::on_buttonReload_clicked()
 {
-    if (m_listManager->reload())
-        setControlsEnabled(false);
+    requestServersList();
 }
 
 void ServersChartView::onGotServers(const ServersListManager::Groups &groups,
@@ -70,12 +83,27 @@ void ServersChartView::setupModel(const ServersListManager::Groups &groups)
 {
     m_serversModel->removeRows(0, m_serversModel->rowCount());
 
+    auto clearGeoName = [](const QString &geoName) -> QString { return QString(geoName).replace('_', ' '); };
+
     for (const auto &group : groups) {
-        QStandardItem *title = new QStandardItem(group.first);
+        QStandardItem *title = new QStandardItem(clearGeoName(group.first));
         m_serversModel->insertRow(m_serversModel->rowCount(), QList<QStandardItem *>() << title);
         for (const auto &city : group.second) {
-            QStandardItem *content = new QStandardItem(city);
+            QStandardItem *content = new QStandardItem(clearGeoName(city));
             title->appendRow(content);
         }
     }
+}
+
+void ServersChartView::onCurrentTreeItemChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
+{
+    QString country, city;
+    if (current.parent().isValid()) {
+        country = current.parent().data().toString();
+        city = current.data().toString();
+    } else {
+        country = current.data().toString();
+    }
+
+    ui->chartWidget->centerOn(country, city);
 }

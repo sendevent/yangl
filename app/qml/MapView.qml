@@ -1,25 +1,20 @@
-import QtQuick 2.0
-import QtQuick.Window 2.14
-import QtLocation 5.6
-import QtPositioning 5.6
+import QtQuick 2.12
+import QtLocation 5.12
 
 Rectangle {
+    id: mapView
+    property alias mapCenter : map.center
+
     Plugin {
         id: mapPlugin
-        name: "mapboxgl" // "mapboxgl", "esri", ...
-        // specify plugin parameters if necessary
-        // PluginParameter {
-        //     name:
-        //     value:
-        // }
+        name: "mapboxgl"
     }
 
     Map {
+        id: map
         anchors.fill: parent
         plugin: mapPlugin
+        activeMapType: supportedMapTypes[6]
         zoomLevel: 2.5
-
-        onZoomLevelChanged: console.log(zoomLevel)
     }
-
 }

@@ -38,6 +38,7 @@ public:
 private slots:
     void on_buttonReload_clicked();
     void onGotServers(const ServersListManager::Groups &groups, const ServersListManager::Groups &countries);
+    void onCurrentTreeItemChanged(const QModelIndex &current, const QModelIndex &previous);
 
 private:
     Ui::ServersChartView *ui;
@@ -46,6 +47,7 @@ private:
     ServersListManager *m_listManager;
     QStandardItemModel *m_serversModel;
 
+    void requestServersList();
     void setControlsEnabled(bool enabled);
 
     void setupModel(const ServersListManager::Groups &groups);

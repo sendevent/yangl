@@ -19,8 +19,12 @@
 
 #include "common.h"
 
+#include <QGeoAddress>
+#include <QGeoCodingManager>
+#include <QGeoServiceProvider>
 #include <QMetaObject>
 #include <QQmlContext>
+#include <QQmlProperty>
 #include <QQuickItem>
 #include <QQuickWidget>
 #include <QVBoxLayout>
@@ -29,7 +33,12 @@
 MapWidget::MapWidget(QWidget *parent)
     : QWidget(parent)
     , m_quickView(new QQuickWidget(this))
+    , m_geoSrvProv(new QGeoServiceProvider("osm"))
+    , m_geoCoder(m_geoSrvProv->geocodingManager())
 {
+    QLocale qLocaleC(QLocale::C, QLocale::AnyCountry);
+    m_geoCoder->setLocale(qLocaleC);
+
     m_quickView->setSource(QStringLiteral("qrc:/qml/qml/MapView.qml"));
     QVBoxLayout *vBox = new QVBoxLayout(this);
     vBox->addWidget(m_quickView);
@@ -55,4 +64,32 @@ void MapWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
     syncMapSize();
+}
+
+void MapWidget::centerOn(const QString &country, const QString &city)
+{
+    QGeoAddress addr;
+    addr.setCountry(country);
+    addr.setCity(city);
+
+    if (QGeoCodeReply *reply = m_geoCoder->geocode(addr)) {
+        if (reply->isFinished() && reply->error() != QGeoCodeReply::NoError) {
+            WRN << "geo reply error:" << reply->errorString();
+            return;
+        }
+
+        connect(reply, &QGeoCodeReply::finished, this, [this] {
+            if (QGeoCodeReply *r = qobject_cast<QGeoCodeReply *>(sender())) {
+                for (auto l : r->locations()) {
+                    LOG << l.coordinate();
+                    if (QQuickItem *map = m_quickView->rootObject()) {
+                        const QVariant &v = QVariant::fromValue(l.coordinate());
+                        QQmlProperty(map, "mapCenter").write(v);
+                        break;
+                    }
+                }
+                r->deleteLater();
+            }
+        });
+    }
 }
