@@ -32,6 +32,9 @@ ServersChartView::ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent
 {
     ui->setupUi(this);
 
+    ui->splitter->setStretchFactor(0, 0);
+    ui->splitter->setStretchFactor(1, 1);
+
     connect(m_listManager, &ServersListManager::ready, this, &ServersChartView::onGotServers);
 
     ui->treeView->setModel(m_serversModel);
