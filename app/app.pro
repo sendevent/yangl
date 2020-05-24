@@ -1,4 +1,4 @@
-QT       += core gui concurrent
+QT       += core gui concurrent qml quick quickwidgets
 TARGET = yangl
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -26,6 +26,7 @@ SOURCES += \
     cli/clicall.cpp \
     cli/clicaller.cpp \
     main.cpp \
+    mapwidget.cpp \
     menuholder.cpp \
     nordvpninfo.cpp \
     nordvpnwraper.cpp \
@@ -48,6 +49,7 @@ HEADERS += \
     cli/clicall.h \
     cli/clicaller.h \
     common.h \
+    mapwidget.h \
     menuholder.h \
     nordvpninfo.h \
     nordvpnwraper.h \
@@ -75,3 +77,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     rsc.qrc
+
+DISTFILES += \
+    qml/MapView.qml

@@ -6,4 +6,7 @@
         <file>resources/sub_toonline.png</file>
         <file>resources/sub_unknown.png</file>
     </qresource>
+    <qresource prefix="/qml">
+        <file>qml/MapView.qml</file>
+    </qresource>
 </RCC>
