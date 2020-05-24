@@ -17,20 +17,26 @@
 
 #pragma once
 
+#include <QGeoServiceProvider>
 #include <QQmlApplicationEngine>
+#include <QSharedPointer>
 #include <QWidget>
 
 class QQuickWidget;
+class QGeoCodingManager;
 class MapWidget : public QWidget
 {
     Q_OBJECT
 public:
     explicit MapWidget(QWidget *parent = nullptr);
 
+    void centerOn(const QString &country, const QString &city);
 signals:
 
 private:
     QQuickWidget *m_quickView;
+    QSharedPointer<QGeoServiceProvider> m_geoSrvProv;
+    QGeoCodingManager *m_geoCoder;
 
     void syncMapSize();
 
