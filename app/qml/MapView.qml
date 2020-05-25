@@ -4,6 +4,8 @@ import QtLocation 5.12
 Rectangle {
     id: mapView
     property alias mapCenter : map.center
+    property alias mapScale: map.zoomLevel
+
     signal markerDoubleclicked(anObject: Item)
 
 

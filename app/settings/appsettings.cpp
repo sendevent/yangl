@@ -45,13 +45,6 @@ void AppSetting::write(const QVariant &val) const
     }
 }
 
-/*static*/ void AppSetting::sync()
-{
-    if (QSettings *settings = SettingsManager::instance()->storage()) {
-        settings->sync();
-    }
-}
-
 OptionsGroup::OptionsGroup(const QString &name, const QVector<AppSetting *> &options,
                            const QVector<OptionsGroup *> &subroups)
     : Name(name)
@@ -75,10 +68,26 @@ GroupMonitor::GroupMonitor()
 {
 }
 
-GroupNVPN::GroupNVPN()
-    : OptionsGroup(localName(), {}, {})
+GroupMap::GroupMap()
+    : OptionsGroup(localName(),
+                   {
+                           new AppSetting(QString("%1/Geometry").arg(localName()), {}),
+                           new AppSetting(QString("%1/Filter").arg(localName()), QString()),
+                           new AppSetting(QString("%1/Visible").arg(localName()), false),
+                           new AppSetting(QString("%1/CenterLat").arg(localName()), {}),
+                           new AppSetting(QString("%1/CenterLon").arg(localName()), {}),
+                           new AppSetting(QString("%1/Scale").arg(localName()), 2.5),
+                   },
+                   {})
 {
 }
 
+/*static*/ void AppSettings::sync()
+{
+    if (QSettings *settings = SettingsManager::instance()->storage()) {
+        settings->sync();
+    }
+}
+
 const GroupMonitor AppSettings::Monitor = {};
-const GroupNVPN AppSettings::NordVPN = {};
+const GroupMap AppSettings::Map = {};

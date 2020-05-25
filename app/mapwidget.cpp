@@ -93,12 +93,24 @@ MapWidget::AddrHandler::AddrHandler(const QString &country, const QString &city)
 
 void MapWidget::centerOn(const QString &country, const QString &city)
 {
-    if (QQuickItem *map = m_quickView->rootObject()) {
+    const AddrHandler addr(country, city);
+    centerOn(m_coordinates[addr.m_country][addr.m_city]);
+}
 
-        const AddrHandler addr(country, city);
-        const QVariant &var = QVariant::fromValue(m_coordinates[addr.m_country][addr.m_city]);
+void MapWidget::centerOn(const QGeoCoordinate &center)
+{
+    if (QQuickItem *map = m_quickView->rootObject()) {
+        const QVariant &var = QVariant::fromValue(center);
         map->setProperty("mapCenter", var);
     }
+}
+
+QGeoCoordinate MapWidget::center() const
+{
+    if (QQuickItem *map = m_quickView->rootObject()) {
+        return map->property("mapCenter").value<QGeoCoordinate>();
+    }
+    return {};
 }
 
 void MapWidget::clearMarks()
@@ -241,4 +253,20 @@ void MapWidget::onMarkerDoubleclicked(QQuickItem *item)
     const AddrHandler received { item->property("countryName").toString(), item->property("cityName").toString() };
     if (m_coordinates.contains(received.m_country) && m_coordinates[received.m_country].contains(received.m_city))
         emit markerDoubleclicked(received);
+}
+
+void MapWidget::setScale(qreal scale)
+{
+    if (QQuickItem *map = m_quickView->rootObject()) {
+        const QVariant &var = QVariant::fromValue(scale);
+        map->setProperty("mapScale", var);
+    }
+}
+
+qreal MapWidget::scale() const
+{
+    if (QQuickItem *map = m_quickView->rootObject()) {
+        return map->property("mapScale").toDouble();
+    }
+    return 0;
 }
