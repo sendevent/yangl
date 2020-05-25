@@ -31,6 +31,7 @@ class MapWidget : public QWidget
     Q_OBJECT
 public:
     explicit MapWidget(QWidget *parent = nullptr);
+    ~MapWidget();
 
     void centerOn(const QString &country, const QString &city);
     void addMark(const QString &country, const QString &city);
@@ -61,4 +62,7 @@ private:
 
     void putMark(const AddrHandler &info, const QGeoCoordinate &point);
     void requestGeo(const AddrHandler &info);
+
+    void loadJson();
+    void saveJson();
 };
