@@ -19,7 +19,6 @@
 
 #include <QGeoCoordinate>
 #include <QGeoServiceProvider>
-#include <QQmlApplicationEngine>
 #include <QSharedPointer>
 #include <QWidget>
 
@@ -78,4 +77,4 @@ private:
     void saveJson();
 };
 
-Q_DECLARE_METATYPE(MapWidget::AddrHandler);
+Q_DECLARE_METATYPE(MapWidget::AddrHandler)

@@ -21,7 +21,14 @@ SOURCES += \
     $$APP_PRO_ROOT/settings/settingsmanager.cpp \
     $$APP_PRO_ROOT/statechecker.cpp \
     $$APP_PRO_ROOT/nordvpninfo.cpp \
-    $$APP_PRO_ROOT/trayicon.cpp
+    $$APP_PRO_ROOT/trayicon.cpp \
+$$APP_PRO_ROOT/mapserversmodel.cpp \
+$$APP_PRO_ROOT/mapwidget.cpp \
+$$APP_PRO_ROOT/serverschartview.cpp \
+$$APP_PRO_ROOT/serversfiltermodel.cpp \
+$$APP_PRO_ROOT/serverslistmanager.cpp \
+
+
 
 HEADERS += $$APP_PRO_ROOT\
     $$APP_PRO_ROOT/actions/action.h \
@@ -40,12 +47,19 @@ HEADERS += $$APP_PRO_ROOT\
     $$APP_PRO_ROOT/settings/settingsmanager.h \
     $$APP_PRO_ROOT/statechecker.h \
     $$APP_PRO_ROOT/nordvpninfo.h \
-    $$APP_PRO_ROOT/trayicon.h
+    $$APP_PRO_ROOT/trayicon.h \
+    $$APP_PRO_ROOT/mapserversmodel.h \
+    $$APP_PRO_ROOT/mapwidget.h \
+    $$APP_PRO_ROOT/serverschartview.h \
+    $$APP_PRO_ROOT/serversfiltermodel.h \
+    $$APP_PRO_ROOT/serverslistmanager.h \
+
 
 FORMS += \
     $$APP_PRO_ROOT/settings/actioneditor.ui \
     $$APP_PRO_ROOT/settings/actionstab.ui \
-    $$APP_PRO_ROOT/settings/settingsdialog.ui
+    $$APP_PRO_ROOT/settings/settingsdialog.ui \
+    $$APP_PRO_ROOT/serverschartview.ui \
 
 RESOURCES += \
     $$APP_PRO_ROOT/rsc.qrc

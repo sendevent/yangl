@@ -16,7 +16,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 */
 
 #include "nordvpnwraper.h"
-#include "serverschartview.h"
 
 #include <QApplication>
 #include <QProcess>
@@ -30,8 +29,8 @@ int main(int argc, char *argv[])
 
     NordVpnWraper nordVpnWraper;
 
-    ServersChartView chartView(&nordVpnWraper);
-    chartView.show();
+    //    ServersChartView chartView(&nordVpnWraper);
+    //    chartView.show();
 
     nordVpnWraper.start();
 

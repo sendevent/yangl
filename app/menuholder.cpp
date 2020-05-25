@@ -36,6 +36,7 @@ QMenu *MenuHolder::createMenu(const QList<Action::Ptr> &actions)
     m_menuMonitor->clear();
     m_menuMonitor->adjustSize();
 
+    m_actMap = m_menuMonitor->addAction(tr("Show &map"));
     m_actSettings = m_menuMonitor->addAction(tr("Show &settings"));
     m_actRun = m_menuMonitor->addAction(tr("&Active"));
     m_actRun->setCheckable(true);
@@ -61,6 +62,11 @@ QAction *MenuHolder::getActRun() const
 QAction *MenuHolder::getActShowSettings() const
 {
     return m_actSettings;
+}
+
+QAction *MenuHolder::getActShowMap() const
+{
+    return m_actMap;
 }
 
 QAction *MenuHolder::getActQuit() const

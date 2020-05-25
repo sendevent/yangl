@@ -33,7 +33,7 @@ public:
     };
 
     MapServersModel(QObject *parent = nullptr);
-    Q_INVOKABLE void addMarker(const QString &country, const QString &city, const QGeoCoordinate &coordinate);
+    void addMarker(const QString &country, const QString &city, const QGeoCoordinate &coordinate);
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
     void clear();
