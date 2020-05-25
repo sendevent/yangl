@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <QGeoCoordinate>
 #include <QGeoServiceProvider>
 #include <QQmlApplicationEngine>
 #include <QSharedPointer>
@@ -24,6 +25,7 @@
 
 class QQuickWidget;
 class QGeoCodingManager;
+class MapServersModel;
 class MapWidget : public QWidget
 {
     Q_OBJECT
@@ -31,15 +33,32 @@ public:
     explicit MapWidget(QWidget *parent = nullptr);
 
     void centerOn(const QString &country, const QString &city);
+    void addMark(const QString &country, const QString &city);
+
+    void clearMarks();
+
 signals:
 
 private:
     QQuickWidget *m_quickView;
     QSharedPointer<QGeoServiceProvider> m_geoSrvProv;
     QGeoCodingManager *m_geoCoder;
+    MapServersModel *m_serversModel;
+
+    struct AddrHandler {
+        AddrHandler(const QString &country, const QString &city = {});
+        QString m_country;
+        QString m_city;
+    };
 
     void syncMapSize();
 
     void showEvent(QShowEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
+
+    QMap<QString, QMap<QString, QGeoCoordinate>> m_allGeo;
+    QMap<QString, QMap<QString, QGeoCoordinate>> m_coordinates;
+
+    void putMark(const AddrHandler &info, const QGeoCoordinate &point);
+    void requestGeo(const AddrHandler &info);
 };

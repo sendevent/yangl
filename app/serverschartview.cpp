@@ -91,15 +91,34 @@ void ServersChartView::onGotServers(const ServersListManager::Groups &groups,
 
 void ServersChartView::setupModel(const ServersListManager::Groups &groups)
 {
+    ui->chartWidget->clearMarks();
+
     m_serversModel->removeRows(0, m_serversModel->rowCount());
     auto clearGeoName = [](const QString &geoName) -> QString { return QString(geoName).replace('_', ' '); };
 
-    for (const auto &group : groups) {
-        QStandardItem *title = new QStandardItem(clearGeoName(group.first));
+    if (groups.isEmpty() || (groups.size() == 1 && groups.first().second.isEmpty())) {
+        QStandardItem *title = new QStandardItem(tr("No data ☹"));
         m_serversModel->insertRow(m_serversModel->rowCount(), QList<QStandardItem *>() << title);
+        title->setEnabled(false);
+        return;
+    }
+
+    for (const auto &group : groups) {
+        const bool isGroups = group.first == "Groups"; // TODO: read ServersListManager
+        const QString &countryName = clearGeoName(group.first);
+        QStandardItem *title = new QStandardItem(countryName);
+        m_serversModel->insertRow(m_serversModel->rowCount(), QList<QStandardItem *>() << title);
+
+        if (!isGroups)
+            ui->chartWidget->addMark(group.first, {});
+
         for (const auto &city : group.second) {
-            QStandardItem *content = new QStandardItem(clearGeoName(city));
+            const QString &cityName = clearGeoName(city);
+            QStandardItem *content = new QStandardItem(cityName);
             title->appendRow(content);
+
+            if (!isGroups)
+                ui->chartWidget->addMark(countryName, cityName);
         }
     }
 }
