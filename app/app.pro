@@ -26,6 +26,7 @@ SOURCES += \
     cli/clicall.cpp \
     cli/clicaller.cpp \
     main.cpp \
+    mapserversmodel.cpp \
     mapwidget.cpp \
     menuholder.cpp \
     nordvpninfo.cpp \
@@ -50,6 +51,7 @@ HEADERS += \
     cli/clicall.h \
     cli/clicaller.h \
     common.h \
+    mapserversmodel.h \
     mapwidget.h \
     menuholder.h \
     nordvpninfo.h \
