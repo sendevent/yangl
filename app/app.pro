@@ -31,6 +31,7 @@ SOURCES += \
     nordvpninfo.cpp \
     nordvpnwraper.cpp \
     serverschartview.cpp \
+    serversfiltermodel.cpp \
     serverslistmanager.cpp \
     settings/actioneditor.cpp \
     settings/actionstab.cpp \
@@ -54,6 +55,7 @@ HEADERS += \
     nordvpninfo.h \
     nordvpnwraper.h \
     serverschartview.h \
+    serversfiltermodel.h \
     serverslistmanager.h \
     settings/actioneditor.h \
     settings/actionstab.h \

@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "nordvpnwraper.h"
+#include "serversfiltermodel.h"
 #include "ui_serverschartview.h"
 
 #include <QItemSelectionModel>
@@ -30,6 +31,7 @@ ServersChartView::ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent
     , m_nordVpnWraper(nordVpnWraper)
     , m_listManager(new ServersListManager(m_nordVpnWraper, this))
     , m_serversModel(new QStandardItemModel(this))
+    , m_serversFilterModel(new ServersFilterModel(this))
 {
     ui->setupUi(this);
 
@@ -40,10 +42,18 @@ ServersChartView::ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent
 
     connect(m_listManager, &ServersListManager::ready, this, &ServersChartView::onGotServers);
 
-    ui->treeView->setModel(m_serversModel);
+    m_serversFilterModel->setSourceModel(m_serversModel);
+    ui->treeView->setModel(m_serversFilterModel);
+    ui->treeView->setEditTriggers(QTreeView::NoEditTriggers);
+    ui->treeView->setAlternatingRowColors(true);
+    ui->treeView->setHeaderHidden(true);
 
     connect(ui->treeView->selectionModel(), &QItemSelectionModel::currentChanged, this,
-            &ServersChartView::onCurrentTreeItemChanged);
+            [this](const QModelIndex &current, const QModelIndex &) { onCurrentTreeItemChanged(current); });
+    connect(ui->treeView, &QTreeView::pressed, this, &ServersChartView::onCurrentTreeItemChanged);
+    connect(ui->treeView, &QTreeView::doubleClicked, this, &ServersChartView::onTreeItemDoubleclicked);
+    connect(ui->lineEdit, &QLineEdit::textChanged, this,
+            [this](const QString &text) { m_serversFilterModel->setFilterRegExp(text); });
 
     requestServersList();
 }
@@ -82,7 +92,6 @@ void ServersChartView::onGotServers(const ServersListManager::Groups &groups,
 void ServersChartView::setupModel(const ServersListManager::Groups &groups)
 {
     m_serversModel->removeRows(0, m_serversModel->rowCount());
-
     auto clearGeoName = [](const QString &geoName) -> QString { return QString(geoName).replace('_', ' '); };
 
     for (const auto &group : groups) {
@@ -95,7 +104,7 @@ void ServersChartView::setupModel(const ServersListManager::Groups &groups)
     }
 }
 
-void ServersChartView::onCurrentTreeItemChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
+void ServersChartView::onCurrentTreeItemChanged(const QModelIndex &current)
 {
     QString country, city;
     if (current.parent().isValid()) {
@@ -106,4 +115,9 @@ void ServersChartView::onCurrentTreeItemChanged(const QModelIndex &current, cons
     }
 
     ui->chartWidget->centerOn(country, city);
+}
+
+void ServersChartView::onTreeItemDoubleclicked(const QModelIndex & /*current*/)
+{
+    NIY;
 }
