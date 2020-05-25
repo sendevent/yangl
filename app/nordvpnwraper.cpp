@@ -22,6 +22,7 @@
 #include "clicaller.h"
 #include "common.h"
 #include "menuholder.h"
+#include "serverschartview.h"
 #include "settingsdialog.h"
 #include "statechecker.h"
 #include "trayicon.h"
@@ -41,6 +42,7 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
     , m_checker(new StateChecker(m_bus, m_actions, AppSettings::Monitor.Interval->read().toInt(), this))
     , m_trayIcon(new TrayIcon(this))
     , m_menuHolder(new MenuHolder(this))
+    , m_chartView(new ServersChartView(this))
     , m_pauseTimer(new QTimer(this))
     , m_paused(0)
     , m_settingsShown(false)
@@ -80,6 +82,8 @@ void NordVpnWraper::start()
     connect(m_menuHolder->getActRun(), &QAction::toggled, m_checker, &StateChecker::setActive, Qt::UniqueConnection);
     connect(m_menuHolder->getActShowSettings(), &QAction::triggered, this, &NordVpnWraper::showSettingsEditor,
             Qt::UniqueConnection);
+    connect(m_menuHolder->getActShowMap(), &QAction::triggered, m_chartView, &QWidget::show, Qt::UniqueConnection);
+
     connect(m_menuHolder->getActQuit(), &QAction::triggered, qApp, &QApplication::quit, Qt::UniqueConnection);
 
     m_menuHolder->getActRun()->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());

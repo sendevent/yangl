@@ -17,6 +17,8 @@
 
 #include <QSortFilterProxyModel>
 
+#pragma once
+
 class ServersFilterModel : public QSortFilterProxyModel
 {
     Q_OBJECT

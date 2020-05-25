@@ -23,6 +23,7 @@
 #include "serversfiltermodel.h"
 #include "ui_serverschartview.h"
 
+#include <QGeoCoordinate>
 #include <QItemSelectionModel>
 #include <QStandardItemModel>
 
