@@ -36,6 +36,7 @@ public:
 
     CLICaller *bus() const;
     ActionStorage *storate() const;
+    void connectTo(const QString &country, const QString &city);
 
 private slots:
     void prepareQuit();

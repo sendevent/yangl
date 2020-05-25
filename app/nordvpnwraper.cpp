@@ -30,6 +30,7 @@
 #include <QInputDialog>
 #include <QTimer>
 #include <QVariant>
+#include <QtConcurrent>
 
 static constexpr int TimeQuantMs = 60 * yangl::OneSecondMs;
 
@@ -289,4 +290,19 @@ void NordVpnWraper::updateActions(bool connected)
 
     if (auto rootMenu = m_trayIcon->contextMenu())
         manageMenuActionsEnablement(rootMenu);
+}
+
+void NordVpnWraper::connectTo(const QString &country, const QString &city)
+{
+    LOG << country << city;
+
+    QtConcurrent::run([country, city, this]() {
+        const Action::Ptr &action = storate()->createUserAction(nullptr);
+        action->setTitle(tr("Geo Connection"));
+        action->setForcedShow(false);
+        action->setArgs({ "c", country == "group" ? "-g" : country, city });
+        if (auto call = action->createRequest()) {
+            call->run();
+        }
+    });
 }

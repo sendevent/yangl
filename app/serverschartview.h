@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "mapwidget.h"
 #include "serverslistmanager.h"
 
 #include <QWidget>
@@ -42,6 +43,8 @@ private slots:
     void onCurrentTreeItemChanged(const QModelIndex &current);
     void onTreeItemDoubleclicked(const QModelIndex &current);
 
+    void onMarkerDoubleclicked(const MapWidget::AddrHandler &addr);
+
 private:
     Ui::ServersChartView *ui;
 
@@ -54,4 +57,6 @@ private:
     void setControlsEnabled(bool enabled);
 
     void setupModel(const ServersListManager::Groups &groups);
+
+    void requestConnection(const QString &group, const QString &server);
 };

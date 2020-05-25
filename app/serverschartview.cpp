@@ -55,6 +55,7 @@ ServersChartView::ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent
     connect(ui->lineEdit, &QLineEdit::textChanged, this,
             [this](const QString &text) { m_serversFilterModel->setFilterRegExp(text); });
 
+    connect(ui->chartWidget, &MapWidget::markerDoubleclicked, this, &ServersChartView::onMarkerDoubleclicked);
     requestServersList();
 }
 
@@ -136,7 +137,40 @@ void ServersChartView::onCurrentTreeItemChanged(const QModelIndex &current)
     ui->chartWidget->centerOn(country, city);
 }
 
-void ServersChartView::onTreeItemDoubleclicked(const QModelIndex & /*current*/)
+void ServersChartView::onTreeItemDoubleclicked(const QModelIndex &current)
 {
-    NIY;
+    QString country, city;
+
+    if (current.parent().isValid()) {
+        country = current.parent().data().toString();
+        city = current.data().toString();
+    } else {
+        country = current.data().toString();
+    }
+    requestConnection(country, city);
+}
+
+void ServersChartView::onMarkerDoubleclicked(const MapWidget::AddrHandler &addr)
+{
+    requestConnection(addr.m_country, addr.m_city);
+}
+
+void ServersChartView::requestConnection(const QString &group, const QString &server)
+{
+    auto clearGeoName = [](const QString &geoName) -> QString {
+        if (geoName == "default")
+            return {};
+
+        if (geoName == "Groups")
+            return "group";
+
+        return QString(geoName).replace(' ', '_');
+    };
+
+    const QString &country = clearGeoName(group);
+    const QString &city = clearGeoName(server);
+    if (country == "group" && city.isEmpty())
+        return;
+
+    m_nordVpnWraper->connectTo(country, city);
 }

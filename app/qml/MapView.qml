@@ -4,6 +4,8 @@ import QtLocation 5.12
 Rectangle {
     id: mapView
     property alias mapCenter : map.center
+    signal markerDoubleclicked(anObject: Item)
+
 
     Plugin {
         id: mapPlugin
@@ -19,12 +21,12 @@ Rectangle {
 
         MapItemView{
             model: markerModel
-            delegate: mapcomponent
+            delegate: nvpnMark
         }
     }
 
     Component {
-            id: mapcomponent
+            id: nvpnMark
             MapQuickItem {
                 id: marker
                 anchorPoint.x: image.width/2
@@ -36,11 +38,15 @@ Rectangle {
                 {
                     id: markerRect
 
+                    property string countryName: country
+                    property string cityName: city
+                    property alias location: marker.coordinate
+
                     width: 28
                     height:width
                     radius:width/2
 
-                    color:"transparent"
+                    color:"blue"
                     border.color: "transparent"
                     border.width: 3
 
@@ -51,6 +57,15 @@ Rectangle {
                         source: "qrc:/icn/resources/offline.png"
                         anchors.fill: parent
                         antialiasing: true
+
+                        MouseArea{
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onDoubleClicked: {
+                                console.log('double-clicked')
+                                mapView.markerDoubleclicked(markerRect)
+                            }
+                        }
                     }
                 }
             }

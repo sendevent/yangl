@@ -30,10 +30,11 @@ void MapServersModel::clear()
     endRemoveRows();
 }
 
-void MapServersModel::addMarker(const QGeoCoordinate &coordinate)
+void MapServersModel::addMarker(const QString &country, const QString &city, const QGeoCoordinate &coordinate)
 {
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
-    m_coordinates.append(coordinate);
+
+    m_coordinates.append({ country, city, coordinate });
     endInsertRows();
 }
 
@@ -44,14 +45,28 @@ int MapServersModel::rowCount(const QModelIndex & /*parent*/) const
 
 QVariant MapServersModel::data(const QModelIndex &index, int role) const
 {
-    if (index.row() < 0 || index.row() >= m_coordinates.count())
+    const int row = index.row();
+    if (row < 0 || row >= m_coordinates.count())
         return QVariant();
-    if (role == MapServersModel::PositionRole)
-        return QVariant::fromValue(m_coordinates[index.row()]);
+
+    const Info &info = m_coordinates[row];
+    switch (role) {
+    case MapServersModel::CountryNameRole:
+        return QVariant::fromValue(info.country);
+    case MapServersModel::CityNameRole:
+        return QVariant::fromValue(info.city);
+    case MapServersModel::PositionRole:
+        return QVariant::fromValue(info.coordinates);
+    }
+
     return QVariant();
 }
 
 QHash<int, QByteArray> MapServersModel::roleNames() const
 {
-    return { { PositionRole, "position" } };
+    return {
+        { PositionRole, "position" },
+        { CountryNameRole, "country" },
+        { CityNameRole, "city" },
+    };
 }

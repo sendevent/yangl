@@ -26,10 +26,17 @@
 class QQuickWidget;
 class QGeoCodingManager;
 class MapServersModel;
+class QQuickItem;
 class MapWidget : public QWidget
 {
     Q_OBJECT
 public:
+    struct AddrHandler {
+        AddrHandler(const QString &country = {}, const QString &city = {});
+        QString m_country;
+        QString m_city;
+    };
+
     explicit MapWidget(QWidget *parent = nullptr);
     ~MapWidget();
 
@@ -39,18 +46,16 @@ public:
     void clearMarks();
 
 signals:
+    void markerDoubleclicked(const AddrHandler &marker);
+
+private slots:
+    void onMarkerDoubleclicked(QQuickItem *item);
 
 private:
     QQuickWidget *m_quickView;
     QSharedPointer<QGeoServiceProvider> m_geoSrvProv;
     QGeoCodingManager *m_geoCoder;
     MapServersModel *m_serversModel;
-
-    struct AddrHandler {
-        AddrHandler(const QString &country, const QString &city = {});
-        QString m_country;
-        QString m_city;
-    };
 
     void syncMapSize();
 
@@ -66,3 +71,5 @@ private:
     void loadJson();
     void saveJson();
 };
+
+Q_DECLARE_METATYPE(MapWidget::AddrHandler);

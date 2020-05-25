@@ -27,11 +27,13 @@ class MapServersModel : public QAbstractListModel
 public:
     enum MarkerRoles
     {
-        PositionRole = Qt::UserRole + 1
+        PositionRole = Qt::UserRole + 1,
+        CountryNameRole,
+        CityNameRole,
     };
 
     MapServersModel(QObject *parent = nullptr);
-    Q_INVOKABLE void addMarker(const QGeoCoordinate &coordinate);
+    Q_INVOKABLE void addMarker(const QString &country, const QString &city, const QGeoCoordinate &coordinate);
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
     void clear();
@@ -41,5 +43,11 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
 private:
-    QList<QGeoCoordinate> m_coordinates;
+    struct Info {
+        QString country;
+        QString city;
+        QGeoCoordinate coordinates;
+    };
+
+    QList<Info> m_coordinates;
 };

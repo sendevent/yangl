@@ -51,6 +51,10 @@ MapWidget::MapWidget(QWidget *parent)
     QVBoxLayout *vBox = new QVBoxLayout(this);
     vBox->addWidget(m_quickView);
 
+    if (QQuickItem *map = m_quickView->rootObject()) {
+        QObject::connect(map, SIGNAL(markerDoubleclicked(QQuickItem *)), this,
+                         SLOT(onMarkerDoubleclicked(QQuickItem *)));
+    }
     syncMapSize();
 
     loadJson();
@@ -160,7 +164,7 @@ void MapWidget::putMark(const AddrHandler &info, const QGeoCoordinate &point)
     populateContainer(m_coordinates);
     populateContainer(m_allGeo);
 
-    m_serversModel->addMarker(point);
+    m_serversModel->addMarker(info.m_country, info.m_city, point);
 }
 
 static const struct {
@@ -227,4 +231,14 @@ void MapWidget::saveJson()
 
     const QByteArray &ba = QJsonDocument(countriesCollectionl).toJson();
     out.write(ba);
+}
+
+void MapWidget::onMarkerDoubleclicked(QQuickItem *item)
+{
+    if (!item)
+        return;
+
+    const AddrHandler received { item->property("countryName").toString(), item->property("cityName").toString() };
+    if (m_coordinates.contains(received.m_country) && m_coordinates[received.m_country].contains(received.m_city))
+        emit markerDoubleclicked(received);
 }
