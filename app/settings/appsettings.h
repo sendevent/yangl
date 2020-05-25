@@ -31,8 +31,6 @@ public:
     QVariant read() const;
     void write(const QVariant &val) const;
 
-    static void sync();
-
 private:
     AppSetting() = delete;
     AppSetting(const AppSetting &) = delete;
@@ -74,23 +72,32 @@ private:
     static const QString localName() { return "Monitor"; }
 };
 
-class GroupNVPN : public OptionsGroup
+class GroupMap : public OptionsGroup
 {
 public:
-    GroupNVPN();
+    GroupMap();
+
+    const AppSetting *Geometry = Options[0];
+    const AppSetting *Filter = Options[1];
+    const AppSetting *Visible = Options[2];
+    const AppSetting *CenterLat = Options[3];
+    const AppSetting *CenterLon = Options[4];
+    const AppSetting *Scale = Options[5];
 
 private:
-    GroupNVPN(const GroupNVPN &) = delete;
-    GroupNVPN &operator=(const GroupNVPN &) = delete;
+    GroupMap(const GroupMap &) = delete;
+    GroupMap &operator=(const GroupMap &) = delete;
 
-    static const QString localName() { return "NordVpn"; }
+    static const QString localName() { return "Map"; }
 };
 
 class AppSettings
 {
 public:
     static const GroupMonitor Monitor;
-    static const GroupNVPN NordVPN;
+    static const GroupMap Map;
+
+    static void sync();
 
 private:
     AppSettings() = delete;

@@ -40,10 +40,16 @@ public:
     explicit MapWidget(QWidget *parent = nullptr);
     ~MapWidget();
 
-    void centerOn(const QString &country, const QString &city);
     void addMark(const QString &country, const QString &city);
 
     void clearMarks();
+
+    void setScale(qreal scale);
+    qreal scale() const;
+
+    QGeoCoordinate center() const;
+    void centerOn(const QString &country, const QString &city);
+    void centerOn(const QGeoCoordinate &center);
 
 signals:
     void markerDoubleclicked(const AddrHandler &marker);

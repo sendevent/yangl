@@ -17,6 +17,7 @@
 
 #include "serverschartview.h"
 
+#include "appsettings.h"
 #include "common.h"
 #include "nordvpnwraper.h"
 #include "serversfiltermodel.h"
@@ -56,11 +57,36 @@ ServersChartView::ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent
             [this](const QString &text) { m_serversFilterModel->setFilterRegExp(text); });
 
     connect(ui->chartWidget, &MapWidget::markerDoubleclicked, this, &ServersChartView::onMarkerDoubleclicked);
+
+    restoreGeometry(AppSettings::Map.Geometry->read().toByteArray());
+    ui->lineEdit->setText(AppSettings::Map.Filter->read().toString());
+    setVisible(AppSettings::Map.Visible->read().toBool());
+
+    const qreal lat = AppSettings::Map.CenterLat->read().toDouble();
+    const qreal lon = AppSettings::Map.CenterLon->read().toDouble();
+    QGeoCoordinate coord;
+    coord.setLatitude(lat);
+    coord.setLongitude(lon);
+    ui->chartWidget->centerOn(coord);
+
+    ui->chartWidget->setScale(AppSettings::Map.Scale->read().toDouble());
+
     requestServersList();
 }
 
 ServersChartView::~ServersChartView()
 {
+    AppSettings::Map.Geometry->write(saveGeometry());
+    AppSettings::Map.Filter->write(ui->lineEdit->text());
+    AppSettings::Map.Visible->write(isVisible());
+
+    const QGeoCoordinate coord = ui->chartWidget->center();
+    AppSettings::Map.CenterLat->write(coord.latitude());
+    AppSettings::Map.CenterLon->write(coord.longitude());
+
+    AppSettings::Map.Scale->write(ui->chartWidget->scale());
+    AppSettings::sync();
+
     delete ui;
 }
 
