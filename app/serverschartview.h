@@ -27,6 +27,7 @@ class ServersChartView;
 
 class NordVpnWraper;
 class QStandardItemModel;
+class ServersFilterModel;
 class ServersChartView : public QWidget
 {
     Q_OBJECT
@@ -38,7 +39,8 @@ public:
 private slots:
     void on_buttonReload_clicked();
     void onGotServers(const ServersListManager::Groups &groups, const ServersListManager::Groups &countries);
-    void onCurrentTreeItemChanged(const QModelIndex &current, const QModelIndex &previous);
+    void onCurrentTreeItemChanged(const QModelIndex &current);
+    void onTreeItemDoubleclicked(const QModelIndex &current);
 
 private:
     Ui::ServersChartView *ui;
@@ -46,6 +48,7 @@ private:
     NordVpnWraper *m_nordVpnWraper;
     ServersListManager *m_listManager;
     QStandardItemModel *m_serversModel;
+    ServersFilterModel *m_serversFilterModel;
 
     void requestServersList();
     void setControlsEnabled(bool enabled);
