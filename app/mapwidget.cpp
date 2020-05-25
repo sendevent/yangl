@@ -19,10 +19,14 @@
 
 #include "common.h"
 #include "mapserversmodel.h"
+#include "settingsmanager.h"
 
+#include <QFile>
 #include <QGeoAddress>
 #include <QGeoCodingManager>
 #include <QGeoServiceProvider>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QMetaObject>
 #include <QQmlContext>
 #include <QQmlProperty>
@@ -48,6 +52,13 @@ MapWidget::MapWidget(QWidget *parent)
     vBox->addWidget(m_quickView);
 
     syncMapSize();
+
+    loadJson();
+}
+
+MapWidget::~MapWidget()
+{
+    saveJson();
 }
 
 void MapWidget::syncMapSize()
@@ -109,11 +120,10 @@ void MapWidget::requestGeo(const AddrHandler &addrHandler)
 {
     QGeoAddress addr;
     addr.setCountry(addrHandler.m_country);
-    addr.setCity(addrHandler.m_city);
+    if (addrHandler.m_city != "default")
+        addr.setCity(addrHandler.m_city);
 
     if (QGeoCodeReply *reply = m_geoCoder->geocode(addr)) {
-        LOG << "requesting for:" << addrHandler.m_country << addrHandler.m_city;
-
         if (reply->isFinished() && reply->error() != QGeoCodeReply::NoError) {
             WRN << "geo reply error:" << reply->errorString();
             return;
@@ -121,12 +131,10 @@ void MapWidget::requestGeo(const AddrHandler &addrHandler)
 
         connect(reply, qOverload<QGeoCodeReply::Error, const QString &>(&QGeoCodeReply::error), this,
                 [addrHandler](QGeoCodeReply::Error error, const QString &errorString) {
-                    LOG << "errorr for:" << addrHandler.m_country << addrHandler.m_city << error << errorString;
+                    WRN << "errorr for:" << addrHandler.m_country << addrHandler.m_city << error << errorString;
                 });
         connect(reply, &QGeoCodeReply::finished, this, [this, addrHandler] {
             if (QGeoCodeReply *r = qobject_cast<QGeoCodeReply *>(sender())) {
-                LOG << "got for:" << addrHandler.m_country << addrHandler.m_city;
-
                 for (auto l : r->locations()) {
                     putMark(addrHandler, l.coordinate());
                     break;
@@ -153,4 +161,70 @@ void MapWidget::putMark(const AddrHandler &info, const QGeoCoordinate &point)
     populateContainer(m_allGeo);
 
     m_serversModel->addMarker(point);
+}
+
+static const struct {
+    const QString latitude { "lat" };
+    const QString longitude { "long" };
+} Consts;
+
+void MapWidget::loadJson()
+{
+    static const QString file = QString("%1/geo.json").arg(SettingsManager::dirPath());
+    QFile in(file);
+    if (!in.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        WRN << "Failed opening file:" << file << in.errorString();
+        return;
+    }
+
+    QJsonParseError err;
+    const QJsonObject &countriesCollection = QJsonDocument::fromJson(in.readAll(), &err).object();
+
+    if (err.error != QJsonParseError::NoError) {
+        WRN << "JSON parsing error:" << err.errorString();
+        return;
+    }
+
+    QJsonObject::const_iterator countries = countriesCollection.constBegin();
+    while (countries != countriesCollection.constEnd()) {
+        const QJsonObject &citiesCollection = countries.value().toObject();
+        QMap<QString, QGeoCoordinate> citiesHandler;
+        QJsonObject::const_iterator cities = citiesCollection.constBegin();
+        while (cities != citiesCollection.constEnd()) {
+            const QJsonObject &city = cities.value().toObject();
+            QGeoCoordinate coord(city.value(Consts.latitude).toDouble(), city.value(Consts.longitude).toDouble());
+            citiesHandler.insert(cities.key(), coord);
+            ++cities;
+        }
+
+        m_allGeo.insert(countries.key(), citiesHandler);
+        ++countries;
+    }
+}
+
+void MapWidget::saveJson()
+{
+    static const QString file = QString("%1/geo.json").arg(SettingsManager::dirPath());
+    QFile out(file);
+    if (!out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        WRN << "Failed opening file:" << file << out.errorString();
+        return;
+    }
+
+    QJsonObject countriesCollectionl;
+    for (const auto &country : m_allGeo.keys()) {
+        QJsonObject cities;
+        for (const auto &city : m_allGeo[country].keys()) {
+            LOG << city;
+            QJsonObject pointObj;
+            const QGeoCoordinate &point = m_allGeo[country].value(city);
+            pointObj[Consts.latitude] = point.latitude();
+            pointObj[Consts.longitude] = point.longitude();
+            cities[city] = pointObj;
+        }
+        countriesCollectionl[country] = cities;
+    }
+
+    const QByteArray &ba = QJsonDocument(countriesCollectionl).toJson();
+    out.write(ba);
 }
