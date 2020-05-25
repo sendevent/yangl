@@ -44,8 +44,8 @@ private slots:
 
 private:
     std::unique_ptr<QMenu> m_menuMonitor;
-    QAction *m_actSettings;
     QAction *m_actMap;
+    QAction *m_actSettings;
     QAction *m_actRun;
     std::unique_ptr<QMenu> m_menuNordVpn;
     std::unique_ptr<QMenu> m_menuUser;

@@ -1,4 +1,4 @@
-QT       += core gui concurrent qml quick quickwidgets location positioning
+QT       += core gui concurrent
 TARGET = yangl
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -26,14 +26,9 @@ SOURCES += \
     cli/clicall.cpp \
     cli/clicaller.cpp \
     main.cpp \
-    mapserversmodel.cpp \
-    mapwidget.cpp \
     menuholder.cpp \
     nordvpninfo.cpp \
     nordvpnwraper.cpp \
-    serverschartview.cpp \
-    serversfiltermodel.cpp \
-    serverslistmanager.cpp \
     settings/actioneditor.cpp \
     settings/actionstab.cpp \
     settings/apppatheditor.cpp \
@@ -51,14 +46,9 @@ HEADERS += \
     cli/clicall.h \
     cli/clicaller.h \
     common.h \
-    mapserversmodel.h \
-    mapwidget.h \
     menuholder.h \
     nordvpninfo.h \
     nordvpnwraper.h \
-    serverschartview.h \
-    serversfiltermodel.h \
-    serverslistmanager.h \
     settings/actioneditor.h \
     settings/actionstab.h \
     settings/apppatheditor.h \
@@ -69,7 +59,6 @@ HEADERS += \
     trayicon.h
 
 FORMS += \
-    serverschartview.ui \
     settings/actioneditor.ui \
     settings/actionstab.ui \
     settings/settingsdialog.ui
@@ -82,5 +71,28 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     rsc.qrc
 
+yangl_no_geochart {
+DEFINES += YANGL_NO_GEOCHART
+} else {
+QT += qml quick quickwidgets location positioning
+
+SOURCES += \
+    mapserversmodel.cpp \
+    mapwidget.cpp \
+    serverschartview.cpp \
+    serversfiltermodel.cpp \
+    serverslistmanager.cpp
+
+HEADERS += \
+    mapserversmodel.h \
+    mapwidget.h \
+    serverschartview.h \
+    serversfiltermodel.h \
+    serverslistmanager.h
+
+FORMS += \
+    serverschartview.ui
+
 DISTFILES += \
     qml/MapView.qml
+}

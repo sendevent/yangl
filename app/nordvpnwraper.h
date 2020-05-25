@@ -21,7 +21,6 @@
 
 #include <QObject>
 
-class ServersChartView;
 class CLICaller;
 class ActionStorage;
 class StateChecker;
@@ -42,6 +41,7 @@ public:
 private slots:
     void prepareQuit();
 
+    void showMapView();
     void showSettingsEditor();
     void performStatusCheck();
 
@@ -57,7 +57,6 @@ private:
     StateChecker *m_checker;
     TrayIcon *m_trayIcon;
     MenuHolder *m_menuHolder;
-    ServersChartView *m_chartView;
     QTimer *m_pauseTimer;
     int m_paused;
     bool m_settingsShown;
