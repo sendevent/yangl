@@ -20,6 +20,7 @@ INCLUDEPATH += \
     actions
 
 SOURCES += \
+    actionresultviewer.cpp \
     actions/action.cpp \
     actions/actionjson.cpp \
     actions/actionstorage.cpp \
@@ -39,6 +40,7 @@ SOURCES += \
     trayicon.cpp
 
 HEADERS += \
+    actionresultviewer.h \
     actions/action.h \
     actions/actionjson.h \
     actions/actionstorage.h \
@@ -76,23 +78,22 @@ DEFINES += YANGL_NO_GEOCHART
 } else {
 QT += qml quick quickwidgets location positioning
 
+INCLUDEPATH += geo
+
 SOURCES += \
-    mapserversmodel.cpp \
-    mapwidget.cpp \
-    serverschartview.cpp \
-    serversfiltermodel.cpp \
-    serverslistmanager.cpp
+    geo/mapserversmodel.cpp \
+    geo/mapwidget.cpp \
+    geo/serverschartview.cpp \
+    geo/serversfiltermodel.cpp \
+    geo/serverslistmanager.cpp
 
 HEADERS += \
-    mapserversmodel.h \
-    mapwidget.h \
-    serverschartview.h \
-    serversfiltermodel.h \
-    serverslistmanager.h
+    geo/mapserversmodel.h \
+    geo/mapwidget.h \
+    geo/serverschartview.h \
+    geo/serversfiltermodel.h \
+    geo/serverslistmanager.h
 
 FORMS += \
-    serverschartview.ui
-
-DISTFILES += \
-    qml/MapView.qml
+    geo/serverschartview.ui
 }
