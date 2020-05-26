@@ -23,6 +23,7 @@ SOURCES += \
     $$APP_PRO_ROOT/nordvpninfo.cpp \
     $$APP_PRO_ROOT/trayicon.cpp
 
+
 HEADERS += $$APP_PRO_ROOT\
     $$APP_PRO_ROOT/actions/action.h \
     $$APP_PRO_ROOT/actions/actionjson.h \
@@ -49,3 +50,29 @@ FORMS += \
 
 RESOURCES += \
     $$APP_PRO_ROOT/rsc.qrc
+
+CONFIG:yangl_no_geochart {
+DEFINES += YANGL_NO_GEOCHART
+} else {
+QT += qml quick quickwidgets location positioning
+
+SOURCES += \
+    $$APP_PRO_ROOT/mapserversmodel.cpp \
+    $$APP_PRO_ROOT/mapwidget.cpp \
+    $$APP_PRO_ROOT/serverschartview.cpp \
+    $$APP_PRO_ROOT/serversfiltermodel.cpp \
+    $$APP_PRO_ROOT/serverslistmanager.cpp
+
+HEADERS += \
+    $$APP_PRO_ROOT/mapserversmodel.h \
+    $$APP_PRO_ROOT/mapwidget.h \
+    $$APP_PRO_ROOT/serverschartview.h \
+    $$APP_PRO_ROOT/serversfiltermodel.h \
+    $$APP_PRO_ROOT/serverslistmanager.h
+
+FORMS += \
+    $$APP_PRO_ROOT/serverschartview.ui
+
+DISTFILES += \
+    $$APP_PRO_ROOT/qml/MapView.qml
+}

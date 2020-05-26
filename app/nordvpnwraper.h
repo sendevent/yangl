@@ -34,9 +34,14 @@ public:
 
     void start();
 
+    CLICaller *bus() const;
+    ActionStorage *storate() const;
+    void connectTo(const QString &country, const QString &city);
+
 private slots:
     void prepareQuit();
 
+    void showMapView();
     void showSettingsEditor();
     void performStatusCheck();
 
@@ -55,7 +60,7 @@ private:
     QTimer *m_pauseTimer;
     int m_paused;
     bool m_settingsShown;
-
+    QPointer<QWidget> m_mapView;
     void loadSettings();
 
     void pause(KnownAction action);

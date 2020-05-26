@@ -109,9 +109,9 @@ void ActionStorage::save(QIODevice(*to))
     return m_json->save(to);
 }
 
-Action::Ptr ActionStorage::createUserAction()
+Action::Ptr ActionStorage::createUserAction(QObject *parent)
 {
-    Action::Ptr action(new Action(Action::Scope::User, KnownAction::Unknown, this));
+    Action::Ptr action(new Action(Action::Scope::User, KnownAction::Unknown, parent));
     action->setApp(AppSettings::Monitor.NVPNPath->read().toString());
     action->setArgs({});
     action->setForcedShow(true);

@@ -99,10 +99,9 @@ protected slots:
 protected:
     friend class ActionStorage;
 
-    explicit Action(Action::Scope scope, KnownAction type, ActionStorage *parent = nullptr, const Action::Id &id = {});
+    explicit Action(Action::Scope scope, KnownAction type, QObject *parent = nullptr, const Action::Id &id = {});
 
     const Action::Id m_id;
-    const ActionStorage *m_storage;
     const Action::Scope m_scope;
     const KnownAction m_type;
 

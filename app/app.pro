@@ -70,3 +70,29 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     rsc.qrc
+
+yangl_no_geochart {
+DEFINES += YANGL_NO_GEOCHART
+} else {
+QT += qml quick quickwidgets location positioning
+
+SOURCES += \
+    mapserversmodel.cpp \
+    mapwidget.cpp \
+    serverschartview.cpp \
+    serversfiltermodel.cpp \
+    serverslistmanager.cpp
+
+HEADERS += \
+    mapserversmodel.h \
+    mapwidget.h \
+    serverschartview.h \
+    serversfiltermodel.h \
+    serverslistmanager.h
+
+FORMS += \
+    serverschartview.ui
+
+DISTFILES += \
+    qml/MapView.qml
+}

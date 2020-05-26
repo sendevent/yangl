@@ -17,6 +17,7 @@
 
 #include "tst_action.h"
 
+#include "actionstorage.h"
 #include "clicall.h"
 
 #include <QtTest>
