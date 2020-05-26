@@ -47,7 +47,7 @@ public:
         Own
     };
 
-    virtual ~Action() = default;
+    virtual ~Action();
     Id id() const;
 
     virtual Action::Scope scope() const;
@@ -83,7 +83,7 @@ public:
     QString key() const;
 
 signals:
-    void performed(const QString &result, bool ok);
+    void performed(const Action::Id &id, const QString &result, bool ok, const QString &description);
     void changed();
 
     void titleChanged(const QString &title) const;
@@ -98,6 +98,7 @@ protected slots:
 
 protected:
     friend class ActionStorage;
+    static int MetaIdId;
 
     explicit Action(Action::Scope scope, KnownAction type, QObject *parent = nullptr, const Action::Id &id = {});
 

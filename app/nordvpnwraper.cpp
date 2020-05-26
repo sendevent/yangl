@@ -103,7 +103,6 @@ void NordVpnWraper::loadSettings()
     m_trayIcon->setMessageDuration(AppSettings::Monitor.MessageDuration->read().toInt() * yangl::OneSecondMs);
 
 #ifndef YANGL_NO_GEOCHART
-    LOG << AppSettings::Map.Visible->read();
     if (AppSettings::Map.Visible->read().toBool())
         showMapView();
 #endif

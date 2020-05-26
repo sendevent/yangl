@@ -17,6 +17,7 @@
 
 #include "action.h"
 
+#include "actionresultviewer.h"
 #include "actionstorage.h"
 #include "clicall.h"
 #include "common.h"
@@ -28,6 +29,8 @@
 
 /*static*/ const QString Action::GroupKeyBuiltin { QStringLiteral("builtin") };
 /*static*/ const QString Action::GroupKeyCustom { QStringLiteral("custom") };
+
+/*static*/ int Action::MetaIdId = -1;
 
 Action::Action(Action::Scope scope, KnownAction type, QObject *parent, const Action::Id &id)
     : QObject(parent)
@@ -41,14 +44,22 @@ Action::Action(Action::Scope scope, KnownAction type, QObject *parent, const Act
     , m_forceShow(false)
     , m_menuPlace(MenuPlace::NoMenu)
 {
+    if (-1 == MetaIdId)
+        MetaIdId = qRegisterMetaType<Action::Id>("Action::Id");
+
     connect(this, &Action::titleChanged, this, &Action::changed);
     connect(this, &Action::appChanged, this, &Action::changed);
     connect(this, &Action::argsChanged, this, &Action::changed);
     connect(this, &Action::timeoutChanged, this, &Action::changed);
     connect(this, &Action::forcedShowChanged, this, &Action::changed);
     connect(this, &Action::anchorChanged, this, &Action::changed);
-}
 
+    ActionResultViewer::registerAction(this);
+}
+Action::~Action()
+{
+    ActionResultViewer::unregisterAction(this);
+}
 Action::Scope Action::scope() const
 {
     return m_scope;
@@ -166,27 +177,15 @@ void Action::onResult(const QString &result)
         call->deleteLater();
     }
 
-    if (hasErrors || forcedShow()) {
-        if (!m_display) {
-            m_display = new QTextBrowser;
-            m_display->setAttribute(Qt::WA_DeleteOnClose);
-            m_display->setReadOnly(true);
-        }
+    QString info = QString("%1 %2 %3:<br>").arg(yangl::now(), app(), args().join(QChar(' ')));
+    if (!result.isEmpty())
+        info.append(QString("<b>Result:</b><br>%1<br>").arg(QString(result).replace("\n", "<br>")));
+    if (exitCode)
+        info.append(QString("<b>Exit code:</b> %1<br>").arg(exitCode));
+    if (!errors.isEmpty())
+        info.append(QString("<b>Errors:</b> %1<br>").arg(errors));
 
-        m_display->setWindowTitle(QStringLiteral("%1 — %2").arg(qApp->applicationDisplayName(), title()));
-        QString info = QString("%1 %2 %3:<br>").arg(yangl::now(), app(), args().join(QChar(' ')));
-        if (!result.isEmpty())
-            info.append(QString("<b>Result:</b><br>%1<br>").arg(QString(result).replace("\n", "<br>")));
-        if (exitCode)
-            info.append(QString("<b>Exit code:</b> %1<br>").arg(exitCode));
-        if (!errors.isEmpty())
-            info.append(QString("<b>Errors:</b> %1<br>").arg(errors));
-
-        m_display->append(info);
-        m_display->show();
-    }
-
-    emit performed(result, !hasErrors);
+    emit performed(m_id, result, !hasErrors, info);
 }
 
 bool Action::isAnchorable() const

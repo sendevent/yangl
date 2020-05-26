@@ -20,6 +20,7 @@ INCLUDEPATH += \
     actions
 
 SOURCES += \
+    actionresultviewer.cpp \
     actions/action.cpp \
     actions/actionjson.cpp \
     actions/actionstorage.cpp \
@@ -39,6 +40,7 @@ SOURCES += \
     trayicon.cpp
 
 HEADERS += \
+    actionresultviewer.h \
     actions/action.h \
     actions/actionjson.h \
     actions/actionstorage.h \
