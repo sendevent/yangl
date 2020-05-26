@@ -18,6 +18,7 @@
 #pragma once
 
 #include "mapwidget.h"
+#include "nordvpninfo.h"
 #include "serverslistmanager.h"
 
 #include <QWidget>
@@ -37,6 +38,11 @@ public:
     explicit ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent = nullptr);
     ~ServersChartView();
 
+    void saveSettings();
+
+public slots:
+    void onStateChanged(const NordVpnInfo &info);
+
 private slots:
     void on_buttonReload_clicked();
     void onGotServers(const ServersListManager::Groups &groups, const ServersListManager::Groups &countries);
@@ -44,6 +50,9 @@ private slots:
     void onTreeItemDoubleclicked(const QModelIndex &current);
 
     void onMarkerDoubleclicked(const MapWidget::AddrHandler &addr);
+
+protected:
+    void hideEvent(QHideEvent *event) override;
 
 private:
     Ui::ServersChartView *ui;

@@ -65,6 +65,14 @@ MapWidget::~MapWidget()
     saveJson();
 }
 
+void MapWidget::setActiveConnection(const AddrHandler &marker)
+{
+    if (auto ctx = m_quickView->rootContext()) {
+        ctx->setContextProperty("currenCountry", marker.m_country);
+        ctx->setContextProperty("currenCity", marker.m_city);
+    }
+}
+
 void MapWidget::syncMapSize()
 {
     if (QQuickItem *map = m_quickView->rootObject()) {
@@ -231,7 +239,6 @@ void MapWidget::saveJson()
     for (const auto &country : m_allGeo.keys()) {
         QJsonObject cities;
         for (const auto &city : m_allGeo[country].keys()) {
-            LOG << city;
             QJsonObject pointObj;
             const QGeoCoordinate &point = m_allGeo[country].value(city);
             pointObj[Consts.latitude] = point.latitude();

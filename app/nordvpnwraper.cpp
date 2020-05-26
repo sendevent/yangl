@@ -101,12 +101,24 @@ void NordVpnWraper::loadSettings()
 {
     m_checker->setInterval(AppSettings::Monitor.Interval->read().toInt());
     m_trayIcon->setMessageDuration(AppSettings::Monitor.MessageDuration->read().toInt() * yangl::OneSecondMs);
+
+#ifndef YANGL_NO_GEOCHART
+    LOG << AppSettings::Map.Visible->read();
+    if (AppSettings::Map.Visible->read().toBool())
+        showMapView();
+#endif
 }
 
 void NordVpnWraper::prepareQuit()
 {
     disconnect(m_trayIcon);
     disconnect(m_checker);
+
+    const bool visible = m_mapView ? m_mapView->isVisible() : false;
+    LOG << visible;
+
+    AppSettings::Map.Visible->write(visible);
+    AppSettings::sync();
 }
 
 void NordVpnWraper::showSettingsEditor()
