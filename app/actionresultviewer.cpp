@@ -38,6 +38,8 @@ ActionResultViewer::ActionResultViewer()
     });
     QGridLayout *layout = new QGridLayout(this);
     layout->addWidget(m_tabWidget);
+
+    setWindowTitle(tr("%1 — CLI Log").arg(qApp->applicationDisplayName()));
 }
 
 /*static*/ ActionResultViewer *ActionResultViewer::instance()

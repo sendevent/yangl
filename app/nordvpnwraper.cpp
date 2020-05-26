@@ -17,6 +17,7 @@
 
 #include "nordvpnwraper.h"
 
+#include "actionresultviewer.h"
 #include "actionstorage.h"
 #include "appsettings.h"
 #include "clicaller.h"
@@ -83,14 +84,15 @@ void NordVpnWraper::start()
     QMenu *menu = m_menuHolder->createMenu(actions);
     m_trayIcon->setContextMenu(menu);
 
-    connect(m_menuHolder->getActRun(), &QAction::toggled, m_checker, &StateChecker::setActive, Qt::UniqueConnection);
-    connect(m_menuHolder->getActShowSettings(), &QAction::triggered, this, &NordVpnWraper::showSettingsEditor,
-            Qt::UniqueConnection);
-
 #ifndef YANGL_NO_GEOCHART
     connect(m_menuHolder->getActShowMap(), &QAction::triggered, this, &NordVpnWraper::showMapView,
             Qt::UniqueConnection);
 #endif
+
+    connect(m_menuHolder->getActShowSettings(), &QAction::triggered, this, &NordVpnWraper::showSettingsEditor,
+            Qt::UniqueConnection);
+    connect(m_menuHolder->getActShowLog(), &QAction::triggered, this, &NordVpnWraper::showLog, Qt::UniqueConnection);
+    connect(m_menuHolder->getActRun(), &QAction::toggled, m_checker, &StateChecker::setActive, Qt::UniqueConnection);
 
     connect(m_menuHolder->getActQuit(), &QAction::triggered, qApp, &QApplication::quit, Qt::UniqueConnection);
 
@@ -114,8 +116,6 @@ void NordVpnWraper::prepareQuit()
     disconnect(m_checker);
 
     const bool visible = m_mapView ? m_mapView->isVisible() : false;
-    LOG << visible;
-
     AppSettings::Map.Visible->write(visible);
     AppSettings::sync();
 }
@@ -132,6 +132,11 @@ void NordVpnWraper::showSettingsEditor()
     });
     m_settingsShown = true;
     dlg->open();
+}
+
+void NordVpnWraper::showLog()
+{
+    ActionResultViewer::instance()->show();
 }
 
 void NordVpnWraper::performStatusCheck()
