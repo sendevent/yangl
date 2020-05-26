@@ -44,21 +44,32 @@ Rectangle {
                     property string cityName: city
                     property alias location: marker.coordinate
 
-                    width: 28
+                    property bool active: countryName === currenCountry && cityName === currenCity;
+
+                    clip: true
+
+                    width: 32
                     height:width
                     radius:width/2
 
-                    color:"lightgray"
-                    border.color: "transparent"
+                    color: /*active ? "blue" :*/ "transparent"
+                    border.color: /*active ? "blue" :*/ "transparent"
                     border.width: 3
 
                     antialiasing: true
 
+                    function isActive()
+                    {
+                        return co
+                    }
+
                     Image {
                         id: image
-                        source: "qrc:/icn/resources/offline.png"
-                        anchors.fill: parent
+                        width: parent.width-2
+                        height: parent.height-2
+                        smooth: true
                         antialiasing: true
+                        source: markerRect.active ? "qrc:/icn/resources/online_map.png":"qrc:/icn/resources/offline_map.png"
 
                         MouseArea{
                             anchors.fill: parent

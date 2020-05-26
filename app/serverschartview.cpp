@@ -24,6 +24,7 @@
 #include "ui_serverschartview.h"
 
 #include <QGeoCoordinate>
+#include <QHideEvent>
 #include <QItemSelectionModel>
 #include <QStandardItemModel>
 
@@ -77,18 +78,25 @@ ServersChartView::ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent
 
 ServersChartView::~ServersChartView()
 {
+    delete ui;
+}
+
+void ServersChartView::saveSettings()
+{
     AppSettings::Map.Geometry->write(saveGeometry());
     AppSettings::Map.Filter->write(ui->lineEdit->text());
-    AppSettings::Map.Visible->write(isVisible());
 
     const QGeoCoordinate coord = ui->chartWidget->center();
     AppSettings::Map.CenterLat->write(coord.latitude());
     AppSettings::Map.CenterLon->write(coord.longitude());
 
     AppSettings::Map.Scale->write(ui->chartWidget->scale());
-    AppSettings::sync();
+}
 
-    delete ui;
+void ServersChartView::hideEvent(QHideEvent *event)
+{
+    saveSettings();
+    QWidget::hideEvent(event);
 }
 
 void ServersChartView::requestServersList()
@@ -200,4 +208,9 @@ void ServersChartView::requestConnection(const QString &group, const QString &se
         return;
 
     m_nordVpnWraper->connectTo(country, city);
+}
+
+void ServersChartView::onStateChanged(const NordVpnInfo &info)
+{
+    ui->chartWidget->setActiveConnection({ info.country(), info.city() });
 }

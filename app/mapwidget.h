@@ -50,6 +50,8 @@ public:
     void centerOn(const QString &country, const QString &city);
     void centerOn(const QGeoCoordinate &center);
 
+    void setActiveConnection(const AddrHandler &marker);
+
 signals:
     void markerDoubleclicked(const AddrHandler &marker);
 

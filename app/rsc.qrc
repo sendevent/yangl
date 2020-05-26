@@ -5,6 +5,8 @@
         <file>resources/sub_toffline.png</file>
         <file>resources/sub_toonline.png</file>
         <file>resources/sub_unknown.png</file>
+        <file>resources/online_map.png</file>
+        <file>resources/offline_map.png</file>
     </qresource>
     <qresource prefix="/qml">
         <file>qml/MapView.qml</file>
