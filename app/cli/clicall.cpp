@@ -110,3 +110,8 @@ QProcess::ExitStatus CLICall::exitStatus() const
 {
     return m_exitStatus;
 }
+
+bool CLICall::success() const
+{
+    return exitCode() == 0 && exitStatus() == QProcess::NormalExit;
+}

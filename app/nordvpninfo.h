@@ -49,6 +49,9 @@ public:
     NordVpnInfo::Status status() const;
     void setStatus(NordVpnInfo::Status status);
 
+    QString country() const;
+    QString city() const;
+
 private:
     Status m_status;
     QString m_server;

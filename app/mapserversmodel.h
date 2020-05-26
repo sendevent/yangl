@@ -17,40 +17,37 @@
 
 #pragma once
 
-#include "action.h"
+#include <QAbstractListModel>
+#include <QGeoCoordinate>
 
-#include <QMenu>
-#include <QObject>
-#include <memory>
-
-class MenuHolder : public QObject
+class MapServersModel : public QAbstractListModel
 {
     Q_OBJECT
+
 public:
-    explicit MenuHolder(QObject *parent = nullptr);
+    enum MarkerRoles
+    {
+        PositionRole = Qt::UserRole + 1,
+        CountryNameRole,
+        CityNameRole,
+    };
 
-    QMenu *createMenu(const QList<Action::Ptr> &actions);
+    MapServersModel(QObject *parent = nullptr);
+    void addMarker(const QString &country, const QString &city, const QGeoCoordinate &coordinate);
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
-    QAction *getActRun() const;
-    QAction *getActShowSettings() const;
-    QAction *getActShowMap() const;
-    QAction *getActQuit() const;
+    void clear();
 
-signals:
-    void actionTriggered(Action *action);
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-private slots:
-    void onActionTriggered();
+    QHash<int, QByteArray> roleNames() const override;
 
 private:
-    std::unique_ptr<QMenu> m_menuMonitor;
-    QAction *m_actMap;
-    QAction *m_actSettings;
-    QAction *m_actRun;
-    std::unique_ptr<QMenu> m_menuNordVpn;
-    std::unique_ptr<QMenu> m_menuUser;
-    QAction *m_actSeparatorExit;
-    QAction *m_actQuit;
+    struct Info {
+        QString country;
+        QString city;
+        QGeoCoordinate coordinates;
+    };
 
-    void populateActions(const QList<Action::Ptr> &actions);
+    QList<Info> m_coordinates;
 };

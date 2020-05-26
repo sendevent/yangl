@@ -1,4 +1,4 @@
-QT += testlib core gui widgets concurrent
+QT += testlib core gui widgets concurrent qml quick quickwidgets location positioning
 CONFIG += qt console warn_on depend_includepath testcase C++14
 mac:CONFIG -= app_bundle
 

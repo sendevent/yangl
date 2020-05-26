@@ -79,7 +79,7 @@ void ActionsTab::addAction(const Action::Ptr &action)
 
 void ActionsTab::onAddRequested()
 {
-    if (Action::Ptr action = m_actStorage->createUserAction()) {
+    if (Action::Ptr action = m_actStorage->createUserAction(m_actStorage)) {
         action->setTitle(tr("Custom#%1").arg(m_actions.size() + 1));
         m_actions.append(action);
         addAction(action);

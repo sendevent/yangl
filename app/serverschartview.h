@@ -1,0 +1,71 @@
+/*
+   Copyright (C) 2020 Denis Gofman - <sendevent@gmail.com>
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Library General Public
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Library General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
+*/
+
+#pragma once
+
+#include "mapwidget.h"
+#include "nordvpninfo.h"
+#include "serverslistmanager.h"
+
+#include <QWidget>
+
+namespace Ui {
+class ServersChartView;
+}
+
+class NordVpnWraper;
+class QStandardItemModel;
+class ServersFilterModel;
+class ServersChartView : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent = nullptr);
+    ~ServersChartView();
+
+    void saveSettings();
+
+public slots:
+    void onStateChanged(const NordVpnInfo &info);
+
+private slots:
+    void on_buttonReload_clicked();
+    void onGotServers(const ServersListManager::Groups &groups, const ServersListManager::Groups &countries);
+    void onCurrentTreeItemChanged(const QModelIndex &current);
+    void onTreeItemDoubleclicked(const QModelIndex &current);
+
+    void onMarkerDoubleclicked(const MapWidget::AddrHandler &addr);
+
+protected:
+    void hideEvent(QHideEvent *event) override;
+
+private:
+    Ui::ServersChartView *ui;
+
+    NordVpnWraper *m_nordVpnWraper;
+    ServersListManager *m_listManager;
+    QStandardItemModel *m_serversModel;
+    ServersFilterModel *m_serversFilterModel;
+
+    void requestServersList();
+    void setControlsEnabled(bool enabled);
+
+    void setupModel(const ServersListManager::Groups &groups);
+
+    void requestConnection(const QString &group, const QString &server);
+};

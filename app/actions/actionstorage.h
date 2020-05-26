@@ -43,7 +43,7 @@ public:
     void save(const QString &to = {});
     void save(QIODevice *from);
 
-    Action::Ptr createUserAction();
+    Action::Ptr createUserAction(QObject *parent = nullptr);
     bool updateActions(const QList<Action::Ptr> &actions, Action::Scope scope);
 
     static QString jsonFilePath();

@@ -22,6 +22,11 @@
 #include "clicaller.h"
 #include "common.h"
 #include "menuholder.h"
+
+#ifndef YANGL_NO_GEOCHART
+#include "serverschartview.h"
+#endif // YANGL_NO_GEOCHART
+
 #include "settingsdialog.h"
 #include "statechecker.h"
 #include "trayicon.h"
@@ -30,6 +35,7 @@
 #include <QInputDialog>
 #include <QTimer>
 #include <QVariant>
+#include <QtConcurrent>
 
 static constexpr int TimeQuantMs = 60 * yangl::OneSecondMs;
 
@@ -43,6 +49,7 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
     , m_pauseTimer(new QTimer(this))
     , m_paused(0)
     , m_settingsShown(false)
+    , m_mapView(nullptr)
 {
     connect(qApp, &QApplication::aboutToQuit, this, &NordVpnWraper::prepareQuit);
     connect(m_checker, &StateChecker::stateChanged, m_trayIcon, &TrayIcon::setState);
@@ -53,6 +60,16 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
 
     m_trayIcon->setContextMenu(m_menuHolder->createMenu(m_actions->load()));
     m_trayIcon->setVisible(true);
+}
+
+CLICaller *NordVpnWraper::bus() const
+{
+    return m_bus;
+}
+
+ActionStorage *NordVpnWraper::storate() const
+{
+    return m_actions;
 }
 
 void NordVpnWraper::start()
@@ -69,6 +86,12 @@ void NordVpnWraper::start()
     connect(m_menuHolder->getActRun(), &QAction::toggled, m_checker, &StateChecker::setActive, Qt::UniqueConnection);
     connect(m_menuHolder->getActShowSettings(), &QAction::triggered, this, &NordVpnWraper::showSettingsEditor,
             Qt::UniqueConnection);
+
+#ifndef YANGL_NO_GEOCHART
+    connect(m_menuHolder->getActShowMap(), &QAction::triggered, this, &NordVpnWraper::showMapView,
+            Qt::UniqueConnection);
+#endif
+
     connect(m_menuHolder->getActQuit(), &QAction::triggered, qApp, &QApplication::quit, Qt::UniqueConnection);
 
     m_menuHolder->getActRun()->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());
@@ -78,12 +101,24 @@ void NordVpnWraper::loadSettings()
 {
     m_checker->setInterval(AppSettings::Monitor.Interval->read().toInt());
     m_trayIcon->setMessageDuration(AppSettings::Monitor.MessageDuration->read().toInt() * yangl::OneSecondMs);
+
+#ifndef YANGL_NO_GEOCHART
+    LOG << AppSettings::Map.Visible->read();
+    if (AppSettings::Map.Visible->read().toBool())
+        showMapView();
+#endif
 }
 
 void NordVpnWraper::prepareQuit()
 {
     disconnect(m_trayIcon);
     disconnect(m_checker);
+
+    const bool visible = m_mapView ? m_mapView->isVisible() : false;
+    LOG << visible;
+
+    AppSettings::Map.Visible->write(visible);
+    AppSettings::sync();
 }
 
 void NordVpnWraper::showSettingsEditor()
@@ -110,6 +145,15 @@ void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason
     KnownAction invokeMe(KnownAction::Unknown);
     switch (reason) {
     case QSystemTrayIcon::Trigger:
+#ifndef YANGL_NO_GEOCHART
+        if (!m_mapView)
+            showMapView();
+        else {
+            m_mapView->activateWindow();
+            m_mapView->raise();
+        }
+        return;
+#endif
         if (!m_settingsShown)
             showSettingsEditor();
         return;
@@ -279,4 +323,35 @@ void NordVpnWraper::updateActions(bool connected)
 
     if (auto rootMenu = m_trayIcon->contextMenu())
         manageMenuActionsEnablement(rootMenu);
+}
+
+void NordVpnWraper::connectTo(const QString &country, const QString &city)
+{
+    LOG << country << city;
+
+    QtConcurrent::run([country, city, this]() {
+        const Action::Ptr &action = storate()->createUserAction(nullptr);
+        action->setTitle(tr("Geo Connection"));
+        action->setForcedShow(false);
+        action->setArgs({ "c", country == "group" ? "-g" : country, city });
+        if (auto call = action->createRequest()) {
+            call->run();
+        }
+    });
+}
+
+void NordVpnWraper::showMapView()
+{
+#ifndef YANGL_NO_GEOCHART
+    if (!m_mapView) {
+        ServersChartView *chartView = new ServersChartView(this);
+        connect(m_checker, &StateChecker::stateChanged, chartView, &ServersChartView::onStateChanged);
+        chartView->onStateChanged(m_checker->state());
+        m_mapView = chartView;
+    }
+#endif
+    if (m_mapView) {
+        m_mapView->setAttribute(Qt::WA_DeleteOnClose);
+        m_mapView->show();
+    }
 }

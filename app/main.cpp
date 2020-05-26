@@ -28,6 +28,10 @@ int main(int argc, char *argv[])
     qRegisterMetaType<QProcess::ExitStatus>();
 
     NordVpnWraper nordVpnWraper;
+
+    //    ServersChartView chartView(&nordVpnWraper);
+    //    chartView.show();
+
     nordVpnWraper.start();
 
     return a.exec();
