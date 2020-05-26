@@ -70,6 +70,7 @@ Rectangle {
                         smooth: true
                         antialiasing: true
                         source: markerRect.active ? "qrc:/icn/resources/online_map.png":"qrc:/icn/resources/offline_map.png"
+                        opacity: 0.75
 
                         MouseArea{
                             anchors.fill: parent
