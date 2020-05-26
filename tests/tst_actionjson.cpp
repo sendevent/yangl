@@ -27,7 +27,9 @@
 /*static*/ const QString tst_ActionJson::TestJson =
         "{\n    \"custom\": {\n        \"{057c11c0-de87-48c4-a98e-93471b4290ca}\": {\n            \"anchor\": 0,\n "
         "           \"app\": \"/usr/bin/ls\",\n            \"args\": [\n                \"-la\"\n            ],\n  "
-        "          \"forcedDisplay\": false,\n            \"title\": \"\"\n        }\n    }\n}\n";
+        "          \"forcedDisplay\": false,\n            \"timeout\": 30000,\n            \"title\": \"\"\n        "
+        "}\n    "
+        "}\n}\n";
 
 tst_ActionJson::tst_ActionJson()
 {

@@ -34,6 +34,7 @@ static const struct {
         const QString Args { QStringLiteral("args") };
         const QString Display { QStringLiteral("forcedDisplay") };
         const QString Anchor { QStringLiteral("anchor") };
+        const QString Timeout { QStringLiteral("timeout") };
     } Action {};
 
 } Json;
@@ -145,6 +146,7 @@ bool ActionJson::updateAction(Action *action)
     }());
     action->setForcedShow(actionJson[Json.Action.Display].toBool());
     action->setAnchor(static_cast<Action::MenuPlace>(actionJson[Json.Action.Anchor].toInt()));
+    action->setTimeout(actionJson[Json.Action.Timeout].toInt() * yangl::OneSecondMs);
 
     return true;
 }
@@ -160,6 +162,7 @@ QJsonObject ActionJson::actionToJson(const Action *action) const
         { Json.Action.Args, QJsonArray::fromStringList(action->args()) },
         { Json.Action.Display, action->forcedShow() },
         { Json.Action.Anchor, static_cast<int>(action->anchor()) },
+        { Json.Action.Timeout, action->timeout() },
     };
 }
 
