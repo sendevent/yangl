@@ -184,7 +184,8 @@ void MapWidget::putMark(const AddrHandler &info, const QGeoCoordinate &point)
     populateContainer(m_coordinates);
     populateContainer(m_allGeo);
 
-    m_serversModel->addMarker(info.m_country, info.m_city, point);
+    auto stripDefault = [](const QString &from) { return from == "default" ? QString() : from; };
+    m_serversModel->addMarker(stripDefault(info.m_country), stripDefault(info.m_city), point);
 }
 
 static const struct {
