@@ -48,7 +48,7 @@ Rectangle {
                     height:width
                     radius:width/2
 
-                    color:"blue"
+                    color:"lightgray"
                     border.color: "transparent"
                     border.width: 3
 

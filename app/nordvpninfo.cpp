@@ -190,3 +190,13 @@ QString NordVpnInfo::toString() const
 
     return text;
 }
+
+QString NordVpnInfo::country() const
+{
+    return m_country;
+}
+
+QString NordVpnInfo::city() const
+{
+    return m_city;
+}
