@@ -9,6 +9,6 @@
         <file>resources/offline_map.png</file>
     </qresource>
     <qresource prefix="/qml">
-        <file>qml/MapView.qml</file>
+        <file>geo/qml/MapView.qml</file>
     </qresource>
 </RCC>
