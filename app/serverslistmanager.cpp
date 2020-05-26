@@ -17,6 +17,7 @@
 
 #include "serverslistmanager.h"
 
+#include "actionresultviewer.h"
 #include "actionstorage.h"
 #include "appsettings.h"
 #include "clicall.h"
@@ -64,6 +65,8 @@ ServersListManager::Servers ServersListManager::queryList(const QStringList &arg
     QString result;
 
     const Action::Ptr &action = m_nordVpn->storate()->createUserAction(nullptr);
+    ActionResultViewer::unregisterAction(action.get());
+    action->setTitle(tr("Servers list"));
     action->setForcedShow(false);
     action->setArgs(args);
 

@@ -6,6 +6,7 @@ INCLUDEPATH += $$APP_PRO_ROOT\
     $$APP_PRO_ROOT/actions
 
 SOURCES += \
+    $$APP_PRO_ROOT/actionresultviewer.cpp \
     $$APP_PRO_ROOT/actions/action.cpp \
     $$APP_PRO_ROOT/actions/actionjson.cpp \
     $$APP_PRO_ROOT/actions/actionstorage.cpp \
@@ -25,6 +26,7 @@ SOURCES += \
 
 
 HEADERS += $$APP_PRO_ROOT\
+    $$APP_PRO_ROOT/actionresultviewer.h \
     $$APP_PRO_ROOT/actions/action.h \
     $$APP_PRO_ROOT/actions/actionjson.h \
     $$APP_PRO_ROOT/actions/actionstorage.h \
@@ -42,6 +44,7 @@ HEADERS += $$APP_PRO_ROOT\
     $$APP_PRO_ROOT/statechecker.h \
     $$APP_PRO_ROOT/nordvpninfo.h \
     $$APP_PRO_ROOT/trayicon.h
+
 
 FORMS += \
     $$APP_PRO_ROOT/settings/actioneditor.ui \
