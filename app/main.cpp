@@ -15,7 +15,6 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "actionresultviewer.h"
 #include "nordvpnwraper.h"
 
 #include <QApplication>
@@ -30,7 +29,6 @@ int main(int argc, char *argv[])
 
     NordVpnWraper nordVpnWraper;
 
-    ActionResultViewer::instance()->show();
     nordVpnWraper.start();
 
     return a.exec();

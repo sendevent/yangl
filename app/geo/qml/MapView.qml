@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import QtLocation 5.12
+import QtQuick.Controls 2.12
 
 Rectangle {
     id: mapView
@@ -58,10 +59,6 @@ Rectangle {
 
                     antialiasing: true
 
-                    function isActive()
-                    {
-                        return co
-                    }
 
                     Image {
                         id: image
@@ -72,9 +69,38 @@ Rectangle {
                         source: markerRect.active ? "qrc:/icn/resources/online_map.png":"qrc:/icn/resources/offline_map.png"
                         opacity: 0.75
 
+
                         MouseArea{
                             anchors.fill: parent
                             hoverEnabled: true
+
+                            ToolTip.visible: containsMouse
+                            ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+                            ToolTip.text: composeTooltip(markerRect.active)
+
+                            function composeTooltip(isActive)
+                            {
+                                var tooltipStr = isActive ? qsTr("Currently connected") : qsTr("Doubleclick to connect")
+                                var addrStr = "";
+
+                                if(!markerRect.cityName.length !== 0)
+                                {
+                                    addrStr += markerRect.cityName
+                                }
+
+                                if(!markerRect.countryName.length !== 0)
+                                {
+                                    if(addrStr.length !== 0)
+                                        addrStr += ", "
+                                    addrStr += markerRect.countryName;
+                                }
+
+                                if(addrStr.length === 0)
+                                    return tooltipStr;
+
+                                return addrStr + "\n" + tooltipStr;
+                            }
+
                             onDoubleClicked: {
                                 console.log('double-clicked')
                                 mapView.markerDoubleclicked(markerRect)

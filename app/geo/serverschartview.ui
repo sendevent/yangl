@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>639</width>
+    <height>390</height>
    </rect>
   </property>
   <layout class="QGridLayout" name="gridLayout">
@@ -22,6 +22,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
           <widget class="QLineEdit" name="lineEdit">
+           <property name="toolTip">
+            <string>Filter by country/city</string>
+           </property>
            <property name="placeholderText">
             <string>🔍</string>
            </property>
@@ -32,6 +35,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="buttonReload">
+           <property name="toolTip">
+            <string>Update available servers list</string>
+           </property>
            <property name="text">
             <string>🗘</string>
            </property>
