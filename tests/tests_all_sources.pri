@@ -6,6 +6,7 @@ INCLUDEPATH += $$APP_PRO_ROOT\
     $$APP_PRO_ROOT/actions
 
 SOURCES += \
+    $$APP_PRO_ROOT/actionresultviewer.cpp \
     $$APP_PRO_ROOT/actions/action.cpp \
     $$APP_PRO_ROOT/actions/actionjson.cpp \
     $$APP_PRO_ROOT/actions/actionstorage.cpp \
@@ -25,6 +26,7 @@ SOURCES += \
 
 
 HEADERS += $$APP_PRO_ROOT\
+    $$APP_PRO_ROOT/actionresultviewer.h \
     $$APP_PRO_ROOT/actions/action.h \
     $$APP_PRO_ROOT/actions/actionjson.h \
     $$APP_PRO_ROOT/actions/actionstorage.h \
@@ -43,6 +45,7 @@ HEADERS += $$APP_PRO_ROOT\
     $$APP_PRO_ROOT/nordvpninfo.h \
     $$APP_PRO_ROOT/trayicon.h
 
+
 FORMS += \
     $$APP_PRO_ROOT/settings/actioneditor.ui \
     $$APP_PRO_ROOT/settings/actionstab.ui \
@@ -56,23 +59,22 @@ DEFINES += YANGL_NO_GEOCHART
 } else {
 QT += qml quick quickwidgets location positioning
 
+INCLUDEPATH += $$APP_PRO_ROOT/geo
+
 SOURCES += \
-    $$APP_PRO_ROOT/mapserversmodel.cpp \
-    $$APP_PRO_ROOT/mapwidget.cpp \
-    $$APP_PRO_ROOT/serverschartview.cpp \
-    $$APP_PRO_ROOT/serversfiltermodel.cpp \
-    $$APP_PRO_ROOT/serverslistmanager.cpp
+    $$APP_PRO_ROOT/geo/mapserversmodel.cpp \
+    $$APP_PRO_ROOT/geo/mapwidget.cpp \
+    $$APP_PRO_ROOT/geo/serverschartview.cpp \
+    $$APP_PRO_ROOT/geo/serversfiltermodel.cpp \
+    $$APP_PRO_ROOT/geo/serverslistmanager.cpp
 
 HEADERS += \
-    $$APP_PRO_ROOT/mapserversmodel.h \
-    $$APP_PRO_ROOT/mapwidget.h \
-    $$APP_PRO_ROOT/serverschartview.h \
-    $$APP_PRO_ROOT/serversfiltermodel.h \
-    $$APP_PRO_ROOT/serverslistmanager.h
+    $$APP_PRO_ROOT/geo/mapserversmodel.h \
+    $$APP_PRO_ROOT/geo/mapwidget.h \
+    $$APP_PRO_ROOT/geo/serverschartview.h \
+    $$APP_PRO_ROOT/geo/serversfiltermodel.h \
+    $$APP_PRO_ROOT/geo/serverslistmanager.h
 
 FORMS += \
-    $$APP_PRO_ROOT/serverschartview.ui
-
-DISTFILES += \
-    $$APP_PRO_ROOT/qml/MapView.qml
+    $$APP_PRO_ROOT/geo/serverschartview.ui
 }

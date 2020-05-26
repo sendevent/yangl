@@ -32,7 +32,8 @@ void tst_CLICaller::test_performAction()
 
     bool actionPerformed(false);
     connect(action.get(), &Action::performed, this,
-            [&actionPerformed](const QString & /*res*/, bool /*ok*/) { actionPerformed = true; });
+            [&actionPerformed](const Action::Id & /*id*/, const QString & /*result*/, bool /*ok*/,
+                               const QString & /*info*/) { actionPerformed = true; });
 
     QSignalSpy spy(action.get(), &Action::performed);
 
@@ -46,7 +47,9 @@ void tst_CLICaller::test_performAction()
 
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.at(0).type() == QVariant::String);
-    QVERIFY(arguments.at(1).type() == QVariant::Bool);
-    QVERIFY(arguments.at(1).toBool() == true);
+    QVERIFY(arguments.at(0).type() == QVariant::Uuid);
+    QVERIFY(arguments.at(1).type() == QVariant::String);
+    QVERIFY(arguments.at(2).type() == QVariant::Bool);
+    QVERIFY(arguments.at(3).type() == QVariant::String);
+    QVERIFY(arguments.at(2).toBool() == true);
 }

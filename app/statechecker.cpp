@@ -87,7 +87,7 @@ void StateChecker::check()
     }
 }
 
-void StateChecker::onQueryFinish(const QString &result, bool ok)
+void StateChecker::onQueryFinish(const Action::Id & /*id*/, const QString &result, bool ok, const QString & /*info*/)
 {
     if (ok)
         QtConcurrent::run(this, &StateChecker::updateState, result);

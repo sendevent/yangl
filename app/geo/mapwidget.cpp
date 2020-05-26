@@ -47,7 +47,7 @@ MapWidget::MapWidget(QWidget *parent)
 
     m_quickView->rootContext()->setContextProperty("markerModel", m_serversModel);
 
-    m_quickView->setSource(QStringLiteral("qrc:/qml/qml/MapView.qml"));
+    m_quickView->setSource(QStringLiteral("qrc:/qml/geo/qml/MapView.qml"));
     QVBoxLayout *vBox = new QVBoxLayout(this);
     vBox->addWidget(m_quickView);
 
