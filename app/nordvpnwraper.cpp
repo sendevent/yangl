@@ -49,6 +49,7 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
     , m_pauseTimer(new QTimer(this))
     , m_paused(0)
     , m_settingsShown(false)
+    , m_mapView(nullptr)
 {
     connect(qApp, &QApplication::aboutToQuit, this, &NordVpnWraper::prepareQuit);
     connect(m_checker, &StateChecker::stateChanged, m_trayIcon, &TrayIcon::setState);
@@ -132,6 +133,15 @@ void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason
     KnownAction invokeMe(KnownAction::Unknown);
     switch (reason) {
     case QSystemTrayIcon::Trigger:
+#ifndef YANGL_NO_GEOCHART
+        if (!m_mapView)
+            showMapView();
+        else {
+            m_mapView->activateWindow();
+            m_mapView->raise();
+        }
+        return;
+#endif
         if (!m_settingsShown)
             showSettingsEditor();
         return;
@@ -320,12 +330,16 @@ void NordVpnWraper::connectTo(const QString &country, const QString &city)
 
 void NordVpnWraper::showMapView()
 {
-    QWidget *mapView(nullptr);
 #ifndef YANGL_NO_GEOCHART
-    mapView = new ServersChartView(this);
+    if (!m_mapView) {
+        ServersChartView *chartView = new ServersChartView(this);
+        connect(m_checker, &StateChecker::stateChanged, chartView, &ServersChartView::onStateChanged);
+        chartView->onStateChanged(m_checker->state());
+        m_mapView = chartView;
+    }
 #endif
-    if (mapView) {
-        mapView->setAttribute(Qt::WA_DeleteOnClose);
-        mapView->show();
+    if (m_mapView) {
+        m_mapView->setAttribute(Qt::WA_DeleteOnClose);
+        m_mapView->show();
     }
 }

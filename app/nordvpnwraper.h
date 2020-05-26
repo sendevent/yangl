@@ -60,7 +60,7 @@ private:
     QTimer *m_pauseTimer;
     int m_paused;
     bool m_settingsShown;
-
+    QPointer<QWidget> m_mapView;
     void loadSettings();
 
     void pause(KnownAction action);
