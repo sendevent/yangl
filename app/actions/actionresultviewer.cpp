@@ -24,6 +24,8 @@
 #include <QTabWidget>
 #include <QTextBrowser>
 
+static constexpr int BrowserMaxLines = 1000;
+
 /*static*/ ActionResultViewer *ActionResultViewer::m_instance = nullptr;
 
 ActionResultViewer::ActionResultViewer()
@@ -38,6 +40,8 @@ ActionResultViewer::ActionResultViewer()
     });
     QGridLayout *layout = new QGridLayout(this);
     layout->addWidget(m_tabWidget);
+
+    setWindowTitle(tr("%1 — CLI Log").arg(qApp->applicationDisplayName()));
 }
 
 /*static*/ ActionResultViewer *ActionResultViewer::instance()
@@ -75,8 +79,11 @@ void ActionResultViewer::onActionPerformed(const Action::Id &id, const QString &
     if (auto action = m_actions.value(id)) {
         const bool forceShow = action->forcedShow();
 
-        if (auto display = displayForAction(action))
+        if (auto display = displayForAction(action)) {
+            if (display->toPlainText().count('\n') >= BrowserMaxLines)
+                display->clear();
             display->append(info);
+        }
 
         if (forceShow || !ok) {
             if (!isVisible())

@@ -19,6 +19,7 @@
 
 #include "actioneditor.h"
 #include "actionstorage.h"
+#include "common.h"
 #include "ui_actionstab.h"
 
 ActionsTab::ActionsTab(QWidget *parent)

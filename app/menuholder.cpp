@@ -24,6 +24,7 @@ MenuHolder::MenuHolder(QObject *parent)
     , m_menuMonitor(new QMenu(tr("Monitor")))
     , m_actMap(nullptr)
     , m_actSettings(nullptr)
+    , m_actLog(nullptr)
     , m_actRun(nullptr)
     , m_menuNordVpn(new QMenu(tr("NordVPN")))
     , m_menuUser(new QMenu(tr("Extra")))
@@ -42,6 +43,7 @@ QMenu *MenuHolder::createMenu(const QList<Action::Ptr> &actions)
 #endif
 
     m_actSettings = m_menuMonitor->addAction(tr("Show &settings"));
+    m_actLog = m_menuMonitor->addAction(tr("Show &Log"));
     m_actRun = m_menuMonitor->addAction(tr("&Active"));
     m_actRun->setCheckable(true);
 
@@ -71,6 +73,11 @@ QAction *MenuHolder::getActShowSettings() const
 QAction *MenuHolder::getActShowMap() const
 {
     return m_actMap;
+}
+
+QAction *MenuHolder::getActShowLog() const
+{
+    return m_actLog;
 }
 
 QAction *MenuHolder::getActQuit() const
