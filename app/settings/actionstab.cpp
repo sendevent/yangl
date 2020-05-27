@@ -106,11 +106,8 @@ bool ActionsTab::save()
             if (!editor->apply())
                 return false;
             actions.append(editor->getAction());
-            LOG << editor->getAction()->timeout();
         }
     }
 
-    if (m_scope == Action::Scope::User)
-        int dbg = 0;
     return m_actStorage->updateActions(actions, m_scope);
 }

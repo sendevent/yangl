@@ -67,4 +67,6 @@ private:
     void pause(KnownAction action);
 
     void updateActions(bool connected);
+
+    void initMenu();
 };

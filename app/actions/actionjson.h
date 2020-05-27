@@ -17,14 +17,16 @@
 
 #pragma once
 
+#include "action.h"
+
 #include <QJsonObject>
 
-class Action;
 class QIODevice;
+class ActionStorage;
 class ActionJson
 {
 public:
-    ActionJson();
+    ActionJson(ActionStorage *storage);
 
     void clear();
 
@@ -37,12 +39,18 @@ public:
     void popAction(const Action *action);
     bool updateAction(Action *action);
 
+    QVector<QString> builtinActionIds() const;
     QVector<QString> customActionIds() const;
 
     static QString jsonFilePath();
 
+    Action::Ptr action(Action::Scope scope, const QString &id);
+
 private:
     QJsonObject m_json;
+    ActionStorage *m_storage;
 
+    QVector<QString> actionsGroup(const QString &group) const;
     QJsonObject actionToJson(const Action *action) const;
+    Action::Ptr actionFromJson(const QJsonObject &json) const;
 };

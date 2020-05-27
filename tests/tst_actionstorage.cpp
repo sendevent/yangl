@@ -196,7 +196,7 @@ void tst_ActionStorage::test_createUserAction()
 
     QCOMPARE(storage.userActions().size(), 0);
 
-    /*const QList<Action::Ptr> &userActions =*/populateUserActions(&storage, UserActionCount);
+    populateUserActions(&storage, UserActionCount);
     QCOMPARE(storage.userActions().size(), UserActionCount);
 }
 

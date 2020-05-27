@@ -7,8 +7,7 @@ Rectangle {
     property alias mapCenter : map.center
     property alias mapScale: map.zoomLevel
 
-    signal markerDoubleclicked(anObject: Item)
-
+    signal markerDoubleclicked(Item anObject)
 
     Plugin {
         id: mapPlugin

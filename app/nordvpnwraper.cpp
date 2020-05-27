@@ -59,8 +59,17 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
     connect(m_menuHolder, &MenuHolder::actionTriggered, this, &NordVpnWraper::onActionTriggered);
     connect(m_pauseTimer, &QTimer::timeout, this, &NordVpnWraper::onPauseTimer);
 
-    m_trayIcon->setContextMenu(m_menuHolder->createMenu(m_actions->load()));
+    initMenu();
     m_trayIcon->setVisible(true);
+}
+
+void NordVpnWraper::initMenu()
+{
+    QList<Action::Ptr> actions = m_actions->load();
+    if (actions.isEmpty())
+        actions = m_actions->load(nullptr);
+    QMenu *menu = m_menuHolder->createMenu(actions);
+    m_trayIcon->setContextMenu(menu);
 }
 
 CLICaller *NordVpnWraper::bus() const
@@ -80,9 +89,7 @@ void NordVpnWraper::start()
 
     loadSettings();
 
-    const QList<Action::Ptr> &actions = m_actions->load();
-    QMenu *menu = m_menuHolder->createMenu(actions);
-    m_trayIcon->setContextMenu(menu);
+    initMenu();
 
 #ifndef YANGL_NO_GEOCHART
     connect(m_menuHolder->getActShowMap(), &QAction::triggered, this, &NordVpnWraper::showMapView,

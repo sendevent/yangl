@@ -26,7 +26,6 @@ enum KnownAction
     Disconnect,
     Settings,
     Account,
-    Groups,
 
     Pause05,
     Pause30,

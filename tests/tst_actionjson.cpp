@@ -18,6 +18,7 @@
 #include "tst_actionjson.h"
 
 #include "actionjson.h"
+#include "actionstorage.h"
 
 #include <QBuffer>
 #include <QtTest>
@@ -25,11 +26,11 @@
 /*static*/ const Action::Id tst_ActionJson::TestId = Action::Id("{057c11c0-de87-48c4-a98e-93471b4290ca}");
 
 /*static*/ const QString tst_ActionJson::TestJson =
-        "{\n    \"custom\": {\n        \"{057c11c0-de87-48c4-a98e-93471b4290ca}\": {\n            \"anchor\": 0,\n "
-        "           \"app\": \"/usr/bin/ls\",\n            \"args\": [\n                \"-la\"\n            ],\n  "
-        "          \"forcedDisplay\": false,\n            \"timeout\": 30000,\n            \"title\": \"\"\n        "
-        "}\n    "
-        "}\n}\n";
+        "{\n    \"custom\": {\n        \"{057c11c0-de87-48c4-a98e-93471b4290ca}\": {\n            \"anchor\": 0,\n     "
+        "       \"app\": \"/usr/bin/ls\",\n            \"args\": [\n                \"-la\"\n            ],\n          "
+        "  \"forcedDisplay\": false,\n            \"id\": \"{057c11c0-de87-48c4-a98e-93471b4290ca}\",\n            "
+        "\"scope\": 1,\n            \"timeout\": 30000,\n            \"title\": \"\",\n            \"type\": 0\n       "
+        " }\n    }\n}\n";
 
 tst_ActionJson::tst_ActionJson()
 {
@@ -51,7 +52,8 @@ void tst_ActionJson::test_load()
     QBuffer in(&inputString);
     in.open(QIODevice::ReadOnly);
 
-    ActionJson json;
+    ActionStorage storage;
+    ActionJson json(&storage);
     QCOMPARE(json.customActionIds(), {});
 
     json.load(&in);
@@ -78,7 +80,8 @@ void tst_ActionJson::test_save()
     QBuffer out(&outString);
     out.open(QIODevice::WriteOnly);
 
-    ActionJson json;
+    ActionStorage storage;
+    ActionJson json(&storage);
     QCOMPARE(json.customActionIds(), {});
 
     json.putAction(action.get());
