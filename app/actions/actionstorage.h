@@ -44,6 +44,10 @@ public:
     void save(QIODevice *from);
 
     Action::Ptr createUserAction(QObject *parent = nullptr);
+    Action::Ptr createAction(Action::Scope scope, KnownAction type, const Action::Id &id, const QString &appPath,
+                             const QString &title, const QStringList &args, bool alwaysShowResult,
+                             Action::MenuPlace anchor, int timeout);
+
     bool updateActions(const QList<Action::Ptr> &actions, Action::Scope scope);
 
     static QString jsonFilePath();
@@ -61,4 +65,7 @@ private:
     bool updateUserActions(const QList<Action::Ptr> &actions);
 
     QList<Action::Ptr> sortActionsByTitle(const QList<Action::Ptr> &actions) const;
+
+    void loadBuiltinActions();
+    void loadUserActions();
 };

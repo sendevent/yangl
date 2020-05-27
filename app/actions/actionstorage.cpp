@@ -25,7 +25,7 @@
 
 ActionStorage::ActionStorage(QObject *parent)
     : QObject(parent)
-    , m_json(new ActionJson)
+    , m_json(new ActionJson(this))
 {
 }
 
@@ -123,21 +123,48 @@ Action::Ptr ActionStorage::createUserAction(QObject *parent)
 void ActionStorage::initActions(bool updateFromJson)
 {
     m_builtinActions.clear();
+    m_userActions.clear();
 
-    for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i) {
-        if (const Action::Ptr &action = createAction(static_cast<KnownAction>(i))) {
-            m_builtinActions.insert(action->type(), action);
-            if (updateFromJson)
-                m_json->updateAction(action.get());
-            else
+    if (!updateFromJson) {
+        for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i) {
+            if (const Action::Ptr &action = createAction(static_cast<KnownAction>(i))) {
+                m_builtinActions.insert(action->type(), action);
                 m_json->putAction(action.get());
+            }
         }
+        return;
     }
 
-    if (!updateFromJson)
-        return;
+    loadBuiltinActions();
 
-    m_userActions.clear();
+    loadUserActions();
+}
+
+void ActionStorage::loadBuiltinActions()
+{
+    QVector<Action::Ptr> builtinActionsJson;
+    QVector<QString> builtinActionIds = m_json->builtinActionIds();
+    for (const auto &id : builtinActionIds)
+        builtinActionsJson.append(m_json->action(Action::Scope::Builtin, id));
+
+    for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i)
+        if (const Action::Ptr action = createAction(static_cast<KnownAction>(i)))
+            m_builtinActions[action->type()] = action;
+
+    while (!builtinActionsJson.isEmpty()) {
+        Action::Ptr jsonAction = builtinActionsJson.takeLast();
+        if (m_builtinActions.contains(jsonAction->type()))
+            m_builtinActions[jsonAction->type()].swap(jsonAction);
+        else
+            m_json->popAction(jsonAction.get());
+    }
+
+    for (const auto &action : m_builtinActions)
+        m_json->putAction(action.get());
+}
+
+void ActionStorage::loadUserActions()
+{
     for (const QString &id : m_json->customActionIds()) {
         if (!id.isEmpty()) {
             if (const Action::Ptr &action = createAction(Unknown, id)) {
@@ -155,28 +182,26 @@ Action::Ptr ActionStorage::createAction(KnownAction actionType, const QString &i
 
     QString title;
     QStringList args;
-    bool forceShow = true;
+    bool forceShow = false;
     Action::MenuPlace menuPlace = Action::MenuPlace::Own;
+    const Action::Id actId = id.isEmpty() ? Action::Id::createUuid() : Action::Id::fromString(id);
 
     switch (actionType) {
     case KnownAction::CheckStatus: {
         title = QObject::tr("Check status");
         args.append("status");
-        forceShow = true;
         menuPlace = Action::MenuPlace::Common;
         break;
     }
     case KnownAction::Connect: {
         title = QObject::tr("Connect");
         args.append("c");
-        forceShow = false;
         menuPlace = Action::MenuPlace::Common;
         break;
     }
     case KnownAction::Disconnect: {
         title = QObject::tr("Disonnect");
         args.append("disconnect");
-        forceShow = false;
         menuPlace = Action::MenuPlace::Own;
         break;
     }
@@ -190,13 +215,6 @@ Action::Ptr ActionStorage::createAction(KnownAction actionType, const QString &i
     case KnownAction::Account: {
         title = QObject::tr("Account details");
         args.append("account");
-        forceShow = true;
-        menuPlace = Action::MenuPlace::Own;
-        break;
-    }
-    case KnownAction::Groups: {
-        title = QObject::tr("List server groups");
-        args.append("groups");
         forceShow = true;
         menuPlace = Action::MenuPlace::Own;
         break;
@@ -225,30 +243,35 @@ Action::Ptr ActionStorage::createAction(KnownAction actionType, const QString &i
         title = QObject::tr("Rate ★★★★★");
         args.append("rate 5");
         menuPlace = Action::MenuPlace::Own;
+        forceShow = true;
         break;
     }
     case KnownAction::Rate4: {
         title = QObject::tr("Rate ★★★★☆");
         args.append("rate 4");
         menuPlace = Action::MenuPlace::Own;
+        forceShow = true;
         break;
     }
     case KnownAction::Rate3: {
         title = QObject::tr("Rate ★★★☆☆");
         args.append("rate 3");
         menuPlace = Action::MenuPlace::Own;
+        forceShow = true;
         break;
     }
     case KnownAction::Rate2: {
         title = QObject::tr("Rate ★★☆☆☆");
         menuPlace = Action::MenuPlace::Own;
         args.append("rate 2");
+        forceShow = true;
         break;
     }
     case KnownAction::Rate1: {
         title = QObject::tr("Rate ★☆☆☆☆");
         menuPlace = Action::MenuPlace::Own;
         args.append("rate 1");
+        forceShow = true;
         break;
     }
     case KnownAction::SetNotifyOff: {
@@ -265,15 +288,28 @@ Action::Ptr ActionStorage::createAction(KnownAction actionType, const QString &i
     }
     default:
         scope = Action::Scope::User;
+        forceShow = true;
         break;
     }
 
-    Action::Ptr action(new Action(scope, actionType, this, id.isEmpty() ? Action::Id() : Action::Id::fromString(id)));
-    action->setApp(appPath);
-    action->setTitle(title);
-    action->setArgs(args);
-    action->setForcedShow(forceShow);
-    action->setAnchor(menuPlace);
+    return createAction(scope, actionType, actId, appPath, title, args, forceShow, menuPlace, 0);
+}
+
+Action::Ptr ActionStorage::createAction(Action::Scope scope, KnownAction type, const Action::Id &id,
+                                        const QString &appPath, const QString &title, const QStringList &args,
+                                        bool alwaysShowResult, Action::MenuPlace anchor, int timeout)
+{
+    Action::Ptr action(new Action(scope, type, this, id));
+    if (!appPath.isEmpty())
+        action->setApp(appPath);
+    if (!title.isEmpty())
+        action->setTitle(title);
+    if (!args.isEmpty())
+        action->setArgs(args);
+    action->setForcedShow(alwaysShowResult);
+    action->setAnchor(anchor);
+    if (0 != timeout)
+        action->setTimeout(timeout);
 
     return action;
 }
