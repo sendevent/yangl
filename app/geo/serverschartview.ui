@@ -33,20 +33,24 @@
            </property>
           </widget>
          </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTreeView" name="treeView"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
           <widget class="QToolButton" name="buttonReload">
            <property name="toolTip">
             <string>Update available servers list</string>
            </property>
            <property name="text">
-            <string>🗘</string>
+            <string>🗘 Reload</string>
            </property>
           </widget>
          </item>
         </layout>
-       </item>
-       <item>
-        <widget class="QTreeView" name="treeView"/>
        </item>
       </layout>
      </widget>
