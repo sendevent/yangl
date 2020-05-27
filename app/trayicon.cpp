@@ -92,7 +92,6 @@ QIcon generateIcon(const NordVpnInfo::Status forStatus)
 #endif
         p.drawPixmap(targetRect, sub, subRect);
     }
-    base.save(QString("./pm_%1.png").arg(static_cast<int>(forStatus)));
     return QIcon(base);
 }
 
