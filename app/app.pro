@@ -20,9 +20,9 @@ INCLUDEPATH += \
     actions
 
 SOURCES += \
-    actionresultviewer.cpp \
     actions/action.cpp \
     actions/actionjson.cpp \
+    actions/actionresultviewer.cpp \
     actions/actionstorage.cpp \
     cli/clicall.cpp \
     cli/clicaller.cpp \
@@ -40,9 +40,9 @@ SOURCES += \
     trayicon.cpp
 
 HEADERS += \
-    actionresultviewer.h \
     actions/action.h \
     actions/actionjson.h \
+    actions/actionresultviewer.h \
     actions/actionstorage.h \
     actions/actiontypes.h \
     cli/clicall.h \
@@ -76,6 +76,7 @@ RESOURCES += \
 yangl_no_geochart {
 DEFINES += YANGL_NO_GEOCHART
 } else {
+message("adding geo chart")
 QT += qml quick quickwidgets location positioning
 
 INCLUDEPATH += geo

@@ -43,6 +43,7 @@ private slots:
 
     void showMapView();
     void showSettingsEditor();
+    void showLog();
     void performStatusCheck();
 
     void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
@@ -66,4 +67,6 @@ private:
     void pause(KnownAction action);
 
     void updateActions(bool connected);
+
+    void initMenu();
 };

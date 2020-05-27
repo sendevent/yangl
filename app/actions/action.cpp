@@ -213,5 +213,5 @@ QString Action::groupKey() const
 
 QString Action::key() const
 {
-    return scope() == Action::Scope::Builtin ? QString::number(type()) : id().toString();
+    return /*scope() == Action::Scope::Builtin ? QString::number(type()) :*/ id().toString();
 }

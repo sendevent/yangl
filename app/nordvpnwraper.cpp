@@ -17,6 +17,7 @@
 
 #include "nordvpnwraper.h"
 
+#include "actionresultviewer.h"
 #include "actionstorage.h"
 #include "appsettings.h"
 #include "clicaller.h"
@@ -58,8 +59,17 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
     connect(m_menuHolder, &MenuHolder::actionTriggered, this, &NordVpnWraper::onActionTriggered);
     connect(m_pauseTimer, &QTimer::timeout, this, &NordVpnWraper::onPauseTimer);
 
-    m_trayIcon->setContextMenu(m_menuHolder->createMenu(m_actions->load()));
+    initMenu();
     m_trayIcon->setVisible(true);
+}
+
+void NordVpnWraper::initMenu()
+{
+    QList<Action::Ptr> actions = m_actions->load();
+    if (actions.isEmpty())
+        actions = m_actions->load(nullptr);
+    QMenu *menu = m_menuHolder->createMenu(actions);
+    m_trayIcon->setContextMenu(menu);
 }
 
 CLICaller *NordVpnWraper::bus() const
@@ -79,18 +89,17 @@ void NordVpnWraper::start()
 
     loadSettings();
 
-    const QList<Action::Ptr> &actions = m_actions->load();
-    QMenu *menu = m_menuHolder->createMenu(actions);
-    m_trayIcon->setContextMenu(menu);
-
-    connect(m_menuHolder->getActRun(), &QAction::toggled, m_checker, &StateChecker::setActive, Qt::UniqueConnection);
-    connect(m_menuHolder->getActShowSettings(), &QAction::triggered, this, &NordVpnWraper::showSettingsEditor,
-            Qt::UniqueConnection);
+    initMenu();
 
 #ifndef YANGL_NO_GEOCHART
     connect(m_menuHolder->getActShowMap(), &QAction::triggered, this, &NordVpnWraper::showMapView,
             Qt::UniqueConnection);
 #endif
+
+    connect(m_menuHolder->getActShowSettings(), &QAction::triggered, this, &NordVpnWraper::showSettingsEditor,
+            Qt::UniqueConnection);
+    connect(m_menuHolder->getActShowLog(), &QAction::triggered, this, &NordVpnWraper::showLog, Qt::UniqueConnection);
+    connect(m_menuHolder->getActRun(), &QAction::toggled, m_checker, &StateChecker::setActive, Qt::UniqueConnection);
 
     connect(m_menuHolder->getActQuit(), &QAction::triggered, qApp, &QApplication::quit, Qt::UniqueConnection);
 
@@ -114,8 +123,6 @@ void NordVpnWraper::prepareQuit()
     disconnect(m_checker);
 
     const bool visible = m_mapView ? m_mapView->isVisible() : false;
-    LOG << visible;
-
     AppSettings::Map.Visible->write(visible);
     AppSettings::sync();
 }
@@ -132,6 +139,14 @@ void NordVpnWraper::showSettingsEditor()
     });
     m_settingsShown = true;
     dlg->open();
+}
+
+void NordVpnWraper::showLog()
+{
+    if (ActionResultViewer::instance()->isVisible())
+        ActionResultViewer::instance()->hide();
+    else
+        ActionResultViewer::instance()->show();
 }
 
 void NordVpnWraper::performStatusCheck()
