@@ -18,6 +18,7 @@
 #include "statechecker.h"
 
 #include "actionstorage.h"
+#include "appsettings.h"
 #include "clicall.h"
 #include "clicaller.h"
 #include "common.h"
@@ -56,6 +57,8 @@ void StateChecker::setActive(bool active)
             m_timer->stop();
             setStatus(NordVpnInfo::Status::Unknown);
         }
+
+        AppSettings::Monitor.Active->write(active);
     }
 }
 

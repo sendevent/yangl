@@ -143,7 +143,10 @@ void NordVpnWraper::showSettingsEditor()
 
 void NordVpnWraper::showLog()
 {
-    ActionResultViewer::instance()->show();
+    if (ActionResultViewer::instance()->isVisible())
+        ActionResultViewer::instance()->hide();
+    else
+        ActionResultViewer::instance()->show();
 }
 
 void NordVpnWraper::performStatusCheck()
