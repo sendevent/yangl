@@ -76,6 +76,7 @@ RESOURCES += \
 yangl_no_geochart {
 DEFINES += YANGL_NO_GEOCHART
 } else {
+message("adding geo chart")
 QT += qml quick quickwidgets location positioning
 
 INCLUDEPATH += geo
