@@ -25,9 +25,9 @@ MapServersModel::MapServersModel(QObject *parent)
 
 void MapServersModel::clear()
 {
-    beginRemoveRows(QModelIndex(), rowCount(), rowCount());
+    beginResetModel();
     m_coordinates.clear();
-    endRemoveRows();
+    endResetModel();
 }
 
 void MapServersModel::addMarker(const QString &country, const QString &city, const QGeoCoordinate &coordinate)
