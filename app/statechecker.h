@@ -32,6 +32,20 @@ class StateChecker : public QObject
 public:
     static const int DefaultIntervalMs;
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 11, 0)
+    class Ptr : public QSharedPointer<StateChecker>
+    {
+    public:
+        Ptr(StateChecker *action = nullptr)
+            : QSharedPointer<StateChecker>(action)
+        {
+        }
+
+        StateChecker *get() const { return data(); }
+    };
+#else
+    using Ptr = QSharedPointer<StateChecker>;
+#endif
     explicit StateChecker(CLICaller *bus, ActionStorage *actions, int intervalMs, QObject *parent = nullptr);
     ~StateChecker() override;
 
