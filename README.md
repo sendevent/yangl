@@ -1,3 +1,7 @@
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+[![qt5](https://img.shields.io/badge/qt-5-green.svg)](https://shields.io/)
+[![cpp11](https://img.shields.io/badge/c%2B%2B-14-brightgreen)](https://shields.io/)
+
 # yangl
 ### **Y**et **A**nother **N**ordVPN **G**UI for **L**inux
 
