@@ -5,7 +5,7 @@
 # yangl
 ### **Y**et **A**nother **N**ordVPN **G**UI for **L**inux
 
-![yangl10](https://user-images.githubusercontent.com/2843765/83081840-54641e80-a08a-11ea-9b7d-814818a5e518.gif)
+![yangl](https://user-images.githubusercontent.com/2843765/83085151-c7be5e00-a093-11ea-9d71-42b1577cb5df.gif)
 
 This is unofficial GUI for [NordVPN](https://nordvpn.com/) desktop client.
 It's written for my own purpose, and I'm not affiliated to the [NordVPN](https://nordvpn.com/) team in no way. Used titles, logo and so on are the property of legal rights holders.
