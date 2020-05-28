@@ -38,15 +38,14 @@ Open [yangl.pro](yangl.pro) and build it as a regular project.
 
 ### Shell
 
-#### [build.sh](build.sh)
+#### Build script
 
+[build.sh](build.sh) performs the build process in the sub directory ./build (created automatically). On success, the directory would contain yangl executable:
 ```
 $ chmod +x ./build.sh && ./build.sh
 ```
 
-This script performs the build process in the sub directory ./build (created automatically). On success, the directory would contain yangl executable.
-
-#### manual
+#### Manual steps
 
 ```
 $ mkdir ./build
