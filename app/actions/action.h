@@ -32,7 +32,21 @@ class Action : public QObject
     Q_OBJECT
 public:
     using Id = QUuid;
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 11, 0)
+    class Ptr : public QSharedPointer<Action>
+    {
+    public:
+        Ptr(Action *action = {})
+            : QSharedPointer<Action>(action)
+        {
+        }
+
+        Action *get() const { return data(); }
+    };
+#else
     using Ptr = QSharedPointer<Action>;
+#endif
 
     enum class Scope
     {
@@ -100,7 +114,7 @@ protected:
     friend class ActionStorage;
     static int MetaIdId;
 
-    explicit Action(Action::Scope scope, KnownAction type, QObject *parent = nullptr, const Action::Id &id = {});
+    explicit Action(Action::Scope scope, KnownAction type, QObject *parent = {}, const Action::Id &id = {});
 
     const Action::Id m_id;
     const Action::Scope m_scope;

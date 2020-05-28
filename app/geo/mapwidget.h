@@ -36,7 +36,7 @@ public:
         QString m_city;
     };
 
-    explicit MapWidget(QWidget *parent = nullptr);
+    explicit MapWidget(QWidget *parent = {});
     ~MapWidget();
 
     void addMark(const QString &country, const QString &city);

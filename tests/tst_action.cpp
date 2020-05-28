@@ -57,7 +57,7 @@ void tst_Action::testCreate_Builtin()
         const KnownAction actionType = static_cast<KnownAction>(i);
         static const Action::Id &id = Action::Id::createUuid();
 
-        const Action::Ptr action(new tst_Action(scope, actionType, nullptr, id));
+        const Action::Ptr action(new tst_Action(scope, actionType, {}, id));
         checkAction(action, actionType, scope, id);
 
         const Action::Ptr actionNoId(new tst_Action(scope, actionType));
@@ -71,7 +71,7 @@ void tst_Action::testCreate_Custom()
     static const Action::Id &id = Action::Id::createUuid();
     static const KnownAction actionType = KnownAction::Unknown;
 
-    const Action::Ptr action(new tst_Action(scope, actionType, nullptr, id));
+    const Action::Ptr action(new tst_Action(scope, actionType, {}, id));
     checkAction(action, actionType, scope, id);
 
     const Action::Ptr actionNoId(new tst_Action(scope, actionType));

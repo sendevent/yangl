@@ -26,7 +26,7 @@
 
 static constexpr int BrowserMaxLines = 1000;
 
-/*static*/ ActionResultViewer *ActionResultViewer::m_instance = nullptr;
+/*static*/ ActionResultViewer *ActionResultViewer::m_instance = {};
 
 ActionResultViewer::ActionResultViewer()
     : QWidget()
@@ -98,7 +98,7 @@ void ActionResultViewer::onActionPerformed(const Action::Id &id, const QString &
 QTextBrowser *ActionResultViewer::displayForAction(Action *action)
 {
     if (!action)
-        return nullptr;
+        return {};
 
     const Action::Id &id = action->id();
     const QString &title = action->title();
@@ -111,5 +111,5 @@ QTextBrowser *ActionResultViewer::displayForAction(Action *action)
         m_tabWidget->addTab(display, title);
     }
 
-    return m_browsers.value(id, nullptr);
+    return m_browsers.value(id, {});
 }

@@ -30,7 +30,7 @@ public:
     using Group = QPair<QString, ServersListManager::Servers>;
     using Groups = QVector<ServersListManager::Group>;
 
-    explicit ServersListManager(NordVpnWraper *nordVpn, QObject *parent = nullptr);
+    explicit ServersListManager(NordVpnWraper *nordVpn, QObject *parent = {});
 
     bool reload();
 

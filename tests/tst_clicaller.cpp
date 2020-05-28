@@ -23,6 +23,7 @@
 #include <QElapsedTimer>
 #include <QSignalSpy>
 #include <QtTest>
+#include <memory>
 
 void tst_CLICaller::test_performAction()
 {

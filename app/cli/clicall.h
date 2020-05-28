@@ -29,7 +29,7 @@ class CLICall : public QObject
 public:
     static constexpr int DefaultTimeoutMSecs = 30000;
 
-    explicit CLICall(const QString &path, const QStringList &params, int timeout, QObject *parent = nullptr);
+    explicit CLICall(const QString &path, const QStringList &params, int timeout, QObject *parent = {});
     ~CLICall() = default;
 
     QString run();
@@ -54,7 +54,7 @@ protected:
     QString setResult(const QString &result, const QString &errors);
 
 private:
-    CLICall(QObject *parent = nullptr) = delete;
+    CLICall(QObject *parent = {}) = delete;
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 13, 0)
     Q_DISABLE_COPY_MOVE(CLICall);

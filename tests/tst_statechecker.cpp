@@ -39,8 +39,7 @@ tst_StateChecker::tst_StateChecker(QObject *parent)
 
 void tst_StateChecker::init()
 {
-    m_checker = QSharedPointer<StateChecker>(
-            new StateChecker(m_caller.get(), m_storage.get(), StateChecker::DefaultIntervalMs));
+    m_checker = StateChecker::Ptr(new StateChecker(m_caller.get(), m_storage.get(), StateChecker::DefaultIntervalMs));
 }
 
 void tst_StateChecker::test_active()

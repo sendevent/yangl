@@ -36,5 +36,5 @@ private slots:
 
 private:
     static const Action::Id TestId;
-    static const QString TestJson;
+    static const QByteArray TestJson;
 };

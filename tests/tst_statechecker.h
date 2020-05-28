@@ -28,7 +28,7 @@ class tst_StateChecker : public QObject
 {
     Q_OBJECT
 public:
-    explicit tst_StateChecker(QObject *parent = nullptr);
+    explicit tst_StateChecker(QObject *parent = {});
 
 private slots:
     void init();
@@ -40,6 +40,6 @@ private slots:
 private:
     const std::unique_ptr<CLICaller> m_caller;
     const std::unique_ptr<ActionStorage> m_storage;
-    QSharedPointer<StateChecker> m_checker;
+    StateChecker::Ptr m_checker;
     void test_check(NordVpnInfo::Status targetStatus);
 };
