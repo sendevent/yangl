@@ -30,7 +30,7 @@ class ActionEditor : public QWidget
     Q_OBJECT
 
 public:
-    explicit ActionEditor(const Action::Ptr &act, QWidget *parent = nullptr);
+    explicit ActionEditor(const Action::Ptr &act, QWidget *parent = {});
     ~ActionEditor();
 
     Action::Ptr getAction() const;

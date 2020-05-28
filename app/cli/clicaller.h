@@ -26,7 +26,7 @@ class CLICaller : public QObject
 {
     Q_OBJECT
 public:
-    explicit CLICaller(QObject *parent = nullptr);
+    explicit CLICaller(QObject *parent = {});
 
     bool performAction(Action *action);
 

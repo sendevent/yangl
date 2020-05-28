@@ -32,7 +32,7 @@ class Dialog : public QDialog
     Q_OBJECT
 
 public:
-    Dialog(ActionStorage *actionStorage, QWidget *parent = nullptr);
+    Dialog(ActionStorage *actionStorage, QWidget *parent = {});
     ~Dialog() override;
 
 public slots:

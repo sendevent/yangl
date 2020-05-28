@@ -30,7 +30,7 @@ class NordVpnWraper : public QObject
 {
     Q_OBJECT
 public:
-    explicit NordVpnWraper(QObject *parent = nullptr);
+    explicit NordVpnWraper(QObject *parent = {});
 
     void start();
 

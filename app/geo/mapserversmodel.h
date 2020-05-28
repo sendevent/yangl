@@ -32,7 +32,7 @@ public:
         CityNameRole,
     };
 
-    MapServersModel(QObject *parent = nullptr);
+    MapServersModel(QObject *parent = {});
     void addMarker(const QString &country, const QString &city, const QGeoCoordinate &coordinate);
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 

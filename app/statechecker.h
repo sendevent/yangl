@@ -36,7 +36,7 @@ public:
     class Ptr : public QSharedPointer<StateChecker>
     {
     public:
-        Ptr(StateChecker *action = nullptr)
+        Ptr(StateChecker *action = {})
             : QSharedPointer<StateChecker>(action)
         {
         }
@@ -46,7 +46,7 @@ public:
 #else
     using Ptr = QSharedPointer<StateChecker>;
 #endif
-    explicit StateChecker(CLICaller *bus, ActionStorage *actions, int intervalMs, QObject *parent = nullptr);
+    explicit StateChecker(CLICaller *bus, ActionStorage *actions, int intervalMs, QObject *parent = {});
     ~StateChecker() override;
 
     void check();

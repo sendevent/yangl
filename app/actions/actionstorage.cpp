@@ -54,12 +54,12 @@ QList<Action::Ptr> ActionStorage::allActions() const
 
 Action::Ptr ActionStorage::action(int knownAction) const
 {
-    return m_builtinActions.value(knownAction, nullptr);
+    return m_builtinActions.value(knownAction, {});
 }
 
 Action::Ptr ActionStorage::action(const Action::Id &userAction) const
 {
-    return m_userActions.value(userAction, nullptr);
+    return m_userActions.value(userAction, {});
 }
 
 QList<Action::Ptr> ActionStorage::load(const QString &from)

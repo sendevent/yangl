@@ -156,7 +156,7 @@ bool ActionJson::updateAction(Action *action)
 Action::Ptr ActionJson::actionFromJson(const QJsonObject &json) const
 {
     if (json.isEmpty())
-        return nullptr;
+        return {};
 
     const auto type = static_cast<KnownAction>(json[Json.Action.Type].toInt());
     const auto scope = static_cast<Action::Scope>(json[Json.Action.Scope].toInt());
@@ -235,5 +235,5 @@ Action::Ptr ActionJson::action(Action::Scope scope, const QString &id)
             return actionFromJson(jsonAction);
     }
 
-    return nullptr;
+    return {};
 }

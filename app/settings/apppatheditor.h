@@ -26,7 +26,7 @@ class AppPathEditor : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AppPathEditor(QWidget *parent = nullptr);
+    explicit AppPathEditor(QWidget *parent = {});
 
     QString text() const;
     void setText(const QString &text);

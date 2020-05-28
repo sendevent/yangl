@@ -32,7 +32,7 @@ public:
     static QString dirPath();
 
 private:
-    SettingsManager(QObject *parent = nullptr);
+    SettingsManager(QObject *parent = {});
     static SettingsManager *m_instance;
-    QSettings *m_settings = nullptr;
+    QSettings *m_settings = {};
 };
