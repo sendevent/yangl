@@ -9,7 +9,7 @@ I assume you already have the c++ build tools and git installed and the source c
 ## Prerequisites
 ### Qt
 #### Version
-Should be compilable with >= 5.7, but you may need to tune versions of used qml imports in app/geo/qml/MapView.qml
+Should be compilable with >= 5.7, but you may need to tune versions of used qml imports in [MapView.qml](app/geo/qml/MapView.qml)
 While tested with 5.12, the primary development version for now is 5.15.
 
 #### Modules
@@ -24,21 +24,21 @@ Here's how to install these on Debian:
 $ sudo apt install qtbase5-dev qtdeclarative5-dev qtlocation5-dev qtpositioning5-dev
 ```
 
-Please refer to your distributive manual to get the related packages.
+Please refer to your distro manual to get the related packages.
 
 ### C++
 
-Relatively modern (c++14-capable) compiller ­­­­­­-­ gcc 9.3 or clang 8 would be enough.
+Relatively modern (c++14-capable) compiller — gcc 9.3 or clang 8 would be enough.
 
 ## Building
 
 ### QtCreator
 
-Open yangl.pro and build it as a regular projec.
+Open [yangl.pro](yangl.pro) and build it as a regular project.
 
 ### Shell
 
-#### build.sh
+#### [build.sh](build.sh)
 
 ```
 $ chmod +x ./build.sh && ./build.sh
@@ -51,6 +51,6 @@ This script performs the build process in the sub directory ./build (created aut
 ```
 $ mkdir ./build
 $ cd ./build
-$ qmake-qt5 -r ../yangl.pro
+$ qmake -r ../yangl.pro #or qmake-qt5, depending on your Linux distro
 $ make -j`nproc`
 ```
