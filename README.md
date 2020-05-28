@@ -68,7 +68,7 @@ Shows advanced info about current connection — used server, uptime and so on:
 ![tooltip](https://user-images.githubusercontent.com/2843765/83079687-0ac50500-a085-11ea-82f5-bef3b91043b2.png)
 
 # Build
-See [BUILD.md] (TBD)
+See [BUILD.md](./BUILD.md)
 
 # Install 
-See [INSTALL.md] (TBD)
+See [INSTALL.md](./INSTALL.md) **(TBD)**
