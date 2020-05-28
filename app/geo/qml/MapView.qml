@@ -1,6 +1,6 @@
-import QtQuick 2.12
-import QtLocation 5.12
-import QtQuick.Controls 2.12
+import QtQuick 2.8
+import QtQuick.Controls 2.2
+import QtLocation 5.0
 
 Rectangle {
     id: mapView

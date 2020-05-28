@@ -32,7 +32,7 @@ class ActionsTab : public QWidget
     Q_OBJECT
 
 public:
-    explicit ActionsTab(QWidget *parent = nullptr);
+    explicit ActionsTab(QWidget *parent = {});
     ~ActionsTab();
 
     void setActions(ActionStorage *actStorage, Action::Scope scope);

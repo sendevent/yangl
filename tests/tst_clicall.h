@@ -23,7 +23,7 @@ class tst_CLICall : public QObject
 {
     Q_OBJECT
 public:
-    tst_CLICall(QObject *parent = nullptr);
+    tst_CLICall(QObject *parent = {});
 
 private slots:
     void testCall();

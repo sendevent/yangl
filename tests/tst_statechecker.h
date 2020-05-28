@@ -28,7 +28,7 @@ class tst_StateChecker : public QObject
 {
     Q_OBJECT
 public:
-    explicit tst_StateChecker(QObject *parent = nullptr);
+    explicit tst_StateChecker(QObject *parent = {});
 
 private slots:
     void init();

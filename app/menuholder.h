@@ -27,7 +27,7 @@ class MenuHolder : public QObject
 {
     Q_OBJECT
 public:
-    explicit MenuHolder(QObject *parent = nullptr);
+    explicit MenuHolder(QObject *parent = {});
 
     QMenu *createMenu(const QList<Action::Ptr> &actions);
 

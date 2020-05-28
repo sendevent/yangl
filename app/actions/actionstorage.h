@@ -29,7 +29,7 @@ class ActionStorage : public QObject
     Q_OBJECT
 
 public:
-    ActionStorage(QObject *parent = nullptr);
+    ActionStorage(QObject *parent = {});
 
     QList<Action::Ptr> knownActions() const;
     QList<Action::Ptr> userActions() const;
@@ -43,7 +43,7 @@ public:
     void save(const QString &to = {});
     void save(QIODevice *from);
 
-    Action::Ptr createUserAction(QObject *parent = nullptr);
+    Action::Ptr createUserAction(QObject *parent = {});
     Action::Ptr createAction(Action::Scope scope, KnownAction type, const Action::Id &id, const QString &appPath,
                              const QString &title, const QStringList &args, bool alwaysShowResult,
                              Action::MenuPlace anchor, int timeout);

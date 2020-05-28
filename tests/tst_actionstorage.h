@@ -26,7 +26,7 @@ class tst_ActionStorage : public QObject
 {
     Q_OBJECT
 public:
-    explicit tst_ActionStorage(QObject *parent = nullptr);
+    explicit tst_ActionStorage(QObject *parent = {});
 
 private:
     QList<Action::Ptr> populateUserActions(ActionStorage *storage, int count);

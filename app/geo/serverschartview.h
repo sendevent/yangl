@@ -35,7 +35,7 @@ class ServersChartView : public QWidget
     Q_OBJECT
 
 public:
-    explicit ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent = nullptr);
+    explicit ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent = {});
     ~ServersChartView();
 
     void saveSettings();

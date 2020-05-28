@@ -50,7 +50,7 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
     , m_pauseTimer(new QTimer(this))
     , m_paused(0)
     , m_settingsShown(false)
-    , m_mapView(nullptr)
+    , m_mapView({})
 {
     connect(qApp, &QApplication::aboutToQuit, this, &NordVpnWraper::prepareQuit);
     connect(m_checker, &StateChecker::stateChanged, m_trayIcon, &TrayIcon::setState);
@@ -67,7 +67,7 @@ void NordVpnWraper::initMenu()
 {
     QList<Action::Ptr> actions = m_actions->load();
     if (actions.isEmpty())
-        actions = m_actions->load(nullptr);
+        actions = m_actions->load({});
     QMenu *menu = m_menuHolder->createMenu(actions);
     m_trayIcon->setContextMenu(menu);
 }
@@ -237,7 +237,7 @@ void NordVpnWraper::pause(KnownAction action)
         duration = 60;
         break;
     case PauseCustom: {
-        duration = QInputDialog::getInt(nullptr, tr("%1 — pause VPN for").arg(qApp->applicationDisplayName()),
+        duration = QInputDialog::getInt({}, tr("%1 — pause VPN for").arg(qApp->applicationDisplayName()),
                                         tr("Minutes:"), 1, 1, 1440);
         break;
     }
@@ -344,7 +344,7 @@ void NordVpnWraper::connectTo(const QString &country, const QString &city)
     LOG << country << city;
 
     QtConcurrent::run([country, city, this]() {
-        const Action::Ptr &action = storate()->createUserAction(nullptr);
+        const Action::Ptr &action = storate()->createUserAction({});
         action->setTitle(tr("Geo Connection"));
         action->setForcedShow(false);
         action->setArgs({ "c", country == "group" ? "-g" : country, city });
