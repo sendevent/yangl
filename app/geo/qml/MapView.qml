@@ -52,12 +52,11 @@ Rectangle {
                     height:width
                     radius:width/2
 
-                    color: /*active ? "blue" :*/ "transparent"
-                    border.color: /*active ? "blue" :*/ "transparent"
-                    border.width: 3
+                    color: "transparent"
+                    border.color: "transparent"
+                    border.width: 0
 
                     antialiasing: true
-
 
                     Image {
                         id: image
