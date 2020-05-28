@@ -160,7 +160,7 @@ Action::Ptr ActionJson::actionFromJson(const QJsonObject &json) const
 
     const auto type = static_cast<KnownAction>(json[Json.Action.Type].toInt());
     const auto scope = static_cast<Action::Scope>(json[Json.Action.Scope].toInt());
-    const Action::Id &id = Action::Id::fromString(json[Json.Action.Id].toString());
+    const Action::Id id = Action::Id(json[Json.Action.Id].toString());
     const auto app = json[Json.Action.App].toString();
     const auto title = json[Json.Action.Title].toString();
     const auto args = [&json]() {

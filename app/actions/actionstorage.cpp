@@ -184,7 +184,7 @@ Action::Ptr ActionStorage::createAction(KnownAction actionType, const QString &i
     QStringList args;
     bool forceShow = false;
     Action::MenuPlace menuPlace = Action::MenuPlace::Own;
-    const Action::Id actId = id.isEmpty() ? Action::Id::createUuid() : Action::Id::fromString(id);
+    const Action::Id &actId = id.isEmpty() ? Action::Id::createUuid() : Action::Id(id);
 
     switch (actionType) {
     case KnownAction::CheckStatus: {
