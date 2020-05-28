@@ -7,8 +7,8 @@ The general description of build process.
 I assume you already have the c++ build tools and git installed and the source code is cloned to your local file system. Or you do know how to perform that in used environment :)
 
 ```
-sudo apt install git build-essential
-mkdir ~/yangl
+sudo apt install git build-essential # may depend on your Linux distro
+mkdir ~/yangl # the actual dir name does not matter
 cd ~/yangl
 git clone https://github.com/sendevent/yangl.git .
 ```
