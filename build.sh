@@ -27,7 +27,7 @@ then
   exit 2
 fi
 
-make -j8
+make -j`nproc`
 
 if [ $? -ne 0 ]
 then

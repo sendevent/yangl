@@ -64,7 +64,7 @@ ServersListManager::Servers ServersListManager::queryList(const QStringList &arg
 {
     QString result;
 
-    const Action::Ptr &action = m_nordVpn->storate()->createUserAction(nullptr);
+    const Action::Ptr &action = m_nordVpn->storate()->createUserAction({});
     ActionResultViewer::unregisterAction(action.get());
     action->setTitle(tr("Servers list"));
     action->setForcedShow(false);

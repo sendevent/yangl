@@ -1,6 +1,6 @@
-import QtQuick 2.12
-import QtLocation 5.12
-import QtQuick.Controls 2.12
+import QtQuick 2.8
+import QtQuick.Controls 2.2
+import QtLocation 5.0
 
 Rectangle {
     id: mapView
@@ -52,12 +52,11 @@ Rectangle {
                     height:width
                     radius:width/2
 
-                    color: /*active ? "blue" :*/ "transparent"
-                    border.color: /*active ? "blue" :*/ "transparent"
-                    border.width: 3
+                    color: "transparent"
+                    border.color: "transparent"
+                    border.width: 0
 
                     antialiasing: true
-
 
                     Image {
                         id: image

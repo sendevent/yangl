@@ -25,7 +25,7 @@
 #include <QSettings>
 #include <QStandardPaths>
 
-SettingsManager *SettingsManager::m_instance = nullptr;
+SettingsManager *SettingsManager::m_instance = {};
 
 /*static*/ QString SettingsManager::dirPath()
 {

@@ -25,7 +25,7 @@
 
 /*static*/ const Action::Id tst_ActionJson::TestId = Action::Id("{057c11c0-de87-48c4-a98e-93471b4290ca}");
 
-/*static*/ const QString tst_ActionJson::TestJson =
+/*static*/ const QByteArray tst_ActionJson::TestJson =
         "{\n    \"custom\": {\n        \"{057c11c0-de87-48c4-a98e-93471b4290ca}\": {\n            \"anchor\": 0,\n     "
         "       \"app\": \"/usr/bin/ls\",\n            \"args\": [\n                \"-la\"\n            ],\n          "
         "  \"forcedDisplay\": false,\n            \"id\": \"{057c11c0-de87-48c4-a98e-93471b4290ca}\",\n            "
@@ -46,9 +46,9 @@ void tst_ActionJson::test_filePath()
 
 void tst_ActionJson::test_load()
 {
-    const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown, nullptr, TestId));
+    const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown, {}, TestId));
 
-    QByteArray inputString(TestJson.toUtf8());
+    QByteArray inputString(TestJson);
     QBuffer in(&inputString);
     in.open(QIODevice::ReadOnly);
 
@@ -72,7 +72,7 @@ void tst_ActionJson::test_load()
 
 void tst_ActionJson::test_save()
 {
-    const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown, nullptr, TestId));
+    const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown, {}, TestId));
     action->setApp("/usr/bin/ls");
     action->setArgs({ "-la" });
 

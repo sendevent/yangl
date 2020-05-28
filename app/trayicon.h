@@ -25,7 +25,7 @@ class TrayIcon : public QSystemTrayIcon
 {
     Q_OBJECT
 public:
-    TrayIcon(QObject *parent = nullptr);
+    TrayIcon(QObject *parent = {});
 
     void setMessageDuration(int durationSecs);
     static QIcon iconForState(const NordVpnInfo &state);
