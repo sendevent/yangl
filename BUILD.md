@@ -6,6 +6,13 @@ The general description of build process.
 
 I assume you already have the c++ build tools and git installed and the source code is cloned to your local file system. Or you do know how to perform that in used environment :)
 
+```
+sudo apt install git build-essential
+mkdir ~/yangl
+cd ~/yangl
+git clone https://github.com/sendevent/yangl.git .
+```
+
 ## Prerequisites
 ### Qt
 #### Version
@@ -21,7 +28,12 @@ While tested with 5.12, the primary development version for now is 5.15.
 Here's how to install these on Debian:
 
 ```
-$ sudo apt install qtbase5-dev qtdeclarative5-dev qtlocation5-dev qtpositioning5-dev
+sudo apt install qt5-default \
+                qtbase5-dev \
+                qtdeclarative5-dev \
+                qtquickcontrols2-5-dev \
+                qtlocation5-dev \
+                qtpositioning5-dev
 ```
 
 Please refer to your distro manual to get the related packages.
@@ -42,14 +54,14 @@ Open [yangl.pro](yangl.pro) and build it as a regular project.
 
 [build.sh](build.sh) performs the build process in the sub directory ./build (created automatically). On success, the directory would contain yangl executable:
 ```
-$ chmod +x ./build.sh && ./build.sh
+chmod +x ./build.sh && ./build.sh
 ```
 
 #### Manual steps
 
 ```
-$ mkdir ./build
-$ cd ./build
-$ qmake -r ../yangl.pro #or qmake-qt5, depending on your Linux distro
-$ make -j`nproc`
+mkdir ./build
+cd ./build
+qmake -r ../yangl.pro #or qmake-qt5, depending on your Linux distro
+make -j`nproc`
 ```
