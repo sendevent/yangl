@@ -70,15 +70,13 @@ private slots:
 protected:
     CLICaller *m_bus;
     ActionStorage *m_actions;
-    QQueue<Action::Ptr> m_calls;
-    Action::Ptr m_currAction;
+    Action::Ptr m_actCheck;
     QTimer *m_timer;
 
     NordVpnInfo m_state;
     void setState(const NordVpnInfo &state);
     void setStatus(NordVpnInfo::Status status);
 
-    void nextQuery();
     void updateState(const QString &from);
 
     friend class tst_StateChecker;
