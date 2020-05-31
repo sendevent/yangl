@@ -28,22 +28,28 @@
 
 /*static*/ const int StateChecker::DefaultIntervalMs = yangl::OneSecondMs;
 
-StateChecker::StateChecker(CLICaller *bus, ActionStorage *actions, int intervalMs, QObject *parent)
+StateChecker::StateChecker(CLICaller *bus, int intervalMs, QObject *parent)
     : QObject(parent)
     , m_bus(bus)
-    , m_actions(actions)
-    , m_actCheck(m_actions->action(KnownAction::CheckStatus))
+    , m_actCheck(nullptr)
     , m_timer(new QTimer(this))
     , m_state()
 {
     setInterval(intervalMs);
     connect(m_timer, &QTimer::timeout, this, &StateChecker::onTimeout);
-    connect(m_actCheck.get(), &Action::performed, this, &StateChecker::onQueryFinish, Qt::UniqueConnection);
 
     setStatus(NordVpnInfo::Status::Unknown);
 }
 
 StateChecker::~StateChecker() {}
+
+void StateChecker::setCheckAction(const Action::Ptr &action)
+{
+    if (m_actCheck != action) {
+        m_actCheck = action;
+        connect(m_actCheck.get(), &Action::performed, this, &StateChecker::onQueryFinish, Qt::UniqueConnection);
+    }
+}
 
 void StateChecker::setActive(bool active)
 {

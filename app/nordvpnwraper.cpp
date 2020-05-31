@@ -44,7 +44,7 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
     : QObject(parent)
     , m_bus(new CLICaller(this))
     , m_actions(new ActionStorage(this))
-    , m_checker(new StateChecker(m_bus, m_actions, AppSettings::Monitor.Interval->read().toInt(), this))
+    , m_checker(new StateChecker(m_bus, AppSettings::Monitor.Interval->read().toInt(), this))
     , m_trayIcon(new TrayIcon(this))
     , m_menuHolder(new MenuHolder(this))
     , m_pauseTimer(new QTimer(this))
@@ -90,6 +90,8 @@ void NordVpnWraper::start()
     loadSettings();
 
     initMenu();
+
+    m_checker->setCheckAction(m_actions->action(KnownAction::CheckStatus));
 
 #ifndef YANGL_NO_GEOCHART
     connect(m_menuHolder->getActShowMap(), &QAction::triggered, this, &NordVpnWraper::showMapView,
