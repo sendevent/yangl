@@ -35,7 +35,7 @@ AppPathEditor::AppPathEditor(QWidget *parent)
     hBox->addWidget(m_pathEdit);
     hBox->addWidget(m_openFileButton);
 
-    m_openFileButton->setText(tr("..."));
+    m_openFileButton->setText(tr("…"));
     connect(m_pathEdit, &QLineEdit::textChanged, this, &AppPathEditor::onAppPathChanged);
     connect(m_openFileButton, &QToolButton::clicked, this, &AppPathEditor::onOpenFileClicked);
 }

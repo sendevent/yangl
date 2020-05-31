@@ -97,6 +97,7 @@ public:
     QString key() const;
 
 signals:
+    void performing(const Action::Id &id, const QString &app, const QStringList &args);
     void performed(const Action::Id &id, const QString &result, bool ok, const QString &description);
     void changed();
 

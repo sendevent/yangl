@@ -55,6 +55,8 @@ QString CLICall::run()
             },
             Qt::DirectConnection);
 
+    emit starting(m_appPath, m_params);
+
     proc.start(m_appPath, m_params, QIODevice::ReadOnly);
 
     if (!proc.waitForStarted(m_timeout))
