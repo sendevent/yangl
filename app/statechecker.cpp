@@ -32,19 +32,18 @@ StateChecker::StateChecker(CLICaller *bus, ActionStorage *actions, int intervalM
     : QObject(parent)
     , m_bus(bus)
     , m_actions(actions)
-    , m_currAction(nullptr)
+    , m_actCheck(m_actions->action(KnownAction::CheckStatus))
     , m_timer(new QTimer(this))
     , m_state()
 {
     setInterval(intervalMs);
     connect(m_timer, &QTimer::timeout, this, &StateChecker::onTimeout);
+    connect(m_actCheck.get(), &Action::performed, this, &StateChecker::onQueryFinish, Qt::UniqueConnection);
+
     setStatus(NordVpnInfo::Status::Unknown);
 }
 
-StateChecker::~StateChecker()
-{
-    m_calls.clear();
-}
+StateChecker::~StateChecker() {}
 
 void StateChecker::setActive(bool active)
 {
@@ -69,11 +68,13 @@ bool StateChecker::isActive() const
 
 void StateChecker::setInterval(int msecs)
 {
+    const bool wasActive(isActive());
+
+    m_timer->stop();
     m_timer->setInterval(msecs);
-    if (isActive()) {
-        m_timer->stop();
+
+    if (wasActive)
         m_timer->start();
-    }
 }
 
 int StateChecker::interval() const
@@ -83,33 +84,13 @@ int StateChecker::interval() const
 
 void StateChecker::check()
 {
-    if (auto statusAct = m_actions->action(KnownAction::CheckStatus)) {
-        connect(statusAct.get(), &Action::performed, this, &StateChecker::onQueryFinish, Qt::UniqueConnection);
-        m_calls.enqueue(statusAct);
-        nextQuery();
-    }
+    m_bus->performAction(m_actCheck.get());
 }
 
-void StateChecker::onQueryFinish(const Action::Id & /*id*/, const QString &result, bool ok, const QString & /*info*/)
+void StateChecker::onQueryFinish(const Action::Id & /*id*/, const QString &result, bool /*ok*/,
+                                 const QString & /*info*/)
 {
-    if (ok)
-        QtConcurrent::run(this, &StateChecker::updateState, result);
-
-    m_currAction.clear();
-    nextQuery();
-}
-
-void StateChecker::nextQuery()
-{
-    if (m_currAction)
-        return;
-
-    if (m_calls.isEmpty())
-        return;
-
-    m_currAction = m_calls.dequeue();
-
-    m_bus->performAction(m_currAction.get());
+    QtConcurrent::run(this, &StateChecker::updateState, result);
 }
 
 void StateChecker::onTimeout()
