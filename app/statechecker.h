@@ -24,7 +24,6 @@
 #include <QQueue>
 
 class CLICaller;
-class ActionStorage;
 class QTimer;
 class StateChecker : public QObject
 {
@@ -46,9 +45,10 @@ public:
 #else
     using Ptr = QSharedPointer<StateChecker>;
 #endif
-    explicit StateChecker(CLICaller *bus, ActionStorage *actions, int intervalMs, QObject *parent = {});
+    explicit StateChecker(CLICaller *bus, int intervalMs, QObject *parent = {});
     ~StateChecker() override;
 
+    void setCheckAction(const Action::Ptr &action);
     void check();
 
     bool isActive() const;
@@ -69,7 +69,6 @@ private slots:
 
 protected:
     CLICaller *m_bus;
-    ActionStorage *m_actions;
     Action::Ptr m_actCheck;
     QTimer *m_timer;
 
