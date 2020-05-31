@@ -60,6 +60,7 @@ ActionResultViewer::ActionResultViewer()
     const Action::Id &id = action->id();
     if (!instance()->m_actions.contains(id)) {
         instance()->m_actions.insert(id, action);
+        connect(action, &Action::performing, instance(), &ActionResultViewer::onActionStarted, Qt::UniqueConnection);
         connect(action, &Action::performed, instance(), &ActionResultViewer::onActionPerformed, Qt::UniqueConnection);
     }
 }
@@ -71,6 +72,17 @@ ActionResultViewer::ActionResultViewer()
 
     disconnect(action, &Action::performed, instance(), &ActionResultViewer::onActionPerformed);
     instance()->m_actions.remove(action->id());
+}
+
+void ActionResultViewer::onActionStarted(const Action::Id &id, const QString & /*app*/, const QStringList & /*args*/)
+{
+    if (auto action = m_actions.value(id)) {
+        if (auto display = displayForAction(action)) {
+            if (display->toPlainText().count('\n') >= BrowserMaxLines)
+                display->clear();
+            display->append(tr("%1 <b>Calling</b>…").arg(yangl::now()));
+        }
+    }
 }
 
 void ActionResultViewer::onActionPerformed(const Action::Id &id, const QString & /*result*/, bool ok,
@@ -101,14 +113,16 @@ QTextBrowser *ActionResultViewer::displayForAction(Action *action)
         return {};
 
     const Action::Id &id = action->id();
-    const QString &title = action->title();
 
     if (!m_browsers.contains(id)) {
+        const QString &title = action->title();
         QTextBrowser *display = new QTextBrowser(this);
         display->setAttribute(Qt::WA_DeleteOnClose);
         connect(display, &QObject::destroyed, this, [this, id]() { m_browsers.remove(id); });
         m_browsers.insert(id, display);
-        m_tabWidget->addTab(display, title);
+        const int tabId = m_tabWidget->addTab(display, title);
+        m_tabWidget->setTabToolTip(tabId,
+                                   QString("%1 %2").arg(action->app(), action->args().join(QStringLiteral(" "))));
     }
 
     return m_browsers.value(id, {});

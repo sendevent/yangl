@@ -34,6 +34,7 @@ public:
     static void unregisterAction(Action *action);
 
 private slots:
+    void onActionStarted(const Action::Id &id, const QString &app, const QStringList &args);
     void onActionPerformed(const Action::Id &id, const QString &result, bool ok, const QString &info);
 
 private:

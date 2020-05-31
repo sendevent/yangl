@@ -147,6 +147,8 @@ CLICall *Action::createRequest()
 
     auto call = new CLICall(app(), args(), timeout(), this);
     this->QObject::connect(call, &CLICall::ready, this, &Action::onResult);
+    this->QObject::connect(call, &CLICall::starting, this,
+                           [this](const QString &app, const QStringList &args) { emit performing(id(), app, args); });
 
     return call;
 }
@@ -177,7 +179,7 @@ void Action::onResult(const QString &result)
         call->deleteLater();
     }
 
-    QString info = QString("%1 %2 %3:<br>").arg(yangl::now(), app(), args().join(QChar(' ')));
+    QString info = QString("%1 ").arg(yangl::now());
     if (!result.isEmpty())
         info.append(QString("<b>Result:</b><br>%1<br>").arg(QString(result).replace("\n", "<br>")));
     if (exitCode)

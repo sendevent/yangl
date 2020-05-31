@@ -41,6 +41,7 @@ public:
     bool success() const;
 
 signals:
+    void starting(const QString &myApp, const QStringList &myArgs) const;
     void ready(const QString &result) const;
 
 protected:
