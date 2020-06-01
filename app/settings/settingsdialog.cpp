@@ -53,6 +53,7 @@ Dialog::Dialog(ActionStorage *actStorage, QWidget *parent)
 
     ui->tabNordVpn->setActions(m_actStorage, Action::Scope::Builtin);
     ui->tabCustom->setActions(m_actStorage, Action::Scope::User);
+    ui->spinBoxLogLines->setValue(AppSettings::Monitor.LogLinesLimit->read().toInt());
 
     restoreGeometry(AppSettings::Monitor.SettingsDialog->read().toByteArray());
 }
@@ -94,6 +95,7 @@ bool Dialog::saveMonitorSettings()
     AppSettings::Monitor.Active->write(ui->checkBoxAutoActive->isChecked());
     AppSettings::Monitor.IgnoreFirstConnected->write(ui->cbIgnoreFirstConnected->isChecked());
     AppSettings::Monitor.MessagePlainText->write(ui->checkBoxMessagePlainText->isChecked());
+    AppSettings::Monitor.LogLinesLimit->write(ui->spinBoxLogLines->value());
 
     return true;
 }

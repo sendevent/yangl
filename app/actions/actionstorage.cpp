@@ -19,6 +19,7 @@
 
 #include "actionjson.h"
 #include "appsettings.h"
+#include "clicall.h"
 #include "common.h"
 
 #include <QFileInfo>
@@ -111,20 +112,12 @@ void ActionStorage::save(QIODevice(*to))
 
 Action::Ptr ActionStorage::createUserAction(QObject *parent)
 {
-    Action::Ptr action(new Action(Action::Scope::User, KnownAction::Unknown, parent));
-    action->setApp(AppSettings::Monitor.NVPNPath->read().toString());
-    action->setArgs({});
-    action->setForcedShow(true);
-    action->setAnchor(Action::MenuPlace::Own);
-
-    return action;
+    return createAction(Action::Scope::User, KnownAction::Unknown, {}, AppSettings::Monitor.NVPNPath->read().toString(),
+                        {}, {}, true, Action::MenuPlace::Own, CLICall::DefaultTimeoutMSecs, parent);
 }
 
 void ActionStorage::initActions(bool updateFromJson)
 {
-    m_builtinActions.clear();
-    m_userActions.clear();
-
     if (!updateFromJson) {
         for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i) {
             if (const Action::Ptr &action = createAction(static_cast<KnownAction>(i))) {
@@ -142,21 +135,27 @@ void ActionStorage::initActions(bool updateFromJson)
 
 void ActionStorage::loadBuiltinActions()
 {
-    QVector<Action::Ptr> builtinActionsJson;
-    QVector<QString> builtinActionIds = m_json->builtinActionIds();
-    for (const auto &id : builtinActionIds)
-        builtinActionsJson.append(m_json->action(Action::Scope::Builtin, id));
+    QMap<KnownAction, Action::Ptr> jsonBuiltinActionsById;
+    const QVector<QString> &jsonBuiltinActionIds = m_json->builtinActionIds();
+    for (const auto &id : jsonBuiltinActionIds)
+        if (const auto &action = m_json->action(Action::Scope::Builtin, id))
+            jsonBuiltinActionsById.insert(action->type(), action);
 
-    for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i)
-        if (const Action::Ptr action = createAction(static_cast<KnownAction>(i)))
-            m_builtinActions[action->type()] = action;
+    for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i) {
+        const KnownAction actionType = static_cast<KnownAction>(i);
+        if (const auto &action = jsonBuiltinActionsById.value(actionType, {})) {
+            m_builtinActions[actionType] = action;
+            jsonBuiltinActionsById.remove(actionType);
+        } else {
+            m_builtinActions[actionType] = createAction(actionType);
+        }
+    }
 
-    while (!builtinActionsJson.isEmpty()) {
-        Action::Ptr jsonAction = builtinActionsJson.takeLast();
-        if (m_builtinActions.contains(jsonAction->type()))
-            m_builtinActions[jsonAction->type()].swap(jsonAction);
-        else
-            m_json->popAction(jsonAction.get());
+    while (!jsonBuiltinActionsById.isEmpty()) {
+        if (const auto &action = jsonBuiltinActionsById.first()) {
+            m_json->popAction(action.get());
+            jsonBuiltinActionsById.remove(action->type());
+        }
     }
 
     for (const auto &action : m_builtinActions)
@@ -165,14 +164,10 @@ void ActionStorage::loadBuiltinActions()
 
 void ActionStorage::loadUserActions()
 {
-    for (const QString &id : m_json->customActionIds()) {
-        if (!id.isEmpty()) {
-            if (const Action::Ptr &action = createAction(Unknown, id)) {
-                m_json->updateAction(action.get());
+    for (const QString &id : m_json->customActionIds())
+        if (!id.isEmpty())
+            if (const Action::Ptr &action = m_json->action(Action::Scope::User, id))
                 m_userActions.insert(action->id(), action);
-            }
-        }
-    }
 }
 
 Action::Ptr ActionStorage::createAction(KnownAction actionType, const QString &id)
@@ -292,14 +287,24 @@ Action::Ptr ActionStorage::createAction(KnownAction actionType, const QString &i
         break;
     }
 
-    return createAction(scope, actionType, actId, appPath, title, args, forceShow, menuPlace, 0);
+    return createAction(scope, actionType, actId, appPath, title, args, forceShow, menuPlace,
+                        CLICall::DefaultTimeoutMSecs, this);
 }
 
 Action::Ptr ActionStorage::createAction(Action::Scope scope, KnownAction type, const Action::Id &id,
                                         const QString &appPath, const QString &title, const QStringList &args,
-                                        bool alwaysShowResult, Action::MenuPlace anchor, int timeout)
+                                        bool alwaysShowResult, Action::MenuPlace anchor, int timeout, QObject *parent)
 {
-    Action::Ptr action(new Action(scope, type, this, id));
+    Action::Ptr action;
+
+    if (scope == Action::Scope::Builtin)
+        action = m_builtinActions.value(type, {});
+    else if (scope == Action::Scope::User && !id.isNull())
+        action = m_userActions.value(id, {});
+
+    if (!action)
+        action = Action::Ptr(new Action(scope, type, parent, id));
+
     if (!appPath.isEmpty())
         action->setApp(appPath);
     if (!title.isEmpty())
@@ -326,7 +331,7 @@ bool ActionStorage::updateBuiltinActions(const QList<Action::Ptr> &actions)
     for (auto action : actions) {
         const int actType = action->type();
         if (m_builtinActions.contains(actType))
-            m_builtinActions[actType].swap(action);
+            m_builtinActions[actType] = action;
         else
             m_builtinActions.insert(actType, action);
         savedActions.append(actType);
@@ -345,7 +350,7 @@ bool ActionStorage::updateUserActions(const QList<Action::Ptr> &actions)
     for (auto action : actions) {
         const Action::Id &actId = action->id();
         if (m_userActions.contains(actId)) {
-            m_userActions[actId].swap(action);
+            m_userActions[actId] = action;
         } else {
             m_userActions.insert(actId, action);
         }

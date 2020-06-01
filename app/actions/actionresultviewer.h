@@ -18,10 +18,10 @@
 #pragma once
 
 #include "action.h"
+#include "clicallresultview.h"
 
 #include <QMap>
 #include <QPointer>
-#include <QTextBrowser>
 #include <QWidget>
 
 class QTabWidget;
@@ -30,8 +30,11 @@ class ActionResultViewer : public QWidget
     Q_OBJECT
 public:
     static ActionResultViewer *instance();
+
     static void registerAction(Action *action);
     static void unregisterAction(Action *action);
+
+    static void updateLinesLimit();
 
 private slots:
     void onActionStarted(const Action::Id &id, const QString &app, const QStringList &args);
@@ -39,11 +42,12 @@ private slots:
 
 private:
     static ActionResultViewer *m_instance;
+    static int m_linesLimit;
 
     explicit ActionResultViewer();
     QTabWidget *m_tabWidget;
 
     QMap<Action::Id, QPointer<Action>> m_actions;
-    QMap<Action::Id, QPointer<QTextBrowser>> m_browsers;
-    QTextBrowser *displayForAction(Action *action);
+    QMap<Action::Id, QPointer<CLICallResultView>> m_browsers;
+    CLICallResultView *displayForAction(Action *action);
 };
