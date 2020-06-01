@@ -17,29 +17,26 @@
 
 #pragma once
 
-#include <QTextBrowser>
+#include <QDialog>
+#include <QPointer>
 
-class QAction;
-class CLICallResultView : public QTextBrowser
+namespace Ui {
+class AboutDialog;
+}
+
+class AboutDialog : public QDialog
 {
     Q_OBJECT
+
 public:
-    static constexpr int MaxBlocksCountDefault = 1000;
+    using Ptr = QPointer<AboutDialog>;
 
-    CLICallResultView(int maxBlcockCount = CLICallResultView::MaxBlocksCountDefault, QWidget *parent = nullptr);
+    ~AboutDialog();
 
-    int blocksLimit() const;
-    void setBlocksLimit(int limit);
-
-protected:
-    virtual void contextMenuEvent(QContextMenuEvent *e) override;
-
-protected slots:
-    void validateTextLength();
+    static void impressTheUser(QWidget *parent);
 
 private:
-    int m_blocksLimit;
-    QAction *m_actClear;
-
-    int newLinesCount() const;
+    static Ptr m_instance;
+    Ui::AboutDialog *ui;
+    explicit AboutDialog(QWidget *parent = nullptr);
 };

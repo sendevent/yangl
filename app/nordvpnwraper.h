@@ -44,6 +44,7 @@ private slots:
     void showMapView();
     void showSettingsEditor();
     void showLog();
+    void showAbout();
     void performStatusCheck();
 
     void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);

@@ -23,6 +23,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setApplicationName(QObject::tr("yangl"));
     a.setQuitOnLastWindowClosed(false);
 
     qRegisterMetaType<QProcess::ExitStatus>();

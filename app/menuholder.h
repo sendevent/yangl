@@ -35,6 +35,7 @@ public:
     QAction *getActShowSettings() const;
     QAction *getActShowMap() const;
     QAction *getActShowLog() const;
+    QAction *getActAbout() const;
     QAction *getActQuit() const;
 
 signals:
@@ -51,6 +52,7 @@ private:
     QAction *m_actRun;
     std::unique_ptr<QMenu> m_menuNordVpn;
     std::unique_ptr<QMenu> m_menuUser;
+    QAction *m_actAbout;
     QAction *m_actSeparatorExit;
     QAction *m_actQuit;
 
