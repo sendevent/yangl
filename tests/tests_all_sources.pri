@@ -7,6 +7,7 @@ INCLUDEPATH += $$APP_PRO_ROOT\
 
 SOURCES += \
     $$APP_PRO_ROOT/actions/actionresultviewer.cpp \
+    $$APP_PRO_ROOT/actions/clicallresultview.cpp \
     $$APP_PRO_ROOT/actions/action.cpp \
     $$APP_PRO_ROOT/actions/actionjson.cpp \
     $$APP_PRO_ROOT/actions/actionstorage.cpp \
@@ -27,6 +28,7 @@ SOURCES += \
 
 HEADERS += $$APP_PRO_ROOT\
     $$APP_PRO_ROOT/actions/actionresultviewer.h \
+    $$APP_PRO_ROOT/actions/clicallresultview.h \
     $$APP_PRO_ROOT/actions/action.h \
     $$APP_PRO_ROOT/actions/actionjson.h \
     $$APP_PRO_ROOT/actions/actionstorage.h \

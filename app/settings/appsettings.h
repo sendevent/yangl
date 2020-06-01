@@ -64,6 +64,7 @@ public:
     const AppSetting *IgnoreFirstConnected = Options[4];
     const AppSetting *SettingsDialog = Options[5];
     const AppSetting *MessagePlainText = Options[6];
+    const AppSetting *LogLinesLimit = Options[7];
 
 private:
     GroupMonitor(const GroupMonitor &) = delete;

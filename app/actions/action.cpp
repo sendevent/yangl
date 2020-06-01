@@ -147,8 +147,7 @@ CLICall *Action::createRequest()
 
     auto call = new CLICall(app(), args(), timeout(), this);
     this->QObject::connect(call, &CLICall::ready, this, &Action::onResult);
-    this->QObject::connect(call, &CLICall::starting, this,
-                           [this](const QString &app, const QStringList &args) { emit performing(id(), app, args); });
+    this->QObject::connect(call, &CLICall::starting, this, &Action::onStart);
 
     return call;
 }
@@ -163,6 +162,11 @@ CLICall *Action::createRequest()
         return false;
 
     return info.isExecutable();
+}
+
+void Action::onStart(const QString &app, const QStringList &args)
+{
+    emit performing(id(), app, args);
 }
 
 void Action::onResult(const QString &result)

@@ -106,6 +106,8 @@ void NordVpnWraper::start()
     connect(m_menuHolder->getActQuit(), &QAction::triggered, qApp, &QApplication::quit, Qt::UniqueConnection);
 
     m_menuHolder->getActRun()->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());
+
+    ActionResultViewer::instance()->updateLinesLimit();
 }
 
 void NordVpnWraper::loadSettings()

@@ -46,7 +46,7 @@ public:
     Action::Ptr createUserAction(QObject *parent = {});
     Action::Ptr createAction(Action::Scope scope, KnownAction type, const Action::Id &id, const QString &appPath,
                              const QString &title, const QStringList &args, bool alwaysShowResult,
-                             Action::MenuPlace anchor, int timeout);
+                             Action::MenuPlace anchor, int timeout, QObject *parent);
 
     bool updateActions(const QList<Action::Ptr> &actions, Action::Scope scope);
 

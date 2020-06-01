@@ -17,6 +17,7 @@
 
 #include "appsettings.h"
 
+#include "clicallresultview.h"
 #include "settingsmanager.h"
 #include "statechecker.h"
 
@@ -63,6 +64,8 @@ GroupMonitor::GroupMonitor()
                            new AppSetting(QString("%1/IgnoreFirstConnected").arg(localName()), true),
                            new AppSetting(QString("%1/EditorGeometry").arg(localName())),
                            new AppSetting(QString("%1/MsgPlainText").arg(localName()), false),
+                           new AppSetting(QString("%1/LogLinesLimit").arg(localName()),
+                                          CLICallResultView::MaxBlocksCountDefault),
                    },
                    {})
 {
