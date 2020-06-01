@@ -18,10 +18,10 @@
 #pragma once
 
 #include "action.h"
+#include "clicallresultview.h"
 
 #include <QMap>
 #include <QPointer>
-#include <QTextBrowser>
 #include <QWidget>
 
 class QTabWidget;
@@ -44,6 +44,6 @@ private:
     QTabWidget *m_tabWidget;
 
     QMap<Action::Id, QPointer<Action>> m_actions;
-    QMap<Action::Id, QPointer<QTextBrowser>> m_browsers;
-    QTextBrowser *displayForAction(Action *action);
+    QMap<Action::Id, QPointer<CLICallResultView>> m_browsers;
+    CLICallResultView *displayForAction(Action *action);
 };

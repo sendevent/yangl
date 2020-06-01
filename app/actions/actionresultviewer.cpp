@@ -76,13 +76,9 @@ ActionResultViewer::ActionResultViewer()
 
 void ActionResultViewer::onActionStarted(const Action::Id &id, const QString & /*app*/, const QStringList & /*args*/)
 {
-    if (auto action = m_actions.value(id)) {
-        if (auto display = displayForAction(action)) {
-            if (display->toPlainText().count('\n') >= BrowserMaxLines)
-                display->clear();
+    if (auto action = m_actions.value(id))
+        if (auto display = displayForAction(action))
             display->append(tr("%1 <b>Calling</b>…").arg(yangl::now()));
-        }
-    }
 }
 
 void ActionResultViewer::onActionPerformed(const Action::Id &id, const QString & /*result*/, bool ok,
@@ -91,11 +87,8 @@ void ActionResultViewer::onActionPerformed(const Action::Id &id, const QString &
     if (auto action = m_actions.value(id)) {
         const bool forceShow = action->forcedShow();
 
-        if (auto display = displayForAction(action)) {
-            if (display->toPlainText().count('\n') >= BrowserMaxLines)
-                display->clear();
+        if (auto display = displayForAction(action))
             display->append(info);
-        }
 
         if (forceShow || !ok) {
             if (!isVisible())
@@ -107,7 +100,7 @@ void ActionResultViewer::onActionPerformed(const Action::Id &id, const QString &
     }
 }
 
-QTextBrowser *ActionResultViewer::displayForAction(Action *action)
+CLICallResultView *ActionResultViewer::displayForAction(Action *action)
 {
     if (!action)
         return {};
@@ -116,7 +109,7 @@ QTextBrowser *ActionResultViewer::displayForAction(Action *action)
 
     if (!m_browsers.contains(id)) {
         const QString &title = action->title();
-        QTextBrowser *display = new QTextBrowser(this);
+        CLICallResultView *display = new CLICallResultView(CLICallResultView::MaxBlocksCountDefault, this);
         display->setAttribute(Qt::WA_DeleteOnClose);
         connect(display, &QObject::destroyed, this, [this, id]() { m_browsers.remove(id); });
         m_browsers.insert(id, display);
