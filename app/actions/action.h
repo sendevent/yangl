@@ -109,6 +109,7 @@ signals:
     void anchorChanged(Action::MenuPlace place) const;
 
 protected slots:
+    virtual void onStart(const QString &app, const QStringList &args);
     virtual void onResult(const QString &result);
 
 protected:
