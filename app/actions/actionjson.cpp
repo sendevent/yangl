@@ -174,7 +174,7 @@ Action::Ptr ActionJson::actionFromJson(const QJsonObject &json) const
     const auto anchor = static_cast<Action::MenuPlace>(json[Json.Action.Anchor].toInt());
     const auto timeout = json[Json.Action.Timeout].toInt() * yangl::OneSecondMs;
 
-    return m_storage->createAction(scope, type, id, app, title, args, alwaysShowResult, anchor, timeout);
+    return m_storage->createAction(scope, type, id, app, title, args, alwaysShowResult, anchor, timeout, m_storage);
 }
 
 QJsonObject ActionJson::actionToJson(const Action *action) const

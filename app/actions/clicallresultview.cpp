@@ -45,16 +45,34 @@ void CLICallResultView::contextMenuEvent(QContextMenuEvent *e)
     }
 }
 
+int CLICallResultView::newLinesCount() const
+{
+    return document()->toPlainText().count('\n');
+}
+
 void CLICallResultView::validateTextLength()
 {
-    if (document()->lineCount() > m_blocksLimit) {
-        QTextBlock begin = document()->findBlockByLineNumber(0);
+    if (m_blocksLimit && newLinesCount() > m_blocksLimit) {
+        QTextBlock begin = document()->begin();
         if (begin.isValid()) {
             QTextCursor cursor(begin);
-            cursor.select(QTextCursor::BlockUnderCursor);
+            cursor.select(QTextCursor::LineUnderCursor);
             cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
             cursor.removeSelectedText();
             setTextCursor(cursor);
         }
+    }
+}
+
+int CLICallResultView::blocksLimit() const
+{
+    return m_blocksLimit;
+}
+
+void CLICallResultView::setBlocksLimit(int limit)
+{
+    if (limit != m_blocksLimit) {
+        m_blocksLimit = limit;
+        validateTextLength();
     }
 }

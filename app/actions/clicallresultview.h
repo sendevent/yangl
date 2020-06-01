@@ -28,6 +28,9 @@ public:
 
     CLICallResultView(int maxBlcockCount = CLICallResultView::MaxBlocksCountDefault, QWidget *parent = nullptr);
 
+    int blocksLimit() const;
+    void setBlocksLimit(int limit);
+
 protected:
     virtual void contextMenuEvent(QContextMenuEvent *e) override;
 
@@ -37,4 +40,6 @@ protected slots:
 private:
     int m_blocksLimit;
     QAction *m_actClear;
+
+    int newLinesCount() const;
 };
