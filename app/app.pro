@@ -24,6 +24,7 @@ SOURCES += \
     actions/actionjson.cpp \
     actions/actionresultviewer.cpp \
     actions/actionstorage.cpp \
+    actions/clicallresultview.cpp \
     cli/clicall.cpp \
     cli/clicaller.cpp \
     main.cpp \
@@ -45,6 +46,7 @@ HEADERS += \
     actions/actionresultviewer.h \
     actions/actionstorage.h \
     actions/actiontypes.h \
+    actions/clicallresultview.h \
     cli/clicall.h \
     cli/clicaller.h \
     common.h \
