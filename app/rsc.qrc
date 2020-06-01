@@ -11,4 +11,9 @@
     <qresource prefix="/qml">
         <file>geo/qml/MapView.qml</file>
     </qresource>
+    <qresource prefix="/about">
+        <file>resources/about/license.txt</file>
+        <file>resources/about/nordvpn.html</file>
+        <file>resources/about/yangl.html</file>
+    </qresource>
 </RCC>

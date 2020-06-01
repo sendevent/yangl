@@ -16,3 +16,5 @@ unix {
 }
     win32:QMAKE_POST_LINK=$${TARGET}.exe
 }
+
+include($$APP_PRO_ROOT/versiongen.pri)

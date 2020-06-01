@@ -28,6 +28,7 @@ MenuHolder::MenuHolder(QObject *parent)
     , m_actRun(nullptr)
     , m_menuNordVpn(new QMenu(tr("NordVPN")))
     , m_menuUser(new QMenu(tr("Extra")))
+    , m_actAbout(nullptr)
     , m_actSeparatorExit(nullptr)
     , m_actQuit(nullptr)
 {
@@ -51,6 +52,8 @@ QMenu *MenuHolder::createMenu(const QList<Action::Ptr> &actions)
     m_menuMonitor->addMenu(m_menuNordVpn.get());
     m_menuMonitor->addMenu(m_menuUser.get());
     m_menuMonitor->addSeparator();
+
+    m_actAbout = m_menuMonitor->addAction(tr("About"));
 
     m_actSeparatorExit = m_menuMonitor->addSeparator();
     m_actQuit = m_menuMonitor->addAction(tr("&Quit"));
@@ -78,6 +81,11 @@ QAction *MenuHolder::getActShowMap() const
 QAction *MenuHolder::getActShowLog() const
 {
     return m_actLog;
+}
+
+QAction *MenuHolder::getActAbout() const
+{
+    return m_actAbout;
 }
 
 QAction *MenuHolder::getActQuit() const
