@@ -1,3 +1,5 @@
+include(versiongen.pri)
+
 QT       += core gui concurrent
 TARGET = yangl
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -20,6 +22,7 @@ INCLUDEPATH += \
     actions
 
 SOURCES += \
+    aboutdialog.cpp \
     actions/action.cpp \
     actions/actionjson.cpp \
     actions/actionresultviewer.cpp \
@@ -41,6 +44,7 @@ SOURCES += \
     trayicon.cpp
 
 HEADERS += \
+    aboutdialog.h \
     actions/action.h \
     actions/actionjson.h \
     actions/actionresultviewer.h \
@@ -63,6 +67,7 @@ HEADERS += \
     trayicon.h
 
 FORMS += \
+    aboutdialog.ui \
     settings/actioneditor.ui \
     settings/actionstab.ui \
     settings/settingsdialog.ui

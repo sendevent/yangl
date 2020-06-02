@@ -23,7 +23,8 @@ SOURCES += \
     $$APP_PRO_ROOT/settings/settingsmanager.cpp \
     $$APP_PRO_ROOT/statechecker.cpp \
     $$APP_PRO_ROOT/nordvpninfo.cpp \
-    $$APP_PRO_ROOT/trayicon.cpp
+    $$APP_PRO_ROOT/trayicon.cpp \
+    $$APP_PRO_ROOT/aboutdialog.cpp
 
 
 HEADERS += $$APP_PRO_ROOT\
@@ -45,13 +46,15 @@ HEADERS += $$APP_PRO_ROOT\
     $$APP_PRO_ROOT/settings/settingsmanager.h \
     $$APP_PRO_ROOT/statechecker.h \
     $$APP_PRO_ROOT/nordvpninfo.h \
-    $$APP_PRO_ROOT/trayicon.h
+    $$APP_PRO_ROOT/trayicon.h \
+    $$APP_PRO_ROOT/aboutdialog.h
 
 
 FORMS += \
     $$APP_PRO_ROOT/settings/actioneditor.ui \
     $$APP_PRO_ROOT/settings/actionstab.ui \
-    $$APP_PRO_ROOT/settings/settingsdialog.ui
+    $$APP_PRO_ROOT/settings/settingsdialog.ui \
+    $$APP_PRO_ROOT/aboutdialog.ui
 
 RESOURCES += \
     $$APP_PRO_ROOT/rsc.qrc
