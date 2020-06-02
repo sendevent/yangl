@@ -23,6 +23,7 @@
 
 #include <QDateTime>
 #include <QFile>
+#include <QPushButton>
 #include <QTextBrowser>
 #include <QVBoxLayout>
 
@@ -101,4 +102,10 @@ void AboutDialog::createTab(const QString &file)
         display->setPlainText(content);
     else
         display->setHtml(content);
+
+    if (file.startsWith(QStringLiteral("Qt."))) {
+        QPushButton *btnAboutQt = new QPushButton(tr("About Qt"), tab);
+        connect(btnAboutQt, &QPushButton::clicked, qApp, &QApplication::aboutQt);
+        vBox->addWidget(btnAboutQt);
+    }
 }
