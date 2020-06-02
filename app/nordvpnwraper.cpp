@@ -1,12 +1,12 @@
 /*
    Copyright (C) 2020 Denis Gofman - <sendevent@gmail.com>
 
-   This library is free software; you can redistribute it and/or
+   This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
    License as published by the Free Software Foundation; either
-   version 2 of the License, or (at your option) any later version.
+   version 3 of the License, or (at your option) any later version.
 
-   This library is distributed in the hope that it will be useful,
+   This application is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    Library General Public License for more details.
@@ -28,6 +28,7 @@
 #include "serverschartview.h"
 #endif // YANGL_NO_GEOCHART
 
+#include "aboutdialog.h"
 #include "settingsdialog.h"
 #include "statechecker.h"
 #include "trayicon.h"
@@ -102,6 +103,8 @@ void NordVpnWraper::start()
             Qt::UniqueConnection);
     connect(m_menuHolder->getActShowLog(), &QAction::triggered, this, &NordVpnWraper::showLog, Qt::UniqueConnection);
     connect(m_menuHolder->getActRun(), &QAction::toggled, m_checker, &StateChecker::setActive, Qt::UniqueConnection);
+
+    connect(m_menuHolder->getActAbout(), &QAction::triggered, this, &NordVpnWraper::showAbout, Qt::UniqueConnection);
 
     connect(m_menuHolder->getActQuit(), &QAction::triggered, qApp, &QApplication::quit, Qt::UniqueConnection);
 
@@ -371,4 +374,9 @@ void NordVpnWraper::showMapView()
         m_mapView->setAttribute(Qt::WA_DeleteOnClose);
         m_mapView->show();
     }
+}
+
+void NordVpnWraper::showAbout()
+{
+    AboutDialog::impressTheUser(nullptr);
 }

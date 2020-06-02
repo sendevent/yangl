@@ -17,31 +17,29 @@
 
 #pragma once
 
-#include "tst_action.h"
+#include <QDialog>
+#include <QPointer>
 
-#include <QObject>
+namespace Ui {
+class AboutDialog;
+}
 
-class ActionStorage;
-class tst_ActionStorage : public QObject
+class AboutDialog : public QDialog
 {
     Q_OBJECT
+
 public:
-    explicit tst_ActionStorage(QObject *parent = {});
+    using Ptr = QPointer<AboutDialog>;
+
+    ~AboutDialog();
+
+    static void impressTheUser(QWidget *parent);
 
 private:
-    QList<Action::Ptr> populateUserActions(ActionStorage *storage, int count);
+    static Ptr m_instance;
+    Ui::AboutDialog *ui;
+    explicit AboutDialog(QWidget *parent = nullptr);
 
-private slots:
-    void init();
-    void cleanup();
-
-    void test_builtinActions();
-    void test_userActions();
-    void test_allActions();
-    void test_actionBuiltin();
-    void test_actionUser();
-    void test_saveAndLoad();
-    void test_createUserAction();
-    void test_updateActionsBuiltin();
-    void test_updateActionsUser();
+    QString readResourceFile(const QString &path) const;
+    void createTab(const QString &title);
 };

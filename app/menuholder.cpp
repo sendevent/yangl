@@ -1,12 +1,12 @@
 /*
    Copyright (C) 2020 Denis Gofman - <sendevent@gmail.com>
 
-   This library is free software; you can redistribute it and/or
+   This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
    License as published by the Free Software Foundation; either
-   version 2 of the License, or (at your option) any later version.
+   version 3 of the License, or (at your option) any later version.
 
-   This library is distributed in the hope that it will be useful,
+   This application is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    Library General Public License for more details.
@@ -28,6 +28,7 @@ MenuHolder::MenuHolder(QObject *parent)
     , m_actRun(nullptr)
     , m_menuNordVpn(new QMenu(tr("NordVPN")))
     , m_menuUser(new QMenu(tr("Extra")))
+    , m_actAbout(nullptr)
     , m_actSeparatorExit(nullptr)
     , m_actQuit(nullptr)
 {
@@ -51,6 +52,8 @@ QMenu *MenuHolder::createMenu(const QList<Action::Ptr> &actions)
     m_menuMonitor->addMenu(m_menuNordVpn.get());
     m_menuMonitor->addMenu(m_menuUser.get());
     m_menuMonitor->addSeparator();
+
+    m_actAbout = m_menuMonitor->addAction(tr("About"));
 
     m_actSeparatorExit = m_menuMonitor->addSeparator();
     m_actQuit = m_menuMonitor->addAction(tr("&Quit"));
@@ -78,6 +81,11 @@ QAction *MenuHolder::getActShowMap() const
 QAction *MenuHolder::getActShowLog() const
 {
     return m_actLog;
+}
+
+QAction *MenuHolder::getActAbout() const
+{
+    return m_actAbout;
 }
 
 QAction *MenuHolder::getActQuit() const
