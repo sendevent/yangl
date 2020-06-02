@@ -1,12 +1,12 @@
 /*
    Copyright (C) 2020 Denis Gofman - <sendevent@gmail.com>
 
-   This library is free software; you can redistribute it and/or
+   This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
    License as published by the Free Software Foundation; either
-   version 2 of the License, or (at your option) any later version.
+   version 3 of the License, or (at your option) any later version.
 
-   This library is distributed in the hope that it will be useful,
+   This application is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    Library General Public License for more details.
@@ -23,19 +23,10 @@
 
 #include <QDateTime>
 #include <QFile>
+#include <QTextBrowser>
+#include <QVBoxLayout>
 
 /*static*/ AboutDialog::Ptr AboutDialog::m_instance = {};
-
-QString readResourceFile(const QString &path)
-{
-    QFile in(path);
-    if (!in.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        WRN << "Failed opening file:" << path << in.errorString();
-        return {};
-    }
-
-    return in.readAll();
-}
 
 AboutDialog::AboutDialog(QWidget *parent)
     : QDialog(parent)
@@ -56,7 +47,13 @@ AboutDialog::AboutDialog(QWidget *parent)
     const QString buildDate = QDateTime::fromSecsSinceEpoch(BUILD_DATE).toUTC().toString("dd MMM yyyy hh:mm:ss t");
     ui->labelBuilt->setText(tr("Built %1").arg(buildDate));
 
-    ui->labelContentAbout->setText(readResourceFile(":/about/resources/about/yangl.html"));
+    for (const auto &tab : {
+                 tr("yangl.html"),
+                 tr("License.txt"),
+                 tr("NordVPN.html"),
+                 tr("Qt.html"),
+         })
+        createTab(tab);
 }
 
 AboutDialog::~AboutDialog()
@@ -74,4 +71,34 @@ AboutDialog::~AboutDialog()
     m_instance->show();
     m_instance->raise();
     m_instance->activateWindow();
+}
+
+QString AboutDialog::readResourceFile(const QString &path) const
+{
+    QFile in(path);
+    if (!in.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        const QString &msg = tr("Failed opening file \"%1\": %2").arg(path, in.errorString());
+        WRN << msg;
+        return msg;
+    }
+
+    return in.readAll();
+}
+
+void AboutDialog::createTab(const QString &file)
+{
+    const QStringList nameParts = file.split('.');
+
+    QWidget *tab = new QWidget(ui->tabWidget);
+    QVBoxLayout *vBox = new QVBoxLayout(tab);
+    QTextBrowser *display = new QTextBrowser(tab);
+    vBox->addWidget(display);
+    ui->tabWidget->addTab(tab, nameParts.first());
+
+    display->setOpenExternalLinks(true);
+    const QString &content = readResourceFile(QStringLiteral(":/about/resources/about/%1").arg(file));
+    if (nameParts.last() == QStringLiteral("txt"))
+        display->setPlainText(content);
+    else
+        display->setHtml(content);
 }

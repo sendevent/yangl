@@ -105,8 +105,3 @@ HEADERS += \
 FORMS += \
     geo/serverschartview.ui
 }
-
-DISTFILES += \
-    resources/about/license.txt \
-    resources/about/nordvpn.html \
-    resources/about/yangl.html
