@@ -49,10 +49,8 @@ MapSettings::MapSettings(QWidget *parent)
     m_comboType->setCurrentIndex(AppSettings::Map.MapType->read().toInt());
     setupMap(AppSettings::Map.MapPlugin->read().toString());
 
-    connect(m_comboType, &QComboBox::currentTextChanged, this, [this](const QString &txt) {
-        LOG << "newtype:" << txt;
-        m_preview->setMapType(txt);
-    });
+    connect(m_comboType, &QComboBox::currentTextChanged, this,
+            [this](const QString &txt) { m_preview->setMapType(txt); });
 }
 
 void MapSettings::setupMap(const QString &pluginName)

@@ -36,21 +36,10 @@
 #include <QVBoxLayout>
 #include <QWindow>
 
-/*static*/ const QString MapWidget::PreferedGeoService = [] {
-    QStringList providers = MapWidget::geoServices();
-    std::sort(providers.begin(), providers.end());
-    static const QString prefered = QStringLiteral("osm");
-    const QString &selected = providers.contains(prefered) ? prefered : providers.first();
-
-    LOG << "available geo service providers:" << providers;
-    LOG << "choice:" << selected;
-    return selected;
-}();
-
 MapWidget::MapWidget(const QString &mapPlugin, int mapType, QWidget *parent)
     : QWidget(parent)
     , m_quickView(new QQuickWidget(this))
-    , m_geoSrvProv(new QGeoServiceProvider(MapWidget::PreferedGeoService))
+    , m_geoSrvProv(new QGeoServiceProvider(QStringLiteral("osm")))
     , m_geoCoder(m_geoSrvProv->geocodingManager())
     , m_serversModel(new MapServersModel(this))
 {
@@ -337,6 +326,7 @@ void MapWidget::setMapType(int mapTypeId)
 void MapWidget::setMapType(const QString &mapTypeName)
 {
     const int id = supportedMapTypes().indexOf(mapTypeName);
+    LOG << mapTypeName << id;
     if (id >= 0)
         setMapType(id);
 }

@@ -30,8 +30,6 @@ class MapWidget : public QWidget
 {
     Q_OBJECT
 public:
-    static const QString PreferedGeoService;
-
     struct AddrHandler {
         AddrHandler(const QString &country = {}, const QString &city = {});
         QString m_country;
