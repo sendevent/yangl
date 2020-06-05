@@ -59,15 +59,17 @@ void tst_ActionJson::test_load()
     json.load(&in);
     QCOMPARE(json.customActionIds(), { TestId.toString() });
 
-    json.updateAction(action.get());
-    QCOMPARE(action->app(), QStringLiteral("/usr/bin/ls"));
-    QCOMPARE(action->args(), { QStringLiteral("-la") });
+    if (action) {
+        json.updateAction(&*action);
+        QCOMPARE(action->app(), QStringLiteral("/usr/bin/ls"));
+        QCOMPARE(action->args(), { QStringLiteral("-la") });
 
-    json.popAction(action.get());
-    QCOMPARE(json.customActionIds(), {});
+        json.popAction(&*action);
+        QCOMPARE(json.customActionIds(), {});
 
-    json.putAction(action.get());
-    QCOMPARE(json.customActionIds(), { TestId.toString() });
+        json.putAction(&*action);
+        QCOMPARE(json.customActionIds(), { TestId.toString() });
+    }
 }
 
 void tst_ActionJson::test_save()
@@ -84,14 +86,16 @@ void tst_ActionJson::test_save()
     ActionJson json(&storage);
     QCOMPARE(json.customActionIds(), {});
 
-    json.putAction(action.get());
-    QCOMPARE(json.customActionIds(), { TestId.toString() });
+    if (action) {
+        json.putAction(&*action);
+        QCOMPARE(json.customActionIds(), { TestId.toString() });
 
-    json.popAction(action.get());
-    QCOMPARE(json.customActionIds(), {});
+        json.popAction(&*action);
+        QCOMPARE(json.customActionIds(), {});
 
-    json.putAction(action.get());
-    QCOMPARE(json.customActionIds(), { TestId.toString() });
+        json.putAction(&*action);
+        QCOMPARE(json.customActionIds(), { TestId.toString() });
+    }
 
     json.save(&out);
 
