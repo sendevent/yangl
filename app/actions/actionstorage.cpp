@@ -180,36 +180,37 @@ Action::Ptr ActionStorage::createAction(KnownAction actionType, const QString &i
     bool forceShow = false;
     Action::MenuPlace menuPlace = Action::MenuPlace::Own;
     const Action::Id &actId = id.isEmpty() ? Action::Id::createUuid() : Action::Id(id);
+    auto wordsToList = [&args](const QString &noQuotes) { args << noQuotes.split(' '); };
 
     switch (actionType) {
     case KnownAction::CheckStatus: {
         title = QObject::tr("Check status");
-        args.append("status");
+        wordsToList(QStringLiteral("status"));
         menuPlace = Action::MenuPlace::Common;
         break;
     }
     case KnownAction::Connect: {
         title = QObject::tr("Connect");
-        args.append("c");
+        wordsToList(QStringLiteral("c"));
         menuPlace = Action::MenuPlace::Common;
         break;
     }
     case KnownAction::Disconnect: {
         title = QObject::tr("Disonnect");
-        args.append("disconnect");
+        wordsToList(QStringLiteral("disconnect"));
         menuPlace = Action::MenuPlace::Own;
         break;
     }
     case KnownAction::Settings: {
         title = QObject::tr("Show used settings");
-        args.append("settings");
+        wordsToList(QStringLiteral("settings"));
         forceShow = true;
         menuPlace = Action::MenuPlace::Own;
         break;
     }
     case KnownAction::Account: {
         title = QObject::tr("Account details");
-        args.append("account");
+        wordsToList(QStringLiteral("account"));
         forceShow = true;
         menuPlace = Action::MenuPlace::Own;
         break;
@@ -236,21 +237,21 @@ Action::Ptr ActionStorage::createAction(KnownAction actionType, const QString &i
     }
     case KnownAction::Rate5: {
         title = QObject::tr("Rate ★★★★★");
-        args.append("rate 5");
+        wordsToList(QStringLiteral("rate 5"));
         menuPlace = Action::MenuPlace::Own;
         forceShow = true;
         break;
     }
     case KnownAction::Rate4: {
         title = QObject::tr("Rate ★★★★☆");
-        args.append("rate 4");
+        wordsToList(QStringLiteral("rate 4"));
         menuPlace = Action::MenuPlace::Own;
         forceShow = true;
         break;
     }
     case KnownAction::Rate3: {
         title = QObject::tr("Rate ★★★☆☆");
-        args.append("rate 3");
+        wordsToList(QStringLiteral("rate 3"));
         menuPlace = Action::MenuPlace::Own;
         forceShow = true;
         break;
@@ -258,27 +259,27 @@ Action::Ptr ActionStorage::createAction(KnownAction actionType, const QString &i
     case KnownAction::Rate2: {
         title = QObject::tr("Rate ★★☆☆☆");
         menuPlace = Action::MenuPlace::Own;
-        args.append("rate 2");
+        wordsToList(QStringLiteral("rate 2"));
         forceShow = true;
         break;
     }
     case KnownAction::Rate1: {
         title = QObject::tr("Rate ★☆☆☆☆");
         menuPlace = Action::MenuPlace::Own;
-        args.append("rate 1");
+        wordsToList(QStringLiteral("rate 1"));
         forceShow = true;
         break;
     }
     case KnownAction::SetNotifyOff: {
         title = QObject::tr("Notify OFF");
         menuPlace = Action::MenuPlace::Own;
-        args.append("set notify 0");
+        wordsToList(QStringLiteral("set notify 0"));
         break;
     }
     case KnownAction::SetNotifyOn: {
         title = QObject::tr("Notify ON");
         menuPlace = Action::MenuPlace::Own;
-        args.append("set notify 1");
+        wordsToList(QStringLiteral("set notify 1"));
         break;
     }
     default:
