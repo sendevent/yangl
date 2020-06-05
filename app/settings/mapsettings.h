@@ -17,38 +17,29 @@
 
 #pragma once
 
-#include "statechecker.h"
+#include <QObject>
+#include <QWidget>
 
-#include <QDialog>
-#include <QPointer>
-#include <QSystemTrayIcon>
-
-namespace Ui {
-class SettingsDialog;
-}
-
-class MapSettings;
-class ActionStorage;
-class SettingsDialog : public QDialog
+class QGroupBox;
+class QComboBox;
+class MapWidget;
+class QFormLayout;
+class MapSettings : public QWidget
 {
     Q_OBJECT
-
 public:
-    static SettingsDialog *makeVisible(ActionStorage *actionStorage);
+    explicit MapSettings(QWidget *parent = nullptr);
 
-    ~SettingsDialog() override;
+    QString selectedPlugin() const;
+    int selectedType() const;
 
-public slots:
-    void accept() override;
+private slots:
+    void setupMap(const QString &pluginName);
 
 private:
-    static QPointer<SettingsDialog> m_instance;
-    SettingsDialog(ActionStorage *actionStorage, QWidget *parent = {});
-    Ui::SettingsDialog *ui;
-    ActionStorage *m_actStorage;
-    MapSettings *m_mapSettings;
-
-    bool saveSettings();
-    bool saveMonitorSettings();
-    bool saveActions();
+    QGroupBox *m_groupBox;
+    QComboBox *m_comboPlugin;
+    QComboBox *m_comboType;
+    MapWidget *m_preview;
+    QFormLayout *m_formLayout;
 };

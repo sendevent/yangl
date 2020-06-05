@@ -11,7 +11,7 @@ Rectangle {
 
     Plugin {
         id: mapPlugin
-        preferred: ["mapboxgl"]
+//        preferred: ["mapboxgl"]
         name: pluginName
     }
 
@@ -109,5 +109,14 @@ Rectangle {
                 }
             }
         }
+
+    function listMapTypes() : variant
+    {
+        var res = [];
+        for( var i = 0; i < map.supportedMapTypes.length; ++i)
+            res[i] = map.supportedMapTypes[i].name
+
+        return res;
+    }
 }
 
