@@ -25,6 +25,10 @@
 #include "common.h"
 #include "ui_settingsdialog.h"
 
+#ifndef YANGL_NO_GEOCHART
+#include "mapwidget.h"
+#endif
+
 #include <QApplication>
 #include <QIcon>
 #include <QMessageBox>
@@ -56,6 +60,13 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
     ui->tabNordVpn->setActions(m_actStorage, Action::Scope::Builtin);
     ui->tabCustom->setActions(m_actStorage, Action::Scope::User);
     ui->spinBoxLogLines->setValue(AppSettings::Monitor.LogLinesLimit->read().toInt());
+
+#ifndef YANGL_NO_GEOCHART
+    ui->geoSrvCombo->addItems(MapWidget::geoServices());
+    ui->geoSrvCombo->setCurrentText(AppSettings::Map.MapPlugin->read().toString());
+    connect(ui->geoSrvCombo, &QComboBox::currentTextChanged, this,
+            [](const QString &txt) { AppSettings::Map.MapPlugin->write(txt); });
+#endif
 
     restoreGeometry(AppSettings::Monitor.SettingsDialog->read().toByteArray());
 }

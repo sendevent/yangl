@@ -17,6 +17,7 @@
 
 #include "mapwidget.h"
 
+#include "appsettings.h"
 #include "common.h"
 #include "mapserversmodel.h"
 #include "settingsmanager.h"
@@ -35,10 +36,21 @@
 #include <QVBoxLayout>
 #include <QWindow>
 
-MapWidget::MapWidget(QWidget *parent)
+/*static*/ const QString MapWidget::PreferedGeoService = [] {
+    QStringList providers = MapWidget::geoServices();
+    std::sort(providers.begin(), providers.end());
+    static const QString prefered = QStringLiteral("osm");
+    const QString &selected = providers.contains(prefered) ? prefered : providers.first();
+
+    LOG << "available geo service providers:" << providers;
+    LOG << "choice:" << selected;
+    return selected;
+}();
+
+MapWidget::MapWidget(const QString &mapPlugin, int mapType, QWidget *parent)
     : QWidget(parent)
     , m_quickView(new QQuickWidget(this))
-    , m_geoSrvProv(new QGeoServiceProvider("osm"))
+    , m_geoSrvProv(new QGeoServiceProvider(MapWidget::PreferedGeoService))
     , m_geoCoder(m_geoSrvProv->geocodingManager())
     , m_serversModel(new MapServersModel(this))
 {
@@ -46,11 +58,21 @@ MapWidget::MapWidget(QWidget *parent)
     m_geoCoder->setLocale(qLocaleC);
 
     m_quickView->rootContext()->setContextProperty("markerModel", m_serversModel);
+    m_quickView->rootContext()->setContextProperty("pluginName", mapPlugin);
+    m_quickView->rootContext()->setContextProperty("mapType", mapType);
 
     m_quickView->setSource(QStringLiteral("qrc:/qml/geo/qml/MapView.qml"));
     QVBoxLayout *vBox = new QVBoxLayout(this);
     vBox->addWidget(m_quickView);
+}
 
+MapWidget::~MapWidget()
+{
+    saveJson();
+}
+
+void MapWidget::init()
+{
     if (QQuickItem *map = m_quickView->rootObject()) {
         QObject::connect(map, SIGNAL(markerDoubleclicked(QQuickItem *)), this,
                          SLOT(onMarkerDoubleclicked(QQuickItem *)));
@@ -60,9 +82,9 @@ MapWidget::MapWidget(QWidget *parent)
     loadJson();
 }
 
-MapWidget::~MapWidget()
+/*static*/ QStringList MapWidget::geoServices()
 {
-    saveJson();
+    return QGeoServiceProvider::availableServiceProviders();
 }
 
 void MapWidget::setActiveConnection(const AddrHandler &marker)
@@ -166,6 +188,8 @@ void MapWidget::requestGeo(const AddrHandler &addrHandler)
                 r->deleteLater();
             }
         });
+    } else {
+        WRN << "failed create geocode request!";
     }
 }
 

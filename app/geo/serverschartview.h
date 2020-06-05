@@ -23,13 +23,14 @@
 
 #include <QWidget>
 
-namespace Ui {
-class ServersChartView;
-}
-
 class NordVpnWraper;
 class QStandardItemModel;
 class ServersFilterModel;
+class QSplitter;
+class QLineEdit;
+class QTreeView;
+class QToolButton;
+
 class ServersChartView : public QWidget
 {
     Q_OBJECT
@@ -57,12 +58,21 @@ protected:
 private:
     static QPointer<ServersChartView> m_instance;
     explicit ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent = {});
-    Ui::ServersChartView *ui;
+
+    QSplitter *splitter;
+    QLineEdit *lineEdit;
+    QTreeView *treeView;
+    QToolButton *buttonReload;
+    MapWidget *chartWidget;
 
     NordVpnWraper *m_nordVpnWraper;
     ServersListManager *m_listManager;
     QStandardItemModel *m_serversModel;
     ServersFilterModel *m_serversFilterModel;
+
+    void initUi();
+    void initConenctions();
+    void loadSettings();
 
     void requestServersList();
     void setControlsEnabled(bool enabled);

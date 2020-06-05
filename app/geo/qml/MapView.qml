@@ -12,13 +12,14 @@ Rectangle {
     Plugin {
         id: mapPlugin
         preferred: ["mapboxgl"]
+        name: pluginName
     }
 
     Map {
         id: map
         anchors.fill: parent
         plugin: mapPlugin
-        activeMapType: supportedMapTypes[ mapPlugin.name === "mapboxgl" ? 6 : 0]
+        activeMapType: supportedMapTypes[ mapType ]
         zoomLevel: 2.5
 
         MapItemView{
