@@ -5,69 +5,79 @@ version: '1.0.0'
 license: LGPL-3.0
 type: app
 grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: devmode # use 'strict' once you have the right plugs and slots
+confinement: classic # use 'strict' once you have the right plugs and slots
+
+plugs:
+    yangl-config:
+        interface: personal-files
+        write: [$HOME/.config/yangl]
 
 apps:
-  yangl:
-    common-id: org.denisgofman.yangl
-    command: desktop-launch $SNAP/opt/yangl/bin/yangl
-    
+    yangl:
+        common-id: org.denisgofman.yangl
+        command: desktop-launch $SNAP/opt/yangl/bin/yangl
+        plugs:
+            - yangl-config
+            - home
+            - network
+            - opengl
+
 parts:
-  yangl:
-    parse-info: [yangl.metainfo.xml]
-    plugin: qmake
-    qt-version: qt5
-    after: [desktop-qt5]
-    
-    options: 
-        - -r
-        - "CONFIG+=release no_tests"
-    build-packages:
-        - git
-        - build-essential
-        - qtdeclarative5-dev
-        - qtlocation5-dev
-        - qtpositioning5-dev
-    source: ./
-    
-  desktop-qt5:
-    build-packages:
-        - build-essential
-        - qtbase5-dev
-        - dpkg-dev
-    make-parameters: [FLAVOR=qt5]
-    plugin: make
-    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-    source-subdir: qt
-    stage-packages:
-        - try: [appmenu-qt5 libqt5location5-plugin-mapboxgl]
-        - libxkbcommon0
-        - ttf-ubuntu-font-family
-        - dmz-cursor-theme
-        #- light-themes
-        - adwaita-icon-theme
-        - shared-mime-info
-        - libqt5svg5
-        - locales-all
-        - xdg-user-dirs
-        - fcitx-frontend-qt5
-        - libqt5core5a
-        - libqt5gui5
-        - qt5-image-formats-plugins
-        - libqt5widgets5
-        - libqt5network5
-        - libqt5concurrent5
-        - libqt5dbus5
-        - libqt5location5
-        - libqt5location5-plugins
-        - libqt5positioning5
-        - libqt5positioning5-plugins
-        - libqt5quick5
-        - libqt5quickwidgets5
-        - libqt5quickcontrols2-5
-        - libqt5qml5
-        - qml-module-qtlocation
-        - qml-module-qtpositioning
-        - qml-module-qtquick-controls2
-        - qml-module-qtquick-controls
-        - qml-module-qtquick2
+    yangl:
+        parse-info:
+            - yangl.metainfo.xml
+        plugin: qmake
+        qt-version: qt5
+
+        options:
+            - -r
+            - "CONFIG+=release no_tests"
+        build-packages:
+            - git
+            - build-essential
+            - qtdeclarative5-dev
+            - qtlocation5-dev
+            - qtpositioning5-dev
+        source: ./
+        after: [desktop-qt5]
+
+    desktop-qt5:
+        build-packages:
+            - build-essential
+            - qtbase5-dev
+            - dpkg-dev
+        make-parameters: [FLAVOR=qt5]
+        plugin: make
+        source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+        source-subdir: qt
+        stage-packages:
+            - try: [appmenu-qt5 libqt5location5-plugin-mapboxgl]
+            - libxkbcommon0
+            - ttf-ubuntu-font-family
+            - dmz-cursor-theme
+            - adwaita-icon-theme
+            - shared-mime-info
+            - libqt5svg5
+            - locales-all
+            - xdg-user-dirs
+            - fcitx-frontend-qt5
+            - libqt5core5a
+            - libqt5gui5
+            - qt5-image-formats-plugins
+            - libqt5widgets5
+            - libqt5network5
+            - libqt5concurrent5
+            - libqt5dbus5
+            - libqt5location5
+            - libqt5location5-plugins
+            - libqt5positioning5
+            - libqt5positioning5-plugins
+            - libqt5quick5
+            - libqt5quickwidgets5
+            #      - libqt5quickcontrols2-5
+            - libqt5qml5
+            - qml-module-qtlocation
+            - qml-module-qtpositioning
+            - qml-module-qtquick-controls2
+            #      - qml-module-qtquick-controls
+            - qml-module-qtquick2

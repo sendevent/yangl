@@ -154,12 +154,16 @@ CLICall *Action::createRequest()
 
 /*static*/ bool Action::isValidAppPath(const QString &path)
 {
-    if (path.isEmpty())
+    if (path.isEmpty()) {
+        WRN << "Emtpy path!";
         return false;
+    }
 
     const QFileInfo info(path);
-    if (!info.exists())
+    if (!info.exists()) {
+        WRN << "file not exists!" << path;
         return false;
+    }
 
     return info.isExecutable();
 }

@@ -103,8 +103,8 @@ bool ActionsTab::save()
     QList<Action::Ptr> actions;
     for (int i = 0; i < ui->toolBox->count(); ++i) {
         if (auto editor = qobject_cast<ActionEditor *>(ui->toolBox->widget(i))) {
-            if (!editor->apply())
-                return false;
+            //            if (!editor->apply())
+            //                return false;
             actions.append(editor->getAction());
         }
     }
