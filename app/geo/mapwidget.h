@@ -30,14 +30,18 @@ class MapWidget : public QWidget
 {
     Q_OBJECT
 public:
+    static const QString PreferedGeoService;
+
     struct AddrHandler {
         AddrHandler(const QString &country = {}, const QString &city = {});
         QString m_country;
         QString m_city;
     };
 
-    explicit MapWidget(QWidget *parent = {});
+    explicit MapWidget(const QString &mapPlugin, int mapType, QWidget *parent = {});
     ~MapWidget();
+
+    void init();
 
     void addMark(const QString &country, const QString &city);
 
@@ -51,6 +55,8 @@ public:
     void centerOn(const QGeoCoordinate &center);
 
     void setActiveConnection(const AddrHandler &marker);
+
+    static QStringList geoServices();
 
 signals:
     void markerDoubleclicked(const AddrHandler &marker);

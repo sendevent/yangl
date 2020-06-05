@@ -21,78 +21,114 @@
 #include "common.h"
 #include "nordvpnwraper.h"
 #include "serversfiltermodel.h"
-#include "ui_serverschartview.h"
 
+#include <QBoxLayout>
 #include <QGeoCoordinate>
 #include <QHideEvent>
 #include <QItemSelectionModel>
+#include <QLineEdit>
+#include <QSplitter>
 #include <QStandardItemModel>
+#include <QToolButton>
+#include <QTreeView>
 
 /*static*/ QPointer<ServersChartView> ServersChartView::m_instance = {};
 
 ServersChartView::ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::ServersChartView)
     , m_nordVpnWraper(nordVpnWraper)
     , m_listManager(new ServersListManager(m_nordVpnWraper, this))
     , m_serversModel(new QStandardItemModel(this))
     , m_serversFilterModel(new ServersFilterModel(this))
 {
-    ui->setupUi(this);
+    m_serversFilterModel->setSourceModel(m_serversModel);
 
+    initUi();
+    initConenctions();
+    loadSettings();
+
+    requestServersList();
+}
+
+ServersChartView::~ServersChartView() {}
+
+void ServersChartView::initUi()
+{
     setWindowTitle(tr("Yet Another NordVPN GUI for Linux"));
 
-    ui->splitter->setStretchFactor(0, 0);
-    ui->splitter->setStretchFactor(1, 1);
+    QWidget *leftView = new QWidget(this);
+    QVBoxLayout *leftVBox = new QVBoxLayout(leftView);
+    lineEdit = new QLineEdit(leftView);
+    lineEdit->setPlaceholderText(QStringLiteral("F"));
+    lineEdit->setToolTip(tr("Filter by country/city"));
+    treeView = new QTreeView(leftView);
+    treeView->setModel(m_serversFilterModel);
+    treeView->setEditTriggers(QTreeView::NoEditTriggers);
+    treeView->setAlternatingRowColors(true);
+    treeView->setHeaderHidden(true);
 
+    QHBoxLayout *hBox = new QHBoxLayout;
+    hBox->setAlignment(Qt::AlignCenter);
+    buttonReload = new QToolButton(leftView);
+    buttonReload->setText("Reload");
+    buttonReload->setToolTip(tr("Update available servers list"));
+    hBox->addWidget(buttonReload);
+
+    chartWidget = new MapWidget(AppSettings::Map.MapPlugin->read().toString(), AppSettings::Map.MapType->read().toInt(),
+                                this);
+    chartWidget->init();
+
+    leftVBox->addWidget(lineEdit);
+    leftVBox->addWidget(treeView);
+    leftVBox->addItem(hBox);
+    splitter = new QSplitter(this);
+    splitter->addWidget(leftView);
+    splitter->addWidget(chartWidget);
+    splitter->setStretchFactor(0, 0);
+    splitter->setStretchFactor(1, 1);
+
+    QGridLayout *grid = new QGridLayout(this);
+    grid->addWidget(splitter);
+}
+
+void ServersChartView::initConenctions()
+{
     connect(m_listManager, &ServersListManager::ready, this, &ServersChartView::onGotServers);
-
-    m_serversFilterModel->setSourceModel(m_serversModel);
-    ui->treeView->setModel(m_serversFilterModel);
-    ui->treeView->setEditTriggers(QTreeView::NoEditTriggers);
-    ui->treeView->setAlternatingRowColors(true);
-    ui->treeView->setHeaderHidden(true);
-
-    connect(ui->treeView->selectionModel(), &QItemSelectionModel::currentChanged, this,
+    connect(treeView->selectionModel(), &QItemSelectionModel::currentChanged, this,
             [this](const QModelIndex &current, const QModelIndex &) { onCurrentTreeItemChanged(current); });
-    connect(ui->treeView, &QTreeView::pressed, this, &ServersChartView::onCurrentTreeItemChanged);
-    connect(ui->treeView, &QTreeView::doubleClicked, this, &ServersChartView::onTreeItemDoubleclicked);
-    connect(ui->lineEdit, &QLineEdit::textChanged, this,
+    connect(treeView, &QTreeView::pressed, this, &ServersChartView::onCurrentTreeItemChanged);
+    connect(treeView, &QTreeView::doubleClicked, this, &ServersChartView::onTreeItemDoubleclicked);
+    connect(lineEdit, &QLineEdit::textChanged, this,
             [this](const QString &text) { m_serversFilterModel->setFilterRegExp(text); });
+    connect(chartWidget, &MapWidget::markerDoubleclicked, this, &ServersChartView::onMarkerDoubleclicked);
+}
 
-    connect(ui->chartWidget, &MapWidget::markerDoubleclicked, this, &ServersChartView::onMarkerDoubleclicked);
-
-    restoreGeometry(AppSettings::Map.Geometry->read().toByteArray());
-    ui->lineEdit->setText(AppSettings::Map.Filter->read().toString());
-    setVisible(AppSettings::Map.Visible->read().toBool());
+void ServersChartView::loadSettings()
+{
+    lineEdit->setText(AppSettings::Map.Filter->read().toString());
 
     const qreal lat = AppSettings::Map.CenterLat->read().toDouble();
     const qreal lon = AppSettings::Map.CenterLon->read().toDouble();
     QGeoCoordinate coord;
     coord.setLatitude(lat);
     coord.setLongitude(lon);
-    ui->chartWidget->centerOn(coord);
+    chartWidget->centerOn(coord);
+    chartWidget->setScale(AppSettings::Map.Scale->read().toDouble());
 
-    ui->chartWidget->setScale(AppSettings::Map.Scale->read().toDouble());
-
-    requestServersList();
-}
-
-ServersChartView::~ServersChartView()
-{
-    delete ui;
+    restoreGeometry(AppSettings::Map.Geometry->read().toByteArray());
+    setVisible(AppSettings::Map.Visible->read().toBool());
 }
 
 void ServersChartView::saveSettings()
 {
     AppSettings::Map.Geometry->write(saveGeometry());
-    AppSettings::Map.Filter->write(ui->lineEdit->text());
+    AppSettings::Map.Filter->write(lineEdit->text());
 
-    const QGeoCoordinate coord = ui->chartWidget->center();
+    const QGeoCoordinate coord = chartWidget->center();
     AppSettings::Map.CenterLat->write(coord.latitude());
     AppSettings::Map.CenterLon->write(coord.longitude());
 
-    AppSettings::Map.Scale->write(ui->chartWidget->scale());
+    AppSettings::Map.Scale->write(chartWidget->scale());
 }
 
 void ServersChartView::hideEvent(QHideEvent *event)
@@ -109,8 +145,7 @@ void ServersChartView::requestServersList()
 
 void ServersChartView::setControlsEnabled(bool enabled)
 {
-    for (auto control :
-         std::initializer_list<QWidget *> { ui->lineEdit, ui->treeView, ui->chartWidget /*, ui->buttonReload*/ })
+    for (auto control : std::initializer_list<QWidget *> { lineEdit, treeView, chartWidget /*, buttonReload*/ })
         control->setEnabled(enabled);
 }
 
@@ -129,7 +164,7 @@ void ServersChartView::onGotServers(const ServersListManager::Groups &groups,
 
 void ServersChartView::setupModel(const ServersListManager::Groups &groups)
 {
-    ui->chartWidget->clearMarks();
+    chartWidget->clearMarks();
 
     m_serversModel->removeRows(0, m_serversModel->rowCount());
     auto clearGeoName = [](const QString &geoName) -> QString { return QString(geoName).replace('_', ' '); };
@@ -148,7 +183,7 @@ void ServersChartView::setupModel(const ServersListManager::Groups &groups)
         m_serversModel->insertRow(m_serversModel->rowCount(), QList<QStandardItem *>() << title);
 
         if (!isGroups)
-            ui->chartWidget->addMark(group.first, {});
+            chartWidget->addMark(group.first, {});
 
         for (const auto &city : group.second) {
             const QString &cityName = clearGeoName(city);
@@ -156,7 +191,7 @@ void ServersChartView::setupModel(const ServersListManager::Groups &groups)
             title->appendRow(content);
 
             if (!isGroups)
-                ui->chartWidget->addMark(countryName, cityName);
+                chartWidget->addMark(countryName, cityName);
         }
     }
 }
@@ -171,7 +206,7 @@ void ServersChartView::onCurrentTreeItemChanged(const QModelIndex &current)
         country = current.data().toString();
     }
 
-    ui->chartWidget->centerOn(country, city);
+    chartWidget->centerOn(country, city);
 }
 
 void ServersChartView::onTreeItemDoubleclicked(const QModelIndex &current)
@@ -214,7 +249,7 @@ void ServersChartView::requestConnection(const QString &group, const QString &se
 
 void ServersChartView::onStateChanged(const NordVpnInfo &info)
 {
-    ui->chartWidget->setActiveConnection({ info.country(), info.city() });
+    chartWidget->setActiveConnection({ info.country(), info.city() });
 }
 
 /*static*/ void ServersChartView::makeVisible(NordVpnWraper *nordVpnWraper)

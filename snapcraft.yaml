@@ -7,17 +7,17 @@ type: app
 grade: devel # must be 'stable' to release into candidate/stable channels
 confinement: classic # use 'strict' once you have the right plugs and slots
 
-plugs:
-    yangl-config:
-        interface: personal-files
-        write: [$HOME/.config/yangl]
+#plugs:
+#    yangl-config:
+#        interface: personal-files
+#        write: [$HOME/.config/yangl]
 
 apps:
     yangl:
         common-id: org.denisgofman.yangl
         command: desktop-launch $SNAP/opt/yangl/bin/yangl
         plugs:
-            - yangl-config
+#            - yangl-config
             - home
             - network
             - opengl

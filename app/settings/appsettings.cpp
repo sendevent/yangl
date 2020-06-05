@@ -80,6 +80,8 @@ GroupMap::GroupMap()
                            new AppSetting(QString("%1/CenterLat").arg(localName()), {}),
                            new AppSetting(QString("%1/CenterLon").arg(localName()), {}),
                            new AppSetting(QString("%1/Scale").arg(localName()), 2.5),
+                           new AppSetting(QString("%1/Plugin").arg(localName()), QStringLiteral("mapboxgl")),
+                           new AppSetting(QString("%1/Type").arg(localName()), 0),
                    },
                    {})
 {
