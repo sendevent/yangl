@@ -26,6 +26,7 @@
 #include "ui_settingsdialog.h"
 
 #ifndef YANGL_NO_GEOCHART
+#include "mapsettings.h"
 #include "mapwidget.h"
 #endif
 
@@ -40,6 +41,11 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::SettingsDialog)
     , m_actStorage(actStorage)
+#ifndef YANGL_NO_GEOCHART
+    , m_mapSettings(new MapSettings(this))
+#else
+    , m_mapSettings(nullptr)
+#endif
 {
     ui->setupUi(this);
 
@@ -62,10 +68,7 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
     ui->spinBoxLogLines->setValue(AppSettings::Monitor.LogLinesLimit->read().toInt());
 
 #ifndef YANGL_NO_GEOCHART
-    ui->geoSrvCombo->addItems(MapWidget::geoServices());
-    ui->geoSrvCombo->setCurrentText(AppSettings::Map.MapPlugin->read().toString());
-    connect(ui->geoSrvCombo, &QComboBox::currentTextChanged, this,
-            [](const QString &txt) { AppSettings::Map.MapPlugin->write(txt); });
+    ui->verticalLayout->addWidget(m_mapSettings);
 #endif
 
     restoreGeometry(AppSettings::Monitor.SettingsDialog->read().toByteArray());
@@ -92,6 +95,13 @@ bool SettingsDialog::saveSettings()
     const bool actionsOk = saveActions();
     if (!actionsOk)
         WRN << "failed to save actions";
+
+#ifndef YANGL_NO_GEOCHART
+    AppSettings::Map.MapType->write(m_mapSettings->selectedType());
+    AppSettings::Map.MapPlugin->write(m_mapSettings->selectedPlugin());
+
+    LOG << m_mapSettings->selectedPlugin() << m_mapSettings->selectedType();
+#endif
 
     return settingsOk && actionsOk;
 }

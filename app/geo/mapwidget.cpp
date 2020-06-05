@@ -59,7 +59,10 @@ MapWidget::MapWidget(const QString &mapPlugin, int mapType, QWidget *parent)
 
     m_quickView->rootContext()->setContextProperty("markerModel", m_serversModel);
     m_quickView->rootContext()->setContextProperty("pluginName", mapPlugin);
-    m_quickView->rootContext()->setContextProperty("mapType", mapType);
+
+    LOG << mapPlugin << mapType;
+
+    setMapType(mapType == -1 ? 0 : mapType);
 
     m_quickView->setSource(QStringLiteral("qrc:/qml/geo/qml/MapView.qml"));
     QVBoxLayout *vBox = new QVBoxLayout(this);
@@ -85,6 +88,29 @@ void MapWidget::init()
 /*static*/ QStringList MapWidget::geoServices()
 {
     return QGeoServiceProvider::availableServiceProviders();
+}
+
+/*static*/ QStringList MapWidget::supportedMapTypesSorted(const QString &inPlugin)
+{
+    MapWidget mapWidget(inPlugin, 0);
+    return mapWidget.supportedMapTypesSorted();
+}
+
+QStringList MapWidget::supportedMapTypes() const
+{
+    if (QQuickItem *map = m_quickView->rootObject()) {
+        QVariant returnedValue;
+        QMetaObject::invokeMethod(map, "listMapTypes", Q_RETURN_ARG(QVariant, returnedValue));
+        return returnedValue.toStringList();
+    }
+    return {};
+}
+
+QStringList MapWidget::supportedMapTypesSorted() const
+{
+    QStringList result = supportedMapTypes();
+    //    std::sort(result.begin(), result.end());
+    return result;
 }
 
 void MapWidget::setActiveConnection(const AddrHandler &marker)
@@ -301,4 +327,16 @@ qreal MapWidget::scale() const
         return map->property("mapScale").toDouble();
     }
     return 0;
+}
+
+void MapWidget::setMapType(int mapTypeId)
+{
+    m_quickView->rootContext()->setContextProperty("mapType", mapTypeId);
+}
+
+void MapWidget::setMapType(const QString &mapTypeName)
+{
+    const int id = supportedMapTypes().indexOf(mapTypeName);
+    if (id >= 0)
+        setMapType(id);
 }

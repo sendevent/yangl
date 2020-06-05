@@ -71,6 +71,7 @@ SOURCES += \
     $$APP_PRO_ROOT/geo/mapwidget.cpp \
     $$APP_PRO_ROOT/geo/serverschartview.cpp \
     $$APP_PRO_ROOT/geo/serversfiltermodel.cpp \
+    $$APP_PRO_ROOT/settings/mapsettings.cpp \
     $$APP_PRO_ROOT/geo/serverslistmanager.cpp
 
 HEADERS += \
@@ -78,8 +79,6 @@ HEADERS += \
     $$APP_PRO_ROOT/geo/mapwidget.h \
     $$APP_PRO_ROOT/geo/serverschartview.h \
     $$APP_PRO_ROOT/geo/serversfiltermodel.h \
+    $$APP_PRO_ROOT/settings/mapsettings.h \
     $$APP_PRO_ROOT/geo/serverslistmanager.h
-
-FORMS += \
-    $$APP_PRO_ROOT/geo/serverschartview.ui
 }

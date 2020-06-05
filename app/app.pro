@@ -38,6 +38,7 @@ SOURCES += \
     settings/actionstab.cpp \
     settings/apppatheditor.cpp \
     settings/appsettings.cpp \
+    settings/mapsettings.cpp \
     settings/settingsdialog.cpp \
     settings/settingsmanager.cpp \
     statechecker.cpp \
@@ -61,6 +62,7 @@ HEADERS += \
     settings/actionstab.h \
     settings/apppatheditor.h \
     settings/appsettings.h \
+    settings/mapsettings.h \
     settings/settingsdialog.h \
     settings/settingsmanager.h \
     statechecker.h \
@@ -101,7 +103,4 @@ HEADERS += \
     geo/serverschartview.h \
     geo/serversfiltermodel.h \
     geo/serverslistmanager.h
-
-FORMS += \
-    geo/serverschartview.ui
 }

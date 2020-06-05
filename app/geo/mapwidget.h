@@ -58,6 +58,11 @@ public:
 
     static QStringList geoServices();
 
+    static QStringList supportedMapTypesSorted(const QString &inPlugin);
+
+    void setMapType(const QString &mapTypeName);
+    void setMapType(int mapTypeId);
+
 signals:
     void markerDoubleclicked(const AddrHandler &marker);
 
@@ -83,6 +88,9 @@ private:
 
     void loadJson();
     void saveJson();
+
+    QStringList supportedMapTypesSorted() const;
+    QStringList supportedMapTypes() const;
 };
 
 Q_DECLARE_METATYPE(MapWidget::AddrHandler)
