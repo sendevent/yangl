@@ -68,7 +68,7 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
     ui->spinBoxLogLines->setValue(AppSettings::Monitor.LogLinesLimit->read().toInt());
 
 #ifndef YANGL_NO_GEOCHART
-    ui->verticalLayout->addWidget(m_mapSettings);
+    ui->verticalLayout->insertWidget(ui->verticalLayout->count() - 1, m_mapSettings);
 #endif
 
     restoreGeometry(AppSettings::Monitor.SettingsDialog->read().toByteArray());

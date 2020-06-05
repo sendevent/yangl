@@ -110,7 +110,7 @@ Rectangle {
             }
         }
 
-    function listMapTypes() : variant
+    function listMapTypes()
     {
         var res = [];
         for( var i = 0; i < map.supportedMapTypes.length; ++i)

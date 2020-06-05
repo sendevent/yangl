@@ -63,6 +63,8 @@ public:
     void setMapType(const QString &mapTypeName);
     void setMapType(int mapTypeId);
 
+    QSize sizeHint() const override;
+
 signals:
     void markerDoubleclicked(const AddrHandler &marker);
 
