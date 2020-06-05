@@ -62,7 +62,7 @@ AboutDialog::~AboutDialog()
     delete ui;
 }
 
-/*static*/ void AboutDialog::impressTheUser(QWidget *parent)
+/*static*/ void AboutDialog::makeVisible(QWidget *parent)
 {
     if (!m_instance) {
         m_instance = new AboutDialog(parent);

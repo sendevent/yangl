@@ -82,6 +82,11 @@ ActionStorage *NordVpnWraper::storate() const
     return m_actions;
 }
 
+StateChecker *NordVpnWraper::stateChecker() const
+{
+    return m_checker;
+}
+
 void NordVpnWraper::start()
 {
     LOG;
@@ -109,7 +114,7 @@ void NordVpnWraper::start()
 
     m_menuHolder->getActRun()->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());
 
-    ActionResultViewer::instance()->updateLinesLimit();
+    ActionResultViewer::updateLinesLimit();
 }
 
 void NordVpnWraper::loadSettings()
@@ -131,25 +136,6 @@ void NordVpnWraper::prepareQuit()
     const bool visible = m_mapView ? m_mapView->isVisible() : false;
     AppSettings::Map.Visible->write(visible);
     AppSettings::sync();
-}
-
-void NordVpnWraper::showSettingsEditor()
-{
-    if (auto dlg = SettingsDialog::makeVisible(m_actions)) {
-        connect(dlg, &QDialog::finished, this, [this](int result) {
-            if (result == QDialog::Accepted) {
-                start();
-            }
-        });
-        dlg->open();
-    }
-}
-
-void NordVpnWraper::showLog()
-{
-    ActionResultViewer::instance()->show();
-    ActionResultViewer::instance()->activateWindow();
-    ActionResultViewer::instance()->raise();
 }
 
 void NordVpnWraper::performStatusCheck()
@@ -359,21 +345,27 @@ void NordVpnWraper::connectTo(const QString &country, const QString &city)
 
 void NordVpnWraper::showMapView()
 {
-#ifndef YANGL_NO_GEOCHART
-    if (!m_mapView) {
-        ServersChartView *chartView = new ServersChartView(this);
-        connect(&*m_checker, &StateChecker::stateChanged, chartView, &ServersChartView::onStateChanged);
-        chartView->onStateChanged(m_checker->state());
-        m_mapView = chartView;
+    ServersChartView::makeVisible(this);
+}
+
+void NordVpnWraper::showSettingsEditor()
+{
+    if (auto dlg = SettingsDialog::makeVisible(m_actions)) {
+        connect(dlg, &QDialog::finished, this, [this](int result) {
+            if (result == QDialog::Accepted) {
+                start();
+            }
+        });
+        dlg->open();
     }
-#endif
-    if (m_mapView) {
-        m_mapView->setAttribute(Qt::WA_DeleteOnClose);
-        m_mapView->show();
-    }
+}
+
+void NordVpnWraper::showLog()
+{
+    ActionResultViewer::makeVisible();
 }
 
 void NordVpnWraper::showAbout()
 {
-    AboutDialog::impressTheUser(nullptr);
+    AboutDialog::makeVisible(nullptr);
 }

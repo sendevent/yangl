@@ -30,7 +30,7 @@
 #include <QMessageBox>
 #include <QMetaEnum>
 
-/*static*/ QPointer<SettingsDialog> SettingsDialog::m_instance = nullptr;
+/*static*/ QPointer<SettingsDialog> SettingsDialog::m_instance = {};
 
 SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
     : QDialog(parent)
