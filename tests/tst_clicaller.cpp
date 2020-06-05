@@ -32,14 +32,14 @@ void tst_CLICaller::test_performAction()
     action->setArgs({ "-la" });
 
     bool actionPerformed(false);
-    connect(action.get(), &Action::performed, this,
+    connect(&*action, &Action::performed, this,
             [&actionPerformed](const Action::Id & /*id*/, const QString & /*result*/, bool /*ok*/,
                                const QString & /*info*/) { actionPerformed = true; });
 
-    QSignalSpy spy(action.get(), &Action::performed);
+    QSignalSpy spy(&*action, &Action::performed);
 
     std::unique_ptr<CLICaller> caller(new CLICaller);
-    caller->performAction(action.get());
+    caller->performAction(&*action);
 
     QElapsedTimer timer;
     timer.start();

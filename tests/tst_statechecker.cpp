@@ -83,10 +83,10 @@ void tst_StateChecker::test_check(NordVpnInfo::Status targetStatus)
 
     NordVpnInfo::Status checkPerformed(sourceStatus);
     connect(
-            m_checker.get(), &StateChecker::statusChanged, this,
+            &*m_checker, &StateChecker::statusChanged, this,
             [&checkPerformed](const NordVpnInfo::Status &status) { checkPerformed = status; }, Qt::UniqueConnection);
 
-    QSignalSpy spy(m_checker.get(), &StateChecker::statusChanged);
+    QSignalSpy spy(&*m_checker, &StateChecker::statusChanged);
 
     m_checker->check();
 
@@ -107,8 +107,8 @@ void tst_StateChecker::test_check_status_change()
     QCOMPARE(m_checker->state().status(), NordVpnInfo::Status::Unknown);
 
     {
-        QSignalSpy spyState(m_checker.get(), &StateChecker::stateChanged);
-        QSignalSpy spyStatus(m_checker.get(), &StateChecker::statusChanged);
+        QSignalSpy spyState(&*m_checker, &StateChecker::stateChanged);
+        QSignalSpy spyStatus(&*m_checker, &StateChecker::statusChanged);
 
         m_checker->setStatus(NordVpnInfo::Status::Connecting);
         QCOMPARE(m_checker->state().status(), NordVpnInfo::Status::Connecting);

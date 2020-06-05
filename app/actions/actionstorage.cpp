@@ -102,10 +102,10 @@ void ActionStorage::save(QIODevice(*to))
     m_json->clear();
 
     for (const auto &action : m_builtinActions)
-        m_json->putAction(action.get());
+        m_json->putAction(&*action);
 
     for (const auto &action : m_userActions)
-        m_json->putAction(action.get());
+        m_json->putAction(&*action);
 
     return m_json->save(to);
 }
@@ -122,7 +122,7 @@ void ActionStorage::initActions(bool updateFromJson)
         for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i) {
             if (const Action::Ptr &action = createAction(static_cast<KnownAction>(i))) {
                 m_builtinActions.insert(action->type(), action);
-                m_json->putAction(action.get());
+                m_json->putAction(&*action);
             }
         }
         return;
@@ -153,13 +153,13 @@ void ActionStorage::loadBuiltinActions()
 
     while (!jsonBuiltinActionsById.isEmpty()) {
         if (const auto &action = jsonBuiltinActionsById.first()) {
-            m_json->popAction(action.get());
+            m_json->popAction(&*action);
             jsonBuiltinActionsById.remove(action->type());
         }
     }
 
     for (const auto &action : m_builtinActions)
-        m_json->putAction(action.get());
+        m_json->putAction(&*action);
 }
 
 void ActionStorage::loadUserActions()
