@@ -28,6 +28,8 @@
 #include <QItemSelectionModel>
 #include <QStandardItemModel>
 
+/*static*/ QPointer<ServersChartView> ServersChartView::m_instance = {};
+
 ServersChartView::ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ServersChartView)
@@ -213,4 +215,24 @@ void ServersChartView::requestConnection(const QString &group, const QString &se
 void ServersChartView::onStateChanged(const NordVpnInfo &info)
 {
     ui->chartWidget->setActiveConnection({ info.country(), info.city() });
+}
+
+/*static*/ void ServersChartView::makeVisible(NordVpnWraper *nordVpnWraper)
+{
+    if (!m_instance) {
+#ifndef YANGL_NO_GEOCHART
+        m_instance = new ServersChartView(nordVpnWraper);
+        if (auto stateChecker = nordVpnWraper->stateChecker()) {
+            connect(stateChecker, &StateChecker::stateChanged, m_instance, &ServersChartView::onStateChanged);
+            m_instance->onStateChanged(stateChecker->state());
+        }
+#endif
+    }
+
+    if (m_instance) {
+        m_instance->setAttribute(Qt::WA_DeleteOnClose);
+        m_instance->show();
+        m_instance->activateWindow();
+        m_instance->raise();
+    }
 }

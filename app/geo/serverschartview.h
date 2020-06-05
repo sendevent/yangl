@@ -35,8 +35,8 @@ class ServersChartView : public QWidget
     Q_OBJECT
 
 public:
-    explicit ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent = {});
     ~ServersChartView();
+    static void makeVisible(NordVpnWraper *nordVpnWraper);
 
     void saveSettings();
 
@@ -55,6 +55,8 @@ protected:
     void hideEvent(QHideEvent *event) override;
 
 private:
+    static QPointer<ServersChartView> m_instance;
+    explicit ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent = {});
     Ui::ServersChartView *ui;
 
     NordVpnWraper *m_nordVpnWraper;

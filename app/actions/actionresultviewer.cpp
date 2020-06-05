@@ -131,3 +131,12 @@ CLICallResultView *ActionResultViewer::displayForAction(Action *action)
             view->setBlocksLimit(m_linesLimit);
     }
 }
+
+/*static*/ void ActionResultViewer::makeVisible()
+{
+    if (auto widget = instance()) {
+        widget->show();
+        widget->activateWindow();
+        widget->raise();
+    }
+}

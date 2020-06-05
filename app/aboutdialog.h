@@ -33,7 +33,7 @@ public:
 
     ~AboutDialog();
 
-    static void impressTheUser(QWidget *parent);
+    static void makeVisible(QWidget *parent);
 
 private:
     static Ptr m_instance;
