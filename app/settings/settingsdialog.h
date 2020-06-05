@@ -20,6 +20,7 @@
 #include "statechecker.h"
 
 #include <QDialog>
+#include <QPointer>
 #include <QSystemTrayIcon>
 
 namespace Ui {
@@ -27,18 +28,21 @@ class SettingsDialog;
 }
 
 class ActionStorage;
-class Dialog : public QDialog
+class SettingsDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    Dialog(ActionStorage *actionStorage, QWidget *parent = {});
-    ~Dialog() override;
+    static SettingsDialog *makeVisible(ActionStorage *actionStorage);
+
+    ~SettingsDialog() override;
 
 public slots:
     void accept() override;
 
 private:
+    static QPointer<SettingsDialog> m_instance;
+    SettingsDialog(ActionStorage *actionStorage, QWidget *parent = {});
     Ui::SettingsDialog *ui;
     ActionStorage *m_actStorage;
 

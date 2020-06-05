@@ -61,7 +61,6 @@ private:
     MenuHolder *m_menuHolder;
     QTimer *m_pauseTimer;
     int m_paused;
-    bool m_settingsShown;
     QPointer<QWidget> m_mapView;
     void loadSettings();
 
