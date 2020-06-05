@@ -340,3 +340,8 @@ void MapWidget::setMapType(const QString &mapTypeName)
     if (id >= 0)
         setMapType(id);
 }
+
+QSize MapWidget::sizeHint() const
+{
+    return { 300, 300 };
+}
