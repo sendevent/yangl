@@ -26,7 +26,6 @@
 class NordVpnWraper;
 class QStandardItemModel;
 class ServersFilterModel;
-class QSplitter;
 class QLineEdit;
 class QTreeView;
 class QToolButton;
@@ -45,7 +44,7 @@ public slots:
     void onStateChanged(const NordVpnInfo &info);
 
 private slots:
-    void on_buttonReload_clicked();
+    void onReloadRequested();
     void onGotServers(const ServersListManager::Groups &groups, const ServersListManager::Groups &countries);
     void onCurrentTreeItemChanged(const QModelIndex &current);
     void onTreeItemDoubleclicked(const QModelIndex &current);
@@ -59,11 +58,10 @@ private:
     static QPointer<ServersChartView> m_instance;
     explicit ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent = {});
 
-    QSplitter *splitter;
-    QLineEdit *lineEdit;
-    QTreeView *treeView;
-    QToolButton *buttonReload;
-    MapWidget *chartWidget;
+    QLineEdit *m_lineEdit;
+    QTreeView *m_treeView;
+    QToolButton *m_buttonReload;
+    MapWidget *m_chartWidget;
 
     NordVpnWraper *m_nordVpnWraper;
     ServersListManager *m_listManager;
