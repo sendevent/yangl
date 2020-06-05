@@ -50,7 +50,6 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
     , m_menuHolder(new MenuHolder(this))
     , m_pauseTimer(new QTimer(this))
     , m_paused(0)
-    , m_settingsShown(false)
     , m_mapView({})
 {
     connect(qApp, &QApplication::aboutToQuit, this, &NordVpnWraper::prepareQuit);
@@ -136,16 +135,14 @@ void NordVpnWraper::prepareQuit()
 
 void NordVpnWraper::showSettingsEditor()
 {
-    Dialog *dlg = new Dialog(m_actions);
-    dlg->setAttribute(Qt::WA_DeleteOnClose);
-    connect(dlg, &QDialog::finished, this, [this](int result) {
-        m_settingsShown = false;
-        if (result == QDialog::Accepted) {
-            start();
-        }
-    });
-    m_settingsShown = true;
-    dlg->open();
+    if (auto dlg = SettingsDialog::makeVisible(m_actions)) {
+        connect(dlg, &QDialog::finished, this, [this](int result) {
+            if (result == QDialog::Accepted) {
+                start();
+            }
+        });
+        dlg->open();
+    }
 }
 
 void NordVpnWraper::showLog()
@@ -164,7 +161,7 @@ void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason
 {
     KnownAction invokeMe(KnownAction::Unknown);
     switch (reason) {
-    case QSystemTrayIcon::Trigger:
+    case QSystemTrayIcon::Trigger: {
 #ifndef YANGL_NO_GEOCHART
         if (!m_mapView)
             showMapView();
@@ -172,11 +169,11 @@ void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason
             m_mapView->activateWindow();
             m_mapView->raise();
         }
-        return;
+#else
+        showSettingsEditor();
 #endif
-        if (!m_settingsShown)
-            showSettingsEditor();
         return;
+    }
     case QSystemTrayIcon::MiddleClick: {
         switch (m_checker->state().status()) {
         case NordVpnInfo::Status::Connected: {
