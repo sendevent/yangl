@@ -187,7 +187,7 @@ void Action::onResult(const QString &result)
         call->deleteLater();
     }
 
-    QString info = QString("%1 ").arg(yangl::now());
+    QString info = QString("%1 ").arg(YANGL_TIMESTAMP);
     if (!result.isEmpty())
         info.append(QString("<b>Result:</b><br>%1<br>").arg(QString(result).replace("\n", "<br>")));
     if (exitCode)
