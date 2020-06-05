@@ -1,5 +1,5 @@
-import QtQuick 2.8
-import QtQuick.Controls 2.2
+import QtQuick 2.0
+import QtQuick.Controls 2.0
 import QtLocation 5.0
 
 Rectangle {
@@ -11,14 +11,14 @@ Rectangle {
 
     Plugin {
         id: mapPlugin
-        name: "mapboxgl"
+        preferred: ["mapboxgl"]
     }
 
     Map {
         id: map
         anchors.fill: parent
         plugin: mapPlugin
-        activeMapType: supportedMapTypes[6]
+        activeMapType: supportedMapTypes[ mapPlugin.name === "mapboxgl" ? 6 : 0]
         zoomLevel: 2.5
 
         MapItemView{

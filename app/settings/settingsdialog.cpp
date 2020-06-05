@@ -72,7 +72,15 @@ void Dialog::accept()
 
 bool Dialog::saveSettings()
 {
-    return saveMonitorSettings() && saveActions();
+    const bool settingsOk = saveMonitorSettings();
+    if (!settingsOk)
+        WRN << "failed to save settings";
+
+    const bool actionsOk = saveActions();
+    if (!actionsOk)
+        WRN << "failed to save actions";
+
+    return settingsOk && actionsOk;
 }
 
 bool Dialog::saveMonitorSettings()
