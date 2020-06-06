@@ -18,6 +18,7 @@
 #pragma once
 
 #include <QDialog>
+#include <QMap>
 #include <QPointer>
 
 namespace Ui {
@@ -29,6 +30,17 @@ class AboutDialog : public QDialog
     Q_OBJECT
 
 public:
+    enum TabId
+    {
+        First = 0,
+        Yangl = First,
+        License,
+        NordVPN,
+        Qt,
+
+        Last
+    };
+
     using Ptr = QPointer<AboutDialog>;
 
     ~AboutDialog();
@@ -36,10 +48,11 @@ public:
     static void makeVisible(QWidget *parent);
 
 private:
+    static const QMap<AboutDialog::TabId, QString> m_tabs;
     static Ptr m_instance;
     Ui::AboutDialog *ui;
     explicit AboutDialog(QWidget *parent = nullptr);
 
     QString readResourceFile(const QString &path) const;
-    void createTab(const QString &title);
+    void createTab(TabId tab);
 };
