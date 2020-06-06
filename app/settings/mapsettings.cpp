@@ -28,16 +28,13 @@
 #include <QLabel>
 
 MapSettings::MapSettings(QWidget *parent)
-    : QWidget(parent)
-    , m_groupBox(new QGroupBox(tr("Map"), this))
+    : QGroupBox(parent)
     , m_comboPlugin(new QComboBox(this))
     , m_comboType(new QComboBox(this))
     , m_preview(nullptr)
-    , m_formLayout(new QFormLayout(m_groupBox))
+    , m_formLayout(new QFormLayout(this))
 {
-    QGridLayout *grid = new QGridLayout(this);
-
-    grid->addWidget(m_groupBox);
+    setTitle(tr("Map"));
 
     m_comboPlugin->addItems(MapWidget::geoServices());
     connect(m_comboPlugin, &QComboBox::currentTextChanged, this, &MapSettings::setupMap);
@@ -61,8 +58,8 @@ void MapSettings::setupMap(const QString &pluginName)
         delete m_preview;
     }
 
-    m_preview = new MapWidget(pluginName, m_comboType->currentIndex(), m_groupBox);
-    m_formLayout->addWidget(m_preview);
+    m_preview = new MapWidget(pluginName, m_comboType->currentIndex(), this);
+    m_formLayout->addRow(m_preview);
 
     m_comboType->clear();
     m_comboType->addItems(m_preview->supportedMapTypesSorted(pluginName));
