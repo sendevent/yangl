@@ -17,14 +17,13 @@
 
 #pragma once
 
+#include <QGroupBox>
 #include <QObject>
-#include <QWidget>
 
-class QGroupBox;
 class QComboBox;
 class MapWidget;
 class QFormLayout;
-class MapSettings : public QWidget
+class MapSettings : public QGroupBox
 {
     Q_OBJECT
 public:
@@ -37,7 +36,6 @@ private slots:
     void setupMap(const QString &pluginName);
 
 private:
-    QGroupBox *m_groupBox;
     QComboBox *m_comboPlugin;
     QComboBox *m_comboType;
     MapWidget *m_preview;

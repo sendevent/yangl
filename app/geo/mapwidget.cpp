@@ -39,7 +39,7 @@
 MapWidget::MapWidget(const QString &mapPlugin, int mapType, QWidget *parent)
     : QWidget(parent)
     , m_quickView(new QQuickWidget(this))
-    , m_geoSrvProv(new QGeoServiceProvider(QStringLiteral("osm")))
+    , m_geoSrvProv(new QGeoServiceProvider(QStringLiteral("esri")))
     , m_geoCoder(m_geoSrvProv->geocodingManager())
     , m_serversModel(new MapServersModel(this))
 {
@@ -203,6 +203,7 @@ void MapWidget::requestGeo(const AddrHandler &addrHandler)
                 r->deleteLater();
             }
         });
+
     } else {
         WRN << "failed create geocode request!";
     }
