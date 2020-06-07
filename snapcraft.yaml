@@ -1,7 +1,6 @@
 name: yangl
 adopt-info: yangl
 base: core18
-version: '1.0.0'
 license: LGPL-3.0
 type: app
 grade: devel # must be 'stable' to release into candidate/stable channels
