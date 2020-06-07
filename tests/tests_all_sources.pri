@@ -22,6 +22,7 @@ QT += qml quick quickwidgets location positioning
 INCLUDEPATH += $$APP_PRO_ROOT/geo
 
 SOURCES += \
+    $$APP_PRO_ROOT/version.cpp \
     $$APP_PRO_ROOT/geo/mapserversmodel.cpp \
     $$APP_PRO_ROOT/geo/mapwidget.cpp \
     $$APP_PRO_ROOT/geo/serverschartview.cpp \
@@ -30,6 +31,7 @@ SOURCES += \
     $$APP_PRO_ROOT/geo/serverslistmanager.cpp
 
 HEADERS += \
+    $$APP_PRO_ROOT/version.h \
     $$APP_PRO_ROOT/geo/mapserversmodel.h \
     $$APP_PRO_ROOT/geo/mapwidget.h \
     $$APP_PRO_ROOT/geo/serverschartview.h \
