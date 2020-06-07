@@ -28,8 +28,8 @@
 
 /*static*/ const int StateChecker::DefaultIntervalMs = yangl::OneSecondMs;
 
-StateChecker::StateChecker(CLICaller *bus, int intervalMs, QObject *parent)
-    : QObject(parent)
+StateChecker::StateChecker(CLICaller *bus, int intervalMs)
+    : QObject()
     , m_bus(bus)
     , m_actCheck(nullptr)
     , m_timer(new QTimer(this))
@@ -47,7 +47,7 @@ void StateChecker::setCheckAction(const Action::Ptr &action)
 {
     if (m_actCheck != action) {
         m_actCheck = action;
-        connect(m_actCheck.get(), &Action::performed, this, &StateChecker::onQueryFinish, Qt::UniqueConnection);
+        connect(&*m_actCheck, &Action::performed, this, &StateChecker::onQueryFinish, Qt::UniqueConnection);
     }
 }
 
@@ -90,7 +90,7 @@ int StateChecker::interval() const
 
 void StateChecker::check()
 {
-    m_bus->performAction(m_actCheck.get());
+    m_bus->performAction(&*m_actCheck);
 }
 
 void StateChecker::onQueryFinish(const Action::Id & /*id*/, const QString &result, bool /*ok*/,

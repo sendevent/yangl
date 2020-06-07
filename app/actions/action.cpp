@@ -154,12 +154,16 @@ CLICall *Action::createRequest()
 
 /*static*/ bool Action::isValidAppPath(const QString &path)
 {
-    if (path.isEmpty())
+    if (path.isEmpty()) {
+        WRN << "Emtpy path!";
         return false;
+    }
 
     const QFileInfo info(path);
-    if (!info.exists())
+    if (!info.exists()) {
+        WRN << "file not exists!" << path;
         return false;
+    }
 
     return info.isExecutable();
 }
@@ -183,7 +187,7 @@ void Action::onResult(const QString &result)
         call->deleteLater();
     }
 
-    QString info = QString("%1 ").arg(yangl::now());
+    QString info = QString("%1 ").arg(YANGL_TIMESTAMP);
     if (!result.isEmpty())
         info.append(QString("<b>Result:</b><br>%1<br>").arg(QString(result).replace("\n", "<br>")));
     if (exitCode)

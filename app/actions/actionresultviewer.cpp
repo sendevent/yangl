@@ -78,7 +78,7 @@ void ActionResultViewer::onActionStarted(const Action::Id &id, const QString & /
 {
     if (auto action = m_actions.value(id))
         if (auto display = displayForAction(action))
-            display->append(tr("%1 <b>Calling</b>…").arg(yangl::now()));
+            display->append(tr("%1 <b>Calling</b>…").arg(YANGL_TIMESTAMP));
 }
 
 void ActionResultViewer::onActionPerformed(const Action::Id &id, const QString & /*result*/, bool ok,
@@ -129,5 +129,14 @@ CLICallResultView *ActionResultViewer::displayForAction(Action *action)
         m_linesLimit = newLimit;
         for (auto view : instance()->m_browsers)
             view->setBlocksLimit(m_linesLimit);
+    }
+}
+
+/*static*/ void ActionResultViewer::makeVisible()
+{
+    if (auto widget = instance()) {
+        widget->show();
+        widget->activateWindow();
+        widget->raise();
     }
 }

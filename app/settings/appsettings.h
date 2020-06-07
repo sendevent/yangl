@@ -84,6 +84,8 @@ public:
     const AppSetting *CenterLat = Options[3];
     const AppSetting *CenterLon = Options[4];
     const AppSetting *Scale = Options[5];
+    const AppSetting *MapPlugin = Options[6];
+    const AppSetting *MapType = Options[7];
 
 private:
     GroupMap(const GroupMap &) = delete;

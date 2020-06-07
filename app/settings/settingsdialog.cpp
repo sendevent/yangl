@@ -25,15 +25,27 @@
 #include "common.h"
 #include "ui_settingsdialog.h"
 
+#ifndef YANGL_NO_GEOCHART
+#include "mapsettings.h"
+#include "mapwidget.h"
+#endif
+
 #include <QApplication>
 #include <QIcon>
 #include <QMessageBox>
 #include <QMetaEnum>
 
-Dialog::Dialog(ActionStorage *actStorage, QWidget *parent)
+/*static*/ QPointer<SettingsDialog> SettingsDialog::m_instance = {};
+
+SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::SettingsDialog)
     , m_actStorage(actStorage)
+#ifndef YANGL_NO_GEOCHART
+    , m_mapSettings(new MapSettings(this))
+#else
+    , m_mapSettings(nullptr)
+#endif
 {
     ui->setupUi(this);
 
@@ -48,34 +60,53 @@ Dialog::Dialog(ActionStorage *actStorage, QWidget *parent)
     ui->cbIgnoreFirstConnected->setChecked(AppSettings::Monitor.IgnoreFirstConnected->read().toBool());
     ui->checkBoxMessagePlainText->setChecked(AppSettings::Monitor.MessagePlainText->read().toBool());
 
-    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &Dialog::accept);
-    connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &Dialog::reject);
+    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::accept);
+    connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &SettingsDialog::reject);
 
     ui->tabNordVpn->setActions(m_actStorage, Action::Scope::Builtin);
     ui->tabCustom->setActions(m_actStorage, Action::Scope::User);
     ui->spinBoxLogLines->setValue(AppSettings::Monitor.LogLinesLimit->read().toInt());
 
+#ifndef YANGL_NO_GEOCHART
+    ui->verticalLayout->insertWidget(ui->verticalLayout->count() - 1, m_mapSettings);
+#endif
+
     restoreGeometry(AppSettings::Monitor.SettingsDialog->read().toByteArray());
 }
 
-Dialog::~Dialog()
+SettingsDialog::~SettingsDialog()
 {
     AppSettings::Monitor.SettingsDialog->write(saveGeometry());
     delete ui;
 }
 
-void Dialog::accept()
+void SettingsDialog::accept()
 {
     if (saveSettings())
         QDialog::accept();
 }
 
-bool Dialog::saveSettings()
+bool SettingsDialog::saveSettings()
 {
-    return saveMonitorSettings() && saveActions();
+    const bool settingsOk = saveMonitorSettings();
+    if (!settingsOk)
+        WRN << "failed to save settings";
+
+    const bool actionsOk = saveActions();
+    if (!actionsOk)
+        WRN << "failed to save actions";
+
+#ifndef YANGL_NO_GEOCHART
+    AppSettings::Map.MapType->write(m_mapSettings->selectedType());
+    AppSettings::Map.MapPlugin->write(m_mapSettings->selectedPlugin());
+
+    LOG << m_mapSettings->selectedPlugin() << m_mapSettings->selectedType();
+#endif
+
+    return settingsOk && actionsOk;
 }
 
-bool Dialog::saveMonitorSettings()
+bool SettingsDialog::saveMonitorSettings()
 {
     const QString &path = ui->leNVPNPath->text();
     if (path != AppSettings::Monitor.NVPNPath->read().toString()) {
@@ -100,10 +131,23 @@ bool Dialog::saveMonitorSettings()
     return true;
 }
 
-bool Dialog::saveActions()
+bool SettingsDialog::saveActions()
 {
     const bool saved = ui->tabNordVpn->save() && ui->tabCustom->save();
     if (saved)
         m_actStorage->save();
     return saved;
+}
+
+/*static*/ SettingsDialog *SettingsDialog::makeVisible(ActionStorage *actionStorage)
+{
+    if (!m_instance) {
+        m_instance = new SettingsDialog(actionStorage);
+        m_instance->setAttribute(Qt::WA_DeleteOnClose);
+        return m_instance;
+    }
+
+    m_instance->activateWindow();
+    m_instance->raise();
+    return {};
 }

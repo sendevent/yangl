@@ -70,7 +70,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox">
+        <widget class="QGroupBox" name="groupBoxMessage">
          <property name="title">
           <string>Message balloon</string>
          </property>

@@ -23,20 +23,20 @@
 
 #include <QWidget>
 
-namespace Ui {
-class ServersChartView;
-}
-
 class NordVpnWraper;
 class QStandardItemModel;
 class ServersFilterModel;
+class QLineEdit;
+class QTreeView;
+class QToolButton;
+
 class ServersChartView : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent = {});
     ~ServersChartView();
+    static void makeVisible(NordVpnWraper *nordVpnWraper);
 
     void saveSettings();
 
@@ -44,7 +44,7 @@ public slots:
     void onStateChanged(const NordVpnInfo &info);
 
 private slots:
-    void on_buttonReload_clicked();
+    void onReloadRequested();
     void onGotServers(const ServersListManager::Groups &groups, const ServersListManager::Groups &countries);
     void onCurrentTreeItemChanged(const QModelIndex &current);
     void onTreeItemDoubleclicked(const QModelIndex &current);
@@ -55,12 +55,22 @@ protected:
     void hideEvent(QHideEvent *event) override;
 
 private:
-    Ui::ServersChartView *ui;
+    static QPointer<ServersChartView> m_instance;
+    explicit ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent = {});
+
+    QLineEdit *m_lineEdit;
+    QTreeView *m_treeView;
+    QToolButton *m_buttonReload;
+    MapWidget *m_chartWidget;
 
     NordVpnWraper *m_nordVpnWraper;
     ServersListManager *m_listManager;
     QStandardItemModel *m_serversModel;
     ServersFilterModel *m_serversFilterModel;
+
+    void initUi();
+    void initConenctions();
+    void loadSettings();
 
     void requestServersList();
     void setControlsEnabled(bool enabled);

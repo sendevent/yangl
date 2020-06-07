@@ -27,6 +27,13 @@
 #include <QTextBrowser>
 #include <QVBoxLayout>
 
+/*static*/ const QMap<AboutDialog::TabId, QString> AboutDialog::m_tabs = {
+    { AboutDialog::TabId::Yangl, QObject::tr("yangl.html") },
+    { AboutDialog::TabId::License, QObject::tr("License.txt") },
+    { AboutDialog::TabId::NordVPN, QObject::tr("NordVPN.html") },
+    { AboutDialog::TabId::Qt, QObject::tr("Qt.html") },
+};
+
 /*static*/ AboutDialog::Ptr AboutDialog::m_instance = {};
 
 AboutDialog::AboutDialog(QWidget *parent)
@@ -43,18 +50,13 @@ AboutDialog::AboutDialog(QWidget *parent)
     ui->labelTitle->setText(appName);
 
     const QString versionTrio = QString("%1.%2.%3").arg(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
-    ui->labelVersion->setText(tr("Version %1 [%2]").arg(versionTrio, GIT_REV_INFO));
+    ui->labelVersion->setText(tr("Version %1 %2").arg(versionTrio, GIT_REV_INFO));
 
     const QString buildDate = QDateTime::fromSecsSinceEpoch(BUILD_DATE).toUTC().toString("dd MMM yyyy hh:mm:ss t");
     ui->labelBuilt->setText(tr("Built %1").arg(buildDate));
 
-    for (const auto &tab : {
-                 tr("yangl.html"),
-                 tr("License.txt"),
-                 tr("NordVPN.html"),
-                 tr("Qt.html"),
-         })
-        createTab(tab);
+    for (int i = TabId::Yangl; i < TabId::Last; ++i)
+        createTab(static_cast<AboutDialog::TabId>(i));
 }
 
 AboutDialog::~AboutDialog()
@@ -62,7 +64,7 @@ AboutDialog::~AboutDialog()
     delete ui;
 }
 
-/*static*/ void AboutDialog::impressTheUser(QWidget *parent)
+/*static*/ void AboutDialog::makeVisible(QWidget *parent)
 {
     if (!m_instance) {
         m_instance = new AboutDialog(parent);
@@ -86,8 +88,9 @@ QString AboutDialog::readResourceFile(const QString &path) const
     return in.readAll();
 }
 
-void AboutDialog::createTab(const QString &file)
+void AboutDialog::createTab(TabId tabId)
 {
+    const QString &file = AboutDialog::m_tabs[tabId];
     const QStringList nameParts = file.split('.');
 
     QWidget *tab = new QWidget(ui->tabWidget);
@@ -103,9 +106,14 @@ void AboutDialog::createTab(const QString &file)
     else
         display->setHtml(content);
 
-    if (file.startsWith(QStringLiteral("Qt."))) {
+    switch (tabId) {
+    case TabId::Qt: {
         QPushButton *btnAboutQt = new QPushButton(tr("About Qt"), tab);
         connect(btnAboutQt, &QPushButton::clicked, qApp, &QApplication::aboutQt);
         vBox->addWidget(btnAboutQt);
+        break;
+    }
+    default:
+        break;
     }
 }

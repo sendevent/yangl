@@ -36,6 +36,8 @@ public:
 
     CLICaller *bus() const;
     ActionStorage *storate() const;
+    StateChecker *stateChecker() const;
+
     void connectTo(const QString &country, const QString &city);
 
 private slots:
@@ -45,6 +47,7 @@ private slots:
     void showSettingsEditor();
     void showLog();
     void showAbout();
+
     void performStatusCheck();
 
     void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
@@ -61,7 +64,6 @@ private:
     MenuHolder *m_menuHolder;
     QTimer *m_pauseTimer;
     int m_paused;
-    bool m_settingsShown;
     QPointer<QWidget> m_mapView;
     void loadSettings();
 
