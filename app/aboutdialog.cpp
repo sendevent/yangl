@@ -20,6 +20,7 @@
 #include "QApplication"
 #include "common.h"
 #include "ui_aboutdialog.h"
+#include "version.h"
 
 #include <QDateTime>
 #include <QFile>
@@ -49,10 +50,10 @@ AboutDialog::AboutDialog(QWidget *parent)
     ui->labelTitle->setFont(f);
     ui->labelTitle->setText(appName);
 
-    const QString versionTrio = QString("%1.%2.%3").arg(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
-    ui->labelVersion->setText(tr("Version %1 %2").arg(versionTrio, GIT_REV_INFO));
+    ui->labelVersion->setText(tr("Version %1 [%2]").arg(yangl::V.trio(), yangl::V.commit()));
 
-    const QString buildDate = QDateTime::fromSecsSinceEpoch(BUILD_DATE).toUTC().toString("dd MMM yyyy hh:mm:ss t");
+    const QString buildDate =
+            QDateTime::fromSecsSinceEpoch(yangl::V.BuildDateSeconds).toUTC().toString("dd MMM yyyy hh:mm:ss t");
     ui->labelBuilt->setText(tr("Built %1").arg(buildDate));
 
     for (int i = TabId::Yangl; i < TabId::Last; ++i)

@@ -78,3 +78,6 @@ build
 #SNAP's
 *.snap
 yangl.metainfo.xml
+
+#versioning
+app/version.h

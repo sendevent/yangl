@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd "$(dirname "$(realpath "$0")")";
+
 CONF_MAJOR="1"
 CONF_MINOR="0"
 CONF_PATCH="0"
@@ -97,3 +99,9 @@ metaFile=yangl.metainfo.xml
 sed -E -e "0,/(replaceme)/ s//\n<release date=\"`date -d @$CONF_BUILDTIME +%Y-%m-%d`\" version=\"$VERSION_SNAP\" \/>/" ./$metaFile.in > ./$metaFile
 
 echo $VERSION
+
+#generating header
+header="version.h"
+cppDirtynessMark=$([[ ! -z "$CONF_DIRTY" ]] && echo "true" || echo "false")
+headerOut=$(printf "`cat ./$header.in`" "$MAJOR" "$MINOR" "$PATCH" "$CONF_BRANCH" "$CONF_HASH" "$cppDirtynessMark" "$CONF_BUILDTIME" )
+echo "$headerOut" > ./app/$header
