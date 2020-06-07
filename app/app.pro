@@ -42,7 +42,8 @@ SOURCES += \
     settings/settingsdialog.cpp \
     settings/settingsmanager.cpp \
     statechecker.cpp \
-    trayicon.cpp
+    trayicon.cpp \
+    version.cpp
 
 HEADERS += \
     aboutdialog.h \
@@ -66,7 +67,8 @@ HEADERS += \
     settings/settingsdialog.h \
     settings/settingsmanager.h \
     statechecker.h \
-    trayicon.h
+    trayicon.h \
+    version.h
 
 FORMS += \
     aboutdialog.ui \
