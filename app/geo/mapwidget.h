@@ -36,8 +36,10 @@ public:
         QString m_city;
     };
 
-    explicit MapWidget(QWidget *parent = {});
+    explicit MapWidget(const QString &mapPlugin, int mapType, QWidget *parent = {});
     ~MapWidget();
+
+    void init();
 
     void addMark(const QString &country, const QString &city);
 
@@ -51,6 +53,15 @@ public:
     void centerOn(const QGeoCoordinate &center);
 
     void setActiveConnection(const AddrHandler &marker);
+
+    static QStringList geoServices();
+
+    static QStringList supportedMapTypesSorted(const QString &inPlugin);
+
+    void setMapType(const QString &mapTypeName);
+    void setMapType(int mapTypeId);
+
+    QSize sizeHint() const override;
 
 signals:
     void markerDoubleclicked(const AddrHandler &marker);
@@ -77,6 +88,9 @@ private:
 
     void loadJson();
     void saveJson();
+
+    QStringList supportedMapTypesSorted() const;
+    QStringList supportedMapTypes() const;
 };
 
 Q_DECLARE_METATYPE(MapWidget::AddrHandler)

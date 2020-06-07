@@ -126,7 +126,8 @@ void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
 
     auto makeConnection = [this](const Action::Ptr &action, QMenu *menu, QAction *before) {
         QAction *qAct = menu->addAction(action->title());
-        qAct->setData(QVariant::fromValue(action.get()));
+        if (action)
+            qAct->setData(QVariant::fromValue(&*action));
         menu->insertAction(before, qAct);
         connect(qAct, &QAction::triggered, this, &MenuHolder::onActionTriggered);
     };

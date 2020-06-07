@@ -76,6 +76,8 @@ QString CLICall::run()
         errors += proc.readAllStandardError();
     }
 
+    proc.waitForFinished(m_timeout);
+
     return setResult(result.trimmed(), errors.trimmed());
 }
 

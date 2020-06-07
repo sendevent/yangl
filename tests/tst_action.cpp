@@ -82,7 +82,7 @@ void tst_Action::testSetTitle()
 {
     static const QString testValue("test");
     const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown));
-    QSignalSpy spy(action.get(), &Action::titleChanged);
+    QSignalSpy spy(&*action, &Action::titleChanged);
 
     action->setTitle(testValue);
 
@@ -97,7 +97,7 @@ void tst_Action::testSetApp()
 {
     static const QString testValue("/no/such/app");
     const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown));
-    QSignalSpy spy(action.get(), &Action::appChanged);
+    QSignalSpy spy(&*action, &Action::appChanged);
 
     action->setApp(testValue);
 
@@ -112,7 +112,7 @@ void tst_Action::testSetArgs()
 {
     static const QStringList testValue { "-a", "\"b c d\"", "e" };
     const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown));
-    QSignalSpy spy(action.get(), &Action::argsChanged);
+    QSignalSpy spy(&*action, &Action::argsChanged);
 
     action->setArgs(testValue);
 
@@ -127,7 +127,7 @@ void tst_Action::testSetTimeout()
 {
     static const int testValue(1);
     const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown));
-    QSignalSpy spy(action.get(), &Action::timeoutChanged);
+    QSignalSpy spy(&*action, &Action::timeoutChanged);
 
     action->setTimeout(testValue);
 
@@ -142,7 +142,7 @@ void tst_Action::testSetForcedShow()
 {
     static const bool testValue(true);
     const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown));
-    QSignalSpy spy(action.get(), &Action::forcedShowChanged);
+    QSignalSpy spy(&*action, &Action::forcedShowChanged);
 
     action->setForcedShow(testValue);
 
@@ -157,7 +157,7 @@ void tst_Action::testSetAnchor()
 {
     static const Action::MenuPlace testValue(Action::MenuPlace::Own);
     const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown));
-    QSignalSpy spy(action.get(), &Action::anchorChanged);
+    QSignalSpy spy(&*action, &Action::anchorChanged);
 
     action->setAnchor(testValue);
 

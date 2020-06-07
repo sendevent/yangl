@@ -29,11 +29,9 @@ class ActionResultViewer : public QWidget
 {
     Q_OBJECT
 public:
-    static ActionResultViewer *instance();
-
+    static void makeVisible();
     static void registerAction(Action *action);
     static void unregisterAction(Action *action);
-
     static void updateLinesLimit();
 
 private slots:
@@ -41,6 +39,7 @@ private slots:
     void onActionPerformed(const Action::Id &id, const QString &result, bool ok, const QString &info);
 
 private:
+    static ActionResultViewer *instance();
     static ActionResultViewer *m_instance;
     static int m_linesLimit;
 

@@ -17,6 +17,7 @@
 
 #include "mapwidget.h"
 
+#include "appsettings.h"
 #include "common.h"
 #include "mapserversmodel.h"
 #include "settingsmanager.h"
@@ -35,10 +36,10 @@
 #include <QVBoxLayout>
 #include <QWindow>
 
-MapWidget::MapWidget(QWidget *parent)
+MapWidget::MapWidget(const QString &mapPlugin, int mapType, QWidget *parent)
     : QWidget(parent)
     , m_quickView(new QQuickWidget(this))
-    , m_geoSrvProv(new QGeoServiceProvider("osm"))
+    , m_geoSrvProv(new QGeoServiceProvider(QStringLiteral("esri")))
     , m_geoCoder(m_geoSrvProv->geocodingManager())
     , m_serversModel(new MapServersModel(this))
 {
@@ -46,11 +47,24 @@ MapWidget::MapWidget(QWidget *parent)
     m_geoCoder->setLocale(qLocaleC);
 
     m_quickView->rootContext()->setContextProperty("markerModel", m_serversModel);
+    m_quickView->rootContext()->setContextProperty("pluginName", mapPlugin);
+
+    LOG << mapPlugin << mapType;
+
+    setMapType(mapType == -1 ? 0 : mapType);
 
     m_quickView->setSource(QStringLiteral("qrc:/qml/geo/qml/MapView.qml"));
     QVBoxLayout *vBox = new QVBoxLayout(this);
     vBox->addWidget(m_quickView);
+}
 
+MapWidget::~MapWidget()
+{
+    saveJson();
+}
+
+void MapWidget::init()
+{
     if (QQuickItem *map = m_quickView->rootObject()) {
         QObject::connect(map, SIGNAL(markerDoubleclicked(QQuickItem *)), this,
                          SLOT(onMarkerDoubleclicked(QQuickItem *)));
@@ -60,9 +74,32 @@ MapWidget::MapWidget(QWidget *parent)
     loadJson();
 }
 
-MapWidget::~MapWidget()
+/*static*/ QStringList MapWidget::geoServices()
 {
-    saveJson();
+    return QGeoServiceProvider::availableServiceProviders();
+}
+
+/*static*/ QStringList MapWidget::supportedMapTypesSorted(const QString &inPlugin)
+{
+    MapWidget mapWidget(inPlugin, 0);
+    return mapWidget.supportedMapTypesSorted();
+}
+
+QStringList MapWidget::supportedMapTypes() const
+{
+    if (QQuickItem *map = m_quickView->rootObject()) {
+        QVariant returnedValue;
+        QMetaObject::invokeMethod(map, "listMapTypes", Q_RETURN_ARG(QVariant, returnedValue));
+        return returnedValue.toStringList();
+    }
+    return {};
+}
+
+QStringList MapWidget::supportedMapTypesSorted() const
+{
+    QStringList result = supportedMapTypes();
+    //    std::sort(result.begin(), result.end());
+    return result;
 }
 
 void MapWidget::setActiveConnection(const AddrHandler &marker)
@@ -166,6 +203,9 @@ void MapWidget::requestGeo(const AddrHandler &addrHandler)
                 r->deleteLater();
             }
         });
+
+    } else {
+        WRN << "failed create geocode request!";
     }
 }
 
@@ -277,4 +317,22 @@ qreal MapWidget::scale() const
         return map->property("mapScale").toDouble();
     }
     return 0;
+}
+
+void MapWidget::setMapType(int mapTypeId)
+{
+    m_quickView->rootContext()->setContextProperty("mapType", mapTypeId);
+}
+
+void MapWidget::setMapType(const QString &mapTypeName)
+{
+    const int id = supportedMapTypes().indexOf(mapTypeName);
+    LOG << mapTypeName << id;
+    if (id >= 0)
+        setMapType(id);
+}
+
+QSize MapWidget::sizeHint() const
+{
+    return { 300, 300 };
 }

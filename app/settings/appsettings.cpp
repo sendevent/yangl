@@ -74,12 +74,19 @@ GroupMonitor::GroupMonitor()
 GroupMap::GroupMap()
     : OptionsGroup(localName(),
                    {
-                           new AppSetting(QString("%1/Geometry").arg(localName()), {}),
-                           new AppSetting(QString("%1/Filter").arg(localName()), QString()),
-                           new AppSetting(QString("%1/Visible").arg(localName()), false),
-                           new AppSetting(QString("%1/CenterLat").arg(localName()), {}),
-                           new AppSetting(QString("%1/CenterLon").arg(localName()), {}),
-                           new AppSetting(QString("%1/Scale").arg(localName()), 2.5),
+                       new AppSetting(QString("%1/Geometry").arg(localName()), {}),
+                               new AppSetting(QString("%1/Filter").arg(localName()), QString()),
+                               new AppSetting(QString("%1/Visible").arg(localName()), false),
+                               new AppSetting(QString("%1/CenterLat").arg(localName()), {}),
+                               new AppSetting(QString("%1/CenterLon").arg(localName()), {}),
+                               new AppSetting(QString("%1/Scale").arg(localName()), 2.5),
+#if QT_VERSION >= QT_VERSION_CHECK(5, 13, 0)
+                               new AppSetting(QString("%1/Plugin").arg(localName()), QStringLiteral("mapboxgl")),
+                               new AppSetting(QString("%1/Type").arg(localName()), 6),
+#else
+                               new AppSetting(QString("%1/Plugin").arg(localName()), QStringLiteral("esri")),
+                               new AppSetting(QString("%1/Type").arg(localName()), 6),
+#endif
                    },
                    {})
 {

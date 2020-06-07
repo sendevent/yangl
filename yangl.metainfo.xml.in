@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.denisgofman.yangl</id> 
+  <name>yangl</name>
+  <title>Yet Another NordVPN GUI for Linux</title>
+  <summary>Unofficial but cute Qt wrapper for the official nordvpn CLI.</summary>
+  <description>
+    System tray entry with quick access to the connection status, 
+    dis-/connect, pause, and customizable actions.
+  </description>
+  <launchable type="desktop-id">
+    org.denisgofman.yangl.desktop
+  </launchable>
+  <releases type="desktop-id">
+    replaceme
+  </releases>
+</component>

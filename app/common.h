@@ -20,8 +20,12 @@
 #include <QDateTime>
 #include <QDebug>
 
+#ifndef YANGL_TIMESTAMP
+#define YANGL_TIMESTAMP QDateTime::currentDateTime().toString("t hh:mm:ss.zzz:")
+#endif // YANGL_TIMESTAMP
+
 #ifndef YANGL_LOG_PREFIX
-#define YANGL_LOG_PREFIX qPrintable(yangl::now()) << Q_FUNC_INFO
+#define YANGL_LOG_PREFIX qPrintable(YANGL_TIMESTAMP) << Q_FUNC_INFO
 #endif // YANGL_LOG_PREFIX
 
 #ifndef LOG
@@ -39,11 +43,5 @@
 namespace yangl {
 
 static constexpr int OneSecondMs { 1000 };
-
-static QString now()
-{
-    QDateTime d = QDateTime::currentDateTime();
-    return d.toString("hh:mm:ss.zzz:");
-}
 
 } // ns yangl
