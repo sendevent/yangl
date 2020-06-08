@@ -53,7 +53,7 @@ QList<Action::Ptr> ActionStorage::allActions() const
     return knownActions() + userActions();
 }
 
-Action::Ptr ActionStorage::action(int knownAction) const
+Action::Ptr ActionStorage::action(Action::NordVPN knownAction) const
 {
     return m_builtinActions.value(knownAction, {});
 }
@@ -69,7 +69,6 @@ QList<Action::Ptr> ActionStorage::load(const QString &from)
     QFile in(usedPath);
     if (!in.open(QIODevice::ReadOnly | QIODevice::Text)) {
         WRN << "failed opening file:" << usedPath << in.errorString();
-        return {};
     }
 
     return load(&in);
@@ -112,15 +111,16 @@ void ActionStorage::save(QIODevice(*to))
 
 Action::Ptr ActionStorage::createUserAction(QObject *parent)
 {
-    return createAction(Action::Scope::User, KnownAction::Unknown, {}, AppSettings::Monitor.NVPNPath->read().toString(),
-                        {}, {}, true, Action::MenuPlace::Own, CLICall::DefaultTimeoutMSecs, parent);
+    return createAction(Action::Flow::Custom, Action::NordVPN::Unknown, {},
+                        AppSettings::Monitor.NVPNPath->read().toString(), {}, {}, true, Action::MenuPlace::Own,
+                        CLICall::DefaultTimeoutMSecs, parent);
 }
 
 void ActionStorage::initActions(bool updateFromJson)
 {
     if (!updateFromJson) {
-        for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i) {
-            if (const Action::Ptr &action = createAction(static_cast<KnownAction>(i))) {
+        for (auto i : Action::knownActions()) {
+            if (const Action::Ptr &action = createAction(static_cast<Action::NordVPN>(i))) {
                 m_builtinActions.insert(action->type(), action);
                 m_json->putAction(&*action);
             }
@@ -135,14 +135,13 @@ void ActionStorage::initActions(bool updateFromJson)
 
 void ActionStorage::loadBuiltinActions()
 {
-    QMap<KnownAction, Action::Ptr> jsonBuiltinActionsById;
+    QMap<Action::NordVPN, Action::Ptr> jsonBuiltinActionsById;
     const QVector<QString> &jsonBuiltinActionIds = m_json->builtinActionIds();
     for (const auto &id : jsonBuiltinActionIds)
-        if (const auto &action = m_json->action(Action::Scope::Builtin, id))
+        if (const auto &action = m_json->action(Action::Flow::NordVPN, id))
             jsonBuiltinActionsById.insert(action->type(), action);
 
-    for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i) {
-        const KnownAction actionType = static_cast<KnownAction>(i);
+    for (auto actionType : Action::knownActions()) {
         if (const auto &action = jsonBuiltinActionsById.value(actionType, {})) {
             m_builtinActions[actionType] = action;
             jsonBuiltinActionsById.remove(actionType);
@@ -166,14 +165,14 @@ void ActionStorage::loadUserActions()
 {
     for (const QString &id : m_json->customActionIds())
         if (!id.isEmpty())
-            if (const Action::Ptr &action = m_json->action(Action::Scope::User, id))
+            if (const Action::Ptr &action = m_json->action(Action::Flow::Custom, id))
                 m_userActions.insert(action->id(), action);
 }
 
-Action::Ptr ActionStorage::createAction(KnownAction actionType, const QString &id)
+Action::Ptr ActionStorage::createAction(Action::NordVPN actionType, const QString &id)
 {
     const QString &appPath = AppSettings::Monitor.NVPNPath->read().toString();
-    Action::Scope scope = Action::Scope::Builtin;
+    Action::Flow scope = Action::Flow::NordVPN;
 
     QString title;
     QStringList args;
@@ -183,107 +182,107 @@ Action::Ptr ActionStorage::createAction(KnownAction actionType, const QString &i
     auto wordsToList = [&args](const QString &noQuotes) { args << noQuotes.split(' '); };
 
     switch (actionType) {
-    case KnownAction::CheckStatus: {
+    case Action::NordVPN::CheckStatus: {
         title = QObject::tr("Check status");
         wordsToList(QStringLiteral("status"));
         menuPlace = Action::MenuPlace::Common;
         break;
     }
-    case KnownAction::Connect: {
+    case Action::NordVPN::Connect: {
         title = QObject::tr("Connect");
         wordsToList(QStringLiteral("c"));
         menuPlace = Action::MenuPlace::Common;
         break;
     }
-    case KnownAction::Disconnect: {
+    case Action::NordVPN::Disconnect: {
         title = QObject::tr("Disonnect");
         wordsToList(QStringLiteral("disconnect"));
         menuPlace = Action::MenuPlace::Own;
         break;
     }
-    case KnownAction::Settings: {
+    case Action::NordVPN::Settings: {
         title = QObject::tr("Show used settings");
         wordsToList(QStringLiteral("settings"));
         forceShow = true;
         menuPlace = Action::MenuPlace::Own;
         break;
     }
-    case KnownAction::Account: {
+    case Action::NordVPN::Account: {
         title = QObject::tr("Account details");
         wordsToList(QStringLiteral("account"));
         forceShow = true;
         menuPlace = Action::MenuPlace::Own;
         break;
     }
-    case KnownAction::Pause05: {
+    case Action::NordVPN::Pause05: {
         title = QObject::tr("Pause for 5m");
         menuPlace = Action::MenuPlace::Common;
         break;
     }
-    case KnownAction::Pause30: {
+    case Action::NordVPN::Pause30: {
         title = QObject::tr("Pause for 30m");
         menuPlace = Action::MenuPlace::Common;
         break;
     }
-    case KnownAction::Pause60: {
+    case Action::NordVPN::Pause60: {
         title = QObject::tr("Pause for 1h");
         menuPlace = Action::MenuPlace::Common;
         break;
     }
-    case KnownAction::PauseCustom: {
+    case Action::NordVPN::PauseCustom: {
         title = QObject::tr("Pause for ?");
         menuPlace = Action::MenuPlace::Common;
         break;
     }
-    case KnownAction::Rate5: {
+    case Action::NordVPN::Rate5: {
         title = QObject::tr("Rate ★★★★★");
         wordsToList(QStringLiteral("rate 5"));
         menuPlace = Action::MenuPlace::Own;
         forceShow = true;
         break;
     }
-    case KnownAction::Rate4: {
+    case Action::NordVPN::Rate4: {
         title = QObject::tr("Rate ★★★★☆");
         wordsToList(QStringLiteral("rate 4"));
         menuPlace = Action::MenuPlace::Own;
         forceShow = true;
         break;
     }
-    case KnownAction::Rate3: {
+    case Action::NordVPN::Rate3: {
         title = QObject::tr("Rate ★★★☆☆");
         wordsToList(QStringLiteral("rate 3"));
         menuPlace = Action::MenuPlace::Own;
         forceShow = true;
         break;
     }
-    case KnownAction::Rate2: {
+    case Action::NordVPN::Rate2: {
         title = QObject::tr("Rate ★★☆☆☆");
         menuPlace = Action::MenuPlace::Own;
         wordsToList(QStringLiteral("rate 2"));
         forceShow = true;
         break;
     }
-    case KnownAction::Rate1: {
+    case Action::NordVPN::Rate1: {
         title = QObject::tr("Rate ★☆☆☆☆");
         menuPlace = Action::MenuPlace::Own;
         wordsToList(QStringLiteral("rate 1"));
         forceShow = true;
         break;
     }
-    case KnownAction::SetNotifyOff: {
+    case Action::NordVPN::SetNotifyOff: {
         title = QObject::tr("Notify OFF");
         menuPlace = Action::MenuPlace::Own;
         wordsToList(QStringLiteral("set notify 0"));
         break;
     }
-    case KnownAction::SetNotifyOn: {
+    case Action::NordVPN::SetNotifyOn: {
         title = QObject::tr("Notify ON");
         menuPlace = Action::MenuPlace::Own;
         wordsToList(QStringLiteral("set notify 1"));
         break;
     }
     default:
-        scope = Action::Scope::User;
+        scope = Action::Flow::Custom;
         forceShow = true;
         break;
     }
@@ -292,15 +291,15 @@ Action::Ptr ActionStorage::createAction(KnownAction actionType, const QString &i
                         CLICall::DefaultTimeoutMSecs, this);
 }
 
-Action::Ptr ActionStorage::createAction(Action::Scope scope, KnownAction type, const Action::Id &id,
+Action::Ptr ActionStorage::createAction(Action::Flow scope, Action::NordVPN type, const Action::Id &id,
                                         const QString &appPath, const QString &title, const QStringList &args,
                                         bool alwaysShowResult, Action::MenuPlace anchor, int timeout, QObject *parent)
 {
     Action::Ptr action;
 
-    if (scope == Action::Scope::Builtin)
+    if (scope == Action::Flow::NordVPN)
         action = m_builtinActions.value(type, {});
-    else if (scope == Action::Scope::User && !id.isNull())
+    else if (scope == Action::Flow::Custom && !id.isNull())
         action = m_userActions.value(id, {});
 
     if (!action)
@@ -320,17 +319,17 @@ Action::Ptr ActionStorage::createAction(Action::Scope scope, KnownAction type, c
     return action;
 }
 
-bool ActionStorage::updateActions(const QList<Action::Ptr> &actions, Action::Scope scope)
+bool ActionStorage::updateActions(const QList<Action::Ptr> &actions, Action::Flow scope)
 {
-    const bool isBuiltin = scope == Action::Scope::Builtin;
+    const bool isBuiltin = scope == Action::Flow::NordVPN;
     return isBuiltin ? updateBuiltinActions(actions) : updateUserActions(actions);
 }
 
 bool ActionStorage::updateBuiltinActions(const QList<Action::Ptr> &actions)
 {
-    QList<int> savedActions;
+    QList<Action::NordVPN> savedActions;
     for (auto action : actions) {
-        const int actType = action->type();
+        const Action::NordVPN actType = action->type();
         if (m_builtinActions.contains(actType))
             m_builtinActions[actType] = action;
         else

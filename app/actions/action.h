@@ -17,8 +17,7 @@
 
 #pragma once
 
-#include "actiontypes.h"
-
+#include <QMetaEnum>
 #include <QObject>
 #include <QPointer>
 #include <QSharedPointer>
@@ -34,11 +33,39 @@ public:
     using Id = QUuid;
     using Ptr = QSharedPointer<Action>;
 
-    enum class Scope
+    enum class Flow
     {
-        Builtin = 0,
-        User,
+        Yangl,
+        NordVPN,
+        Custom,
     };
+
+    enum class NordVPN
+    {
+        Unknown,
+
+        CheckStatus,
+        Connect,
+        Disconnect,
+        Settings,
+        Account,
+
+        Pause05,
+        Pause30,
+        Pause60,
+        PauseCustom,
+
+        Rate5,
+        Rate4,
+        Rate3,
+        Rate2,
+        Rate1,
+
+        SetNotifyOff,
+        SetNotifyOn,
+    };
+
+    Q_ENUM(NordVPN);
 
     enum class MenuPlace
     {
@@ -50,8 +77,10 @@ public:
     virtual ~Action();
     Id id() const;
 
-    virtual Action::Scope scope() const;
-    virtual KnownAction type() const;
+    virtual Action::Flow scope() const;
+    virtual Action::NordVPN type() const;
+
+    static QVector<Action::NordVPN> knownActions();
 
     QString title() const;
     void setTitle(const QString &title);
@@ -102,11 +131,11 @@ protected:
     friend class ActionStorage;
     static int MetaIdId;
 
-    explicit Action(Action::Scope scope, KnownAction type, QObject *parent = {}, const Action::Id &id = {});
+    explicit Action(Action::Flow scope, NordVPN type, QObject *parent = {}, const Action::Id &id = {});
 
     const Action::Id m_id;
-    const Action::Scope m_scope;
-    const KnownAction m_type;
+    const Action::Flow m_scope;
+    const NordVPN m_type;
 
     QString m_title;
     QString m_app;
@@ -118,3 +147,5 @@ protected:
 };
 
 Q_DECLARE_METATYPE(Action::MenuPlace);
+
+uint qHash(Action::NordVPN key, uint seed = 0);

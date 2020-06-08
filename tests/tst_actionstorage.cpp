@@ -17,14 +17,24 @@
 
 #include "tst_actionstorage.h"
 
+#include "action.h"
 #include "actionstorage.h"
+#include "settingsmanager.h"
 
+#include <QFile>
 #include <QtTest>
 
 tst_ActionStorage::tst_ActionStorage(QObject *parent)
     : QObject(parent)
 {
     QStandardPaths::setTestModeEnabled(true);
+}
+
+void tst_ActionStorage::cleanupTestCase()
+{
+    static const QString path = SettingsManager::dirPath();
+    for (const auto &file : { "actions.json", "settings.conf" })
+        QFile::remove(QString("%1/%2").arg(path, file));
 }
 
 void tst_ActionStorage::init()
@@ -44,15 +54,15 @@ QList<Action::Ptr> tst_ActionStorage::populateUserActions(ActionStorage *storage
     QList<Action::Ptr> userActions;
     for (int i = 0; i < count; ++i)
         userActions.append(storage->createUserAction());
-    storage->updateActions(userActions, Action::Scope::User);
+    storage->updateActions(userActions, Action::Flow::Custom);
     return userActions;
 }
 
 void tst_ActionStorage::test_builtinActions()
 {
-    QList<KnownAction> knownActions;
-    for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i)
-        knownActions.append(static_cast<KnownAction>(i));
+    QList<Action::Action::NordVPN> knownActions;
+    for (auto i : Action::knownActions())
+        knownActions.append(i);
 
     ActionStorage storage;
     storage.load();
@@ -96,7 +106,7 @@ void tst_ActionStorage::test_allActions()
     storage.load();
 
     const QList<Action::Ptr> &knownActions = storage.knownActions();
-    QCOMPARE(knownActions.size(), KnownAction::Last - 1);
+    QCOMPARE(knownActions.size(), QMetaEnum::fromType<Action::NordVPN>().keyCount() - 1);
 
     QCOMPARE(storage.userActions().size(), 0);
 
@@ -107,7 +117,7 @@ void tst_ActionStorage::test_allActions()
     QVERIFY(allActions.size() == userActions.size() + knownActions.size());
 
     for (const auto &actionHandled : allActions) {
-        if (actionHandled->scope() == Action::Scope::Builtin)
+        if (actionHandled->scope() == Action::Flow::NordVPN)
             QVERIFY(knownActions.indexOf(actionHandled) >= 0);
         else
             QVERIFY(userActions.indexOf(actionHandled) >= 0);
@@ -120,12 +130,12 @@ void tst_ActionStorage::test_actionBuiltin()
     storage.load();
 
     const QList<Action::Ptr> &knownActions = storage.knownActions();
-    QCOMPARE(knownActions.size(), KnownAction::Last - 1);
+    QCOMPARE(knownActions.size(), QMetaEnum::fromType<Action::NordVPN>().keyCount() - 1);
 
-    for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i) {
+    for (auto i : Action::knownActions()) {
         const Action::Ptr &action = storage.action(i);
         QVERIFY(action != nullptr);
-        QCOMPARE(action->type(), static_cast<KnownAction>(i));
+        QCOMPARE(action->type(), static_cast<Action::NordVPN>(i));
     }
 }
 
@@ -162,8 +172,8 @@ void tst_ActionStorage::test_saveAndLoad()
         QCOMPARE(storage.userActions().size(), UserActionCount);
 
         for (const Action::Ptr &action : storage.allActions()) {
-            if (action->scope() == Action::Scope::Builtin)
-                action->setTitle(QString("BuiltinAction_%1").arg(action->type()));
+            if (action->scope() == Action::Flow::NordVPN)
+                action->setTitle(QString("BuiltinAction_%1").arg(static_cast<int>(action->type())));
             else
                 action->setTitle(QString("UserAction_%1").arg(action->id().toString()));
         }
@@ -176,11 +186,11 @@ void tst_ActionStorage::test_saveAndLoad()
         storage.load();
 
         const QList<Action::Ptr> allActions = storage.allActions();
-        QCOMPARE(allActions.size(), KnownAction::Last - 1 + UserActionCount);
+        QCOMPARE(allActions.size(), QMetaEnum::fromType<Action::NordVPN>().keyCount() - 1 + UserActionCount);
 
         for (const Action::Ptr &action : allActions) {
-            if (action->scope() == Action::Scope::Builtin)
-                QCOMPARE(action->title(), QString("BuiltinAction_%1").arg(action->type()));
+            if (action->scope() == Action::Flow::NordVPN)
+                QCOMPARE(action->title(), QString("BuiltinAction_%1").arg(static_cast<int>(action->type())));
             else
                 QCOMPARE(action->title(), QString("UserAction_%1").arg(action->id().toString()));
         }
@@ -206,17 +216,18 @@ void tst_ActionStorage::test_updateActionsBuiltin()
     storage.load();
 
     const QList<Action::Ptr> &actions = storage.knownActions();
-    QCOMPARE(actions.size(), KnownAction::Last - 1);
+    QCOMPARE(actions.size(), QMetaEnum::fromType<Action::NordVPN>().keyCount() - 1);
+
     for (int i = 0; i < actions.size(); ++i) {
         const Action::Ptr &action = actions.at(i);
-        action->setTitle(QString("BuiltinAction_%1").arg(action->type()));
+        action->setTitle(QString("BuiltinAction_%1").arg(static_cast<int>(action->type())));
     }
 
-    storage.updateActions(actions, Action::Scope::Builtin);
+    storage.updateActions(actions, Action::Flow::NordVPN);
 
-    for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i) {
+    for (auto i : Action::knownActions()) {
         const Action::Ptr &action = storage.action(i);
-        QCOMPARE(action->title(), QString("BuiltinAction_%1").arg(action->type()));
+        QCOMPARE(action->title(), QString("BuiltinAction_%1").arg(static_cast<int>(action->type())));
     }
 }
 
@@ -237,7 +248,7 @@ void tst_ActionStorage::test_updateActionsUser()
         action->setTitle(QString("UserAction_%1").arg(action->id().toString()));
     }
 
-    storage.updateActions(userActions, Action::Scope::User);
+    storage.updateActions(userActions, Action::Flow::Custom);
 
     for (int i = 0; i < UserActionCount; ++i) {
         const Action::Ptr &action = storage.action(userActions.at(i)->id());

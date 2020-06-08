@@ -27,7 +27,7 @@ ActionsTab::ActionsTab(QWidget *parent)
     , ui(new Ui::ActionsTab)
     , m_actions()
     , m_actStorage(nullptr)
-    , m_scope(Action::Scope::Builtin)
+    , m_scope(Action::Flow::NordVPN)
 {
     ui->setupUi(this);
     ui->buttonRemove->setEnabled(false);
@@ -41,7 +41,7 @@ ActionsTab::~ActionsTab()
     delete ui;
 }
 
-void ActionsTab::setActions(ActionStorage *actStorage, Action::Scope scope)
+void ActionsTab::setActions(ActionStorage *actStorage, Action::Flow scope)
 {
     m_scope = scope;
     m_actStorage = actStorage;
@@ -52,7 +52,7 @@ void ActionsTab::setActions(ActionStorage *actStorage, Action::Scope scope)
         delete last;
     }
 
-    if (scope == Action::Scope::Builtin) {
+    if (scope == Action::Flow::NordVPN) {
         ui->buttonAdd->hide();
         ui->buttonRemove->hide();
         delete ui->buttonsLayout;

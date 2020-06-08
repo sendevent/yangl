@@ -32,6 +32,8 @@ private:
     QList<Action::Ptr> populateUserActions(ActionStorage *storage, int count);
 
 private slots:
+    void cleanupTestCase();
+
     void init();
     void cleanup();
 

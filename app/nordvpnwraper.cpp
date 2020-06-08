@@ -96,7 +96,7 @@ void NordVpnWraper::start()
 
     initMenu();
 
-    m_checker->setCheckAction(m_actions->action(KnownAction::CheckStatus));
+    m_checker->setCheckAction(m_actions->action(Action::NordVPN::CheckStatus));
 
 #ifndef YANGL_NO_GEOCHART
     connect(m_menuHolder->getActShowMap(), &QAction::triggered, this, &NordVpnWraper::showMapView,
@@ -145,7 +145,7 @@ void NordVpnWraper::performStatusCheck()
 
 void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    KnownAction invokeMe(KnownAction::Unknown);
+    Action::NordVPN invokeMe(Action::NordVPN::Unknown);
     switch (reason) {
     case QSystemTrayIcon::Trigger: {
 #ifndef YANGL_NO_GEOCHART
@@ -163,15 +163,15 @@ void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason
     case QSystemTrayIcon::MiddleClick: {
         switch (m_checker->state().status()) {
         case NordVpnInfo::Status::Connected: {
-            invokeMe = KnownAction::Disconnect;
+            invokeMe = Action::NordVPN::Disconnect;
             break;
         }
         case NordVpnInfo::Status::Disconnected: {
-            invokeMe = KnownAction::Connect;
+            invokeMe = Action::NordVPN::Connect;
             break;
         }
         case NordVpnInfo::Status::Unknown: {
-            invokeMe = KnownAction::CheckStatus;
+            invokeMe = Action::NordVPN::CheckStatus;
             break;
         }
         default:
@@ -183,7 +183,7 @@ void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason
         return;
     }
 
-    if (invokeMe == KnownAction::Unknown)
+    if (invokeMe == Action::NordVPN::Unknown)
         return;
 
     if (const Action::Ptr &action = m_actions->action(invokeMe))
@@ -193,12 +193,12 @@ void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason
 void NordVpnWraper::onActionTriggered(Action *action)
 {
     if (action) {
-        const KnownAction actType = action->type();
+        const Action::NordVPN actType = action->type();
         switch (actType) {
-        case Pause05:
-        case Pause30:
-        case Pause60:
-        case PauseCustom: {
+        case Action::NordVPN::Pause05:
+        case Action::NordVPN::Pause30:
+        case Action::NordVPN::Pause60:
+        case Action::NordVPN::PauseCustom: {
             pause(actType);
             return;
         }
@@ -209,23 +209,23 @@ void NordVpnWraper::onActionTriggered(Action *action)
     }
 }
 
-void NordVpnWraper::pause(KnownAction action)
+void NordVpnWraper::pause(Action::NordVPN action)
 {
     if (m_paused)
         return;
 
     int duration(0);
     switch (action) {
-    case Pause05:
+    case Action::NordVPN::Pause05:
         duration = 5;
         break;
-    case Pause30:
+    case Action::NordVPN::Pause30:
         duration = 30;
         break;
-    case Pause60:
+    case Action::NordVPN::Pause60:
         duration = 60;
         break;
-    case PauseCustom: {
+    case Action::NordVPN::PauseCustom: {
         duration = QInputDialog::getInt({}, tr("%1 — pause VPN for").arg(qApp->applicationDisplayName()),
                                         tr("Minutes:"), 1, 1, 1440);
         break;
@@ -239,7 +239,7 @@ void NordVpnWraper::pause(KnownAction action)
 
     m_paused = duration * TimeQuantMs;
 
-    if (auto disconnect = m_actions->action(KnownAction::Disconnect)) {
+    if (auto disconnect = m_actions->action(Action::NordVPN::Disconnect)) {
         onActionTriggered(&*disconnect);
         m_pauseTimer->start(yangl::OneSecondMs);
     }
@@ -254,7 +254,7 @@ void NordVpnWraper::onPauseTimer()
         const NordVpnInfo &currentState = m_checker->state();
         if (currentState.status() == NordVpnInfo::Status::Unknown
             || currentState.status() == NordVpnInfo::Status::Disconnected) {
-            if (auto connect = m_actions->action(KnownAction::Connect)) {
+            if (auto connect = m_actions->action(Action::NordVPN::Connect)) {
                 onActionTriggered(&*connect);
             }
         }
@@ -297,23 +297,23 @@ void NordVpnWraper::updateActions(bool connected)
 
             if (auto action = qAction->data().value<Action *>()) {
                 switch (action->type()) {
-                case KnownAction::Rate1:
-                case KnownAction::Rate2:
-                case KnownAction::Rate3:
-                case KnownAction::Rate4:
-                case KnownAction::Rate5:
-                case KnownAction::Connect: {
+                case Action::NordVPN::Rate1:
+                case Action::NordVPN::Rate2:
+                case Action::NordVPN::Rate3:
+                case Action::NordVPN::Rate4:
+                case Action::NordVPN::Rate5:
+                case Action::NordVPN::Connect: {
                     qAction->setEnabled(!connected);
                     break;
                 }
-                case KnownAction::Disconnect: {
+                case Action::NordVPN::Disconnect: {
                     qAction->setEnabled(connected);
                     break;
                 }
-                case KnownAction::Pause05:
-                case KnownAction::Pause30:
-                case KnownAction::Pause60:
-                case KnownAction::PauseCustom: {
+                case Action::NordVPN::Pause05:
+                case Action::NordVPN::Pause30:
+                case Action::NordVPN::Pause60:
+                case Action::NordVPN::PauseCustom: {
                     qAction->setEnabled(connected && !m_pauseTimer->isActive());
                     break;
                 }
