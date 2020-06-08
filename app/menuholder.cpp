@@ -107,7 +107,7 @@ void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
         switch (act->anchor()) {
         case Action::MenuPlace::Own: {
             switch (act->scope()) {
-            case Action::Scope::User: {
+            case Action::Flow::Custom: {
                 customActions.append(act);
                 break;
             }

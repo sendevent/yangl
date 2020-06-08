@@ -67,7 +67,7 @@ private:
     QPointer<QWidget> m_mapView;
     void loadSettings();
 
-    void pause(KnownAction action);
+    void pause(Action::NordVPN action);
 
     void updateActions(bool connected);
 

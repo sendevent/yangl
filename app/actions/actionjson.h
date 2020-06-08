@@ -44,7 +44,7 @@ public:
 
     static QString jsonFilePath();
 
-    Action::Ptr action(Action::Scope scope, const QString &id);
+    Action::Ptr action(Action::Flow scope, const QString &id);
 
 private:
     QJsonObject m_json;

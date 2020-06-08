@@ -32,7 +32,12 @@
 
 /*static*/ int Action::MetaIdId = -1;
 
-Action::Action(Action::Scope scope, KnownAction type, QObject *parent, const Action::Id &id)
+uint qHash(Action::NordVPN key, uint seed)
+{
+    return qHash(static_cast<int>(key), seed);
+}
+
+Action::Action(Action::Flow scope, NordVPN type, QObject *parent, const Action::Id &id)
     : QObject(parent)
     , m_id(id.isNull() ? QUuid::createUuid() : id)
     , m_scope(scope)
@@ -60,12 +65,12 @@ Action::~Action()
 {
     ActionResultViewer::unregisterAction(this);
 }
-Action::Scope Action::scope() const
+Action::Flow Action::scope() const
 {
     return m_scope;
 }
 
-KnownAction Action::type() const
+Action::NordVPN Action::type() const
 {
     return m_type;
 }
@@ -218,10 +223,18 @@ void Action::setAnchor(MenuPlace place)
 
 QString Action::groupKey() const
 {
-    return scope() == Action::Scope::Builtin ? GroupKeyBuiltin : GroupKeyCustom;
+    return scope() == Action::Flow::NordVPN ? GroupKeyBuiltin : GroupKeyCustom;
 }
 
 QString Action::key() const
 {
     return /*scope() == Action::Scope::Builtin ? QString::number(type()) :*/ id().toString();
+}
+
+/*static*/ QVector<Action::NordVPN> Action::knownActions()
+{
+    static QVector<Action::NordVPN> actions;
+    if (actions.isEmpty())
+        actions = yangl::allEnum<Action::NordVPN>({ Action::NordVPN::Unknown });
+    return actions;
 }

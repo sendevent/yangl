@@ -29,7 +29,7 @@
         "{\n    \"custom\": {\n        \"{057c11c0-de87-48c4-a98e-93471b4290ca}\": {\n            \"anchor\": 0,\n     "
         "       \"app\": \"/usr/bin/ls\",\n            \"args\": [\n                \"-la\"\n            ],\n          "
         "  \"forcedDisplay\": false,\n            \"id\": \"{057c11c0-de87-48c4-a98e-93471b4290ca}\",\n            "
-        "\"scope\": 1,\n            \"timeout\": 30000,\n            \"title\": \"\",\n            \"type\": 0\n       "
+        "\"scope\": 2,\n            \"timeout\": 30000,\n            \"title\": \"\",\n            \"type\": 0\n       "
         " }\n    }\n}\n";
 
 tst_ActionJson::tst_ActionJson()
@@ -41,12 +41,11 @@ void tst_ActionJson::test_filePath()
 {
     const QString jsonFilePath = ActionJson::jsonFilePath();
     QVERIFY(jsonFilePath.endsWith(QString("%1/actions.json").arg(qAppName())));
-    QVERIFY(QFileInfo::exists(jsonFilePath));
 }
 
 void tst_ActionJson::test_load()
 {
-    const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown, {}, TestId));
+    const Action::Ptr action(new tst_Action(Action::Flow::Custom, Action::NordVPN::Unknown, {}, TestId));
 
     QByteArray inputString(TestJson);
     QBuffer in(&inputString);
@@ -74,7 +73,7 @@ void tst_ActionJson::test_load()
 
 void tst_ActionJson::test_save()
 {
-    const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown, {}, TestId));
+    const Action::Ptr action(new tst_Action(Action::Flow::Custom, Action::NordVPN::Unknown, {}, TestId));
     action->setApp("/usr/bin/ls");
     action->setArgs({ "-la" });
 
