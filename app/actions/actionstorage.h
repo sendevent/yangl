@@ -35,7 +35,7 @@ public:
     QList<Action::Ptr> userActions() const;
     QList<Action::Ptr> allActions() const;
 
-    Action::Ptr action(int knownAction) const;
+    Action::Ptr action(Action::NordVPN knownAction) const;
     Action::Ptr action(const Action::Id &userAction) const;
 
     QList<Action::Ptr> load(const QString &from = {});
@@ -44,22 +44,20 @@ public:
     void save(QIODevice *from);
 
     Action::Ptr createUserAction(QObject *parent = {});
-    Action::Ptr createAction(Action::Scope scope, KnownAction type, const Action::Id &id, const QString &appPath,
+    Action::Ptr createAction(Action::Flow scope, Action::NordVPN type, const Action::Id &id, const QString &appPath,
                              const QString &title, const QStringList &args, bool alwaysShowResult,
                              Action::MenuPlace anchor, int timeout, QObject *parent);
 
-    bool updateActions(const QList<Action::Ptr> &actions, Action::Scope scope);
-
-    static QString jsonFilePath();
+    bool updateActions(const QList<Action::Ptr> &actions, Action::Flow scope);
 
 private:
-    QHash<int, Action::Ptr> m_builtinActions;
+    QHash<Action::NordVPN, Action::Ptr> m_builtinActions;
     QHash<Action::Id, Action::Ptr> m_userActions;
     const std::unique_ptr<ActionJson> m_json;
 
     void initActions(bool updateFromJson);
 
-    Action::Ptr createAction(KnownAction actionType, const QString &id = {});
+    Action::Ptr createAction(Action::NordVPN actionType, const QString &id = {});
 
     bool updateBuiltinActions(const QList<Action::Ptr> &actions);
     bool updateUserActions(const QList<Action::Ptr> &actions);

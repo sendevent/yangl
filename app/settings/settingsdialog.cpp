@@ -63,8 +63,8 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::accept);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &SettingsDialog::reject);
 
-    ui->tabNordVpn->setActions(m_actStorage, Action::Scope::Builtin);
-    ui->tabCustom->setActions(m_actStorage, Action::Scope::User);
+    ui->tabNordVpn->setActions(m_actStorage, Action::Flow::NordVPN);
+    ui->tabCustom->setActions(m_actStorage, Action::Flow::Custom);
     ui->spinBoxLogLines->setValue(AppSettings::Monitor.LogLinesLimit->read().toInt());
 
 #ifndef YANGL_NO_GEOCHART
