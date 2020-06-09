@@ -30,9 +30,8 @@ ActionEditor::ActionEditor(const Action::Ptr &act, QWidget *parent)
 
     ui->spinBoxTimeout->setToolTip(
             QString("%1 — %2").arg(ui->spinBoxTimeout->minimum()).arg(ui->spinBoxTimeout->maximum()));
-    setupAction(act);
-
     connect(ui->leTitle, &QLineEdit::textChanged, this, &ActionEditor::titleChanged);
+    setupAction(act);
 }
 
 ActionEditor::~ActionEditor()
@@ -65,11 +64,25 @@ void ActionEditor::setupAction(const Action::Ptr &action)
     ui->comboBoxMenu->addItem(isCustom ? tr("Custom") : tr("NordVPN"), static_cast<int>(Action::MenuPlace::Own));
     ui->comboBoxMenu->setCurrentIndex(static_cast<int>(m_act->anchor()));
 
+    QVector<int> excludeRows;
+    switch (action->scope()) {
+    case Action::Flow::Yangl: {
+        excludeRows = { 5, 3, 2, 1, 0 };
+        break;
+    }
+    case Action::Flow::NordVPN: {
+        excludeRows = { 1 };
+        break;
+    }
+    default: {
+        break;
+    }
+    }
+
+    for (int row : excludeRows)
+        ui->formLayout->removeRow(row);
+
     if (m_act->scope() == Action::Flow::NordVPN) {
-        for (auto wgt : std::initializer_list<QWidget *> { ui->labelApp, ui->leApplication }) {
-            wgt->hide();
-            ui->formLayout->removeWidget(wgt);
-        }
     }
 }
 

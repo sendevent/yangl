@@ -25,7 +25,7 @@
      </property>
      <widget class="QWidget" name="tabMonitor">
       <attribute name="title">
-       <string>Monitor</string>
+       <string>Application</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
@@ -151,15 +151,34 @@
        </item>
       </layout>
      </widget>
-     <widget class="ActionsTab" name="tabNordVpn">
+     <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>NordVpn</string>
+       <string>Actions</string>
       </attribute>
-     </widget>
-     <widget class="ActionsTab" name="tabCustom">
-      <attribute name="title">
-       <string>Custom</string>
-      </attribute>
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="0" column="0">
+        <widget class="QTabWidget" name="tabWidget_2">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="ActionsTab" name="tabActionsYangl">
+          <attribute name="title">
+           <string>yangl</string>
+          </attribute>
+         </widget>
+         <widget class="ActionsTab" name="tabActionsNordVPN">
+          <attribute name="title">
+           <string>NordVPN</string>
+          </attribute>
+         </widget>
+         <widget class="ActionsTab" name="tabActionsUser">
+          <attribute name="title">
+           <string>Custom</string>
+          </attribute>
+         </widget>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
