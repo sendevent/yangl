@@ -367,6 +367,42 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
         wordsToList(QStringLiteral("set notify 1"));
         break;
     }
+    case Action::NordVPN::KillSwitchOn: {
+        title = QObject::tr("Kill Switch ON");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set killswitch 1"));
+        break;
+    }
+    case Action::NordVPN::KillSwithcOff: {
+        title = QObject::tr("Kill Switch OFF");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set killswitch 0"));
+        break;
+    }
+    case Action::NordVPN::CyberSecOn: {
+        title = QObject::tr("CyberSec ON");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set cybersec 1"));
+        break;
+    }
+    case Action::NordVPN::CyberSecOff: {
+        title = QObject::tr("CyberSec OFF");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set cybersec 0"));
+        break;
+    }
+    case Action::NordVPN::ObfuscateOn: {
+        title = QObject::tr("Obfuscate ON");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set obfuscate 1"));
+        break;
+    }
+    case Action::NordVPN::ObfuscateOff: {
+        title = QObject::tr("Obfuscate OFF");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set obfuscate 0"));
+        break;
+    }
     default:
         scope = Action::Flow::Custom;
         forceShow = true;
