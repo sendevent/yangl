@@ -39,6 +39,7 @@ public:
     void popAction(const Action *action);
     bool updateAction(Action *action);
 
+    QVector<QString> yanglActionIds() const;
     QVector<QString> builtinActionIds() const;
     QVector<QString> customActionIds() const;
 

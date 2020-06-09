@@ -56,7 +56,7 @@ void ActionsTab::setActions(ActionStorage *actStorage, Action::Flow scope)
         ui->buttonAdd->hide();
         ui->buttonRemove->hide();
         delete ui->buttonsLayout;
-        m_actions = m_actStorage->knownActions();
+        m_actions = m_actStorage->nvpnActions();
     } else {
         ui->buttonRemove->setEnabled(m_actions.size());
         m_actions = m_actStorage->userActions();
@@ -100,7 +100,7 @@ void ActionsTab::onRemoveRequested()
 
 bool ActionsTab::save()
 {
-    QList<Action::Ptr> actions;
+    QVector<Action::Ptr> actions;
     for (int i = 0; i < ui->toolBox->count(); ++i) {
         if (auto editor = qobject_cast<ActionEditor *>(ui->toolBox->widget(i))) {
             //            if (!editor->apply())
