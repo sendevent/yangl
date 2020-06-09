@@ -29,7 +29,7 @@
         "{\n    \"custom\": {\n        \"{057c11c0-de87-48c4-a98e-93471b4290ca}\": {\n            \"anchor\": 0,\n     "
         "       \"app\": \"/usr/bin/ls\",\n            \"args\": [\n                \"-la\"\n            ],\n          "
         "  \"forcedDisplay\": false,\n            \"id\": \"{057c11c0-de87-48c4-a98e-93471b4290ca}\",\n            "
-        "\"scope\": 2,\n            \"timeout\": 30000,\n            \"title\": \"\",\n            \"type\": 0\n       "
+        "\"scope\": 2,\n            \"timeout\": 30,\n            \"title\": \"\",\n            \"type\": 0\n       "
         " }\n    }\n}\n";
 
 tst_ActionJson::tst_ActionJson()
