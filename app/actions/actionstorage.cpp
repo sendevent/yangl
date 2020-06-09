@@ -55,7 +55,10 @@ QVector<Action::Ptr> ActionStorage::userActions() const
 
 QVector<Action::Ptr> ActionStorage::allActions() const
 {
-    return yanglActions() + nvpnActions() + userActions();
+    QVector<Action::Ptr> allActions = yanglActions() + nvpnActions() + userActions();
+    std::sort(allActions.begin(), allActions.end(),
+              [](const Action::Ptr &a, const Action::Ptr &b) { return a->title() < b->title(); });
+    return allActions;
 }
 
 Action::Ptr ActionStorage::action(Action::NordVPN requested) const
@@ -102,7 +105,7 @@ QVector<Action::Ptr> ActionStorage::load(QIODevice *from)
     if (!jsonLoaded)
         m_json->save(from);
 
-    return yanglActions() + nvpnActions() + userActions();
+    return allActions();
 }
 
 void ActionStorage::save(const QString &to)
@@ -265,7 +268,7 @@ Action::Ptr ActionStorage::createYanglAction(Action::Yangl actionType, const QSt
         break;
     }
 
-    return createAction(Action::Flow::Yangl, static_cast<int>(actionType), {}, {}, title, {}, {}, anchor,
+    return createAction(Action::Flow::Yangl, static_cast<int>(actionType), id, {}, title, {}, {}, anchor,
                         CLICall::DefaultTimeoutMSecs, this);
 }
 
