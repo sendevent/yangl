@@ -134,7 +134,7 @@ bool SettingsDialog::saveMonitorSettings()
 
 bool SettingsDialog::saveActions()
 {
-    const bool saved = ui->tabActionsNordVPN->save() && ui->tabActionsUser->save();
+    const bool saved = ui->tabActionsYangl->save() && ui->tabActionsNordVPN->save() && ui->tabActionsUser->save();
     if (saved)
         m_actStorage->save();
     return saved;

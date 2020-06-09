@@ -40,25 +40,22 @@ QVector<Action::Ptr> ActionStorage::sortActionsByTitle(const QVector<Action::Ptr
 
 QVector<Action::Ptr> ActionStorage::yanglActions() const
 {
-    return m_yanglActions.values().toVector();
+    return sortActionsByTitle(m_yanglActions.values().toVector());
 }
 
 QVector<Action::Ptr> ActionStorage::nvpnActions() const
 {
-    return m_nvpnActions.values().toVector();
+    return sortActionsByTitle(m_nvpnActions.values().toVector());
 }
 
 QVector<Action::Ptr> ActionStorage::userActions() const
 {
-    return m_userActions.values().toVector();
+    return sortActionsByTitle(m_userActions.values().toVector());
 }
 
 QVector<Action::Ptr> ActionStorage::allActions() const
 {
-    QVector<Action::Ptr> allActions = yanglActions() + nvpnActions() + userActions();
-    std::sort(allActions.begin(), allActions.end(),
-              [](const Action::Ptr &a, const Action::Ptr &b) { return a->title() < b->title(); });
-    return allActions;
+    return yanglActions() + nvpnActions() + userActions();
 }
 
 Action::Ptr ActionStorage::action(Action::NordVPN requested) const
@@ -101,7 +98,7 @@ QVector<Action::Ptr> ActionStorage::load(const QString &from)
 QVector<Action::Ptr> ActionStorage::load(QIODevice *from)
 {
     const bool jsonLoaded = m_json->load(from);
-    initActions(jsonLoaded);
+    loadActions();
     if (!jsonLoaded)
         m_json->save(from);
 
@@ -142,18 +139,8 @@ Action::Ptr ActionStorage::createUserAction(QObject *parent)
                         Action::MenuPlace::Own, CLICall::DefaultTimeoutMSecs, parent);
 }
 
-void ActionStorage::initActions(bool updateFromJson)
+void ActionStorage::loadActions()
 {
-    //    if (!updateFromJson) {
-    //        for (auto i : Action::knownActions()) {
-    //            if (const Action::Ptr &action = createAction(static_cast<Action::NordVPN>(i))) {
-    //                m_builtinActions.insert(action->type(), action);
-    //                m_json->putAction(&*action);
-    //            }
-    //        }
-    //        return;
-    //    }
-
     loadYanglActions();
 
     loadBuiltinActions();
