@@ -58,6 +58,24 @@ QVector<Action::Ptr> tst_ActionStorage::populateUserActions(ActionStorage *stora
     return userActions;
 }
 
+void tst_ActionStorage::test_yanglActions()
+{
+    QVector<Action::Action::Yangl> knownActions;
+    for (auto i : Action::yanglActions())
+        knownActions.append(i);
+
+    ActionStorage storage;
+    storage.load();
+
+    const QVector<Action::Ptr> &actions = storage.yanglActions();
+
+    QCOMPARE(actions.size(), knownActions.size());
+    for (const auto &action : actions)
+        knownActions.removeAll(static_cast<Action::Yangl>(action->type()));
+
+    QVERIFY(knownActions.isEmpty());
+}
+
 void tst_ActionStorage::test_builtinActions()
 {
     QVector<Action::Action::NordVPN> knownActions;

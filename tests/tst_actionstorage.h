@@ -37,6 +37,7 @@ private slots:
     void init();
     void cleanup();
 
+    void test_yanglActions();
     void test_builtinActions();
     void test_userActions();
     void test_allActions();
