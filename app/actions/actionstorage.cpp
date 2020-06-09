@@ -227,19 +227,16 @@ Action::Ptr ActionStorage::createAction(Action::Flow flow, int actionType, const
 Action::Ptr ActionStorage::createYanglAction(Action::Yangl actionType, const QString &id)
 {
     QString title;
-    Action::MenuPlace anchor;
+    Action::MenuPlace anchor = Action::MenuPlace::Own;
     switch (actionType) {
     case Action::Yangl::ShowMap:
         title = tr("Show Map");
-        anchor = Action::MenuPlace::Own;
         break;
     case Action::Yangl::ShowSettings:
         title = tr("Settings");
-        anchor = Action::MenuPlace::Own;
         break;
     case Action::Yangl::ShowLog:
         title = tr("Log");
-        anchor = Action::MenuPlace::Own;
         break;
     case Action::Yangl::Activated:
         title = tr("Active");
@@ -247,7 +244,6 @@ Action::Ptr ActionStorage::createYanglAction(Action::Yangl actionType, const QSt
         break;
     case Action::Yangl::ShowAbout:
         title = tr("About");
-        anchor = Action::MenuPlace::Own;
         break;
     case Action::Yangl::Quit:
         title = tr("Quit");
