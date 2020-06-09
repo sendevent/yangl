@@ -158,8 +158,8 @@ Action::Ptr ActionJson::actionFromJson(const QJsonObject &json) const
     if (json.isEmpty())
         return {};
 
-    const auto type = static_cast<KnownAction>(json[Json.Action.Type].toInt());
-    const auto scope = static_cast<Action::Scope>(json[Json.Action.Scope].toInt());
+    const auto scope = static_cast<Action::Flow>(json[Json.Action.Scope].toInt());
+    const auto type = json[Json.Action.Type].toInt();
     const Action::Id id = Action::Id(json[Json.Action.Id].toString());
     const auto app = json[Json.Action.App].toString();
     const auto title = json[Json.Action.Title].toString();
@@ -183,22 +183,31 @@ QJsonObject ActionJson::actionToJson(const Action *action) const
         return {};
 
     return {
-        { Json.Action.Type, action->type() },          { Json.Action.Scope, static_cast<int>(action->scope()) },
-        { Json.Action.Id, action->id().toString() },   { Json.Action.App, action->app() },
-        { Json.Action.Title, action->title() },        { Json.Action.Args, QJsonArray::fromStringList(action->args()) },
-        { Json.Action.Display, action->forcedShow() }, { Json.Action.Anchor, static_cast<int>(action->anchor()) },
-        { Json.Action.Timeout, action->timeout() },
+        { Json.Action.Scope, static_cast<int>(action->scope()) },
+        { Json.Action.Type, action->type() },
+        { Json.Action.Id, action->id().toString() },
+        { Json.Action.App, action->app() },
+        { Json.Action.Title, action->title() },
+        { Json.Action.Args, QJsonArray::fromStringList(action->args()) },
+        { Json.Action.Display, action->forcedShow() },
+        { Json.Action.Anchor, static_cast<int>(action->anchor()) },
+        { Json.Action.Timeout, action->timeout() / yangl::OneSecondMs },
     };
+}
+
+QVector<QString> ActionJson::yanglActionIds() const
+{
+    return actionsGroup(Action::groupKey(Action::Flow::Yangl));
 }
 
 QVector<QString> ActionJson::builtinActionIds() const
 {
-    return actionsGroup(Action::GroupKeyBuiltin);
+    return actionsGroup(Action::groupKey(Action::Flow::NordVPN));
 }
 
 QVector<QString> ActionJson::customActionIds() const
 {
-    return actionsGroup(Action::GroupKeyCustom);
+    return actionsGroup(Action::groupKey(Action::Flow::Custom));
 }
 
 QVector<QString> ActionJson::actionsGroup(const QString &group) const
@@ -225,9 +234,9 @@ QVector<QString> ActionJson::actionsGroup(const QString &group) const
     return jsonPath;
 }
 
-Action::Ptr ActionJson::action(Action::Scope scope, const QString &id)
+Action::Ptr ActionJson::action(Action::Flow scope, const QString &id)
 {
-    const QString &groupKey = scope == Action::Scope::Builtin ? Action::GroupKeyBuiltin : Action::GroupKeyCustom;
+    const QString &groupKey = Action::groupKey(scope);
     const QJsonObject &collection = m_json[groupKey].toObject();
     for (const auto &item : collection) {
         const QJsonObject &jsonAction = item.toObject();

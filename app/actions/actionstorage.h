@@ -31,41 +31,47 @@ class ActionStorage : public QObject
 public:
     ActionStorage(QObject *parent = {});
 
-    QList<Action::Ptr> knownActions() const;
-    QList<Action::Ptr> userActions() const;
-    QList<Action::Ptr> allActions() const;
+    QVector<Action::Ptr> yanglActions() const;
+    QVector<Action::Ptr> nvpnActions() const;
+    QVector<Action::Ptr> userActions() const;
+    QVector<Action::Ptr> allActions() const;
 
-    Action::Ptr action(int knownAction) const;
+    Action::Ptr action(Action::Yangl yanglAction) const;
+    Action::Ptr action(Action::NordVPN knownAction) const;
     Action::Ptr action(const Action::Id &userAction) const;
 
-    QList<Action::Ptr> load(const QString &from = {});
-    QList<Action::Ptr> load(QIODevice *from);
+    QVector<Action::Ptr> load(const QString &from = {});
+    QVector<Action::Ptr> load(QIODevice *from);
     void save(const QString &to = {});
     void save(QIODevice *from);
 
     Action::Ptr createUserAction(QObject *parent = {});
-    Action::Ptr createAction(Action::Scope scope, KnownAction type, const Action::Id &id, const QString &appPath,
+    Action::Ptr createAction(Action::Flow scope, int type, const Action::Id &id, const QString &appPath,
                              const QString &title, const QStringList &args, bool alwaysShowResult,
                              Action::MenuPlace anchor, int timeout, QObject *parent);
 
-    bool updateActions(const QList<Action::Ptr> &actions, Action::Scope scope);
-
-    static QString jsonFilePath();
+    bool updateActions(const QVector<Action::Ptr> &actions, Action::Flow scope);
 
 private:
-    QHash<int, Action::Ptr> m_builtinActions;
+    QHash<Action::Yangl, Action::Ptr> m_yanglActions;
+    QHash<Action::NordVPN, Action::Ptr> m_nvpnActions;
     QHash<Action::Id, Action::Ptr> m_userActions;
+
     const std::unique_ptr<ActionJson> m_json;
 
-    void initActions(bool updateFromJson);
+    void loadActions();
 
-    Action::Ptr createAction(KnownAction actionType, const QString &id = {});
+    Action::Ptr createAction(Action::Flow flow, int actionType, const QString &id = {});
 
-    bool updateBuiltinActions(const QList<Action::Ptr> &actions);
-    bool updateUserActions(const QList<Action::Ptr> &actions);
+    Action::Ptr createYanglAction(Action::Yangl actionType, const QString &id = {});
+    Action::Ptr createNVPNAction(Action::NordVPN actionType, const QString &id = {});
 
-    QList<Action::Ptr> sortActionsByTitle(const QList<Action::Ptr> &actions) const;
+    bool updateBuiltinActions(const QVector<Action::Ptr> &actions);
+    bool updateUserActions(const QVector<Action::Ptr> &actions);
 
+    QVector<Action::Ptr> sortActionsByTitle(const QVector<Action::Ptr> &actions) const;
+
+    void loadYanglActions();
     void loadBuiltinActions();
     void loadUserActions();
 };

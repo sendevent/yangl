@@ -29,14 +29,8 @@ class MenuHolder : public QObject
 public:
     explicit MenuHolder(QObject *parent = {});
 
-    QMenu *createMenu(const QList<Action::Ptr> &actions);
-
-    QAction *getActRun() const;
-    QAction *getActShowSettings() const;
-    QAction *getActShowMap() const;
-    QAction *getActShowLog() const;
-    QAction *getActAbout() const;
-    QAction *getActQuit() const;
+    QMenu *createMenu(const QVector<Action::Ptr> &actions);
+    QAction *yangleAction(Action::Yangl act) const;
 
 signals:
     void actionTriggered(Action *action);
@@ -45,16 +39,12 @@ private slots:
     void onActionTriggered();
 
 private:
-    std::unique_ptr<QMenu> m_menuMonitor;
-    QAction *m_actMap;
-    QAction *m_actSettings;
-    QAction *m_actLog;
-    QAction *m_actRun;
+    std::unique_ptr<QMenu> m_menuRoot;
+    std::unique_ptr<QMenu> m_menuYangl;
     std::unique_ptr<QMenu> m_menuNordVpn;
     std::unique_ptr<QMenu> m_menuUser;
-    QAction *m_actAbout;
-    QAction *m_actSeparatorExit;
-    QAction *m_actQuit;
 
-    void populateActions(const QList<Action::Ptr> &actions);
+    void populateActions(const QVector<Action::Ptr> &actions);
+
+    QHash<Action::Flow, QVector<QAction *>> m_qActions;
 };

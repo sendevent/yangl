@@ -28,11 +28,17 @@ ActionEditor::ActionEditor(const Action::Ptr &act, QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->spinBoxTimeout->setToolTip(
-            QString("%1 — %2").arg(ui->spinBoxTimeout->minimum()).arg(ui->spinBoxTimeout->maximum()));
-    setupAction(act);
+    m_leTitle = ui->leTitle;
+    m_leApplication = ui->leApplication;
+    m_leArguments = ui->leArguments;
+    m_spinBoxTimeout = ui->spinBoxTimeout;
+    m_checkBoxForceShow = ui->checkBoxForceShow;
+    m_comboBoxMenu = ui->comboBoxMenu;
 
-    connect(ui->leTitle, &QLineEdit::textChanged, this, &ActionEditor::titleChanged);
+    m_spinBoxTimeout->setToolTip(QString("%1 — %2").arg(m_spinBoxTimeout->minimum()).arg(m_spinBoxTimeout->maximum()));
+    connect(m_leTitle, &QLineEdit::textChanged, this, &ActionEditor::titleChanged);
+
+    setupAction(act);
 }
 
 ActionEditor::~ActionEditor()
@@ -51,40 +57,80 @@ void ActionEditor::setupAction(const Action::Ptr &action)
     if (!m_act)
         return;
 
-    const bool isCustom = m_act->scope() == Action::Scope::User;
+    m_leTitle->setText(m_act->title());
+    m_leApplication->setText(m_act->app());
+    m_leArguments->setText(m_act->args().join(" "));
+    m_spinBoxTimeout->setValue(m_act->timeout() / yangl::OneSecondMs);
+    m_checkBoxForceShow->setChecked(m_act->forcedShow());
 
-    ui->leTitle->setText(m_act->title());
-    ui->leApplication->setText(m_act->app());
-    ui->leArguments->setText(m_act->args().join(" "));
-    ui->spinBoxTimeout->setValue(m_act->timeout() / yangl::OneSecondMs);
-    ui->checkBoxForceShow->setChecked(m_act->forcedShow());
+    QMap<Action::MenuPlace, QString> anchors { { Action::MenuPlace::NoMenu, tr("Hide") },
+                                               { Action::MenuPlace::Common, tr("Common") } };
+    QVector<int> excludeRows;
+    switch (action->scope()) {
+    case Action::Flow::Yangl: {
+        excludeRows = { 5, 3, 2, 1, 0 };
+        anchors[Action::MenuPlace::Own] = tr("yangl");
 
-    ui->comboBoxMenu->clear();
-    ui->comboBoxMenu->addItem(tr("Hide"), static_cast<int>(Action::MenuPlace::NoMenu));
-    ui->comboBoxMenu->addItem(tr("Monitor"), static_cast<int>(Action::MenuPlace::Common));
-    ui->comboBoxMenu->addItem(isCustom ? tr("Custom") : tr("NordVPN"), static_cast<int>(Action::MenuPlace::Own));
-    ui->comboBoxMenu->setCurrentIndex(static_cast<int>(m_act->anchor()));
-
-    if (m_act->scope() == Action::Scope::Builtin) {
-        for (auto wgt : std::initializer_list<QWidget *> { ui->labelApp, ui->leApplication }) {
-            wgt->hide();
-            ui->formLayout->removeWidget(wgt);
+        switch (static_cast<Action::Yangl>(action->type())) {
+        case Action::Yangl::ShowSettings:
+        case Action::Yangl::Quit:
+            anchors.remove(Action::MenuPlace::NoMenu);
+            break;
+        default:
+            break;
         }
+
+        break;
     }
+    case Action::Flow::NordVPN: {
+        excludeRows = { 1 };
+        anchors[Action::MenuPlace::Own] = tr("NordVPN");
+        break;
+    }
+    case Action::Flow::Custom: {
+        anchors[Action::MenuPlace::Own] = tr("Extra");
+        break;
+    }
+    }
+
+    for (int row : excludeRows)
+        ui->formLayout->removeRow(row);
+
+    m_comboBoxMenu->clear();
+    QMap<Action::MenuPlace, int> comboIds;
+    for (auto iter = anchors.cbegin(); iter != anchors.cend(); ++iter) {
+        const Action::MenuPlace anchor = iter.key();
+        comboIds[anchor] = m_comboBoxMenu->count();
+        m_comboBoxMenu->addItem(iter.value(), static_cast<int>(anchor));
+    }
+
+    m_comboBoxMenu->setCurrentIndex(comboIds.value(m_act->anchor()));
 }
 
 bool ActionEditor::apply()
 {
     if (m_act) {
-        m_act->setTitle(ui->leTitle->text().trimmed());
-        const QString &app = ui->leApplication->text().trimmed();
-        if (!Action::isValidAppPath(app))
-            return false; // TODO: ask
-        m_act->setApp(app);
-        m_act->setArgs(ui->leArguments->text().split(" ")); // TODO: obey quotes
-        m_act->setTimeout(ui->spinBoxTimeout->value());
-        m_act->setForcedShow(ui->checkBoxForceShow->isChecked());
-        m_act->setAnchor(ui->comboBoxMenu->currentData().value<Action::MenuPlace>());
+        if (m_leTitle)
+            m_act->setTitle(m_leTitle->text().trimmed());
+
+        if (m_leApplication) {
+            const QString &app = m_leApplication->text().trimmed();
+            if (!Action::isValidAppPath(app))
+                return false; // TODO: ask
+            m_act->setApp(app);
+        }
+
+        if (m_leArguments)
+            m_act->setArgs(m_leArguments->text().split(" ")); // TODO: obey quotes
+
+        if (m_spinBoxTimeout)
+            m_act->setTimeout(m_spinBoxTimeout->value() * yangl::OneSecondMs);
+
+        if (m_checkBoxForceShow)
+            m_act->setForcedShow(m_checkBoxForceShow->isChecked());
+
+        if (m_comboBoxMenu)
+            m_act->setAnchor(m_comboBoxMenu->currentData().value<Action::MenuPlace>());
     }
 
     return true;

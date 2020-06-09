@@ -51,7 +51,6 @@ HEADERS += \
     actions/actionjson.h \
     actions/actionresultviewer.h \
     actions/actionstorage.h \
-    actions/actiontypes.h \
     actions/clicallresultview.h \
     cli/clicall.h \
     cli/clicaller.h \

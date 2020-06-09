@@ -27,7 +27,7 @@ ActionsTab::ActionsTab(QWidget *parent)
     , ui(new Ui::ActionsTab)
     , m_actions()
     , m_actStorage(nullptr)
-    , m_scope(Action::Scope::Builtin)
+    , m_scope(Action::Flow::NordVPN)
 {
     ui->setupUi(this);
     ui->buttonRemove->setEnabled(false);
@@ -41,7 +41,7 @@ ActionsTab::~ActionsTab()
     delete ui;
 }
 
-void ActionsTab::setActions(ActionStorage *actStorage, Action::Scope scope)
+void ActionsTab::setActions(ActionStorage *actStorage, Action::Flow scope)
 {
     m_scope = scope;
     m_actStorage = actStorage;
@@ -52,14 +52,26 @@ void ActionsTab::setActions(ActionStorage *actStorage, Action::Scope scope)
         delete last;
     }
 
-    if (scope == Action::Scope::Builtin) {
+    switch (scope) {
+    case Action::Flow::Yangl: {
         ui->buttonAdd->hide();
         ui->buttonRemove->hide();
         delete ui->buttonsLayout;
-        m_actions = m_actStorage->knownActions();
-    } else {
+        m_actions = m_actStorage->yanglActions();
+        break;
+    }
+    case Action::Flow::NordVPN: {
+        ui->buttonAdd->hide();
+        ui->buttonRemove->hide();
+        delete ui->buttonsLayout;
+        m_actions = m_actStorage->nvpnActions();
+        break;
+    }
+    case Action::Flow::Custom: {
         ui->buttonRemove->setEnabled(m_actions.size());
         m_actions = m_actStorage->userActions();
+        break;
+    }
     }
 
     for (auto act : m_actions)
@@ -100,11 +112,10 @@ void ActionsTab::onRemoveRequested()
 
 bool ActionsTab::save()
 {
-    QList<Action::Ptr> actions;
+    QVector<Action::Ptr> actions;
     for (int i = 0; i < ui->toolBox->count(); ++i) {
         if (auto editor = qobject_cast<ActionEditor *>(ui->toolBox->widget(i))) {
-            //            if (!editor->apply())
-            //                return false;
+            editor->apply();
             actions.append(editor->getAction());
         }
     }

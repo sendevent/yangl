@@ -46,7 +46,6 @@ HEADERS += $$APP_PRO_ROOT\
     $$APP_PRO_ROOT/actions/action.h \
     $$APP_PRO_ROOT/actions/actionjson.h \
     $$APP_PRO_ROOT/actions/actionstorage.h \
-    $$APP_PRO_ROOT/actions/actiontypes.h \
     $$APP_PRO_ROOT/cli/clicaller.h \
     $$APP_PRO_ROOT/cli/clicall.h \
     $$APP_PRO_ROOT/menuholder.h \

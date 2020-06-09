@@ -39,12 +39,13 @@ public:
     void popAction(const Action *action);
     bool updateAction(Action *action);
 
+    QVector<QString> yanglActionIds() const;
     QVector<QString> builtinActionIds() const;
     QVector<QString> customActionIds() const;
 
     static QString jsonFilePath();
 
-    Action::Ptr action(Action::Scope scope, const QString &id);
+    Action::Ptr action(Action::Flow scope, const QString &id);
 
 private:
     QJsonObject m_json;

@@ -24,14 +24,14 @@
 
 /*static*/ int tst_Action::MetaIdMenuPlace = -1;
 
-tst_Action::tst_Action(Action::Scope scope, KnownAction action, ActionStorage *parent, const Action::Id &id)
-    : Action(scope, action, parent, id)
+tst_Action::tst_Action(Action::Flow scope, NordVPN action, ActionStorage *parent, const Action::Id &id)
+    : Action(scope, static_cast<int>(action), parent, id)
 {
     if (-1 == tst_Action::MetaIdMenuPlace)
         tst_Action::MetaIdMenuPlace = qRegisterMetaType<Action::MenuPlace>();
 }
 
-void tst_Action::checkAction(const Action::Ptr &action, KnownAction expectedType, Action::Scope expectedScope,
+void tst_Action::checkAction(const Action::Ptr &action, int expectedType, Action::Flow expectedScope,
                              const Action::Id &expectedId) const
 {
     QCOMPARE(action->type(), expectedType);
@@ -52,36 +52,35 @@ void tst_Action::checkAction(const Action::Ptr &action, KnownAction expectedType
 
 void tst_Action::testCreate_Builtin()
 {
-    static const Action::Scope scope = Action::Scope::Builtin;
-    for (int i = KnownAction::Unknown + 1; i < KnownAction::Last; ++i) {
-        const KnownAction actionType = static_cast<KnownAction>(i);
+    static const Action::Flow scope = Action::Flow::NordVPN;
+    for (auto actionType : Action::nvpnActions()) {
         static const Action::Id &id = Action::Id::createUuid();
 
         const Action::Ptr action(new tst_Action(scope, actionType, {}, id));
-        checkAction(action, actionType, scope, id);
+        checkAction(action, static_cast<int>(actionType), scope, id);
 
         const Action::Ptr actionNoId(new tst_Action(scope, actionType));
-        checkAction(actionNoId, actionType, scope);
+        checkAction(actionNoId, static_cast<int>(actionType), scope);
     }
 }
 
 void tst_Action::testCreate_Custom()
 {
-    static const Action::Scope scope = Action::Scope::User;
+    static const Action::Flow scope = Action::Flow::Custom;
     static const Action::Id &id = Action::Id::createUuid();
-    static const KnownAction actionType = KnownAction::Unknown;
+    static const NordVPN actionType = NordVPN::Unknown;
 
     const Action::Ptr action(new tst_Action(scope, actionType, {}, id));
-    checkAction(action, actionType, scope, id);
+    checkAction(action, static_cast<int>(actionType), scope, id);
 
     const Action::Ptr actionNoId(new tst_Action(scope, actionType));
-    checkAction(actionNoId, actionType, scope);
+    checkAction(actionNoId, static_cast<int>(actionType), scope);
 }
 
 void tst_Action::testSetTitle()
 {
     static const QString testValue("test");
-    const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown));
+    const Action::Ptr action(new tst_Action(Action::Flow::Custom, NordVPN::Unknown));
     QSignalSpy spy(&*action, &Action::titleChanged);
 
     action->setTitle(testValue);
@@ -96,7 +95,7 @@ void tst_Action::testSetTitle()
 void tst_Action::testSetApp()
 {
     static const QString testValue("/no/such/app");
-    const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown));
+    const Action::Ptr action(new tst_Action(Action::Flow::Custom, NordVPN::Unknown));
     QSignalSpy spy(&*action, &Action::appChanged);
 
     action->setApp(testValue);
@@ -111,7 +110,7 @@ void tst_Action::testSetApp()
 void tst_Action::testSetArgs()
 {
     static const QStringList testValue { "-a", "\"b c d\"", "e" };
-    const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown));
+    const Action::Ptr action(new tst_Action(Action::Flow::Custom, NordVPN::Unknown));
     QSignalSpy spy(&*action, &Action::argsChanged);
 
     action->setArgs(testValue);
@@ -126,7 +125,7 @@ void tst_Action::testSetArgs()
 void tst_Action::testSetTimeout()
 {
     static const int testValue(1);
-    const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown));
+    const Action::Ptr action(new tst_Action(Action::Flow::Custom, NordVPN::Unknown));
     QSignalSpy spy(&*action, &Action::timeoutChanged);
 
     action->setTimeout(testValue);
@@ -141,7 +140,7 @@ void tst_Action::testSetTimeout()
 void tst_Action::testSetForcedShow()
 {
     static const bool testValue(true);
-    const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown));
+    const Action::Ptr action(new tst_Action(Action::Flow::Custom, NordVPN::Unknown));
     QSignalSpy spy(&*action, &Action::forcedShowChanged);
 
     action->setForcedShow(testValue);
@@ -156,7 +155,7 @@ void tst_Action::testSetForcedShow()
 void tst_Action::testSetAnchor()
 {
     static const Action::MenuPlace testValue(Action::MenuPlace::Own);
-    const Action::Ptr action(new tst_Action(Action::Scope::User, KnownAction::Unknown));
+    const Action::Ptr action(new tst_Action(Action::Flow::Custom, NordVPN::Unknown));
     QSignalSpy spy(&*action, &Action::anchorChanged);
 
     action->setAnchor(testValue);

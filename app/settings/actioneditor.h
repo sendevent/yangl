@@ -18,9 +18,14 @@
 #pragma once
 
 #include "action.h"
+#include "apppatheditor.h"
 
+#include <QCheckBox>
+#include <QComboBox>
+#include <QLineEdit>
+#include <QPointer>
+#include <QSpinBox>
 #include <QWidget>
-
 namespace Ui {
 class ActionEditor;
 }
@@ -43,6 +48,13 @@ signals:
 private:
     Ui::ActionEditor *ui;
     Action::Ptr m_act;
+
+    QPointer<QLineEdit> m_leTitle;
+    QPointer<AppPathEditor> m_leApplication;
+    QPointer<QLineEdit> m_leArguments;
+    QPointer<QSpinBox> m_spinBoxTimeout;
+    QPointer<QCheckBox> m_checkBoxForceShow;
+    QPointer<QComboBox> m_comboBoxMenu;
 
     void setupAction(const Action::Ptr &action);
 };

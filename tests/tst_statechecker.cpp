@@ -29,7 +29,7 @@ tst_StateChecker::tst_StateChecker(QObject *parent)
     QStandardPaths::setTestModeEnabled(true);
 
     m_storage->load();
-    const Action::Ptr &action = m_storage->action(KnownAction::CheckStatus);
+    const Action::Ptr &action = m_storage->action(Action::NordVPN::CheckStatus);
     QString statusSink(qApp->applicationFilePath());
     statusSink = statusSink.replace(qAppName(), "test_fake_status");
     action->setApp(statusSink);
@@ -40,7 +40,7 @@ tst_StateChecker::tst_StateChecker(QObject *parent)
 void tst_StateChecker::init()
 {
     m_checker = StateChecker::Ptr(new StateChecker(m_caller.get(), StateChecker::DefaultIntervalMs));
-    m_checker->setCheckAction(m_storage->action(KnownAction::CheckStatus));
+    m_checker->setCheckAction(m_storage->action(Action::NordVPN::CheckStatus));
 }
 
 void tst_StateChecker::test_active()
@@ -65,7 +65,7 @@ void tst_StateChecker::test_interval()
 void tst_StateChecker::test_check(NordVpnInfo::Status targetStatus)
 {
     const NordVpnInfo::Status sourceStatus = m_checker->state().status();
-    const Action::Ptr &action = m_storage->action(KnownAction::CheckStatus);
+    const Action::Ptr &action = m_storage->action(Action::NordVPN::CheckStatus);
 
     switch (targetStatus) {
     case NordVpnInfo::Status::Connecting:
@@ -93,7 +93,7 @@ void tst_StateChecker::test_check(NordVpnInfo::Status targetStatus)
     QElapsedTimer timer;
     timer.start();
     while (checkPerformed == sourceStatus && timer.elapsed() < 20000)
-        QTest::qWait(10);
+        QTest::qWait(50);
 
     QCOMPARE(m_checker->state().status(), targetStatus);
 
