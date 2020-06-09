@@ -25,13 +25,13 @@
 /*static*/ int tst_Action::MetaIdMenuPlace = -1;
 
 tst_Action::tst_Action(Action::Flow scope, NordVPN action, ActionStorage *parent, const Action::Id &id)
-    : Action(scope, action, parent, id)
+    : Action(scope, static_cast<int>(action), parent, id)
 {
     if (-1 == tst_Action::MetaIdMenuPlace)
         tst_Action::MetaIdMenuPlace = qRegisterMetaType<Action::MenuPlace>();
 }
 
-void tst_Action::checkAction(const Action::Ptr &action, NordVPN expectedType, Action::Flow expectedScope,
+void tst_Action::checkAction(const Action::Ptr &action, int expectedType, Action::Flow expectedScope,
                              const Action::Id &expectedId) const
 {
     QCOMPARE(action->type(), expectedType);
@@ -53,14 +53,14 @@ void tst_Action::checkAction(const Action::Ptr &action, NordVPN expectedType, Ac
 void tst_Action::testCreate_Builtin()
 {
     static const Action::Flow scope = Action::Flow::NordVPN;
-    for (auto actionType : Action::knownActions()) {
+    for (auto actionType : Action::nvpnActions()) {
         static const Action::Id &id = Action::Id::createUuid();
 
         const Action::Ptr action(new tst_Action(scope, actionType, {}, id));
-        checkAction(action, actionType, scope, id);
+        checkAction(action, static_cast<int>(actionType), scope, id);
 
         const Action::Ptr actionNoId(new tst_Action(scope, actionType));
-        checkAction(actionNoId, actionType, scope);
+        checkAction(actionNoId, static_cast<int>(actionType), scope);
     }
 }
 
@@ -71,10 +71,10 @@ void tst_Action::testCreate_Custom()
     static const NordVPN actionType = NordVPN::Unknown;
 
     const Action::Ptr action(new tst_Action(scope, actionType, {}, id));
-    checkAction(action, actionType, scope, id);
+    checkAction(action, static_cast<int>(actionType), scope, id);
 
     const Action::Ptr actionNoId(new tst_Action(scope, actionType));
-    checkAction(actionNoId, actionType, scope);
+    checkAction(actionNoId, static_cast<int>(actionType), scope);
 }
 
 void tst_Action::testSetTitle()

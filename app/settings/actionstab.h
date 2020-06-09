@@ -45,7 +45,7 @@ private slots:
 
 private:
     Ui::ActionsTab *ui;
-    QList<Action::Ptr> m_actions;
+    QVector<Action::Ptr> m_actions;
     ActionStorage *m_actStorage;
     Action::Flow m_scope;
 

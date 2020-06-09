@@ -67,6 +67,17 @@ public:
 
     Q_ENUM(NordVPN);
 
+    enum class Yangl
+    {
+        ShowMap,
+        ShowSettings,
+        ShowLog,
+        Activated,
+        ShowAbout,
+        Quit
+    };
+    Q_ENUM(Yangl);
+
     enum class MenuPlace
     {
         NoMenu = 0,
@@ -78,9 +89,10 @@ public:
     Id id() const;
 
     virtual Action::Flow scope() const;
-    virtual Action::NordVPN type() const;
+    virtual int type() const;
 
-    static QVector<Action::NordVPN> knownActions();
+    static QVector<Action::Yangl> yanglActions();
+    static QVector<Action::NordVPN> nvpnActions();
 
     QString title() const;
     void setTitle(const QString &title);
@@ -105,9 +117,7 @@ public:
     void setAnchor(MenuPlace place);
     Action::MenuPlace anchor() const;
 
-    static const QString GroupKeyBuiltin;
-    static const QString GroupKeyCustom;
-
+    static QString groupKey(Action::Flow flow);
     QString groupKey() const;
     QString key() const;
 
@@ -129,13 +139,18 @@ protected slots:
 
 protected:
     friend class ActionStorage;
+
+    static const QString GroupKeyYangl;
+    static const QString GroupKeyBuiltin;
+    static const QString GroupKeyCustom;
+
     static int MetaIdId;
 
-    explicit Action(Action::Flow scope, NordVPN type, QObject *parent = {}, const Action::Id &id = {});
+    explicit Action(Action::Flow scope, int type, QObject *parent = {}, const Action::Id &id = {});
 
     const Action::Id m_id;
     const Action::Flow m_scope;
-    const NordVPN m_type;
+    const int m_type;
 
     QString m_title;
     QString m_app;
@@ -148,4 +163,6 @@ protected:
 
 Q_DECLARE_METATYPE(Action::MenuPlace);
 
+uint qHash(Action::Yangl key, uint seed = 0);
 uint qHash(Action::NordVPN key, uint seed = 0);
+uint qHash(Action::Flow key, uint seed = 0);

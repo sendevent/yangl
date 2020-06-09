@@ -27,17 +27,28 @@
 #include <QFileInfo>
 #include <QTextBrowser>
 
+/*static*/ const QString Action::GroupKeyYangl { QStringLiteral("yangl") };
 /*static*/ const QString Action::GroupKeyBuiltin { QStringLiteral("builtin") };
 /*static*/ const QString Action::GroupKeyCustom { QStringLiteral("custom") };
 
 /*static*/ int Action::MetaIdId = -1;
+
+uint qHash(Action::Yangl key, uint seed)
+{
+    return qHash(static_cast<int>(key), seed);
+}
 
 uint qHash(Action::NordVPN key, uint seed)
 {
     return qHash(static_cast<int>(key), seed);
 }
 
-Action::Action(Action::Flow scope, NordVPN type, QObject *parent, const Action::Id &id)
+uint qHash(Action::Flow key, uint seed)
+{
+    return qHash(static_cast<int>(key), seed);
+}
+
+Action::Action(Action::Flow scope, int type, QObject *parent, const Action::Id &id)
     : QObject(parent)
     , m_id(id.isNull() ? QUuid::createUuid() : id)
     , m_scope(scope)
@@ -70,7 +81,7 @@ Action::Flow Action::scope() const
     return m_scope;
 }
 
-Action::NordVPN Action::type() const
+int Action::type() const
 {
     return m_type;
 }
@@ -221,9 +232,21 @@ void Action::setAnchor(MenuPlace place)
     }
 }
 
+/*static*/ QString Action::groupKey(Action::Flow flow)
+{
+    switch (flow) {
+    case Action::Flow::Yangl:
+        return GroupKeyYangl;
+    case Action::Flow::NordVPN:
+        return GroupKeyBuiltin;
+    default:
+        return GroupKeyCustom;
+    }
+}
+
 QString Action::groupKey() const
 {
-    return scope() == Action::Flow::NordVPN ? GroupKeyBuiltin : GroupKeyCustom;
+    return groupKey(scope());
 }
 
 QString Action::key() const
@@ -231,7 +254,15 @@ QString Action::key() const
     return /*scope() == Action::Scope::Builtin ? QString::number(type()) :*/ id().toString();
 }
 
-/*static*/ QVector<Action::NordVPN> Action::knownActions()
+/*static*/ QVector<Action::Yangl> Action::yanglActions()
+{
+    static QVector<Action::Yangl> actions;
+    if (actions.isEmpty())
+        actions = yangl::allEnum<Action::Yangl>();
+    return actions;
+}
+
+/*static*/ QVector<Action::NordVPN> Action::nvpnActions()
 {
     static QVector<Action::NordVPN> actions;
     if (actions.isEmpty())

@@ -65,7 +65,7 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
 
 void NordVpnWraper::initMenu()
 {
-    QList<Action::Ptr> actions = m_actions->load();
+    QVector<Action::Ptr> actions = m_actions->load();
     if (actions.isEmpty())
         actions = m_actions->load({});
     QMenu *menu = m_menuHolder->createMenu(actions);
@@ -98,21 +98,23 @@ void NordVpnWraper::start()
 
     m_checker->setCheckAction(m_actions->action(Action::NordVPN::CheckStatus));
 
-#ifndef YANGL_NO_GEOCHART
-    connect(m_menuHolder->getActShowMap(), &QAction::triggered, this, &NordVpnWraper::showMapView,
-            Qt::UniqueConnection);
-#endif
+    //#ifndef YANGL_NO_GEOCHART
+    //    connect(m_menuHolder->getActShowMap(), &QAction::triggered, this, &NordVpnWraper::showMapView,
+    //            Qt::UniqueConnection);
+    //#endif
 
-    connect(m_menuHolder->getActShowSettings(), &QAction::triggered, this, &NordVpnWraper::showSettingsEditor,
-            Qt::UniqueConnection);
-    connect(m_menuHolder->getActShowLog(), &QAction::triggered, this, &NordVpnWraper::showLog, Qt::UniqueConnection);
-    connect(m_menuHolder->getActRun(), &QAction::toggled, &*m_checker, &StateChecker::setActive, Qt::UniqueConnection);
+    //    connect(m_menuHolder->getActShowSettings(), &QAction::triggered, this, &NordVpnWraper::showSettingsEditor,
+    //            Qt::UniqueConnection);
+    //    connect(m_menuHolder->getActShowLog(), &QAction::triggered, this, &NordVpnWraper::showLog,
+    //    Qt::UniqueConnection); connect(m_menuHolder->getActRun(), &QAction::toggled, &*m_checker,
+    //    &StateChecker::setActive, Qt::UniqueConnection);
 
-    connect(m_menuHolder->getActAbout(), &QAction::triggered, this, &NordVpnWraper::showAbout, Qt::UniqueConnection);
+    //    connect(m_menuHolder->getActAbout(), &QAction::triggered, this, &NordVpnWraper::showAbout,
+    //    Qt::UniqueConnection);
 
-    connect(m_menuHolder->getActQuit(), &QAction::triggered, qApp, &QApplication::quit, Qt::UniqueConnection);
+    //    connect(m_menuHolder->getActQuit(), &QAction::triggered, qApp, &QApplication::quit, Qt::UniqueConnection);
 
-    m_menuHolder->getActRun()->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());
+    //    m_menuHolder->getActRun()->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());
 
     ActionResultViewer::updateLinesLimit();
 }
@@ -192,8 +194,8 @@ void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason
 
 void NordVpnWraper::onActionTriggered(Action *action)
 {
-    if (action) {
-        const Action::NordVPN actType = action->type();
+    if (action && action->scope() == Action::Flow::NordVPN) {
+        const Action::NordVPN actType = static_cast<Action::NordVPN>(action->type());
         switch (actType) {
         case Action::NordVPN::Pause05:
         case Action::NordVPN::Pause30:
@@ -296,7 +298,7 @@ void NordVpnWraper::updateActions(bool connected)
             }
 
             if (auto action = qAction->data().value<Action *>()) {
-                switch (action->type()) {
+                switch (static_cast<Action::NordVPN>(action->type())) {
                 case Action::NordVPN::Rate1:
                 case Action::NordVPN::Rate2:
                 case Action::NordVPN::Rate3:

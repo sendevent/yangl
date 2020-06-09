@@ -24,8 +24,8 @@ class tst_Action : public Action
 {
     Q_OBJECT
 public:
-    tst_Action(Action::Flow scope = Action::Flow::Custom, NordVPN action = NordVPN::Unknown,
-               ActionStorage *parent = {}, const Action::Id &id = {});
+    tst_Action(Action::Flow scope = Action::Flow::Custom, NordVPN action = NordVPN::Unknown, ActionStorage *parent = {},
+               const Action::Id &id = {});
     ~tst_Action() = default;
 
 private:
@@ -34,7 +34,7 @@ private slots:
     void testCreate_Builtin();
     void testCreate_Custom();
 
-    void checkAction(const Action::Ptr &action, NordVPN expectedType, Action::Flow expectedScope,
+    void checkAction(const Action::Ptr &action, int expectedType, Action::Flow expectedScope,
                      const Action::Id &expectedId = {}) const;
 
     void testSetTitle();
