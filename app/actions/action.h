@@ -63,6 +63,13 @@ public:
 
         SetNotifyOff,
         SetNotifyOn,
+
+        KillSwitchOn,
+        KillSwithcOff,
+        CyberSecOn,
+        CyberSecOff,
+        ObfuscateOn,
+        ObfuscateOff,
     };
 
     Q_ENUM(NordVPN);
