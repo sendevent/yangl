@@ -89,7 +89,6 @@ StateChecker *NordVpnWraper::stateChecker() const
 
 void NordVpnWraper::start()
 {
-    LOG;
     const bool wasActive = m_checker->isActive();
 
     loadSettings();
@@ -100,6 +99,7 @@ void NordVpnWraper::start()
     if (auto act = m_menuHolder->yangleAction(Action::Yangl::Activated)) {
         act->setCheckable(true);
         act->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());
+        m_checker->setActive(act->isChecked());
     }
 
     ActionResultViewer::updateLinesLimit();
@@ -230,6 +230,7 @@ void NordVpnWraper::processYangleAction(Action *action)
         break;
     case Action::Yangl::Activated:
         m_checker->setActive(!m_checker->isActive());
+        break;
     case Action::Yangl::ShowAbout:
         showAbout();
         break;
@@ -358,6 +359,8 @@ void NordVpnWraper::updateActions(bool connected)
             }
 
             if (auto action = qAction->data().value<Action *>()) {
+                if (action->scope() != Action::Flow::NordVPN)
+                    continue;
                 switch (static_cast<Action::NordVPN>(action->type())) {
                 case Action::NordVPN::Rate1:
                 case Action::NordVPN::Rate2:
