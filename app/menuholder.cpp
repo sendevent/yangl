@@ -23,30 +23,38 @@ MenuHolder::MenuHolder(QObject *parent)
     : QObject(parent)
     , m_menuRoot(new QMenu(tr("Monitor")))
     , m_menuYangl(new QMenu(tr("yangl")))
-    //    , m_actMap(nullptr)
-    //    , m_actSettings(nullptr)
-    //    , m_actLog(nullptr)
-    //    , m_actRun(nullptr)
     , m_menuNordVpn(new QMenu(tr("NordVPN")))
     , m_menuUser(new QMenu(tr("Extra")))
-//    , m_actAbout(nullptr)
-//    , m_actSeparatorExit(nullptr)
-//    , m_actQuit(nullptr)
 {
+}
+
+QAction *MenuHolder::yangleAction(Action::Yangl act) const
+{
+    const auto &collection = m_qActions[Action::Flow::Yangl];
+    const auto found = std::find_if(collection.cbegin(), collection.cend(), [&act](const QAction *qAction) {
+        Action *action = qAction->data().value<Action *>();
+        return static_cast<Action::Yangl>(action->type()) == act;
+    });
+
+    if (found != collection.end())
+        return *found;
+    return {};
 }
 
 QMenu *MenuHolder::createMenu(const QVector<Action::Ptr> &actions)
 {
     m_menuRoot->clear();
-    m_menuRoot->adjustSize();
 
     populateActions(actions);
+
+    m_menuRoot->adjustSize();
 
     return m_menuRoot.get();
 }
 
 void MenuHolder::populateActions(const QVector<Action::Ptr> &actions)
 {
+    m_qActions.clear();
     m_menuYangl->clear();
     m_menuNordVpn->clear();
     m_menuUser->clear();
@@ -66,7 +74,12 @@ void MenuHolder::populateActions(const QVector<Action::Ptr> &actions)
         QVector<Action::Ptr> m_menuActions {};
     };
 
-    auto addActions = [this, &makeConnection](const ActionsHolder &collection) {
+    QHash<Action::Flow, ActionsHolder> actionsHolders { { Action::Flow::Yangl, { &*m_menuYangl } },
+                                                        { Action::Flow::NordVPN, { &*m_menuNordVpn } },
+                                                        { Action::Flow::Custom, { &*m_menuUser } } };
+
+    auto addActions = [this, &actionsHolders, &makeConnection](Action::Flow flow) {
+        const ActionsHolder &collection = actionsHolders[flow];
         m_menuRoot->addSection(collection.m_menu->title());
 
         for (auto act : collection.m_menuActions)
@@ -75,6 +88,7 @@ void MenuHolder::populateActions(const QVector<Action::Ptr> &actions)
         QAction *qAct = nullptr;
         for (auto act : collection.m_topActions) {
             QAction *added = makeConnection(act, &*m_menuRoot, {});
+            m_qActions[flow].append(added);
             if (!qAct)
                 qAct = added;
         }
@@ -83,9 +97,6 @@ void MenuHolder::populateActions(const QVector<Action::Ptr> &actions)
         m_menuRoot->insertMenu(qAct, collection.m_menu);
     };
 
-    QHash<Action::Flow, ActionsHolder> actionsHolders { { Action::Flow::Yangl, { &*m_menuYangl } },
-                                                        { Action::Flow::NordVPN, { &*m_menuNordVpn } },
-                                                        { Action::Flow::Custom, { &*m_menuUser } } };
     for (const auto &action : actions) {
         switch (action->anchor()) {
         case Action::MenuPlace::Own:
@@ -100,7 +111,7 @@ void MenuHolder::populateActions(const QVector<Action::Ptr> &actions)
     }
 
     for (auto flow : { Action::Flow::Yangl, Action::Flow::NordVPN, Action::Flow::Custom })
-        addActions(actionsHolders[flow]);
+        addActions(flow);
 }
 
 void MenuHolder::onActionTriggered()
