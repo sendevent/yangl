@@ -191,7 +191,7 @@ QJsonObject ActionJson::actionToJson(const Action *action) const
         { Json.Action.Args, QJsonArray::fromStringList(action->args()) },
         { Json.Action.Display, action->forcedShow() },
         { Json.Action.Anchor, static_cast<int>(action->anchor()) },
-        { Json.Action.Timeout, action->timeout() },
+        { Json.Action.Timeout, action->timeout() / yangl::OneSecondMs },
     };
 }
 

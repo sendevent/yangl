@@ -81,9 +81,6 @@ void ActionEditor::setupAction(const Action::Ptr &action)
 
     for (int row : excludeRows)
         ui->formLayout->removeRow(row);
-
-    if (m_act->scope() == Action::Flow::NordVPN) {
-    }
 }
 
 bool ActionEditor::apply()
