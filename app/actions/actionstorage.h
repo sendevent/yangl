@@ -59,7 +59,7 @@ private:
 
     const std::unique_ptr<ActionJson> m_json;
 
-    void initActions(bool updateFromJson);
+    void loadActions();
 
     Action::Ptr createAction(Action::Flow flow, int actionType, const QString &id = {});
 
