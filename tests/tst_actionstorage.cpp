@@ -114,13 +114,19 @@ void tst_ActionStorage::test_allActions()
     QVERIFY(userActions.size() == UserActionCount);
 
     const QVector<Action::Ptr> &allActions = storage.yanglActions() + storage.nvpnActions() + storage.userActions();
-    QVERIFY(allActions.size() == userActions.size() + knownActions.size());
+    QVERIFY(allActions.size() == userActions.size() + knownActions.size() + storage.yanglActions().size());
 
     for (const auto &actionHandled : allActions) {
-        if (actionHandled->scope() == Action::Flow::NordVPN)
+        switch (actionHandled->scope()) {
+        case Action::Flow::NordVPN:
             QVERIFY(knownActions.indexOf(actionHandled) >= 0);
-        else
+            break;
+        case Action::Flow::Custom:
             QVERIFY(userActions.indexOf(actionHandled) >= 0);
+            break;
+        default:
+            break;
+        }
     }
 }
 
@@ -186,7 +192,9 @@ void tst_ActionStorage::test_saveAndLoad()
         storage.load();
 
         const QVector<Action::Ptr> allActions = storage.allActions();
-        QCOMPARE(allActions.size(), QMetaEnum::fromType<Action::NordVPN>().keyCount() - 1 + UserActionCount);
+        QCOMPARE(allActions.size(),
+                 QMetaEnum::fromType<Action::NordVPN>().keyCount() - 1 + UserActionCount
+                         + storage.yanglActions().size());
 
         for (const Action::Ptr &action : allActions) {
             const QString suffix = (action->scope() == Action::Flow::Custom) ? action->id().toString()
