@@ -63,8 +63,9 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::accept);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &SettingsDialog::reject);
 
-    ui->tabNordVpn->setActions(m_actStorage, Action::Flow::NordVPN);
-    ui->tabCustom->setActions(m_actStorage, Action::Flow::Custom);
+    ui->tabActionsYangl->setActions(m_actStorage, Action::Flow::Yangl);
+    ui->tabActionsNordVPN->setActions(m_actStorage, Action::Flow::NordVPN);
+    ui->tabActionsUser->setActions(m_actStorage, Action::Flow::Custom);
     ui->spinBoxLogLines->setValue(AppSettings::Monitor.LogLinesLimit->read().toInt());
 
 #ifndef YANGL_NO_GEOCHART
@@ -133,7 +134,7 @@ bool SettingsDialog::saveMonitorSettings()
 
 bool SettingsDialog::saveActions()
 {
-    const bool saved = ui->tabNordVpn->save() && ui->tabCustom->save();
+    const bool saved = ui->tabActionsNordVPN->save() && ui->tabActionsUser->save();
     if (saved)
         m_actStorage->save();
     return saved;

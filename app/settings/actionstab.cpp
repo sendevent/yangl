@@ -52,14 +52,26 @@ void ActionsTab::setActions(ActionStorage *actStorage, Action::Flow scope)
         delete last;
     }
 
-    if (scope == Action::Flow::NordVPN) {
+    switch (scope) {
+    case Action::Flow::Yangl: {
+        ui->buttonAdd->hide();
+        ui->buttonRemove->hide();
+        delete ui->buttonsLayout;
+        m_actions = m_actStorage->yanglActions();
+        break;
+    }
+    case Action::Flow::NordVPN: {
         ui->buttonAdd->hide();
         ui->buttonRemove->hide();
         delete ui->buttonsLayout;
         m_actions = m_actStorage->nvpnActions();
-    } else {
+        break;
+    }
+    case Action::Flow::Custom: {
         ui->buttonRemove->setEnabled(m_actions.size());
         m_actions = m_actStorage->userActions();
+        break;
+    }
     }
 
     for (auto act : m_actions)
