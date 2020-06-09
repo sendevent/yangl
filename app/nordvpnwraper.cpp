@@ -97,24 +97,10 @@ void NordVpnWraper::start()
     initMenu();
 
     m_checker->setCheckAction(m_actions->action(Action::NordVPN::CheckStatus));
-
-    //#ifndef YANGL_NO_GEOCHART
-    //    connect(m_menuHolder->getActShowMap(), &QAction::triggered, this, &NordVpnWraper::showMapView,
-    //            Qt::UniqueConnection);
-    //#endif
-
-    //    connect(m_menuHolder->getActShowSettings(), &QAction::triggered, this, &NordVpnWraper::showSettingsEditor,
-    //            Qt::UniqueConnection);
-    //    connect(m_menuHolder->getActShowLog(), &QAction::triggered, this, &NordVpnWraper::showLog,
-    //    Qt::UniqueConnection); connect(m_menuHolder->getActRun(), &QAction::toggled, &*m_checker,
-    //    &StateChecker::setActive, Qt::UniqueConnection);
-
-    //    connect(m_menuHolder->getActAbout(), &QAction::triggered, this, &NordVpnWraper::showAbout,
-    //    Qt::UniqueConnection);
-
-    //    connect(m_menuHolder->getActQuit(), &QAction::triggered, qApp, &QApplication::quit, Qt::UniqueConnection);
-
-    //    m_menuHolder->getActRun()->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());
+    if (auto act = m_menuHolder->yangleAction(Action::Yangl::Activated)) {
+        act->setCheckable(true);
+        act->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());
+    }
 
     ActionResultViewer::updateLinesLimit();
 }
@@ -194,21 +180,95 @@ void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason
 
 void NordVpnWraper::onActionTriggered(Action *action)
 {
-    if (action && action->scope() == Action::Flow::NordVPN) {
-        const Action::NordVPN actType = static_cast<Action::NordVPN>(action->type());
-        switch (actType) {
-        case Action::NordVPN::Pause05:
-        case Action::NordVPN::Pause30:
-        case Action::NordVPN::Pause60:
-        case Action::NordVPN::PauseCustom: {
-            pause(actType);
-            return;
-        }
-        default:
-            break;
-        }
-        m_bus->performAction(action);
+    if (!action)
+        return;
+
+    switch (action->scope()) {
+    case Action::Flow::Yangl:
+        return processYangleAction(action);
+    case Action::Flow::NordVPN:
+        return processNordVpnAction(action);
+    case Action::Flow::Custom:
+        return processUserAction(action);
     }
+}
+
+/*static*/ bool NordVpnWraper::isAcceptableAction(const Action *action, Action::Flow expectedFlow,
+                                                  const QString &callerInfo)
+{
+    if (!action) {
+        WRN << "No action!" << callerInfo;
+        return false;
+    }
+
+    if (action->scope() != expectedFlow) {
+        static const QString wrn("Unexpected Flow: %1 (expected: %2).");
+        WRN << wrn.arg(QString::number(static_cast<int>(action->scope())),
+                       QString::number(static_cast<int>(expectedFlow)))
+            << callerInfo;
+        return false;
+    }
+
+    return true;
+}
+
+void NordVpnWraper::processYangleAction(Action *action)
+{
+    if (!isAcceptableAction(action, Action::Flow::Yangl, Q_FUNC_INFO))
+        return;
+
+    const Action::Yangl actType = static_cast<Action::Yangl>(action->type());
+    switch (actType) {
+    case Action::Yangl::ShowMap:
+        showMapView();
+        break;
+    case Action::Yangl::ShowSettings:
+        showSettingsEditor();
+        break;
+    case Action::Yangl::ShowLog:
+        showLog();
+        break;
+    case Action::Yangl::Activated:
+        m_checker->setActive(!m_checker->isActive());
+    case Action::Yangl::ShowAbout:
+        showAbout();
+        break;
+    case Action::Yangl::Quit: {
+        qApp->quit();
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void NordVpnWraper::processUserAction(Action *action)
+{
+    if (!isAcceptableAction(action, Action::Flow::Custom, Q_FUNC_INFO))
+        return;
+
+    m_bus->performAction(action);
+}
+
+void NordVpnWraper::processNordVpnAction(Action *action)
+{
+    if (!isAcceptableAction(action, Action::Flow::NordVPN, Q_FUNC_INFO))
+        return;
+
+    const Action::NordVPN actType = static_cast<Action::NordVPN>(action->type());
+    switch (actType) {
+    case Action::NordVPN::Pause05:
+    case Action::NordVPN::Pause30:
+    case Action::NordVPN::Pause60:
+    case Action::NordVPN::PauseCustom: {
+        pause(actType);
+        return;
+    }
+    default:
+        break;
+    }
+
+    m_bus->performAction(action);
 }
 
 void NordVpnWraper::pause(Action::NordVPN action)

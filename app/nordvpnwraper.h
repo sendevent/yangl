@@ -72,4 +72,10 @@ private:
     void updateActions(bool connected);
 
     void initMenu();
+
+    void processYangleAction(Action *action);
+    void processNordVpnAction(Action *action);
+    void processUserAction(Action *action);
+
+    static bool isAcceptableAction(const Action *action, Action::Flow expectedFlow, const QString &callerInfo);
 };
