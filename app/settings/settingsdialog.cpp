@@ -112,7 +112,7 @@ bool SettingsDialog::saveMonitorSettings()
     const QString &path = ui->leNVPNPath->text();
     if (path != AppSettings::Monitor.NVPNPath->read().toString()) {
         if (!Action::isValidAppPath(path)) {
-            QMessageBox::critical(this, tr("NordVPN binary"), tr("Please, specefy valid path."));
+            QMessageBox::critical(this, tr("NordVPN binary"), tr("Please, specefy a valid path."));
             ui->tabWidget->setCurrentIndex(0);
             ui->leNVPNPath->setFocus();
 

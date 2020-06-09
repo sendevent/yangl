@@ -110,7 +110,7 @@ void MenuHolder::populateActions(const QVector<Action::Ptr> &actions)
         }
     }
 
-    for (auto flow : { Action::Flow::Yangl, Action::Flow::NordVPN, Action::Flow::Custom })
+    for (auto flow : { Action::Flow::NordVPN, Action::Flow::Custom, Action::Flow::Yangl })
         addActions(flow);
 }
 

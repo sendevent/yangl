@@ -311,17 +311,17 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
     }
     case Action::NordVPN::Pause30: {
         title = QObject::tr("Pause for 30m");
-        menuPlace = Action::MenuPlace::Common;
+        menuPlace = Action::MenuPlace::Own;
         break;
     }
     case Action::NordVPN::Pause60: {
         title = QObject::tr("Pause for 1h");
-        menuPlace = Action::MenuPlace::Common;
+        menuPlace = Action::MenuPlace::Own;
         break;
     }
     case Action::NordVPN::PauseCustom: {
         title = QObject::tr("Pause for ?");
-        menuPlace = Action::MenuPlace::Common;
+        menuPlace = Action::MenuPlace::Own;
         break;
     }
     case Action::NordVPN::Rate5: {
