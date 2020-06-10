@@ -27,16 +27,34 @@ class TrayIcon : public QSystemTrayIcon
 public:
     TrayIcon(QObject *parent = {});
 
+    static void reloadIcons();
+
     void setMessageDuration(int durationSecs);
-    static QIcon iconForState(const NordVpnInfo &state);
-    static QIcon iconForStatus(const NordVpnInfo::Status &status);
     int duration() const { return m_duration; }
+
+    void updateIcon(NordVpnInfo::Status status);
 
 public slots:
     void setState(const NordVpnInfo &state);
 
 private:
+    struct IconInfo {
+        QString m_base;
+        QString m_sub;
+        NordVpnInfo::Status m_status;
+    };
+    static QMap<NordVpnInfo::Status, IconInfo> m_allIcons;
+    static QMap<NordVpnInfo::Status, QIcon> m_composedIcons;
+
     NordVpnInfo m_state;
     bool m_isFirstChange;
     int m_duration;
+
+    static QIcon iconForState(const NordVpnInfo &state);
+    static QIcon iconForStatus(const NordVpnInfo::Status &status);
+
+    static TrayIcon::IconInfo infoPixmaps(const NordVpnInfo::Status forStatus);
+    static QIcon generateIcon(const NordVpnInfo::Status forStatus);
+
+    void deployDefaults() const;
 };

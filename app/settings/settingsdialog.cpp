@@ -46,12 +46,12 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
 
     connect(ui->checkBoxAutoActive, &QCheckBox::toggled, ui->cbIgnoreFirstConnected, &QCheckBox::setEnabled);
 
-    ui->leNVPNPath->setText(AppSettings::Monitor.NVPNPath->read().toString());
-    ui->spinBoxInterval->setValue(AppSettings::Monitor.Interval->read().toInt() / yangl::OneSecondMs);
-    ui->spinBoxMsgDuration->setValue(AppSettings::Monitor.MessageDuration->read().toInt());
-    ui->checkBoxAutoActive->setChecked(AppSettings::Monitor.Active->read().toBool());
-    ui->cbIgnoreFirstConnected->setChecked(AppSettings::Monitor.IgnoreFirstConnected->read().toBool());
-    ui->checkBoxMessagePlainText->setChecked(AppSettings::Monitor.MessagePlainText->read().toBool());
+    ui->leNVPNPath->setText(AppSettings::Monitor->NVPNPath->read().toString());
+    ui->spinBoxInterval->setValue(AppSettings::Monitor->Interval->read().toInt() / yangl::OneSecondMs);
+    ui->spinBoxMsgDuration->setValue(AppSettings::Tray->MessageDuration->read().toInt());
+    ui->checkBoxAutoActive->setChecked(AppSettings::Monitor->Active->read().toBool());
+    ui->cbIgnoreFirstConnected->setChecked(AppSettings::Tray->IgnoreFirstConnected->read().toBool());
+    ui->checkBoxMessagePlainText->setChecked(AppSettings::Tray->MessagePlainText->read().toBool());
 
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::accept);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &SettingsDialog::reject);
@@ -59,16 +59,25 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
     ui->tabActionsYangl->setActions(m_actStorage, Action::Flow::Yangl);
     ui->tabActionsNordVPN->setActions(m_actStorage, Action::Flow::NordVPN);
     ui->tabActionsUser->setActions(m_actStorage, Action::Flow::Custom);
-    ui->spinBoxLogLines->setValue(AppSettings::Monitor.LogLinesLimit->read().toInt());
+    ui->spinBoxLogLines->setValue(AppSettings::Monitor->LogLinesLimit->read().toInt());
+
+    ui->iconUnknownEdit->setPath(AppSettings::Tray->IcnUnknown->read().toString());
+    ui->iconUnknownSubEdit->setPath(AppSettings::Tray->IcnUnknownSub->read().toString());
+    ui->iconDisconnectedEdit->setPath(AppSettings::Tray->IcnDisconnected->read().toString());
+    ui->iconDisconnectedSubEdit->setPath(AppSettings::Tray->IcnDisconnectedSub->read().toString());
+    ui->iconConnectingEdit->setPath(AppSettings::Tray->IcnConnecting->read().toString());
+    ui->iconConnectingSubEdit->setPath(AppSettings::Tray->IcnConnectingSub->read().toString());
+    ui->iconConnectedEdit->setPath(AppSettings::Tray->IcnConnected->read().toString());
+    ui->iconConnectedSubEdit->setPath(AppSettings::Tray->IcnConnectedSub->read().toString());
 
     ui->mapVerticalLayout->insertWidget(0, m_mapSettings);
 
-    restoreGeometry(AppSettings::Monitor.SettingsDialog->read().toByteArray());
+    restoreGeometry(AppSettings::Monitor->SettingsDialog->read().toByteArray());
 }
 
 SettingsDialog::~SettingsDialog()
 {
-    AppSettings::Monitor.SettingsDialog->write(saveGeometry());
+    AppSettings::Monitor->SettingsDialog->write(saveGeometry());
     delete ui;
 }
 
@@ -88,10 +97,19 @@ bool SettingsDialog::saveSettings()
     if (!actionsOk)
         WRN << "failed to save actions";
 
-    AppSettings::Map.MapType->write(m_mapSettings->selectedType());
-    AppSettings::Map.MapPlugin->write(m_mapSettings->selectedPlugin());
+    AppSettings::Map->MapType->write(m_mapSettings->selectedType());
+    AppSettings::Map->MapPlugin->write(m_mapSettings->selectedPlugin());
 
     LOG << m_mapSettings->selectedPlugin() << m_mapSettings->selectedType();
+
+    AppSettings::Tray->IcnUnknown->write(ui->iconUnknownEdit->path());
+    AppSettings::Tray->IcnUnknownSub->write(ui->iconUnknownSubEdit->path());
+    AppSettings::Tray->IcnDisconnected->write(ui->iconDisconnectedEdit->path());
+    AppSettings::Tray->IcnDisconnectedSub->write(ui->iconDisconnectedSubEdit->path());
+    AppSettings::Tray->IcnConnecting->write(ui->iconConnectingEdit->path());
+    AppSettings::Tray->IcnConnectingSub->write(ui->iconConnectingSubEdit->path());
+    AppSettings::Tray->IcnConnected->write(ui->iconConnectedEdit->path());
+    AppSettings::Tray->IcnConnectedSub->write(ui->iconConnectedSubEdit->path());
 
     return settingsOk && actionsOk;
 }
@@ -99,7 +117,7 @@ bool SettingsDialog::saveSettings()
 bool SettingsDialog::saveMonitorSettings()
 {
     const QString &path = ui->leNVPNPath->text();
-    if (path != AppSettings::Monitor.NVPNPath->read().toString()) {
+    if (path != AppSettings::Monitor->NVPNPath->read().toString()) {
         if (!Action::isValidAppPath(path)) {
             QMessageBox::critical(this, tr("NordVPN binary"), tr("Please, specefy a valid path."));
             ui->tabWidget->setCurrentIndex(0);
@@ -110,13 +128,13 @@ bool SettingsDialog::saveMonitorSettings()
         QMessageBox::information(this, tr("NordVPN binary"), tr("Please, restart the application to apply changes."));
     }
 
-    AppSettings::Monitor.NVPNPath->write(path);
-    AppSettings::Monitor.MessageDuration->write(ui->spinBoxMsgDuration->value());
-    AppSettings::Monitor.Interval->write(ui->spinBoxInterval->value() * yangl::OneSecondMs);
-    AppSettings::Monitor.Active->write(ui->checkBoxAutoActive->isChecked());
-    AppSettings::Monitor.IgnoreFirstConnected->write(ui->cbIgnoreFirstConnected->isChecked());
-    AppSettings::Monitor.MessagePlainText->write(ui->checkBoxMessagePlainText->isChecked());
-    AppSettings::Monitor.LogLinesLimit->write(ui->spinBoxLogLines->value());
+    AppSettings::Monitor->NVPNPath->write(path);
+    AppSettings::Tray->MessageDuration->write(ui->spinBoxMsgDuration->value());
+    AppSettings::Monitor->Interval->write(ui->spinBoxInterval->value() * yangl::OneSecondMs);
+    AppSettings::Monitor->Active->write(ui->checkBoxAutoActive->isChecked());
+    AppSettings::Tray->IgnoreFirstConnected->write(ui->cbIgnoreFirstConnected->isChecked());
+    AppSettings::Tray->MessagePlainText->write(ui->checkBoxMessagePlainText->isChecked());
+    AppSettings::Monitor->LogLinesLimit->write(ui->spinBoxLogLines->value());
 
     return true;
 }

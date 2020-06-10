@@ -26,8 +26,6 @@ tst_StateChecker::tst_StateChecker(QObject *parent)
     , m_caller(new CLICaller)
     , m_storage(new ActionStorage)
 {
-    QStandardPaths::setTestModeEnabled(true);
-
     m_storage->load();
     const Action::Ptr &action = m_storage->action(Action::NordVPN::CheckStatus);
     QString statusSink(qApp->applicationFilePath());

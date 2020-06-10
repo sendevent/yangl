@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>430</width>
-    <height>368</height>
+    <height>650</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -24,7 +24,7 @@
        <item row="0" column="0">
         <widget class="QTabWidget" name="appTabWidget">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="tabAppCommon">
           <attribute name="title">
@@ -61,26 +61,39 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="0" colspan="2">
-            <widget class="QCheckBox" name="checkBoxAutoActive">
-             <property name="text">
-              <string>Activate on app start</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
+           <item row="2" column="0">
             <widget class="QLabel" name="label_4">
              <property name="text">
               <string>Log lines limit:</string>
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
+           <item row="2" column="1">
             <widget class="QSpinBox" name="spinBoxLogLines">
              <property name="maximum">
               <number>10000</number>
              </property>
             </widget>
+           </item>
+           <item row="3" column="0" colspan="2">
+            <widget class="QCheckBox" name="checkBoxAutoActive">
+             <property name="text">
+              <string>Activate on app start</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
@@ -108,110 +121,159 @@
           <attribute name="title">
            <string>Tray</string>
           </attribute>
-          <widget class="QGroupBox" name="groupBoxMessage">
-           <property name="geometry">
-            <rect>
-             <x>9</x>
-             <y>9</y>
-             <width>260</width>
-             <height>120</height>
-            </rect>
-           </property>
-           <property name="title">
-            <string>Message balloon</string>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-           <layout class="QGridLayout" name="gridLayout">
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_3">
-              <property name="text">
-               <string>Duration:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QCheckBox" name="cbIgnoreFirstConnected">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>Ommit first &quot;Connected&quot;</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QCheckBox" name="checkBoxMessagePlainText">
-              <property name="text">
-               <string>Plain text</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QSpinBox" name="spinBoxMsgDuration">
-              <property name="suffix">
-               <string>s</string>
-              </property>
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <number>3600</number>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QGroupBox" name="groupBox">
-           <property name="geometry">
-            <rect>
-             <x>30</x>
-             <y>180</y>
-             <width>451</width>
-             <height>161</height>
-            </rect>
-           </property>
-           <property name="title">
-            <string>Icon</string>
-           </property>
-           <widget class="QLineEdit" name="lineEdit">
-            <property name="geometry">
-             <rect>
-              <x>210</x>
-              <y>40</y>
-              <width>113</width>
-              <height>23</height>
-             </rect>
-            </property>
-           </widget>
-           <widget class="QLabel" name="label_5">
-            <property name="geometry">
-             <rect>
-              <x>30</x>
-              <y>40</y>
-              <width>57</width>
-              <height>15</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-           <widget class="QToolButton" name="toolButton">
-            <property name="geometry">
-             <rect>
-              <x>330</x>
-              <y>40</y>
-              <width>28</width>
-              <height>22</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>...</string>
-            </property>
-           </widget>
-          </widget>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="1" column="0">
+            <widget class="QGroupBox" name="groupBox">
+             <property name="title">
+              <string>Icon</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout_2">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_5">
+                <property name="text">
+                 <string>Unknown:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="IconLineEdit" name="iconUnknownEdit" native="true"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>Sub:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="IconLineEdit" name="iconUnknownSubEdit" native="true"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_8">
+                <property name="text">
+                 <string>Disconnected:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="IconLineEdit" name="iconDisconnectedEdit" native="true"/>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>Sub:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="IconLineEdit" name="iconDisconnectedSubEdit" native="true"/>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_10">
+                <property name="text">
+                 <string>Connecting:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="IconLineEdit" name="iconConnectingEdit" native="true"/>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>Sub:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="IconLineEdit" name="iconConnectingSubEdit" native="true"/>
+              </item>
+              <item row="6" column="0">
+               <widget class="QLabel" name="label_12">
+                <property name="text">
+                 <string>Connected:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="1">
+               <widget class="IconLineEdit" name="iconConnectedEdit" native="true"/>
+              </item>
+              <item row="7" column="0">
+               <widget class="QLabel" name="label_11">
+                <property name="text">
+                 <string>Sub:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="1">
+               <widget class="IconLineEdit" name="iconConnectedSubEdit" native="true"/>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QGroupBox" name="groupBoxMessage">
+             <property name="title">
+              <string>Message balloon</string>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+             <layout class="QGridLayout" name="gridLayout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_3">
+                <property name="text">
+                 <string>Duration:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QCheckBox" name="cbIgnoreFirstConnected">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Ommit first &quot;Connected&quot;</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QCheckBox" name="checkBoxMessagePlainText">
+                <property name="text">
+                 <string>Plain text</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QSpinBox" name="spinBoxMsgDuration">
+                <property name="suffix">
+                 <string>s</string>
+                </property>
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>3600</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </widget>
         </widget>
        </item>
@@ -268,6 +330,12 @@
    <class>AppPathEditor</class>
    <extends>QWidget</extends>
    <header>apppatheditor.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>IconLineEdit</class>
+   <extends>QWidget</extends>
+   <header>iconlineedit.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
