@@ -82,23 +82,28 @@ void IconLineEdit::updatePreview(const QString &to)
     static const int imgPreviewSide = 32;
     static const int imgTooltipSide = 512;
 
+    QString previewTooltip;
     QPixmap pm(to);
-    if (pm.isNull())
+    if (pm.isNull()) {
         pm = QPixmap(":/icn/resources/noimage.png");
-    else
+        previewTooltip = tr("No image used");
+    } else
         m_edit->setToolTip(to);
 
     if (pm.width() > imgTooltipSide || pm.height() > imgTooltipSide)
         pm = pm.scaled(imgTooltipSide, imgTooltipSide, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
-    QByteArray ba;
-    QBuffer buffer(&ba);
-    buffer.open(QIODevice::WriteOnly);
-    pm.save(&buffer, "PNG");
-    const QByteArray &ba64 = ba.toBase64();
+    if (previewTooltip.isEmpty()) {
+        QByteArray ba;
+        QBuffer buffer(&ba);
+        buffer.open(QIODevice::WriteOnly);
+        pm.save(&buffer, "PNG");
+        const QByteArray &ba64 = ba.toBase64();
 
-    static const QString html("<img width=%1 height=%2 src=\"data:image/png;base64, %3\" />");
+        static const QString html("<img width=%1 height=%2 src=\"data:image/png;base64, %3\" />");
+        previewTooltip = html.arg(QString::number(pm.width()), QString::number(pm.height()), QString(ba64));
+    }
 
-    m_preview->setToolTip(html.arg(QString::number(pm.width()), QString::number(pm.height()), QString(ba64)));
+    m_preview->setToolTip(previewTooltip);
     m_preview->setPixmap(pm.scaled(imgPreviewSide, imgPreviewSide, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
