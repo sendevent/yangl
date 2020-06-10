@@ -99,6 +99,9 @@ void NordVpnWraper::start()
     }
 
     ActionResultViewer::updateLinesLimit();
+
+    TrayIcon::reloadIcons();
+    m_trayIcon->updateIcon(m_checker->state().status());
 }
 
 void NordVpnWraper::loadSettings()
