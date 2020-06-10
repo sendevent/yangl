@@ -48,10 +48,10 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
 
     ui->leNVPNPath->setText(AppSettings::Monitor.NVPNPath->read().toString());
     ui->spinBoxInterval->setValue(AppSettings::Monitor.Interval->read().toInt() / yangl::OneSecondMs);
-    ui->spinBoxMsgDuration->setValue(AppSettings::Monitor.MessageDuration->read().toInt());
+    ui->spinBoxMsgDuration->setValue(AppSettings::Tray.MessageDuration->read().toInt());
     ui->checkBoxAutoActive->setChecked(AppSettings::Monitor.Active->read().toBool());
-    ui->cbIgnoreFirstConnected->setChecked(AppSettings::Monitor.IgnoreFirstConnected->read().toBool());
-    ui->checkBoxMessagePlainText->setChecked(AppSettings::Monitor.MessagePlainText->read().toBool());
+    ui->cbIgnoreFirstConnected->setChecked(AppSettings::Tray.IgnoreFirstConnected->read().toBool());
+    ui->checkBoxMessagePlainText->setChecked(AppSettings::Tray.MessagePlainText->read().toBool());
 
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::accept);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &SettingsDialog::reject);
@@ -111,11 +111,11 @@ bool SettingsDialog::saveMonitorSettings()
     }
 
     AppSettings::Monitor.NVPNPath->write(path);
-    AppSettings::Monitor.MessageDuration->write(ui->spinBoxMsgDuration->value());
+    AppSettings::Tray.MessageDuration->write(ui->spinBoxMsgDuration->value());
     AppSettings::Monitor.Interval->write(ui->spinBoxInterval->value() * yangl::OneSecondMs);
     AppSettings::Monitor.Active->write(ui->checkBoxAutoActive->isChecked());
-    AppSettings::Monitor.IgnoreFirstConnected->write(ui->cbIgnoreFirstConnected->isChecked());
-    AppSettings::Monitor.MessagePlainText->write(ui->checkBoxMessagePlainText->isChecked());
+    AppSettings::Tray.IgnoreFirstConnected->write(ui->cbIgnoreFirstConnected->isChecked());
+    AppSettings::Tray.MessagePlainText->write(ui->checkBoxMessagePlainText->isChecked());
     AppSettings::Monitor.LogLinesLimit->write(ui->spinBoxLogLines->value());
 
     return true;
