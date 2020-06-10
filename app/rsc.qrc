@@ -7,6 +7,7 @@
         <file>resources/sub_unknown.png</file>
         <file>resources/online_map.png</file>
         <file>resources/offline_map.png</file>
+        <file>resources/noimage.png</file>
     </qresource>
     <qresource prefix="/qml">
         <file>geo/qml/MapView.qml</file>
