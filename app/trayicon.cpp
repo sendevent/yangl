@@ -21,57 +21,59 @@
 #include "common.h"
 
 #include <QApplication>
+#include <QFileInfo>
 #include <QMetaEnum>
 #include <QPainter>
 #include <QPixmap>
 #include <QTextDocumentFragment>
 
-struct IconInfo {
-    QString m_base;
-    QString m_sub;
-    NordVpnInfo::Status m_status;
-};
+/*static*/ QMap<NordVpnInfo::Status, TrayIcon::IconInfo> TrayIcon::m_allIcons = {};
+/*static*/ QMap<NordVpnInfo::Status, QIcon> TrayIcon::m_composedIcons = {};
 
-/*static*/ IconInfo infoPixmaps(const NordVpnInfo::Status forStatus)
+/*static*/ void TrayIcon::reloadIcons()
 {
-    static const QMap<NordVpnInfo::Status, IconInfo> staticIcons = [] {
-        QMap<NordVpnInfo::Status, IconInfo> icons;
-        QMetaEnum me = QMetaEnum::fromType<NordVpnInfo::Status>();
-        for (int i = 0; i < me.keyCount(); ++i) {
-            IconInfo info;
-            info.m_status = static_cast<NordVpnInfo::Status>(i);
-            const NordVpnInfo::Status state = static_cast<NordVpnInfo::Status>(me.value(i));
-            switch (state) {
-            case NordVpnInfo::Status::Connected:
-                info.m_base = QStringLiteral(":/icn/resources/online.png");
-                //                info.m_sub = QStringLiteral(":/icn/resources/sub_online.png");
-                break;
-            case NordVpnInfo::Status::Disconnected:
-                info.m_base = QStringLiteral(":/icn/resources/offline.png");
-                //                info.m_sub = QStringLiteral(":/icn/resources/sub_offline.png");
-                break;
-            case NordVpnInfo::Status::Connecting:
-                info.m_base = QStringLiteral(":/icn/resources/offline.png");
-                info.m_sub = QStringLiteral(":/icn/resources/sub_toonline.png");
-                break;
-            case NordVpnInfo::Status::Disconnecting:
-                info.m_base = QStringLiteral(":/icn/resources/offline.png");
-                info.m_sub = QStringLiteral(":/icn/resources/sub_toffline.png");
-                break;
-            default:
-                info.m_base = QStringLiteral(":/icn/resources/offline.png");
-                info.m_sub = QStringLiteral(":/icn/resources/sub_unknown.png");
-                break;
-            }
-            icons.insert(info.m_status, info);
-        }
-        return icons;
-    }();
+    m_allIcons.clear();
+    m_composedIcons.clear();
 
-    return staticIcons.value(forStatus);
+    QMetaEnum me = QMetaEnum::fromType<NordVpnInfo::Status>();
+    for (int i = 0; i < me.keyCount(); ++i) {
+        IconInfo info;
+        info.m_status = static_cast<NordVpnInfo::Status>(i);
+        const NordVpnInfo::Status &state = static_cast<NordVpnInfo::Status>(me.value(i));
+
+        switch (state) {
+        case NordVpnInfo::Status::Connected:
+            info.m_base = AppSettings::Tray->IcnConnected->read().toString();
+            info.m_sub = AppSettings::Tray->IcnConnectedSub->read().toString();
+            break;
+        case NordVpnInfo::Status::Disconnected:
+            info.m_base = AppSettings::Tray->IcnDisconnected->read().toString();
+            info.m_sub = AppSettings::Tray->IcnDisconnectedSub->read().toString();
+            break;
+        case NordVpnInfo::Status::Connecting:
+            info.m_base = AppSettings::Tray->IcnConnecting->read().toString();
+            info.m_sub = AppSettings::Tray->IcnConnectingSub->read().toString();
+            break;
+            //        case NordVpnInfo::Status::Disconnecting:
+            //            info.m_base = QStringLiteral(":/icn/resources/offline.png");
+            //            info.m_sub = QStringLiteral(":/icn/resources/sub_toffline.png");
+            //            break;
+        default:
+            info.m_base = AppSettings::Tray->IcnUnknown->read().toString();
+            info.m_sub = AppSettings::Tray->IcnUnknownSub->read().toString();
+            break;
+        }
+        m_allIcons.insert(info.m_status, info);
+        m_composedIcons.insert(state, generateIcon(state));
+    }
 }
 
-QIcon generateIcon(const NordVpnInfo::Status forStatus)
+/*static*/ TrayIcon::IconInfo TrayIcon::infoPixmaps(const NordVpnInfo::Status forStatus)
+{
+    return m_allIcons.value(forStatus);
+}
+
+/*static*/ QIcon TrayIcon::generateIcon(const NordVpnInfo::Status forStatus)
 {
     const IconInfo &info = infoPixmaps(forStatus);
     QPixmap base(info.m_base);
@@ -99,6 +101,10 @@ TrayIcon::TrayIcon(QObject *parent)
     : QSystemTrayIcon(iconForStatus(NordVpnInfo::Status::Unknown), parent)
     , m_isFirstChange(true)
 {
+    deployDefaults();
+    reloadIcons();
+
+    setIcon(iconForStatus(NordVpnInfo::Status::Unknown));
 }
 
 /*static*/ QIcon TrayIcon::iconForState(const NordVpnInfo &state)
@@ -108,17 +114,7 @@ TrayIcon::TrayIcon(QObject *parent)
 
 /*static*/ QIcon TrayIcon::iconForStatus(const NordVpnInfo::Status &status)
 {
-    static const QMap<NordVpnInfo::Status, QIcon> staticIcons = [] {
-        QMap<NordVpnInfo::Status, QIcon> icons;
-        QMetaEnum me = QMetaEnum::fromType<NordVpnInfo::Status>();
-        for (int i = 0; i < me.keyCount(); ++i) {
-            const NordVpnInfo::Status state = static_cast<NordVpnInfo::Status>(me.value(i));
-            icons.insert(state, generateIcon(state));
-        }
-        return icons;
-    }();
-
-    return staticIcons[status];
+    return m_composedIcons[status];
 }
 
 void TrayIcon::setMessageDuration(int durationSecs)
@@ -150,4 +146,31 @@ void TrayIcon::setState(const NordVpnInfo &state)
 
     m_state = state;
     m_isFirstChange = false;
+}
+
+void TrayIcon::deployDefaults() const
+{
+    static const QString rscPath(":/icn/resources/tray/%1");
+
+    for (const auto &fsFile : {
+                 GroupTray::iconPath(QStringLiteral("unknown.png")),
+                 GroupTray::iconPath(QStringLiteral("unknown_sub.png")),
+                 GroupTray::iconPath(QStringLiteral("disconnected.png")),
+                 GroupTray::iconPath(QStringLiteral("disconnected_sub.png")),
+                 GroupTray::iconPath(QStringLiteral("connecting.png")),
+                 GroupTray::iconPath(QStringLiteral("connecting_sub.png")),
+                 GroupTray::iconPath(QStringLiteral("connected.png")),
+                 GroupTray::iconPath(QStringLiteral("connected_sub.png")),
+         }) {
+
+        LOG << "src:" << fsFile;
+        const QFileInfo info(fsFile);
+        if (info.exists())
+            continue;
+
+        const QString rscFile(rscPath.arg(info.fileName()));
+        LOG << "dst:" << rscFile;
+
+        QFile::copy(rscFile, fsFile);
+    }
 }

@@ -37,7 +37,6 @@ tst_ActionJson::tst_ActionJson() {}
 void tst_ActionJson::test_filePath()
 {
     const QString jsonFilePath = ActionJson::jsonFilePath();
-    qDebug() << jsonFilePath;
     QVERIFY(jsonFilePath.endsWith(QString("%1/actions.json").arg(qAppName())));
 }
 
