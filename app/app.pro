@@ -31,6 +31,7 @@ SOURCES += \
     actions/clicallresultview.cpp \
     cli/clicall.cpp \
     cli/clicaller.cpp \
+    common.cpp \
     main.cpp \
     menuholder.cpp \
     nordvpninfo.cpp \

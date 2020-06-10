@@ -59,4 +59,6 @@ QVector<SomeQEnum> allEnum(const QVector<SomeQEnum> &excluded = {})
     return values;
 }
 
+QString ensureDirExists(const QString &path);
+
 } // ns yangl

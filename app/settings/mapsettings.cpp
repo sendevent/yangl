@@ -36,13 +36,13 @@ MapSettings::MapSettings(QWidget *parent)
 {
     m_comboPlugin->addItems(MapWidget::geoServices());
     connect(m_comboPlugin, &QComboBox::currentTextChanged, this, &MapSettings::setupMap);
-    m_comboPlugin->setCurrentText(AppSettings::Map.MapPlugin->read().toString());
+    m_comboPlugin->setCurrentText(AppSettings::Map->MapPlugin->read().toString());
 
     m_formLayout->addRow(tr("Service:"), m_comboPlugin);
     m_formLayout->addRow(tr("Type:"), m_comboType);
 
-    m_comboType->setCurrentIndex(AppSettings::Map.MapType->read().toInt());
-    setupMap(AppSettings::Map.MapPlugin->read().toString());
+    m_comboType->setCurrentIndex(AppSettings::Map->MapType->read().toInt());
+    setupMap(AppSettings::Map->MapPlugin->read().toString());
 
     connect(m_comboType, &QComboBox::currentTextChanged, this,
             [this](const QString &txt) { m_preview->setMapType(txt); });

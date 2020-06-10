@@ -135,7 +135,7 @@ void ActionStorage::save(QIODevice(*to))
 
 Action::Ptr ActionStorage::createUserAction(QObject *parent)
 {
-    return createAction(Action::Flow::Custom, 0, {}, AppSettings::Monitor.NVPNPath->read().toString(), {}, {}, true,
+    return createAction(Action::Flow::Custom, 0, {}, AppSettings::Monitor->NVPNPath->read().toString(), {}, {}, true,
                         Action::MenuPlace::Own, CLICall::DefaultTimeoutMSecs, parent);
 }
 
@@ -257,7 +257,7 @@ Action::Ptr ActionStorage::createYanglAction(Action::Yangl actionType, const QSt
 
 Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QString &id)
 {
-    const QString &appPath = AppSettings::Monitor.NVPNPath->read().toString();
+    const QString &appPath = AppSettings::Monitor->NVPNPath->read().toString();
     Action::Flow scope = Action::Flow::NordVPN;
 
     QString title;

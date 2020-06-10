@@ -225,12 +225,9 @@ QVector<QString> ActionJson::actionsGroup(const QString &group) const
 /*static*/ QString ActionJson::jsonFilePath()
 {
     static QString jsonPath;
-    if (jsonPath.isEmpty()) {
-        jsonPath = QString("%1/actions.json").arg(SettingsManager::dirPath());
-        QDir dir = QFileInfo(jsonPath).absoluteDir();
-        if (!dir.exists())
-            dir.mkpath(dir.absolutePath());
-    }
+    if (jsonPath.isEmpty())
+        jsonPath = yangl::ensureDirExists(QString("%1/actions.json").arg(SettingsManager::dirPath()));
+
     return jsonPath;
 }
 
