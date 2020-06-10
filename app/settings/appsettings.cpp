@@ -90,15 +90,38 @@ GroupMap::GroupMap()
 }
 
 GroupTray::GroupTray()
-    : OptionsGroup(localName(),
-                   {
-                           new AppSetting(QString("%1/MessageDuration").arg(localName()), 10),
-                           new AppSetting(QString("%1/IgnoreFirstConnected").arg(localName()), true),
-                           new AppSetting(QString("%1/MsgPlainText").arg(localName()), false),
-                   },
-                   {})
+    : OptionsGroup(
+            localName(),
+            {
+                    new AppSetting(QString("%1/MessageDuration").arg(localName()), 10),
+                    new AppSetting(QString("%1/IgnoreFirstConnected").arg(localName()), true),
+                    new AppSetting(QString("%1/MsgPlainText").arg(localName()), false),
+
+                    new AppSetting(QString("%1/IcnUnknown").arg(localName()), iconPath(QStringLiteral("unknown.png"))),
+                    new AppSetting(QString("%1/IcnUnknownSub").arg(localName()),
+                                   iconPath(QStringLiteral("unknown_sub.png"))),
+                    new AppSetting(QString("%1/IcnDisconnected").arg(localName()),
+                                   iconPath(QStringLiteral("disconnected.png"))),
+                    new AppSetting(QString("%1/IcnDisconnectedSub").arg(localName()),
+                                   iconPath(QStringLiteral("disconnected_sub.png"))),
+                    new AppSetting(QString("%1/IcnConnecting").arg(localName()),
+                                   iconPath(QStringLiteral("connecting.png"))),
+                    new AppSetting(QString("%1/IcnConnectingSub").arg(localName()),
+                                   iconPath(QStringLiteral("connecting_sub.png"))),
+                    new AppSetting(QString("%1/IcnConnected").arg(localName()),
+                                   iconPath(QStringLiteral("connected.png"))),
+                    new AppSetting(QString("%1/IcnConnectedSub").arg(localName()),
+                                   iconPath(QStringLiteral("connected_sub.png"))),
+            },
+            {})
 {
 }
+
+/*static*/ QString GroupTray::iconPath(const QString &iconFile)
+{
+    return iconFile;
+}
+
 /*static*/ void AppSettings::sync()
 {
     if (QSettings *settings = SettingsManager::instance()->storage()) {
