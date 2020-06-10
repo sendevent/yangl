@@ -33,7 +33,7 @@ Rectangle {
             MapQuickItem {
                 id: marker
                 anchorPoint.x: image.width/2
-                anchorPoint.y: image.height/2
+                anchorPoint.y: image.height
                 coordinate: position
 
 
@@ -49,7 +49,7 @@ Rectangle {
 
                     clip: true
 
-                    width: 32
+                    width: 48
                     height:width
                     radius:width/2
 
