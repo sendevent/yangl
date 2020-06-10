@@ -32,14 +32,12 @@
         "\"scope\": 2,\n            \"timeout\": 30,\n            \"title\": \"\",\n            \"type\": 0\n       "
         " }\n    }\n}\n";
 
-tst_ActionJson::tst_ActionJson()
-{
-    QStandardPaths::setTestModeEnabled(true);
-}
+tst_ActionJson::tst_ActionJson() {}
 
 void tst_ActionJson::test_filePath()
 {
     const QString jsonFilePath = ActionJson::jsonFilePath();
+    qDebug() << jsonFilePath;
     QVERIFY(jsonFilePath.endsWith(QString("%1/actions.json").arg(qAppName())));
 }
 

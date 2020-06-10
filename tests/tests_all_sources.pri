@@ -16,6 +16,7 @@ RESOURCES += \
     $$APP_PRO_ROOT/rsc.qrc
 
 HEADERS += $$APP_PRO_ROOT\
+    $$APP_PRO_ROOT/common.h \
     $$APP_PRO_ROOT/actions/actionresultviewer.h \
     $$APP_PRO_ROOT/actions/clicallresultview.h \
     $$APP_PRO_ROOT/actions/action.h \
@@ -45,6 +46,7 @@ HEADERS += $$APP_PRO_ROOT\
     $$APP_PRO_ROOT/geo/serverslistmanager.h
 
 SOURCES += \
+    $$APP_PRO_ROOT/common.cpp \
     $$APP_PRO_ROOT/actions/actionresultviewer.cpp \
     $$APP_PRO_ROOT/actions/clicallresultview.cpp \
     $$APP_PRO_ROOT/actions/action.cpp \

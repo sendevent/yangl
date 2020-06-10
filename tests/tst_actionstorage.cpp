@@ -27,7 +27,6 @@
 tst_ActionStorage::tst_ActionStorage(QObject *parent)
     : QObject(parent)
 {
-    QStandardPaths::setTestModeEnabled(true);
 }
 
 void tst_ActionStorage::cleanupTestCase()

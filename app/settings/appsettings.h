@@ -119,9 +119,11 @@ private:
 class AppSettings
 {
 public:
-    static const GroupMonitor Monitor;
-    static const GroupMap Map;
-    static const GroupTray Tray;
+    static GroupMonitor *Monitor;
+    static GroupMap *Map;
+    static GroupTray *Tray;
+
+    static void init();
 
     static void sync();
 

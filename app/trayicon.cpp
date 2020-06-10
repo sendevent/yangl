@@ -128,7 +128,7 @@ void TrayIcon::setMessageDuration(int durationSecs)
 
 void TrayIcon::setState(const NordVpnInfo &state)
 {
-    const QString description = AppSettings::Tray.MessagePlainText->read().toBool()
+    const QString description = AppSettings::Tray->MessagePlainText->read().toBool()
             ? QTextDocumentFragment::fromHtml(state.toString()).toPlainText()
             : state.toString();
 
@@ -138,7 +138,8 @@ void TrayIcon::setState(const NordVpnInfo &state)
 
         bool skeepMessage(false);
         if (m_isFirstChange && state.status() == NordVpnInfo::Status::Connected)
-            if (AppSettings::Monitor.Active->read().toBool() && AppSettings::Tray.IgnoreFirstConnected->read().toBool())
+            if (AppSettings::Monitor->Active->read().toBool()
+                && AppSettings::Tray->IgnoreFirstConnected->read().toBool())
                 skeepMessage = true;
 
         if (!skeepMessage)
