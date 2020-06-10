@@ -61,6 +61,15 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
     ui->tabActionsUser->setActions(m_actStorage, Action::Flow::Custom);
     ui->spinBoxLogLines->setValue(AppSettings::Monitor->LogLinesLimit->read().toInt());
 
+    ui->iconUnknownEdit->setPath(AppSettings::Tray->IcnUnknown->read().toString());
+    ui->iconUnknownSubEdit->setPath(AppSettings::Tray->IcnUnknownSub->read().toString());
+    ui->iconDisconnectedEdit->setPath(AppSettings::Tray->IcnDisconnected->read().toString());
+    ui->iconDisconnectedSubEdit->setPath(AppSettings::Tray->IcnDisconnectedSub->read().toString());
+    ui->iconConnectingEdit->setPath(AppSettings::Tray->IcnConnecting->read().toString());
+    ui->iconConnectingSubEdit->setPath(AppSettings::Tray->IcnConnectingSub->read().toString());
+    ui->iconConnectedEdit->setPath(AppSettings::Tray->IcnConnected->read().toString());
+    ui->iconConnectedSubEdit->setPath(AppSettings::Tray->IcnConnectedSub->read().toString());
+
     ui->mapVerticalLayout->insertWidget(0, m_mapSettings);
 
     restoreGeometry(AppSettings::Monitor->SettingsDialog->read().toByteArray());
@@ -92,6 +101,15 @@ bool SettingsDialog::saveSettings()
     AppSettings::Map->MapPlugin->write(m_mapSettings->selectedPlugin());
 
     LOG << m_mapSettings->selectedPlugin() << m_mapSettings->selectedType();
+
+    AppSettings::Tray->IcnUnknown->write(ui->iconUnknownEdit->path());
+    AppSettings::Tray->IcnUnknownSub->write(ui->iconUnknownSubEdit->path());
+    AppSettings::Tray->IcnDisconnected->write(ui->iconDisconnectedEdit->path());
+    AppSettings::Tray->IcnDisconnectedSub->write(ui->iconDisconnectedSubEdit->path());
+    AppSettings::Tray->IcnConnecting->write(ui->iconConnectingEdit->path());
+    AppSettings::Tray->IcnConnectingSub->write(ui->iconConnectingSubEdit->path());
+    AppSettings::Tray->IcnConnected->write(ui->iconConnectedEdit->path());
+    AppSettings::Tray->IcnConnectedSub->write(ui->iconConnectedSubEdit->path());
 
     return settingsOk && actionsOk;
 }

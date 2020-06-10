@@ -122,6 +122,13 @@ void TrayIcon::setMessageDuration(int durationSecs)
     m_duration = durationSecs;
 }
 
+void TrayIcon::updateIcon(NordVpnInfo::Status status)
+{
+    const QIcon &icn = iconForStatus(status);
+    if (!icn.isNull())
+        setIcon(icn);
+}
+
 void TrayIcon::setState(const NordVpnInfo &state)
 {
     const QString description = AppSettings::Tray->MessagePlainText->read().toBool()
@@ -129,8 +136,7 @@ void TrayIcon::setState(const NordVpnInfo &state)
             : state.toString();
 
     if (m_state.status() != state.status() && !qApp->isSavingSession()) {
-        QIcon icn = iconForStatus(state.status());
-        setIcon(icn);
+        updateIcon(state.status());
 
         bool skeepMessage(false);
         if (m_isFirstChange && state.status() == NordVpnInfo::Status::Connected)
@@ -163,14 +169,8 @@ void TrayIcon::deployDefaults() const
                  GroupTray::iconPath(QStringLiteral("connected_sub.png")),
          }) {
 
-        LOG << "src:" << fsFile;
         const QFileInfo info(fsFile);
-        if (info.exists())
-            continue;
-
-        const QString rscFile(rscPath.arg(info.fileName()));
-        LOG << "dst:" << rscFile;
-
-        QFile::copy(rscFile, fsFile);
+        if (!info.exists())
+            QFile::copy(rscPath.arg(info.fileName()), fsFile);
     }
 }
