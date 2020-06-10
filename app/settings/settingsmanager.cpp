@@ -19,6 +19,7 @@
 
 #include "common.h"
 
+#include <QApplication>
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
@@ -32,11 +33,11 @@ SettingsManager *SettingsManager::m_instance = {};
     static QString path;
 
     if (path.isEmpty()) {
-        path = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-        QDir dir = QFileInfo(path).absoluteDir();
-        if (!dir.exists())
-            dir.mkpath(dir.absolutePath());
+        path = yangl::ensureDirExists(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation));
+        if (!path.endsWith(qAppName()))
+            path = QStringLiteral("%1/%2").arg(path, qAppName());
     }
+
     return path;
 }
 

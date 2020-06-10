@@ -63,7 +63,7 @@ void StateChecker::setActive(bool active)
             setStatus(NordVpnInfo::Status::Unknown);
         }
 
-        AppSettings::Monitor.Active->write(active);
+        AppSettings::Monitor->Active->write(active);
     }
 }
 

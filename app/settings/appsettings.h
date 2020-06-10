@@ -59,12 +59,9 @@ public:
 
     const AppSetting *NVPNPath = Options[0];
     const AppSetting *Interval = Options[1];
-    const AppSetting *MessageDuration = Options[2];
-    const AppSetting *Active = Options[3];
-    const AppSetting *IgnoreFirstConnected = Options[4];
-    const AppSetting *SettingsDialog = Options[5];
-    const AppSetting *MessagePlainText = Options[6];
-    const AppSetting *LogLinesLimit = Options[7];
+    const AppSetting *Active = Options[2];
+    const AppSetting *SettingsDialog = Options[3];
+    const AppSetting *LogLinesLimit = Options[4];
 
 private:
     GroupMonitor(const GroupMonitor &) = delete;
@@ -94,11 +91,40 @@ private:
     static const QString localName() { return "Map"; }
 };
 
+class GroupTray : public OptionsGroup
+{
+public:
+    GroupTray();
+
+    const AppSetting *MessageDuration = Options[0];
+    const AppSetting *IgnoreFirstConnected = Options[1];
+    const AppSetting *MessagePlainText = Options[2];
+    const AppSetting *IcnUnknown = Options[3];
+    const AppSetting *IcnUnknownSub = Options[4];
+    const AppSetting *IcnDisconnected = Options[5];
+    const AppSetting *IcnDisconnectedSub = Options[6];
+    const AppSetting *IcnConnecting = Options[7];
+    const AppSetting *IcnConnectingSub = Options[8];
+    const AppSetting *IcnConnected = Options[9];
+    const AppSetting *IcnConnectedSub = Options[10];
+
+    static QString iconPath(const QString &iconFile);
+
+private:
+    GroupTray(const GroupTray &) = delete;
+    GroupTray &operator=(const GroupTray &) = delete;
+
+    static const QString localName() { return "Tray"; }
+};
+
 class AppSettings
 {
 public:
-    static const GroupMonitor Monitor;
-    static const GroupMap Map;
+    static GroupMonitor *Monitor;
+    static GroupMap *Map;
+    static GroupTray *Tray;
+
+    static void init();
 
     static void sync();
 

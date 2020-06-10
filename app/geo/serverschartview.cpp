@@ -58,6 +58,7 @@ void ServersChartView::initUi()
 
     QWidget *leftView = new QWidget(this);
     QVBoxLayout *leftVBox = new QVBoxLayout(leftView);
+    leftVBox->setMargin(0);
     m_lineEdit = new QLineEdit(leftView);
     m_lineEdit->setPlaceholderText(QStringLiteral("F"));
     m_lineEdit->setToolTip(tr("Filter by country/city"));
@@ -74,8 +75,8 @@ void ServersChartView::initUi()
     m_buttonReload->setToolTip(tr("Update available servers list"));
     hBox->addWidget(m_buttonReload);
 
-    m_chartWidget = new MapWidget(AppSettings::Map.MapPlugin->read().toString(),
-                                  AppSettings::Map.MapType->read().toInt(), this);
+    m_chartWidget = new MapWidget(AppSettings::Map->MapPlugin->read().toString(),
+                                  AppSettings::Map->MapType->read().toInt(), this);
     m_chartWidget->init();
 
     leftVBox->addWidget(m_lineEdit);
@@ -106,30 +107,30 @@ void ServersChartView::initConenctions()
 
 void ServersChartView::loadSettings()
 {
-    m_lineEdit->setText(AppSettings::Map.Filter->read().toString());
+    m_lineEdit->setText(AppSettings::Map->Filter->read().toString());
 
-    const qreal lat = AppSettings::Map.CenterLat->read().toDouble();
-    const qreal lon = AppSettings::Map.CenterLon->read().toDouble();
+    const qreal lat = AppSettings::Map->CenterLat->read().toDouble();
+    const qreal lon = AppSettings::Map->CenterLon->read().toDouble();
     QGeoCoordinate coord;
     coord.setLatitude(lat);
     coord.setLongitude(lon);
     m_chartWidget->centerOn(coord);
-    m_chartWidget->setScale(AppSettings::Map.Scale->read().toDouble());
+    m_chartWidget->setScale(AppSettings::Map->Scale->read().toDouble());
 
-    restoreGeometry(AppSettings::Map.Geometry->read().toByteArray());
-    setVisible(AppSettings::Map.Visible->read().toBool());
+    restoreGeometry(AppSettings::Map->Geometry->read().toByteArray());
+    setVisible(AppSettings::Map->Visible->read().toBool());
 }
 
 void ServersChartView::saveSettings()
 {
-    AppSettings::Map.Geometry->write(saveGeometry());
-    AppSettings::Map.Filter->write(m_lineEdit->text());
+    AppSettings::Map->Geometry->write(saveGeometry());
+    AppSettings::Map->Filter->write(m_lineEdit->text());
 
     const QGeoCoordinate coord = m_chartWidget->center();
-    AppSettings::Map.CenterLat->write(coord.latitude());
-    AppSettings::Map.CenterLon->write(coord.longitude());
+    AppSettings::Map->CenterLat->write(coord.latitude());
+    AppSettings::Map->CenterLon->write(coord.longitude());
 
-    AppSettings::Map.Scale->write(m_chartWidget->scale());
+    AppSettings::Map->Scale->write(m_chartWidget->scale());
 }
 
 void ServersChartView::hideEvent(QHideEvent *event)

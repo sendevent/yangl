@@ -17,27 +17,29 @@
 
 #pragma once
 
-#include <QGroupBox>
-#include <QObject>
+#include <QWidget>
 
-class QComboBox;
-class MapWidget;
-class QFormLayout;
-class MapSettings : public QWidget
+class QLineEdit;
+class QToolButton;
+class QLabel;
+class IconLineEdit : public QWidget
 {
     Q_OBJECT
 public:
-    explicit MapSettings(QWidget *parent = nullptr);
+    explicit IconLineEdit(QWidget *parent = nullptr);
 
-    QString selectedPlugin() const;
-    int selectedType() const;
+    QString path() const;
+    void setPath(const QString &path);
 
 private slots:
-    void setupMap(const QString &pluginName);
+    void onOpenRequested();
+    void onPathChanged();
 
 private:
-    QComboBox *m_comboPlugin;
-    QComboBox *m_comboType;
-    MapWidget *m_preview;
-    QFormLayout *m_formLayout;
+    QLabel *m_preview;
+    QLineEdit *m_edit;
+    QToolButton *m_button;
+
+    bool isValidImage(const QString &path) const;
+    void updatePreview(const QString &to);
 };

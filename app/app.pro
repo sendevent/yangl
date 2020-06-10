@@ -31,6 +31,7 @@ SOURCES += \
     actions/clicallresultview.cpp \
     cli/clicall.cpp \
     cli/clicaller.cpp \
+    common.cpp \
     main.cpp \
     menuholder.cpp \
     nordvpninfo.cpp \
@@ -39,6 +40,7 @@ SOURCES += \
     settings/actionstab.cpp \
     settings/apppatheditor.cpp \
     settings/appsettings.cpp \
+    settings/iconlineedit.cpp \
     settings/mapsettings.cpp \
     settings/settingsdialog.cpp \
     settings/settingsmanager.cpp \
@@ -68,6 +70,7 @@ HEADERS += \
     settings/actionstab.h \
     settings/apppatheditor.h \
     settings/appsettings.h \
+    settings/iconlineedit.h \
     settings/mapsettings.h \
     settings/settingsdialog.h \
     settings/settingsmanager.h \

@@ -65,7 +65,7 @@ Rectangle {
                         height: parent.height-2
                         smooth: true
                         antialiasing: true
-                        source: markerRect.active ? "qrc:/icn/resources/online_map.png":"qrc:/icn/resources/offline_map.png"
+                        source: markerRect.active ? "qrc:/icn/resources/map/online_map.png" : "qrc:/icn/resources/map/offline_map.png"
                         opacity: 0.75
 
 

@@ -15,6 +15,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
+#include "appsettings.h"
 #include "nordvpnwraper.h"
 
 #include <QApplication>
@@ -25,6 +26,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setApplicationName(QObject::tr("yangl"));
     a.setQuitOnLastWindowClosed(false);
+
+    AppSettings::init();
 
     qRegisterMetaType<QProcess::ExitStatus>();
 

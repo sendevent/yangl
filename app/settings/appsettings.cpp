@@ -18,6 +18,7 @@
 #include "appsettings.h"
 
 #include "clicallresultview.h"
+#include "common.h"
 #include "settingsmanager.h"
 #include "statechecker.h"
 
@@ -59,11 +60,8 @@ GroupMonitor::GroupMonitor()
                    {
                            new AppSetting(QString("%1/NVPNPath").arg(localName()), QStringLiteral("/usr/bin/nordvpn")),
                            new AppSetting(QString("%1/Interval").arg(localName()), StateChecker::DefaultIntervalMs),
-                           new AppSetting(QString("%1/MessageDuration").arg(localName()), 10),
                            new AppSetting(QString("%1/Active").arg(localName()), false),
-                           new AppSetting(QString("%1/IgnoreFirstConnected").arg(localName()), true),
                            new AppSetting(QString("%1/EditorGeometry").arg(localName())),
-                           new AppSetting(QString("%1/MsgPlainText").arg(localName()), false),
                            new AppSetting(QString("%1/LogLinesLimit").arg(localName()),
                                           CLICallResultView::MaxBlocksCountDefault),
                    },
@@ -92,6 +90,39 @@ GroupMap::GroupMap()
 {
 }
 
+GroupTray::GroupTray()
+    : OptionsGroup(
+            localName(),
+            {
+                    new AppSetting(QString("%1/MessageDuration").arg(localName()), 10),
+                    new AppSetting(QString("%1/IgnoreFirstConnected").arg(localName()), true),
+                    new AppSetting(QString("%1/MsgPlainText").arg(localName()), false),
+
+                    new AppSetting(QString("%1/IcnUnknown").arg(localName()), iconPath(QStringLiteral("unknown.png"))),
+                    new AppSetting(QString("%1/IcnUnknownSub").arg(localName()),
+                                   iconPath(QStringLiteral("unknown_sub.png"))),
+                    new AppSetting(QString("%1/IcnDisconnected").arg(localName()),
+                                   iconPath(QStringLiteral("disconnected.png"))),
+                    new AppSetting(QString("%1/IcnDisconnectedSub").arg(localName()),
+                                   iconPath(QStringLiteral("disconnected_sub.png"))),
+                    new AppSetting(QString("%1/IcnConnecting").arg(localName()),
+                                   iconPath(QStringLiteral("connecting.png"))),
+                    new AppSetting(QString("%1/IcnConnectingSub").arg(localName()),
+                                   iconPath(QStringLiteral("connecting_sub.png"))),
+                    new AppSetting(QString("%1/IcnConnected").arg(localName()),
+                                   iconPath(QStringLiteral("connected.png"))),
+                    new AppSetting(QString("%1/IcnConnectedSub").arg(localName()),
+                                   iconPath(QStringLiteral("connected_sub.png"))),
+            },
+            {})
+{
+}
+
+/*static*/ QString GroupTray::iconPath(const QString &iconFile)
+{
+    return yangl::ensureDirExists(QString("%1/tray/%2").arg(SettingsManager::dirPath(), iconFile));
+}
+
 /*static*/ void AppSettings::sync()
 {
     if (QSettings *settings = SettingsManager::instance()->storage()) {
@@ -99,5 +130,17 @@ GroupMap::GroupMap()
     }
 }
 
-const GroupMonitor AppSettings::Monitor = {};
-const GroupMap AppSettings::Map = {};
+/*static*/ GroupMonitor *AppSettings::Monitor = {};
+/*static*/ GroupMap *AppSettings::Map = {};
+/*static*/ GroupTray *AppSettings::Tray = {};
+
+/*static*/ void AppSettings::init()
+{
+#ifdef QT_TESTLIB_LIB
+    QStandardPaths::setTestModeEnabled(true);
+#endif
+
+    Monitor = new GroupMonitor;
+    Map = new GroupMap;
+    Tray = new GroupTray;
+}
