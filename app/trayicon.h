@@ -27,10 +27,12 @@ class TrayIcon : public QSystemTrayIcon
 public:
     TrayIcon(QObject *parent = {});
 
+    static void reloadIcons();
+
     void setMessageDuration(int durationSecs);
-    static QIcon iconForState(const NordVpnInfo &state);
-    static QIcon iconForStatus(const NordVpnInfo::Status &status);
     int duration() const { return m_duration; }
+
+    void updateIcon(NordVpnInfo::Status status);
 
 public slots:
     void setState(const NordVpnInfo &state);
@@ -48,7 +50,9 @@ private:
     bool m_isFirstChange;
     int m_duration;
 
-    static void reloadIcons();
+    static QIcon iconForState(const NordVpnInfo &state);
+    static QIcon iconForStatus(const NordVpnInfo::Status &status);
+
     static TrayIcon::IconInfo infoPixmaps(const NordVpnInfo::Status forStatus);
     static QIcon generateIcon(const NordVpnInfo::Status forStatus);
 
