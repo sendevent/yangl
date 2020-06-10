@@ -61,7 +61,7 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
     ui->tabActionsUser->setActions(m_actStorage, Action::Flow::Custom);
     ui->spinBoxLogLines->setValue(AppSettings::Monitor.LogLinesLimit->read().toInt());
 
-    ui->verticalLayout->insertWidget(ui->verticalLayout->count() - 1, m_mapSettings);
+    ui->mapVerticalLayout->insertWidget(0, m_mapSettings);
 
     restoreGeometry(AppSettings::Monitor.SettingsDialog->read().toByteArray());
 }
