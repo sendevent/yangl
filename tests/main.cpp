@@ -15,6 +15,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
+#include "appsettings.h"
 #include "tst_action.h"
 #include "tst_actionjson.h"
 #include "tst_actionstorage.h"
@@ -28,6 +29,7 @@
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv); // init standard paths
+    AppSettings::init();
 
     int status = 0;
     auto ASSERT_TEST = [&status, argc, argv](QObject *obj) {

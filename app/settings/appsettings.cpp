@@ -18,6 +18,7 @@
 #include "appsettings.h"
 
 #include "clicallresultview.h"
+#include "common.h"
 #include "settingsmanager.h"
 #include "statechecker.h"
 
@@ -119,7 +120,7 @@ GroupTray::GroupTray()
 
 /*static*/ QString GroupTray::iconPath(const QString &iconFile)
 {
-    return iconFile;
+    return yangl::ensureDirExists(QString("%1/tray/%2").arg(SettingsManager::dirPath(), iconFile));
 }
 
 /*static*/ void AppSettings::sync()
@@ -129,6 +130,17 @@ GroupTray::GroupTray()
     }
 }
 
-const GroupMonitor AppSettings::Monitor = {};
-const GroupMap AppSettings::Map = {};
-const GroupTray AppSettings::Tray = {};
+/*static*/ GroupMonitor *AppSettings::Monitor = {};
+/*static*/ GroupMap *AppSettings::Map = {};
+/*static*/ GroupTray *AppSettings::Tray = {};
+
+/*static*/ void AppSettings::init()
+{
+#ifdef QT_TESTLIB_LIB
+    QStandardPaths::setTestModeEnabled(true);
+#endif
+
+    Monitor = new GroupMonitor;
+    Map = new GroupMap;
+    Tray = new GroupTray;
+}
