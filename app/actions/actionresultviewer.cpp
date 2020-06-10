@@ -123,7 +123,7 @@ CLICallResultView *ActionResultViewer::displayForAction(Action *action)
 
 /*static*/ void ActionResultViewer::updateLinesLimit()
 {
-    const int newLimit = AppSettings::Monitor.LogLinesLimit->read().toInt();
+    const int newLimit = AppSettings::Monitor->LogLinesLimit->read().toInt();
 
     if (newLimit != m_linesLimit) {
         m_linesLimit = newLimit;

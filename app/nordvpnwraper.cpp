@@ -41,7 +41,7 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
     : QObject(parent)
     , m_bus(new CLICaller(this))
     , m_actions(new ActionStorage(this))
-    , m_checker(new StateChecker(m_bus, AppSettings::Monitor.Interval->read().toInt()))
+    , m_checker(new StateChecker(m_bus, AppSettings::Monitor->Interval->read().toInt()))
     , m_trayIcon(new TrayIcon(this))
     , m_menuHolder(new MenuHolder(this))
     , m_pauseTimer(new QTimer(this))
@@ -94,19 +94,22 @@ void NordVpnWraper::start()
     m_checker->setCheckAction(m_actions->action(Action::NordVPN::CheckStatus));
     if (auto act = m_menuHolder->yangleAction(Action::Yangl::Activated)) {
         act->setCheckable(true);
-        act->setChecked(wasActive || AppSettings::Monitor.Active->read().toBool());
+        act->setChecked(wasActive || AppSettings::Monitor->Active->read().toBool());
         m_checker->setActive(act->isChecked());
     }
 
     ActionResultViewer::updateLinesLimit();
+
+    TrayIcon::reloadIcons();
+    m_trayIcon->updateIcon(m_checker->state().status());
 }
 
 void NordVpnWraper::loadSettings()
 {
-    m_checker->setInterval(AppSettings::Monitor.Interval->read().toInt());
-    m_trayIcon->setMessageDuration(AppSettings::Monitor.MessageDuration->read().toInt() * yangl::OneSecondMs);
+    m_checker->setInterval(AppSettings::Monitor->Interval->read().toInt());
+    m_trayIcon->setMessageDuration(AppSettings::Tray->MessageDuration->read().toInt() * yangl::OneSecondMs);
 
-    if (AppSettings::Map.Visible->read().toBool())
+    if (AppSettings::Map->Visible->read().toBool())
         showMapView();
 }
 
@@ -116,7 +119,7 @@ void NordVpnWraper::prepareQuit()
     disconnect(&*m_checker);
 
     const bool visible = m_mapView ? m_mapView->isVisible() : false;
-    AppSettings::Map.Visible->write(visible);
+    AppSettings::Map->Visible->write(visible);
     AppSettings::sync();
 }
 

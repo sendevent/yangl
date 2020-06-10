@@ -15,29 +15,27 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#pragma once
+#include "common.h"
 
-#include <QGroupBox>
-#include <QObject>
+#include <QDir>
+#include <QFileInfo>
 
-class QComboBox;
-class MapWidget;
-class QFormLayout;
-class MapSettings : public QWidget
+namespace yangl {
+
+QString ensureDirExists(const QString &path)
 {
-    Q_OBJECT
-public:
-    explicit MapSettings(QWidget *parent = nullptr);
+    if (path.isEmpty()) {
+        WRN << "Empty path";
+        return path;
+    }
 
-    QString selectedPlugin() const;
-    int selectedType() const;
+    const QFileInfo info(path);
+    const QDir &dir = info.absoluteDir();
+    if (!dir.exists())
+        dir.mkpath(dir.absolutePath());
 
-private slots:
-    void setupMap(const QString &pluginName);
+    const QString res = info.absoluteFilePath();
+    return res;
+}
 
-private:
-    QComboBox *m_comboPlugin;
-    QComboBox *m_comboType;
-    MapWidget *m_preview;
-    QFormLayout *m_formLayout;
-};
+} // namespace yangl
