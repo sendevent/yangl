@@ -59,12 +59,9 @@ public:
 
     const AppSetting *NVPNPath = Options[0];
     const AppSetting *Interval = Options[1];
-    const AppSetting *MessageDuration = Options[2];
-    const AppSetting *Active = Options[3];
-    const AppSetting *IgnoreFirstConnected = Options[4];
-    const AppSetting *SettingsDialog = Options[5];
-    const AppSetting *MessagePlainText = Options[6];
-    const AppSetting *LogLinesLimit = Options[7];
+    const AppSetting *Active = Options[2];
+    const AppSetting *SettingsDialog = Options[3];
+    const AppSetting *LogLinesLimit = Options[4];
 
 private:
     GroupMonitor(const GroupMonitor &) = delete;
@@ -94,11 +91,28 @@ private:
     static const QString localName() { return "Map"; }
 };
 
+class GroupTray : public OptionsGroup
+{
+public:
+    GroupTray();
+
+    const AppSetting *MessageDuration = Options[0];
+    const AppSetting *IgnoreFirstConnected = Options[1];
+    const AppSetting *MessagePlainText = Options[2];
+
+private:
+    GroupTray(const GroupTray &) = delete;
+    GroupTray &operator=(const GroupTray &) = delete;
+
+    static const QString localName() { return "Tray"; }
+};
+
 class AppSettings
 {
 public:
     static const GroupMonitor Monitor;
     static const GroupMap Map;
+    static const GroupTray Tray;
 
     static void sync();
 

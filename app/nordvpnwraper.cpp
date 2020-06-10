@@ -104,7 +104,7 @@ void NordVpnWraper::start()
 void NordVpnWraper::loadSettings()
 {
     m_checker->setInterval(AppSettings::Monitor.Interval->read().toInt());
-    m_trayIcon->setMessageDuration(AppSettings::Monitor.MessageDuration->read().toInt() * yangl::OneSecondMs);
+    m_trayIcon->setMessageDuration(AppSettings::Tray.MessageDuration->read().toInt() * yangl::OneSecondMs);
 
     if (AppSettings::Map.Visible->read().toBool())
         showMapView();
