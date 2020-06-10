@@ -56,6 +56,7 @@ MapWidget::MapWidget(const QString &mapPlugin, int mapType, QWidget *parent)
     m_quickView->setSource(QStringLiteral("qrc:/qml/geo/qml/MapView.qml"));
     QVBoxLayout *vBox = new QVBoxLayout(this);
     vBox->addWidget(m_quickView);
+    vBox->setMargin(0);
 }
 
 MapWidget::~MapWidget()
