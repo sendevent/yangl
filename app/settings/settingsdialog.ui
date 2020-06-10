@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>430</width>
-    <height>368</height>
+    <height>650</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -24,7 +24,7 @@
        <item row="0" column="0">
         <widget class="QTabWidget" name="appTabWidget">
          <property name="currentIndex">
-          <number>2</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="tabAppCommon">
           <attribute name="title">
@@ -82,6 +82,19 @@
              </property>
             </widget>
            </item>
+           <item row="4" column="0">
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
           </layout>
          </widget>
          <widget class="QWidget" name="tabAppMap">
@@ -109,6 +122,95 @@
            <string>Tray</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_2">
+           <item row="1" column="0">
+            <widget class="QGroupBox" name="groupBox">
+             <property name="title">
+              <string>Icon</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout_2">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_5">
+                <property name="text">
+                 <string>Unknown:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="IconLineEdit" name="iconUnknownEdit" native="true"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>Sub:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="IconLineEdit" name="iconUnknownSubEdit" native="true"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_8">
+                <property name="text">
+                 <string>Disconnected:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="IconLineEdit" name="iconDisconnectedEdit" native="true"/>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>Sub:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="IconLineEdit" name="iconDisconnectedSubEdit" native="true"/>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_10">
+                <property name="text">
+                 <string>Connecting:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="IconLineEdit" name="iconConnectingEdit" native="true"/>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>Sub:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="IconLineEdit" name="iconConnectingSubEdit" native="true"/>
+              </item>
+              <item row="6" column="0">
+               <widget class="QLabel" name="label_12">
+                <property name="text">
+                 <string>Connected:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="1">
+               <widget class="IconLineEdit" name="iconConnectedEdit" native="true"/>
+              </item>
+              <item row="7" column="0">
+               <widget class="QLabel" name="label_11">
+                <property name="text">
+                 <string>Sub:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="1">
+               <widget class="IconLineEdit" name="iconConnectedSubEdit" native="true"/>
+              </item>
+             </layout>
+            </widget>
+           </item>
            <item row="0" column="0">
             <widget class="QGroupBox" name="groupBoxMessage">
              <property name="title">
@@ -158,34 +260,18 @@
              </layout>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QGroupBox" name="groupBox">
-             <property name="title">
-              <string>Icon</string>
+           <item row="2" column="0">
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
              </property>
-             <layout class="QFormLayout" name="formLayout_2">
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_5">
-                <property name="text">
-                 <string>Unknown:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="IconLineEdit" name="iconEditUnknown" native="true"/>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_6">
-                <property name="text">
-                 <string>Sub</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="IconLineEdit" name="iconEditUnknownSub" native="true"/>
-              </item>
-             </layout>
-            </widget>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
