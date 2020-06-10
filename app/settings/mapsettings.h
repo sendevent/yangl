@@ -23,7 +23,7 @@
 class QComboBox;
 class MapWidget;
 class QFormLayout;
-class MapSettings : public QGroupBox
+class MapSettings : public QWidget
 {
     Q_OBJECT
 public:

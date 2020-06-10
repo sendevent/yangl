@@ -28,14 +28,12 @@
 #include <QLabel>
 
 MapSettings::MapSettings(QWidget *parent)
-    : QGroupBox(parent)
+    : QWidget(parent)
     , m_comboPlugin(new QComboBox(this))
     , m_comboType(new QComboBox(this))
     , m_preview(nullptr)
     , m_formLayout(new QFormLayout(this))
 {
-    setTitle(tr("Map"));
-
     m_comboPlugin->addItems(MapWidget::geoServices());
     connect(m_comboPlugin, &QComboBox::currentTextChanged, this, &MapSettings::setupMap);
     m_comboPlugin->setCurrentText(AppSettings::Map.MapPlugin->read().toString());
