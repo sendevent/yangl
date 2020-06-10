@@ -58,6 +58,7 @@ void ServersChartView::initUi()
 
     QWidget *leftView = new QWidget(this);
     QVBoxLayout *leftVBox = new QVBoxLayout(leftView);
+    leftVBox->setMargin(0);
     m_lineEdit = new QLineEdit(leftView);
     m_lineEdit->setPlaceholderText(QStringLiteral("F"));
     m_lineEdit->setToolTip(tr("Filter by country/city"));

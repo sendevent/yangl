@@ -46,6 +46,8 @@ MapSettings::MapSettings(QWidget *parent)
 
     connect(m_comboType, &QComboBox::currentTextChanged, this,
             [this](const QString &txt) { m_preview->setMapType(txt); });
+
+    m_formLayout->setMargin(0);
 }
 
 void MapSettings::setupMap(const QString &pluginName)
