@@ -17,18 +17,14 @@
 
 #include "nordvpnwraper.h"
 
+#include "aboutdialog.h"
 #include "actionresultviewer.h"
 #include "actionstorage.h"
 #include "appsettings.h"
 #include "clicaller.h"
 #include "common.h"
 #include "menuholder.h"
-
-#ifndef YANGL_NO_GEOCHART
 #include "serverschartview.h"
-#endif // YANGL_NO_GEOCHART
-
-#include "aboutdialog.h"
 #include "settingsdialog.h"
 #include "statechecker.h"
 #include "trayicon.h"
@@ -110,10 +106,8 @@ void NordVpnWraper::loadSettings()
     m_checker->setInterval(AppSettings::Monitor.Interval->read().toInt());
     m_trayIcon->setMessageDuration(AppSettings::Monitor.MessageDuration->read().toInt() * yangl::OneSecondMs);
 
-#ifndef YANGL_NO_GEOCHART
     if (AppSettings::Map.Visible->read().toBool())
         showMapView();
-#endif
 }
 
 void NordVpnWraper::prepareQuit()
@@ -136,16 +130,12 @@ void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason
     Action::NordVPN invokeMe(Action::NordVPN::Unknown);
     switch (reason) {
     case QSystemTrayIcon::Trigger: {
-#ifndef YANGL_NO_GEOCHART
         if (!m_mapView)
             showMapView();
         else {
             m_mapView->activateWindow();
             m_mapView->raise();
         }
-#else
-        showSettingsEditor();
-#endif
         return;
     }
     case QSystemTrayIcon::MiddleClick: {
