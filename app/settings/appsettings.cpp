@@ -59,11 +59,8 @@ GroupMonitor::GroupMonitor()
                    {
                            new AppSetting(QString("%1/NVPNPath").arg(localName()), QStringLiteral("/usr/bin/nordvpn")),
                            new AppSetting(QString("%1/Interval").arg(localName()), StateChecker::DefaultIntervalMs),
-                           new AppSetting(QString("%1/MessageDuration").arg(localName()), 10),
                            new AppSetting(QString("%1/Active").arg(localName()), false),
-                           new AppSetting(QString("%1/IgnoreFirstConnected").arg(localName()), true),
                            new AppSetting(QString("%1/EditorGeometry").arg(localName())),
-                           new AppSetting(QString("%1/MsgPlainText").arg(localName()), false),
                            new AppSetting(QString("%1/LogLinesLimit").arg(localName()),
                                           CLICallResultView::MaxBlocksCountDefault),
                    },
@@ -92,6 +89,16 @@ GroupMap::GroupMap()
 {
 }
 
+GroupTray::GroupTray()
+    : OptionsGroup(localName(),
+                   {
+                           new AppSetting(QString("%1/MessageDuration").arg(localName()), 10),
+                           new AppSetting(QString("%1/IgnoreFirstConnected").arg(localName()), true),
+                           new AppSetting(QString("%1/MsgPlainText").arg(localName()), false),
+                   },
+                   {})
+{
+}
 /*static*/ void AppSettings::sync()
 {
     if (QSettings *settings = SettingsManager::instance()->storage()) {
@@ -101,3 +108,4 @@ GroupMap::GroupMap()
 
 const GroupMonitor AppSettings::Monitor = {};
 const GroupMap AppSettings::Map = {};
+const GroupTray AppSettings::Tray = {};
