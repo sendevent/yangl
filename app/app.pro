@@ -1,6 +1,6 @@
 include(versiongen.pri)
 
-QT += core gui concurrent
+QT += core gui concurrent qml quick quickwidgets location positioning
 TARGET = yangl
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -19,7 +19,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 INCLUDEPATH += \
     cli \
     settings \
-    actions
+    actions \
+    geo
 
 SOURCES += \
     aboutdialog.cpp \
@@ -43,7 +44,12 @@ SOURCES += \
     settings/settingsmanager.cpp \
     statechecker.cpp \
     trayicon.cpp \
-    version.cpp
+    version.cpp \
+    geo/mapserversmodel.cpp \
+    geo/mapwidget.cpp \
+    geo/serverschartview.cpp \
+    geo/serversfiltermodel.cpp \
+    geo/serverslistmanager.cpp
 
 HEADERS += \
     aboutdialog.h \
@@ -67,7 +73,12 @@ HEADERS += \
     settings/settingsmanager.h \
     statechecker.h \
     trayicon.h \
-    version.h
+    version.h \
+    geo/mapserversmodel.h \
+    geo/mapwidget.h \
+    geo/serverschartview.h \
+    geo/serversfiltermodel.h \
+    geo/serverslistmanager.h
 
 FORMS += \
     aboutdialog.ui \
@@ -82,26 +93,3 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     rsc.qrc
-
-yangl_no_geochart {
-DEFINES += YANGL_NO_GEOCHART
-} else {
-message("adding geo chart")
-QT += qml quick quickwidgets location positioning
-
-INCLUDEPATH += geo
-
-SOURCES += \
-    geo/mapserversmodel.cpp \
-    geo/mapwidget.cpp \
-    geo/serverschartview.cpp \
-    geo/serversfiltermodel.cpp \
-    geo/serverslistmanager.cpp
-
-HEADERS += \
-    geo/mapserversmodel.h \
-    geo/mapwidget.h \
-    geo/serverschartview.h \
-    geo/serversfiltermodel.h \
-    geo/serverslistmanager.h
-}

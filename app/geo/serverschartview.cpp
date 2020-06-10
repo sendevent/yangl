@@ -256,13 +256,11 @@ void ServersChartView::onStateChanged(const NordVpnInfo &info)
 /*static*/ void ServersChartView::makeVisible(NordVpnWraper *nordVpnWraper)
 {
     if (!m_instance) {
-#ifndef YANGL_NO_GEOCHART
         m_instance = new ServersChartView(nordVpnWraper);
         if (auto stateChecker = nordVpnWraper->stateChecker()) {
             connect(stateChecker, &StateChecker::stateChanged, m_instance, &ServersChartView::onStateChanged);
             m_instance->onStateChanged(stateChecker->state());
         }
-#endif
     }
 
     if (m_instance) {
