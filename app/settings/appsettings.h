@@ -108,12 +108,13 @@ public:
     const AppSetting *IcnConnected = Options[9];
     const AppSetting *IcnConnectedSub = Options[10];
 
+    static QString iconPath(const QString &iconFile);
+
 private:
     GroupTray(const GroupTray &) = delete;
     GroupTray &operator=(const GroupTray &) = delete;
 
     static const QString localName() { return "Tray"; }
-    static QString iconPath(const QString &iconFile);
 };
 
 class AppSettings
