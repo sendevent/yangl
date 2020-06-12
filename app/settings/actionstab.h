@@ -18,8 +18,10 @@
 #pragma once
 
 #include "action.h"
+#include "actioneditor.h"
 
 #include <QList>
+#include <QMap>
 #include <QWidget>
 
 namespace Ui {
@@ -27,6 +29,7 @@ class ActionsTab;
 }
 
 class ActionStorage;
+class QStandardItemModel;
 class ActionsTab : public QWidget
 {
     Q_OBJECT
@@ -42,12 +45,18 @@ public:
 private slots:
     void onAddRequested();
     void onRemoveRequested();
+    void onCurrentRowChanged(const QModelIndex &current, const QModelIndex &previous);
+    void onCurrentTitleChanged(const QString &title);
 
 private:
+    static const int ActionPointerDataRole;
     Ui::ActionsTab *ui;
-    QVector<Action::Ptr> m_actions;
     ActionStorage *m_actStorage;
     Action::Flow m_scope;
+    QList<ActionEditor::ActionInfoPtr> m_actionInfos;
 
     void addAction(const Action::Ptr &action);
+
+    int actionsCount() const;
+    QStandardItemModel *model() const;
 };
