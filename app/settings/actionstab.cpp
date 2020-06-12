@@ -22,10 +22,13 @@
 #include "common.h"
 #include "ui_actionstab.h"
 
+#include <QStandardItemModel>
+
+/*static*/ const int ActionsTab::ActionPointerDataRole = Qt::UserRole + 1;
+
 ActionsTab::ActionsTab(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ActionsTab)
-    , m_actions()
     , m_actStorage(nullptr)
     , m_scope(Action::Flow::NordVPN)
 {
@@ -34,6 +37,12 @@ ActionsTab::ActionsTab(QWidget *parent)
 
     connect(ui->buttonAdd, &QPushButton::clicked, this, &ActionsTab::onAddRequested);
     connect(ui->buttonRemove, &QPushButton::clicked, this, &ActionsTab::onRemoveRequested);
+
+    ui->listView->setModel(new QStandardItemModel(ui->listView));
+    connect(ui->listView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
+            &ActionsTab::onCurrentRowChanged);
+
+    connect(ui->editorWidget, &ActionEditor::titleChanged, this, &ActionsTab::onCurrentTitleChanged);
 }
 
 ActionsTab::~ActionsTab()
@@ -41,41 +50,49 @@ ActionsTab::~ActionsTab()
     delete ui;
 }
 
+int ActionsTab::actionsCount() const
+{
+    return m_actionInfos.size();
+}
+
 void ActionsTab::setActions(ActionStorage *actStorage, Action::Flow scope)
 {
+    m_actionInfos.clear();
+    model()->removeRows(0, actionsCount());
+
     m_scope = scope;
     m_actStorage = actStorage;
-    while (ui->toolBox->count()) {
-        const int pos = ui->toolBox->count() - 1;
-        auto last = ui->toolBox->widget(pos);
-        ui->toolBox->removeItem(pos);
-        delete last;
-    }
 
-    switch (scope) {
+    ui->editorWidget->prepareUi(m_scope);
+
+    QVector<Action::Ptr> actions;
+    switch (m_scope) {
     case Action::Flow::Yangl: {
         ui->buttonAdd->hide();
         ui->buttonRemove->hide();
         delete ui->buttonsLayout;
-        m_actions = m_actStorage->yanglActions();
+        actions = m_actStorage->yanglActions();
         break;
     }
     case Action::Flow::NordVPN: {
         ui->buttonAdd->hide();
         ui->buttonRemove->hide();
         delete ui->buttonsLayout;
-        m_actions = m_actStorage->nvpnActions();
+        actions = m_actStorage->nvpnActions();
         break;
     }
     case Action::Flow::Custom: {
-        ui->buttonRemove->setEnabled(m_actions.size());
-        m_actions = m_actStorage->userActions();
+        ui->buttonRemove->setEnabled(actions.size());
+        actions = m_actStorage->userActions();
         break;
     }
     }
 
-    for (auto act : m_actions)
+    for (auto act : actions)
         addAction(act);
+
+    ui->buttonRemove->setEnabled(actions.size());
+    ui->listView->setCurrentIndex(model()->index(0, 0));
 }
 
 void ActionsTab::addAction(const Action::Ptr &action)
@@ -83,42 +100,78 @@ void ActionsTab::addAction(const Action::Ptr &action)
     if (!action)
         return;
 
-    ActionEditor *editor = new ActionEditor(action);
-    connect(editor, &ActionEditor::titleChanged, this,
-            [this, editor](const QString &title) { ui->toolBox->setItemText(ui->toolBox->indexOf(editor), title); });
-    ui->toolBox->addItem(editor, action->title());
-    ui->buttonRemove->setEnabled(m_actions.size());
+    m_actionInfos.append(ui->editorWidget->wrapAction(action));
+
+    QStandardItem *item = new QStandardItem(action->title());
+    item->setData(QVariant::fromValue(m_actionInfos.last()), ActionPointerDataRole);
+    model()->appendRow(item);
+
+    ui->buttonRemove->setEnabled(m_actionInfos.size());
 }
 
 void ActionsTab::onAddRequested()
 {
     if (Action::Ptr action = m_actStorage->createUserAction(m_actStorage)) {
-        action->setTitle(tr("Custom#%1").arg(m_actions.size() + 1));
-        m_actions.append(action);
+        action->setTitle(tr("Custom#%1").arg(m_actionInfos.size() + 1));
         addAction(action);
+
+        ui->listView->setCurrentIndex(model()->index(m_actionInfos.size() - 1, 0));
     }
 }
 
 void ActionsTab::onRemoveRequested()
 {
-    if (auto editor = qobject_cast<ActionEditor *>(ui->toolBox->currentWidget())) {
-        const int id = ui->toolBox->currentIndex();
-        ui->toolBox->removeItem(id);
-        editor->deleteLater();
-        m_actions.removeAt(id);
-        ui->buttonRemove->setEnabled(m_actions.size());
+    const QModelIndex &currId = ui->listView->currentIndex();
+    if (!currId.isValid())
+        return;
+
+    const int row = currId.row();
+    if (const auto &info = currId.data(ActionPointerDataRole).value<ActionEditor::ActionInfoPtr>()) {
+        model()->removeRow(row);
+        m_actionInfos.removeAll(info);
+        if (m_actionInfos.size()) {
+            const int nextRow = qBound(0, row, m_actionInfos.size() - 1);
+            ui->listView->setCurrentIndex(model()->index(nextRow, 0));
+        }
     }
+
+    ui->buttonRemove->setEnabled(m_actionInfos.size());
 }
 
 bool ActionsTab::save()
 {
+    ui->editorWidget->commitInfoHandler();
+
     QVector<Action::Ptr> actions;
-    for (int i = 0; i < ui->toolBox->count(); ++i) {
-        if (auto editor = qobject_cast<ActionEditor *>(ui->toolBox->widget(i))) {
-            editor->apply();
-            actions.append(editor->getAction());
-        }
-    }
+    for (const auto &info : m_actionInfos)
+        if (info->apply())
+            actions.append(info->m_action);
 
     return m_actStorage->updateActions(actions, m_scope);
+}
+
+void ActionsTab::onCurrentRowChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
+{
+    ActionEditor::ActionInfoPtr action;
+    if (current.isValid())
+        action = current.data(ActionPointerDataRole).value<ActionEditor::ActionInfoPtr>();
+
+    ui->editorWidget->setAction(action);
+}
+
+void ActionsTab::onCurrentTitleChanged(const QString &title)
+{
+    const QModelIndex &currRow = ui->listView->selectionModel()->currentIndex();
+    if (!currRow.isValid())
+        return;
+
+    if (auto info = currRow.data(ActionPointerDataRole).value<ActionEditor::ActionInfoPtr>()) {
+        info->m_title = title;
+        model()->setData(currRow, title);
+    }
+}
+
+QStandardItemModel *ActionsTab::model() const
+{
+    return qobject_cast<QStandardItemModel *>(ui->listView->model());
 }
