@@ -21,10 +21,10 @@
 #include "common.h"
 #include "ui_actioneditor.h"
 
-ActionEditor::ActionEditor(const Action::Ptr &act, QWidget *parent)
+ActionEditor::ActionEditor(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ActionEditor)
-    , m_act(nullptr)
+    , m_actionInfo(nullptr)
 {
     ui->setupUi(this);
 
@@ -37,8 +37,6 @@ ActionEditor::ActionEditor(const Action::Ptr &act, QWidget *parent)
 
     m_spinBoxTimeout->setToolTip(QString("%1 — %2").arg(m_spinBoxTimeout->minimum()).arg(m_spinBoxTimeout->maximum()));
     connect(m_leTitle, &QLineEdit::textChanged, this, &ActionEditor::titleChanged);
-
-    setupAction(act);
 }
 
 ActionEditor::~ActionEditor()
@@ -46,32 +44,85 @@ ActionEditor::~ActionEditor()
     delete ui;
 }
 
-Action::Ptr ActionEditor::getAction() const
+void ActionEditor::prepareUi(Action::Flow scope)
 {
-    return m_act;
+    static const QMap<Action::Flow, QVector<int>> excludedRows {
+        { Action::Flow::Yangl, { 5, 3, 2, 1, 0 } },
+        { Action::Flow::NordVPN, { 1 } },
+        { Action::Flow::Custom, {} },
+    };
+
+    for (int i : excludedRows[scope])
+        ui->formLayout->removeRow(i);
 }
 
-void ActionEditor::setupAction(const Action::Ptr &action)
+bool ActionEditor::ActionInfoHandler::apply()
 {
-    m_act = action;
-    if (!m_act)
+    if (!m_action)
+        return false;
+
+    m_action->setTitle(m_title.trimmed());
+    m_action->setApp(m_app);
+    m_action->setArgs(m_args); // TODO: obey quotes
+    m_action->setTimeout(m_timeout);
+    m_action->setForcedShow(m_forceShow);
+    m_action->setAnchor(m_menuPlace);
+
+    return true;
+}
+
+/*static*/ ActionEditor::ActionInfoPtr ActionEditor::wrapAction(const Action::Ptr &action)
+{
+    if (!action)
+        return {};
+
+    ActionEditor::ActionInfoPtr info(new ActionEditor::ActionInfoHandler);
+
+    info->m_action = action;
+    info->m_title = action->title();
+    info->m_app = action->app();
+    info->m_args = action->args();
+    info->m_timeout = action->timeout();
+    info->m_forceShow = action->forcedShow();
+    info->m_menuPlace = action->anchor();
+
+    return info;
+}
+
+void ActionEditor::setAction(const ActionInfoPtr &actionInfo)
+{
+    if (m_actionInfo)
+        commitInfoHandler();
+
+    m_actionInfo = actionInfo;
+
+    for (int i = 0; i < ui->formLayout->count(); ++i)
+        ui->formLayout->itemAt(i)->widget()->setVisible(m_actionInfo);
+
+    if (!m_actionInfo || !m_actionInfo->m_action)
         return;
 
-    m_leTitle->setText(m_act->title());
-    m_leApplication->setText(m_act->app());
-    m_leArguments->setText(m_act->args().join(" "));
-    m_spinBoxTimeout->setValue(m_act->timeout() / yangl::OneSecondMs);
-    m_checkBoxForceShow->setChecked(m_act->forcedShow());
+    if (m_leTitle)
+        m_leTitle->setText(m_actionInfo->m_title);
+    if (m_leApplication)
+        m_leApplication->setText(m_actionInfo->m_app);
+    if (m_leArguments)
+        m_leArguments->setText(m_actionInfo->m_args.join(" "));
+    if (m_spinBoxTimeout)
+        m_spinBoxTimeout->setValue(m_actionInfo->m_timeout / yangl::OneSecondMs);
+    if (m_checkBoxForceShow)
+        m_checkBoxForceShow->setChecked(m_actionInfo->m_forceShow);
+
+    if (!m_comboBoxMenu)
+        return;
 
     QMap<Action::MenuPlace, QString> anchors { { Action::MenuPlace::NoMenu, tr("Hide") },
                                                { Action::MenuPlace::Common, tr("Common") } };
     QVector<int> excludeRows;
-    switch (action->scope()) {
+    switch (m_actionInfo->m_action->scope()) {
     case Action::Flow::Yangl: {
-        excludeRows = { 5, 3, 2, 1, 0 };
         anchors[Action::MenuPlace::Own] = tr("yangl");
-
-        switch (static_cast<Action::Yangl>(action->type())) {
+        switch (static_cast<Action::Yangl>(m_actionInfo->m_action->type())) {
         case Action::Yangl::ShowSettings:
         case Action::Yangl::Quit:
             anchors.remove(Action::MenuPlace::NoMenu);
@@ -83,7 +134,6 @@ void ActionEditor::setupAction(const Action::Ptr &action)
         break;
     }
     case Action::Flow::NordVPN: {
-        excludeRows = { 1 };
         anchors[Action::MenuPlace::Own] = tr("NordVPN");
         break;
     }
@@ -93,9 +143,6 @@ void ActionEditor::setupAction(const Action::Ptr &action)
     }
     }
 
-    for (int row : excludeRows)
-        ui->formLayout->removeRow(row);
-
     m_comboBoxMenu->clear();
     QMap<Action::MenuPlace, int> comboIds;
     for (auto iter = anchors.cbegin(); iter != anchors.cend(); ++iter) {
@@ -104,34 +151,34 @@ void ActionEditor::setupAction(const Action::Ptr &action)
         m_comboBoxMenu->addItem(iter.value(), static_cast<int>(anchor));
     }
 
-    m_comboBoxMenu->setCurrentIndex(comboIds.value(m_act->anchor()));
+    m_comboBoxMenu->setCurrentIndex(comboIds.value(m_actionInfo->m_menuPlace));
 }
 
-bool ActionEditor::apply()
+ActionEditor::ActionInfoPtr ActionEditor::getAction() const
 {
-    if (m_act) {
-        if (m_leTitle)
-            m_act->setTitle(m_leTitle->text().trimmed());
+    return m_actionInfo;
+}
 
-        if (m_leApplication) {
-            const QString &app = m_leApplication->text().trimmed();
-            if (!Action::isValidAppPath(app))
-                return false; // TODO: ask
-            m_act->setApp(app);
-        }
+void ActionEditor::commitInfoHandler()
+{
+    if (!m_actionInfo)
+        return;
 
-        if (m_leArguments)
-            m_act->setArgs(m_leArguments->text().split(" ")); // TODO: obey quotes
+    if (m_leTitle)
+        m_actionInfo->m_title = m_leTitle->text().trimmed();
 
-        if (m_spinBoxTimeout)
-            m_act->setTimeout(m_spinBoxTimeout->value() * yangl::OneSecondMs);
+    if (m_leApplication)
+        m_actionInfo->m_app = m_leApplication->text().trimmed();
 
-        if (m_checkBoxForceShow)
-            m_act->setForcedShow(m_checkBoxForceShow->isChecked());
+    if (m_leArguments)
+        m_actionInfo->m_args = m_leArguments->text().trimmed().split(' ');
 
-        if (m_comboBoxMenu)
-            m_act->setAnchor(m_comboBoxMenu->currentData().value<Action::MenuPlace>());
-    }
+    if (m_spinBoxTimeout)
+        m_actionInfo->m_timeout = m_spinBoxTimeout->value() * yangl::OneSecondMs;
 
-    return true;
+    if (m_checkBoxForceShow)
+        m_actionInfo->m_forceShow = m_checkBoxForceShow->isChecked();
+
+    if (m_comboBoxMenu)
+        m_actionInfo->m_menuPlace = m_comboBoxMenu->currentData().value<Action::MenuPlace>();
 }

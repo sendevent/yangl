@@ -24,8 +24,10 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QPointer>
+#include <QSharedPointer>
 #include <QSpinBox>
 #include <QWidget>
+
 namespace Ui {
 class ActionEditor;
 }
@@ -35,19 +37,35 @@ class ActionEditor : public QWidget
     Q_OBJECT
 
 public:
-    explicit ActionEditor(const Action::Ptr &act, QWidget *parent = {});
+    explicit ActionEditor(QWidget *parent = {});
     ~ActionEditor();
 
-    Action::Ptr getAction() const;
+    void prepareUi(Action::Flow scope);
 
-    bool apply();
+    struct ActionInfoHandler {
+        Action::Ptr m_action;
+        QString m_title;
+        QString m_app;
+        QStringList m_args;
+        int m_timeout;
+        bool m_forceShow;
+        Action::MenuPlace m_menuPlace;
+
+        bool apply();
+    };
+    using ActionInfoPtr = QSharedPointer<ActionEditor::ActionInfoHandler>;
+
+    static ActionInfoPtr wrapAction(const Action::Ptr &action);
+    void setAction(const ActionInfoPtr &actionInfo);
+    ActionInfoPtr getAction() const;
+    void commitInfoHandler();
 
 signals:
     void titleChanged(const QString &text) const;
 
 private:
     Ui::ActionEditor *ui;
-    Action::Ptr m_act;
+    ActionEditor::ActionInfoPtr m_actionInfo;
 
     QPointer<QLineEdit> m_leTitle;
     QPointer<AppPathEditor> m_leApplication;
@@ -55,6 +73,6 @@ private:
     QPointer<QSpinBox> m_spinBoxTimeout;
     QPointer<QCheckBox> m_checkBoxForceShow;
     QPointer<QComboBox> m_comboBoxMenu;
-
-    void setupAction(const Action::Ptr &action);
 };
+
+Q_DECLARE_METATYPE(ActionEditor::ActionInfoPtr);
