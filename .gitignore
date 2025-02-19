@@ -88,7 +88,7 @@ build
 yangl.metainfo.xml
 
 #versioning
-app/version.h
+app/version/appversiondefs.h
 
 # CMake generated files
 CMakeLists.txt.user
