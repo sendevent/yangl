@@ -1,1 +1,1 @@
-/home/denis/develop/me/yangl/lgpl-3.0.txt
+/home/denis/develop/cpp/me/yangl/lgpl-3.0.txt
