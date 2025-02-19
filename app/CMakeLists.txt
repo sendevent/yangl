@@ -1,6 +1,7 @@
 collect_source_files()
 
 add_subdirectory(actions)
+add_subdirectory(version)
 add_subdirectory(cli)
 add_subdirectory(geo)
 add_subdirectory(settings)
