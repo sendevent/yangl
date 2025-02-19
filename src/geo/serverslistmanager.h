@@ -35,7 +35,7 @@ public:
     bool reload();
 
 signals:
-    void ready(const Groups &groups, const Groups &countries) const;
+    void ready(const Groups &groups, const Groups &countries);
 
 private slots:
     void onFinished();
