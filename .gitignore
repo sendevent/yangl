@@ -12,7 +12,10 @@
 *.rej
 *.so
 *.so.*
-*_pch.h.cpp
+*.lo
+*.la
+*.out
+*_pch.h.cppp
 *_resource.rc
 *.qm
 .#*
@@ -24,19 +27,24 @@ tags
 .directory
 *.debug
 Makefile*
-*.prl
 *.app
 moc_*.cpp
 ui_*.h
 qrc_*.cpp
-Thumbs.db
 *.res
-*.rc
+
+# Qt Creator specific files
+.qtcreator/
+*.creator.user
+*.creator.user.*
+*.creator.*
+*.pro.user*
+*.qbs.user
+*.qbs.user.*
 /.qmake.cache
 /.qmake.stash
+*.prl
 
-# qtcreator generated files
-*.pro.user*
 lgpl.lic.qtc
 
 # xemacs temporary files
@@ -81,3 +89,14 @@ yangl.metainfo.xml
 
 #versioning
 app/version.h
+
+# CMake generated files
+CMakeLists.txt.user
+CMakeLists.txt.user.*
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# Generated documentation
+doc/
+docs/
