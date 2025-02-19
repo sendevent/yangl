@@ -10,8 +10,6 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(YANGL_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
-
 qt_standard_project_setup()
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/CollectSourceFiles.cmake)

@@ -17,8 +17,8 @@
 
 #include "actionresultviewer.h"
 
-#include "appsettings.h"
-#include "common.h"
+#include "settings/appsettings.h"
+#include "app/common.h"
 
 #include <QApplication>
 #include <QGridLayout>

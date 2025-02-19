@@ -17,10 +17,10 @@
 
 #include "appsettings.h"
 
-#include "clicallresultview.h"
-#include "common.h"
-#include "settingsmanager.h"
-#include "statechecker.h"
+#include "actions/clicallresultview.h"
+#include "app/common.h"
+#include "settings/settingsmanager.h"
+#include "app/statechecker.h"
 
 #include <QSettings>
 #include <QStandardPaths>

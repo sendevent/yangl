@@ -17,7 +17,7 @@
 
 #include "clicaller.h"
 
-#include "action.h"
+#include "actions/action.h"
 
 #include <QRunnable>
 #include <QThreadPool>

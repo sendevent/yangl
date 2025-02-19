@@ -17,7 +17,7 @@
 
 #include "serversfiltermodel.h"
 
-#include "common.h"
+#include "app/common.h"
 
 ServersFilterModel::ServersFilterModel(QObject *parent)
     : QSortFilterProxyModel(parent)

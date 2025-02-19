@@ -18,7 +18,7 @@
 #pragma once
 
 #include "mapwidget.h"
-#include "nordvpninfo.h"
+#include "app/nordvpninfo.h"
 #include "serverslistmanager.h"
 
 #include <QWidget>

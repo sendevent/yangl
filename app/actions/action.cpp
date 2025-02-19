@@ -19,8 +19,8 @@
 
 #include "actionresultviewer.h"
 #include "actionstorage.h"
-#include "clicall.h"
-#include "common.h"
+#include "cli/clicall.h"
+#include "app/common.h"
 
 #include <QApplication>
 #include <QDebug>
