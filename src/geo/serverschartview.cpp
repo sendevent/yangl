@@ -17,10 +17,10 @@
 
 #include "serverschartview.h"
 
-#include "settings/appsettings.h"
 #include "app/common.h"
-#include "nordvpnwraper.h"
+#include "app/nordvpnwraper.h"
 #include "serversfiltermodel.h"
+#include "settings/appsettings.h"
 
 #include <QBoxLayout>
 #include <QGeoCoordinate>
@@ -50,7 +50,7 @@ ServersChartView::ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent
     requestServersList();
 }
 
-ServersChartView::~ServersChartView() {}
+ServersChartView::~ServersChartView() { }
 
 void ServersChartView::initUi()
 {
@@ -58,7 +58,7 @@ void ServersChartView::initUi()
 
     QWidget *leftView = new QWidget(this);
     QVBoxLayout *leftVBox = new QVBoxLayout(leftView);
-    leftVBox->setMargin(0);
+    leftVBox->setContentsMargins(0, 0, 0, 0);
     m_lineEdit = new QLineEdit(leftView);
     m_lineEdit->setPlaceholderText(QStringLiteral("F"));
     m_lineEdit->setToolTip(tr("Filter by country/city"));
@@ -100,7 +100,7 @@ void ServersChartView::initConenctions()
     connect(m_treeView, &QTreeView::pressed, this, &ServersChartView::onCurrentTreeItemChanged);
     connect(m_treeView, &QTreeView::doubleClicked, this, &ServersChartView::onTreeItemDoubleclicked);
     connect(m_lineEdit, &QLineEdit::textChanged, this,
-            [this](const QString &text) { m_serversFilterModel->setFilterRegExp(text); });
+            [this](const QString &text) { m_serversFilterModel->setFilterRegularExpression(text); });
     connect(m_chartWidget, &MapWidget::markerDoubleclicked, this, &ServersChartView::onMarkerDoubleclicked);
     connect(m_buttonReload, &QToolButton::clicked, this, &ServersChartView::onReloadRequested);
 }

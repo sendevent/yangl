@@ -39,7 +39,7 @@ AppPathEditor::AppPathEditor(QWidget *parent)
     connect(m_pathEdit, &QLineEdit::textChanged, this, &AppPathEditor::onAppPathChanged);
     connect(m_openFileButton, &QToolButton::clicked, this, &AppPathEditor::onOpenFileClicked);
 
-    hBox->setMargin(0);
+    hBox->setContentsMargins(0, 0, 0, 0);
 }
 
 QString AppPathEditor::text() const

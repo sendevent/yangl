@@ -26,7 +26,7 @@ ServersFilterModel::ServersFilterModel(QObject *parent)
 
 bool ServersFilterModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
-    const QRegExp &filter = filterRegExp();
+    const auto &filter = filterRegularExpression();
     auto isAcceptable = [&filter](const QModelIndex &id) { return id.data().toString().contains(filter); };
     const QModelIndex &current = sourceModel()->index(sourceRow, 0, sourceParent);
 

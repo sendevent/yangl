@@ -18,9 +18,9 @@
 #include "aboutdialog.h"
 
 #include "QApplication"
-#include "common.h"
+#include "app/common.h"
 #include "ui_aboutdialog.h"
-#include "version.h"
+#include "version/appversiondefs.h"
 
 #include <QDateTime>
 #include <QFile>

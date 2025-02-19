@@ -76,9 +76,9 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
     if (text.isEmpty())
         return updatedState;
 
-    const QStringList &pairs = text.split('\n', QString::SkipEmptyParts);
+    const QStringList &pairs = text.split('\n', Qt::SkipEmptyParts);
     for (const QString &line : pairs) {
-        const QStringList &pair = line.split(':', QString::SkipEmptyParts);
+        const QStringList &pair = line.split(':', Qt::SkipEmptyParts);
         if (pair.size() != 2) {
             WRN << "Unexpected format:" << line;
             continue;
@@ -142,7 +142,7 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
         result += QString("%1").arg(value, width, 10, QChar('0'));
     };
 
-    const QStringList &parts = from.split(QChar(' '), QString::SkipEmptyParts);
+    const QStringList &parts = from.split(QChar(' '), Qt::SkipEmptyParts);
     for (int i = 0; i <= parts.size() - 2; ++i) {
         bool converted(false);
         const int value = parts.at(i).toInt(&converted);

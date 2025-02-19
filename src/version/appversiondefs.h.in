@@ -7,7 +7,7 @@
 
 namespace yangl {
 
-struct VersionInfo {
+static const struct VersionInfo {
 
     const int Major { @YANGL_V_MAJOR@ } ;
     const int Minor { @YANGL_V_MINOR@ } ;
@@ -24,9 +24,6 @@ struct VersionInfo {
     QString commit() const;
     QString buildDate(const QString& format) const;
 
-};
-
-// Instance declaration for the static version info, it should be outside the struct
-extern const VersionInfo V;
+} V = {};
 
 }  // namespace yangl

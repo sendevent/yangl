@@ -14,7 +14,7 @@ qt_standard_project_setup()
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/CollectSourceFiles.cmake)
 
-add_subdirectory(app)
+add_subdirectory(src)
 
 option(DISABLE_TESTS "Disable unit tests" OFF)
 # if(NOT DISABLE_TESTS)

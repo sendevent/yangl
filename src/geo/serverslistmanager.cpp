@@ -19,11 +19,11 @@
 
 #include "actions/actionresultviewer.h"
 #include "actions/actionstorage.h"
-#include "settings/appsettings.h"
+#include "app/common.h"
+#include "app/nordvpnwraper.h"
 #include "cli/clicall.h"
 #include "cli/clicaller.h"
-#include "app/common.h"
-#include "nordvpnwraper.h"
+#include "settings/appsettings.h"
 
 #include <QFutureWatcher>
 #include <QtConcurrent>
@@ -57,7 +57,7 @@ bool ServersListManager::reload()
 
 /*static*/ ServersListManager::Servers ServersListManager::stringToServers(const QString &in)
 {
-    return in.split(QStringLiteral(", "), QString::SkipEmptyParts).toVector();
+    return in.split(QStringLiteral(", "), Qt::SkipEmptyParts).toVector();
 }
 
 ServersListManager::Servers ServersListManager::queryList(const QStringList &args) const
@@ -102,7 +102,8 @@ void ServersListManager::run()
     m_gotGroups = false;
     m_gotCountries = false;
 
-    QFuture<void> future = QtConcurrent::run(this, &ServersListManager::runSeparated);
+    QFuture<void> future = QtConcurrent::run([this]() { this->runSeparated(); });
+
     m_futureWatcher.setFuture(future);
 }
 

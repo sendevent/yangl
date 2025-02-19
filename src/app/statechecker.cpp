@@ -17,11 +17,11 @@
 
 #include "statechecker.h"
 
-#include "actionstorage.h"
-#include "appsettings.h"
-#include "clicall.h"
-#include "clicaller.h"
-#include "common.h"
+#include "actions/actionstorage.h"
+#include "app/common.h"
+#include "cli/clicall.h"
+#include "cli/clicaller.h"
+#include "settings/appsettings.h"
 
 #include <QTimer>
 #include <QtConcurrent>
@@ -41,7 +41,7 @@ StateChecker::StateChecker(CLICaller *bus, int intervalMs)
     setStatus(NordVpnInfo::Status::Unknown);
 }
 
-StateChecker::~StateChecker() {}
+StateChecker::~StateChecker() { }
 
 void StateChecker::setCheckAction(const Action::Ptr &action)
 {
@@ -96,7 +96,7 @@ void StateChecker::check()
 void StateChecker::onQueryFinish(const Action::Id & /*id*/, const QString &result, bool /*ok*/,
                                  const QString & /*info*/)
 {
-    QtConcurrent::run(this, &StateChecker::updateState, result);
+    QtConcurrent::run([this, result]() { updateState(result); });
 }
 
 void StateChecker::onTimeout()

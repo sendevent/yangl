@@ -18,16 +18,16 @@
 #include "nordvpnwraper.h"
 
 #include "aboutdialog.h"
-#include "actionresultviewer.h"
-#include "actionstorage.h"
-#include "appsettings.h"
-#include "clicaller.h"
-#include "common.h"
-#include "menuholder.h"
-#include "serverschartview.h"
-#include "settingsdialog.h"
-#include "statechecker.h"
-#include "trayicon.h"
+#include "actions/actionresultviewer.h"
+#include "actions/actionstorage.h"
+#include "app/common.h"
+#include "app/menuholder.h"
+#include "app/statechecker.h"
+#include "app/trayicon.h"
+#include "cli/clicaller.h"
+#include "geo/serverschartview.h"
+#include "settings/appsettings.h"
+#include "settings/settingsdialog.h"
 
 #include <QApplication>
 #include <QInputDialog>

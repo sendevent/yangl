@@ -17,8 +17,8 @@
 
 #include "clicall.h"
 
-#include "clicaller.h"
 #include "app/common.h"
+#include "clicaller.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -48,7 +48,7 @@ QString CLICall::run()
     QProcess proc;
 
     connect(
-            &proc, qOverload<int, QProcess::ExitStatus>(&QProcess::finished), this,
+            &proc, &QProcess::finished, this,
             [this](int exitCode, QProcess::ExitStatus exitStatus) {
                 m_exitCode = exitCode;
                 m_exitStatus = exitStatus;

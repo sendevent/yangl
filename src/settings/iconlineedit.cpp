@@ -33,7 +33,7 @@ IconLineEdit::IconLineEdit(QWidget *parent)
 {
     m_button->setText(tr("…"));
     QHBoxLayout *hBox = new QHBoxLayout(this);
-    hBox->setMargin(0);
+    hBox->setContentsMargins(0, 0, 0, 0);
 
     hBox->addWidget(m_preview);
     hBox->addWidget(m_edit);
