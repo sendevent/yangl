@@ -1,6 +1,6 @@
 # "v 1.2.3" — to be actualized manually:
 
-set(YANGL_V_MAJOR 1)
+set(YANGL_V_MAJOR 2)
 set(YANGL_V_MINOR 0)
 set(YANGL_V_PATCH 0)
 
