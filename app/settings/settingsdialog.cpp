@@ -18,13 +18,13 @@
 
 #include "settingsdialog.h"
 
-#include "action.h"
+#include "actions/action.h"
 #include "actioneditor.h"
-#include "actionstorage.h"
-#include "appsettings.h"
-#include "common.h"
-#include "mapsettings.h"
-#include "mapwidget.h"
+#include "actions/actionstorage.h"
+#include "settings/appsettings.h"
+#include "app/common.h"
+#include "settings/mapsettings.h"
+#include "geo/mapwidget.h"
 #include "ui_settingsdialog.h"
 
 #include <QApplication>

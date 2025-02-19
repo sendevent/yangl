@@ -323,19 +323,19 @@
   <customwidget>
    <class>ActionsTab</class>
    <extends>QWidget</extends>
-   <header>actionstab.h</header>
+   <header>settings/actionstab.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>AppPathEditor</class>
    <extends>QWidget</extends>
-   <header>apppatheditor.h</header>
+   <header>settings/apppatheditor.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>IconLineEdit</class>
    <extends>QWidget</extends>
-   <header>iconlineedit.h</header>
+   <header>settings/iconlineedit.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
