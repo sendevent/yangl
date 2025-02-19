@@ -17,7 +17,7 @@
 
 #include "menuholder.h"
 
-#include "action.h"
+#include "actions/action.h"
 
 MenuHolder::MenuHolder(QObject *parent)
     : QObject(parent)

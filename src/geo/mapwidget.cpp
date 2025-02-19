@@ -17,14 +17,15 @@
 
 #include "mapwidget.h"
 
-#include "settings/appsettings.h"
 #include "app/common.h"
 #include "mapserversmodel.h"
+#include "settings/appsettings.h"
 #include "settings/settingsmanager.h"
 
 #include <QFile>
 #include <QGeoAddress>
 #include <QGeoCodingManager>
+#include <QGeoLocation>
 #include <QGeoServiceProvider>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -56,7 +57,7 @@ MapWidget::MapWidget(const QString &mapPlugin, int mapType, QWidget *parent)
     m_quickView->setSource(QStringLiteral("qrc:/qml/geo/qml/MapView.qml"));
     QVBoxLayout *vBox = new QVBoxLayout(this);
     vBox->addWidget(m_quickView);
-    vBox->setMargin(0);
+    vBox->setContentsMargins(0, 0, 0, 0);
 }
 
 MapWidget::~MapWidget()
@@ -191,7 +192,7 @@ void MapWidget::requestGeo(const AddrHandler &addrHandler)
             return;
         }
 
-        connect(reply, qOverload<QGeoCodeReply::Error, const QString &>(&QGeoCodeReply::error), this,
+        connect(reply, &QGeoCodeReply::errorOccurred, this,
                 [addrHandler](QGeoCodeReply::Error error, const QString &errorString) {
                     WRN << "errorr for:" << addrHandler.m_country << addrHandler.m_city << error << errorString;
                 });

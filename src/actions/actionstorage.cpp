@@ -18,11 +18,12 @@
 #include "actionstorage.h"
 
 #include "actionjson.h"
-#include "settings/appsettings.h"
-#include "cli/clicall.h"
 #include "app/common.h"
+#include "cli/clicall.h"
+#include "settings/appsettings.h"
 
 #include <QFileInfo>
+#include <quuid.h>
 
 ActionStorage::ActionStorage(QObject *parent)
     : QObject(parent)
@@ -251,8 +252,15 @@ Action::Ptr ActionStorage::createYanglAction(Action::Yangl actionType, const QSt
         break;
     }
 
-    return createAction(Action::Flow::Yangl, static_cast<int>(actionType), id, {}, title, {}, {}, anchor,
-                        CLICall::DefaultTimeoutMSecs, this);
+    const Action::Flow scope = Action::Flow::Yangl;
+    const int t = static_cast<int>(actionType);
+    const Action::Id &i = QUuid::fromString(id);
+    const QString appPath = {};
+    const QStringList args = {};
+    bool alwaysShowResult = false;
+    const int timeout = CLICall::DefaultTimeoutMSecs;
+
+    return createAction(scope, t, i, appPath, title, args, alwaysShowResult, anchor, timeout, this);
 }
 
 Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QString &id)

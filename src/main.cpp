@@ -15,8 +15,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "appsettings.h"
-#include "nordvpnwraper.h"
+#include "app/nordvpnwraper.h"
+#include "settings/appsettings.h"
 
 #include <QApplication>
 #include <QProcess>

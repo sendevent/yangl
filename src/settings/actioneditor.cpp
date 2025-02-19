@@ -97,7 +97,7 @@ void ActionEditor::setAction(const ActionInfoPtr &actionInfo)
     m_actionInfo = actionInfo;
 
     for (int i = 0; i < ui->formLayout->count(); ++i)
-        ui->formLayout->itemAt(i)->widget()->setVisible(m_actionInfo);
+        ui->formLayout->itemAt(i)->widget()->setVisible(m_actionInfo.get());
 
     if (!m_actionInfo || !m_actionInfo->m_action)
         return;

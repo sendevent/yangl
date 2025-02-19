@@ -17,9 +17,9 @@
 
 #include "mapsettings.h"
 
-#include "settings/appsettings.h"
 #include "app/common.h"
 #include "geo/mapwidget.h"
+#include "settings/appsettings.h"
 
 #include <QComboBox>
 #include <QFormLayout>
@@ -47,7 +47,7 @@ MapSettings::MapSettings(QWidget *parent)
     connect(m_comboType, &QComboBox::currentTextChanged, this,
             [this](const QString &txt) { m_preview->setMapType(txt); });
 
-    m_formLayout->setMargin(0);
+    m_formLayout->setContentsMargins(0, 0, 0, 0);
 }
 
 void MapSettings::setupMap(const QString &pluginName)
