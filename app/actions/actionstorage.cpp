@@ -18,9 +18,9 @@
 #include "actionstorage.h"
 
 #include "actionjson.h"
-#include "appsettings.h"
-#include "clicall.h"
-#include "common.h"
+#include "settings/appsettings.h"
+#include "cli/clicall.h"
+#include "app/common.h"
 
 #include <QFileInfo>
 

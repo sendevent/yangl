@@ -17,7 +17,7 @@
 
 #include "clicallresultview.h"
 
-#include "common.h"
+#include "app/common.h"
 
 #include <QAction>
 #include <QContextMenuEvent>

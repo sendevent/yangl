@@ -17,7 +17,7 @@
 
 #include "settingsmanager.h"
 
-#include "common.h"
+#include "app/common.h"
 
 #include <QApplication>
 #include <QDebug>

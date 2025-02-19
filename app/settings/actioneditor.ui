@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>258</width>
-    <height>184</height>
+    <height>189</height>
    </rect>
   </property>
   <layout class="QFormLayout" name="formLayout">
@@ -84,7 +84,7 @@
   <customwidget>
    <class>AppPathEditor</class>
    <extends>QWidget</extends>
-   <header>apppatheditor.h</header>
+   <header>settings/apppatheditor.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

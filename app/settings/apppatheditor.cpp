@@ -17,7 +17,7 @@
 
 #include "apppatheditor.h"
 
-#include "action.h"
+#include "actions/action.h"
 
 #include <QFileDialog>
 #include <QHBoxLayout>

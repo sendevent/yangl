@@ -17,10 +17,10 @@
 
 #include "actionjson.h"
 
-#include "action.h"
+#include "actions/action.h"
 #include "actionstorage.h"
-#include "common.h"
-#include "settingsmanager.h"
+#include "app/common.h"
+#include "settings/settingsmanager.h"
 
 #include <QDir>
 #include <QFile>

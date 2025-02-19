@@ -17,9 +17,9 @@
 
 #include "mapsettings.h"
 
-#include "appsettings.h"
-#include "common.h"
-#include "mapwidget.h"
+#include "settings/appsettings.h"
+#include "app/common.h"
+#include "geo/mapwidget.h"
 
 #include <QComboBox>
 #include <QFormLayout>

@@ -18,8 +18,8 @@
 #include "actionstab.h"
 
 #include "actioneditor.h"
-#include "actionstorage.h"
-#include "common.h"
+#include "actions/actionstorage.h"
+#include "app/common.h"
 #include "ui_actionstab.h"
 
 #include <QStandardItemModel>

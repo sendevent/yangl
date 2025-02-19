@@ -17,12 +17,12 @@
 
 #include "serverslistmanager.h"
 
-#include "actionresultviewer.h"
-#include "actionstorage.h"
-#include "appsettings.h"
-#include "clicall.h"
-#include "clicaller.h"
-#include "common.h"
+#include "actions/actionresultviewer.h"
+#include "actions/actionstorage.h"
+#include "settings/appsettings.h"
+#include "cli/clicall.h"
+#include "cli/clicaller.h"
+#include "app/common.h"
 #include "nordvpnwraper.h"
 
 #include <QFutureWatcher>

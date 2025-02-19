@@ -17,8 +17,8 @@
 
 #include "actioneditor.h"
 
-#include "action.h"
-#include "common.h"
+#include "actions/action.h"
+#include "app/common.h"
 #include "ui_actioneditor.h"
 
 ActionEditor::ActionEditor(QWidget *parent)

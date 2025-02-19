@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "action.h"
-#include "actioneditor.h"
+#include "actions/action.h"
+#include "settings/actioneditor.h"
 
 #include <QList>
 #include <QMap>

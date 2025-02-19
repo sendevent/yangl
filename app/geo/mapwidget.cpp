@@ -17,10 +17,10 @@
 
 #include "mapwidget.h"
 
-#include "appsettings.h"
-#include "common.h"
+#include "settings/appsettings.h"
+#include "app/common.h"
 #include "mapserversmodel.h"
-#include "settingsmanager.h"
+#include "settings/settingsmanager.h"
 
 #include <QFile>
 #include <QGeoAddress>
