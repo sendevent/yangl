@@ -391,15 +391,36 @@ void NordVpnWraper::connectTo(const QString &country, const QString &city)
 {
     LOG << country << city;
 
-    QtConcurrent::run([country, city, this]() {
-        const Action::Ptr &action = storate()->createUserAction({});
-        action->setTitle(tr("Geo Connection"));
-        action->setForcedShow(false);
-        action->setArgs({ "c", country == "group" ? "-g" : country, city });
-        if (auto call = action->createRequest()) {
-            call->run();
+    auto future = QtConcurrent::run([country, city, this]() -> bool {
+        try {
+            const Action::Ptr &action = storate()->createUserAction({});
+            action->setTitle(tr("Geo Connection"));
+            action->setForcedShow(false);
+            action->setArgs({ "c", country == "group" ? "-g" : country, city });
+            if (auto call = action->createRequest()) {
+                call->run();
+            }
+            return true; // Success
+        } catch (const std::exception &e) {
+            WRN << "Exception in async task:" << e.what();
+            return false; // Failure
+        } catch (...) {
+            WRN << "Unknown error in async task!";
+            return false;
         }
     });
+
+    // Check result when available
+    auto *watcher = new QFutureWatcher<bool>(this);
+    QObject::connect(watcher, &QFutureWatcher<bool>::finished, this, [future, watcher]() {
+        if (!future.result()) { // If false, an error occurred
+            WRN << "Async task failed!";
+        } else {
+            WRN << "Async task completed successfully.";
+        }
+        watcher->deleteLater();
+    });
+    watcher->setFuture(future);
 }
 
 void NordVpnWraper::showMapView()
