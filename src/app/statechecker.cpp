@@ -17,14 +17,12 @@
 
 #include "statechecker.h"
 
-#include "actions/actionstorage.h"
 #include "app/common.h"
-#include "cli/clicall.h"
 #include "cli/clicaller.h"
 #include "settings/appsettings.h"
 
 #include <QTimer>
-#include <QtConcurrent>
+#include <QtConcurrentRun>
 
 /*static*/ const int StateChecker::DefaultIntervalMs = yangl::OneSecondMs;
 

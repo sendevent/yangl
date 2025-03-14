@@ -79,7 +79,11 @@ GroupMap::GroupMap()
                            new AppSetting(QString("%1/CenterLat").arg(localName()), {}),
                            new AppSetting(QString("%1/CenterLon").arg(localName()), {}),
                            new AppSetting(QString("%1/Scale").arg(localName()), 2.5),
-                           new AppSetting(QString("%1/Plugin").arg(localName()), MapWidget::geoServices().first()),
+                           new AppSetting(QString("%1/Plugin").arg(localName()),
+                                          []() {
+                                              const auto &plugins = MapWidget::geoServices();
+                                              return plugins.size() ? plugins.first() : "osm";
+                                          }()),
                            new AppSetting(QString("%1/Type").arg(localName()), 6),
                    },
                    {})

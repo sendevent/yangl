@@ -33,7 +33,7 @@
 #include <QInputDialog>
 #include <QTimer>
 #include <QVariant>
-#include <QtConcurrent>
+#include <QtConcurrentRun>
 
 static constexpr int TimeQuantMs = 60 * yangl::OneSecondMs;
 
@@ -345,7 +345,8 @@ void NordVpnWraper::updateActions(bool connected)
         if (!menu)
             return;
 
-        for (auto qAction : menu->actions()) {
+        const auto &actions = menu->actions();
+        for (const auto qAction : actions) {
             if (auto subMenu = qAction->menu()) {
                 manageMenuActionsEnablement(subMenu);
                 continue;
