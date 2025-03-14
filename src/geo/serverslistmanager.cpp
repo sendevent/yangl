@@ -57,7 +57,7 @@ bool ServersListManager::reload()
 
 /*static*/ ServersListManager::Servers ServersListManager::stringToServers(const QString &in)
 {
-    return in.split(QStringLiteral(", "), Qt::SkipEmptyParts).toVector();
+    return in.split('\n', Qt::SkipEmptyParts).toVector();
 }
 
 ServersListManager::Servers ServersListManager::queryList(const QStringList &args) const
