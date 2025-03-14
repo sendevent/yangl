@@ -23,6 +23,7 @@
 #include "ui_actionstab.h"
 
 #include <QStandardItemModel>
+#include <utility>
 
 /*static*/ const int ActionsTab::ActionPointerDataRole = Qt::UserRole + 1;
 
@@ -88,8 +89,9 @@ void ActionsTab::setActions(ActionStorage *actStorage, Action::Flow scope)
     }
     }
 
-    for (auto act : actions)
+    for (const auto &act : std::as_const(actions)) {
         addAction(act);
+    }
 
     ui->buttonRemove->setEnabled(actions.size());
     ui->listView->setCurrentIndex(model()->index(0, 0));
@@ -143,9 +145,11 @@ bool ActionsTab::save()
     ui->editorWidget->commitInfoHandler();
 
     QList<Action::Ptr> actions;
-    for (const auto &info : m_actionInfos)
-        if (info->apply())
+    for (const auto &info : std::as_const(m_actionInfos)) {
+        if (info->apply()) {
             actions.append(info->m_action);
+        }
+    }
 
     return m_actStorage->updateActions(actions, m_scope);
 }

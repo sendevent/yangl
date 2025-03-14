@@ -26,9 +26,9 @@
 #include "settings/appsettings.h"
 
 #include <QFutureWatcher>
-#include <QtConcurrent>
+#include <QtConcurrentRun>
 
-static const struct {
+const struct {
     const QString ArgGroups = QStringLiteral("groups");
     const QString ArgCountries = QStringLiteral("countries");
     const QString ArgCountry = QStringLiteral("cities");

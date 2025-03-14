@@ -29,9 +29,8 @@
 #include <QJsonDocument>
 #include <algorithm>
 #include <iterator>
-#include <utility>
 
-static const struct {
+const struct {
     const struct {
         const QString Type { QStringLiteral("type") };
         const QString Scope { QStringLiteral("scope") };

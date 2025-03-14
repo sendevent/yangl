@@ -41,8 +41,8 @@ public:
     bool success() const;
 
 signals:
-    void starting(const QString &myApp, const QStringList &myArgs) const;
-    void ready(const QString &result) const;
+    void starting(const QString &myApp, const QStringList &myArgs);
+    void ready(const QString &result);
 
 protected:
     const QString m_appPath;

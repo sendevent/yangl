@@ -133,12 +133,12 @@ signals:
     void performed(const Action::Id &id, const QString &result, bool ok, const QString &description);
     void changed();
 
-    void titleChanged(const QString &title) const;
-    void appChanged(const QString &app) const;
-    void argsChanged(const QStringList &args) const;
-    void timeoutChanged(int timeout) const;
-    void forcedShowChanged(bool forced) const;
-    void anchorChanged(Action::MenuPlace place) const;
+    void titleChanged(const QString &title);
+    void appChanged(const QString &app);
+    void argsChanged(const QStringList &args);
+    void timeoutChanged(int timeout);
+    void forcedShowChanged(bool forced);
+    void anchorChanged(Action::MenuPlace place);
 
 protected slots:
     virtual void onStart(const QString &app, const QStringList &args);

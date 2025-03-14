@@ -24,6 +24,7 @@
 
 #include <QFileInfo>
 #include <quuid.h>
+#include <utility>
 
 ActionStorage::ActionStorage(QObject *parent)
     : QObject(parent)
@@ -41,17 +42,17 @@ QList<Action::Ptr> ActionStorage::sortActionsByTitle(const QList<Action::Ptr> &a
 
 QList<Action::Ptr> ActionStorage::yanglActions() const
 {
-    return sortActionsByTitle(m_yanglActions.values().toVector());
+    return sortActionsByTitle(m_yanglActions.values());
 }
 
 QList<Action::Ptr> ActionStorage::nvpnActions() const
 {
-    return sortActionsByTitle(m_nvpnActions.values().toVector());
+    return sortActionsByTitle(m_nvpnActions.values());
 }
 
 QList<Action::Ptr> ActionStorage::userActions() const
 {
-    return sortActionsByTitle(m_userActions.values().toVector());
+    return sortActionsByTitle(m_userActions.values());
 }
 
 QList<Action::Ptr> ActionStorage::allActions() const
@@ -122,14 +123,11 @@ void ActionStorage::save(QIODevice(*to))
 {
     m_json->clear();
 
-    for (const auto &action : yanglActions())
-        m_json->putAction(&*action);
-
-    for (const auto &action : nvpnActions())
-        m_json->putAction(&*action);
-
-    for (const auto &action : userActions())
-        m_json->putAction(&*action);
+    for (const auto &actionsCollection : { yanglActions(), nvpnActions(), userActions() }) {
+        for (const auto &action : actionsCollection) {
+            m_json->putAction(&*action);
+        }
+    }
 
     return m_json->save(to);
 }
@@ -157,7 +155,8 @@ void ActionStorage::loadYanglActions()
         if (const auto &action = m_json->action(Action::Flow::Yangl, id))
             jsonYanglActionsById.insert(static_cast<Action::Yangl>(action->type()), action);
 
-    for (auto actionType : Action::yanglActions()) {
+    const auto &actionTypes = Action::yanglActions();
+    for (auto actionType : actionTypes) {
         if (const auto &action = jsonYanglActionsById.value(actionType, {})) {
             m_yanglActions[actionType] = action;
             jsonYanglActionsById.remove(actionType);
@@ -173,8 +172,9 @@ void ActionStorage::loadYanglActions()
         }
     }
 
-    for (const auto &action : m_nvpnActions)
+    for (const auto &action : std::as_const(m_nvpnActions)) {
         m_json->putAction(&*action);
+    }
 }
 
 void ActionStorage::loadBuiltinActions()
@@ -185,7 +185,8 @@ void ActionStorage::loadBuiltinActions()
         if (const auto &action = m_json->action(Action::Flow::NordVPN, id))
             jsonBuiltinActionsById.insert(static_cast<Action::NordVPN>(action->type()), action);
 
-    for (auto actionType : Action::nvpnActions()) {
+    const auto &actions = Action::nvpnActions();
+    for (auto actionType : actions) {
         if (const auto &action = jsonBuiltinActionsById.value(actionType, {})) {
             m_nvpnActions[actionType] = action;
             jsonBuiltinActionsById.remove(actionType);
@@ -201,16 +202,21 @@ void ActionStorage::loadBuiltinActions()
         }
     }
 
-    for (const auto &action : m_nvpnActions)
+    for (const auto &action : std::as_const(m_nvpnActions)) {
         m_json->putAction(&*action);
+    }
 }
 
 void ActionStorage::loadUserActions()
 {
-    for (const QString &id : m_json->customActionIds())
-        if (!id.isEmpty())
-            if (const Action::Ptr &action = m_json->action(Action::Flow::Custom, id))
+    const auto &ids = m_json->customActionIds();
+    for (const QString &id : ids) {
+        if (!id.isEmpty()) {
+            if (const Action::Ptr &action = m_json->action(Action::Flow::Custom, id)) {
                 m_userActions.insert(action->id(), action);
+            }
+        }
+    }
 }
 
 Action::Ptr ActionStorage::createAction(Action::Flow flow, int actionType, const QString &id)
@@ -465,40 +471,47 @@ bool ActionStorage::updateActions(const QList<Action::Ptr> &actions, Action::Flo
 
 bool ActionStorage::updateBuiltinActions(const QList<Action::Ptr> &actions)
 {
-    QList<Action::NordVPN> savedActions;
-    for (auto action : actions) {
+    QSet<Action::NordVPN> savedActions;
+    for (const auto &action : actions) {
         const Action::NordVPN actType = static_cast<Action::NordVPN>(action->type());
         if (m_nvpnActions.contains(actType))
             m_nvpnActions[actType] = action;
         else
             m_nvpnActions.insert(actType, action);
-        savedActions.append(actType);
+        savedActions.insert(actType);
     }
 
-    for (const auto key : m_nvpnActions.keys())
-        if (!savedActions.contains(key))
-            m_nvpnActions.remove(key);
+    for (auto it = m_nvpnActions.begin(); it != m_nvpnActions.end();) {
+        if (!savedActions.contains(it.key())) {
+            it = m_nvpnActions.erase(it);
+        } else {
+            ++it;
+        }
+    }
 
     return true;
 }
 
 bool ActionStorage::updateUserActions(const QList<Action::Ptr> &actions)
 {
-    QList<Action::Id> savedActions;
-    for (auto action : actions) {
+    QSet<Action::Id> savedActions;
+    for (const auto &action : actions) {
         const Action::Id &actId = action->id();
         if (m_userActions.contains(actId)) {
             m_userActions[actId] = action;
         } else {
             m_userActions.insert(actId, action);
         }
-        savedActions.append(actId);
+        savedActions.insert(actId);
     }
 
-    for (const auto key : m_userActions.keys())
-        if (!savedActions.contains(key)) {
-            m_userActions.remove(key);
+    for (auto it = m_userActions.begin(); it != m_userActions.end();) {
+        if (!savedActions.contains(it.key())) {
+            it = m_userActions.erase(it);
+        } else {
+            ++it;
         }
+    }
 
     return true;
 }
