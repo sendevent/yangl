@@ -65,7 +65,7 @@ void ActionsTab::setActions(ActionStorage *actStorage, Action::Flow scope)
 
     ui->editorWidget->prepareUi(m_scope);
 
-    QVector<Action::Ptr> actions;
+    QList<Action::Ptr> actions;
     switch (m_scope) {
     case Action::Flow::Yangl: {
         ui->buttonAdd->hide();
@@ -142,7 +142,7 @@ bool ActionsTab::save()
 {
     ui->editorWidget->commitInfoHandler();
 
-    QVector<Action::Ptr> actions;
+    QList<Action::Ptr> actions;
     for (const auto &info : m_actionInfos)
         if (info->apply())
             actions.append(info->m_action);

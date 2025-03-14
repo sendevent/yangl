@@ -29,7 +29,7 @@ class MenuHolder : public QObject
 public:
     explicit MenuHolder(QObject *parent = {});
 
-    QMenu *createMenu(const QVector<Action::Ptr> &actions);
+    QMenu *createMenu(const QList<Action::Ptr> &actions);
     QAction *yangleAction(Action::Yangl act) const;
 
 signals:
@@ -44,7 +44,7 @@ private:
     std::unique_ptr<QMenu> m_menuNordVpn;
     std::unique_ptr<QMenu> m_menuUser;
 
-    void populateActions(const QVector<Action::Ptr> &actions);
+    void populateActions(const QList<Action::Ptr> &actions);
 
-    QHash<Action::Flow, QVector<QAction *>> m_qActions;
+    QHash<Action::Flow, QList<QAction *>> m_qActions;
 };

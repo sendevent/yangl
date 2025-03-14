@@ -198,27 +198,27 @@ QJsonObject ActionJson::actionToJson(const Action *action) const
     };
 }
 
-QVector<QString> ActionJson::yanglActionIds() const
+QList<QString> ActionJson::yanglActionIds() const
 {
     return actionsGroup(Action::groupKey(Action::Flow::Yangl));
 }
 
-QVector<QString> ActionJson::builtinActionIds() const
+QList<QString> ActionJson::builtinActionIds() const
 {
     return actionsGroup(Action::groupKey(Action::Flow::NordVPN));
 }
 
-QVector<QString> ActionJson::customActionIds() const
+QList<QString> ActionJson::customActionIds() const
 {
     return actionsGroup(Action::groupKey(Action::Flow::Custom));
 }
 
-QVector<QString> ActionJson::actionsGroup(const QString &group) const
+QList<QString> ActionJson::actionsGroup(const QString &group) const
 {
     if (group.isEmpty() || !m_json.contains(group))
         return {};
 
-    QVector<QString> keys;
+    QList<QString> keys;
     const auto &oldkeys = m_json[group].toObject().keys();
     std::copy(oldkeys.cbegin(), oldkeys.cend(), std::back_inserter(keys));
     return keys;

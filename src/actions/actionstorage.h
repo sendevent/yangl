@@ -31,17 +31,17 @@ class ActionStorage : public QObject
 public:
     ActionStorage(QObject *parent = {});
 
-    QVector<Action::Ptr> yanglActions() const;
-    QVector<Action::Ptr> nvpnActions() const;
-    QVector<Action::Ptr> userActions() const;
-    QVector<Action::Ptr> allActions() const;
+    QList<Action::Ptr> yanglActions() const;
+    QList<Action::Ptr> nvpnActions() const;
+    QList<Action::Ptr> userActions() const;
+    QList<Action::Ptr> allActions() const;
 
     Action::Ptr action(Action::Yangl yanglAction) const;
     Action::Ptr action(Action::NordVPN knownAction) const;
     Action::Ptr action(const Action::Id &userAction) const;
 
-    QVector<Action::Ptr> load(const QString &from = {});
-    QVector<Action::Ptr> load(QIODevice *from);
+    QList<Action::Ptr> load(const QString &from = {});
+    QList<Action::Ptr> load(QIODevice *from);
     void save(const QString &to = {});
     void save(QIODevice *from);
 
@@ -50,7 +50,7 @@ public:
                              const QString &title, const QStringList &args, bool alwaysShowResult,
                              Action::MenuPlace anchor, int timeout, QObject *parent);
 
-    bool updateActions(const QVector<Action::Ptr> &actions, Action::Flow scope);
+    bool updateActions(const QList<Action::Ptr> &actions, Action::Flow scope);
 
 private:
     QHash<Action::Yangl, Action::Ptr> m_yanglActions;
@@ -66,10 +66,10 @@ private:
     Action::Ptr createYanglAction(Action::Yangl actionType, const QString &id = {});
     Action::Ptr createNVPNAction(Action::NordVPN actionType, const QString &id = {});
 
-    bool updateBuiltinActions(const QVector<Action::Ptr> &actions);
-    bool updateUserActions(const QVector<Action::Ptr> &actions);
+    bool updateBuiltinActions(const QList<Action::Ptr> &actions);
+    bool updateUserActions(const QList<Action::Ptr> &actions);
 
-    QVector<Action::Ptr> sortActionsByTitle(const QVector<Action::Ptr> &actions) const;
+    QList<Action::Ptr> sortActionsByTitle(const QList<Action::Ptr> &actions) const;
 
     void loadYanglActions();
     void loadBuiltinActions();

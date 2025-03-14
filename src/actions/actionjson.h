@@ -39,9 +39,9 @@ public:
     void popAction(const Action *action);
     bool updateAction(Action *action);
 
-    QVector<QString> yanglActionIds() const;
-    QVector<QString> builtinActionIds() const;
-    QVector<QString> customActionIds() const;
+    QList<QString> yanglActionIds() const;
+    QList<QString> builtinActionIds() const;
+    QList<QString> customActionIds() const;
 
     static QString jsonFilePath();
 
@@ -51,7 +51,7 @@ private:
     QJsonObject m_json;
     ActionStorage *m_storage;
 
-    QVector<QString> actionsGroup(const QString &group) const;
+    QList<QString> actionsGroup(const QString &group) const;
     QJsonObject actionToJson(const Action *action) const;
     Action::Ptr actionFromJson(const QJsonObject &json) const;
 };

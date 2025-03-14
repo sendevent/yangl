@@ -41,7 +41,7 @@ QAction *MenuHolder::yangleAction(Action::Yangl act) const
     return {};
 }
 
-QMenu *MenuHolder::createMenu(const QVector<Action::Ptr> &actions)
+QMenu *MenuHolder::createMenu(const QList<Action::Ptr> &actions)
 {
     m_menuRoot->clear();
 
@@ -52,7 +52,7 @@ QMenu *MenuHolder::createMenu(const QVector<Action::Ptr> &actions)
     return m_menuRoot.get();
 }
 
-void MenuHolder::populateActions(const QVector<Action::Ptr> &actions)
+void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
 {
     m_qActions.clear();
     m_menuYangl->clear();
@@ -70,8 +70,8 @@ void MenuHolder::populateActions(const QVector<Action::Ptr> &actions)
 
     struct ActionsHolder {
         QMenu *m_menu { nullptr };
-        QVector<Action::Ptr> m_topActions {};
-        QVector<Action::Ptr> m_menuActions {};
+        QList<Action::Ptr> m_topActions {};
+        QList<Action::Ptr> m_menuActions {};
     };
 
     QHash<Action::Flow, ActionsHolder> actionsHolders { { Action::Flow::Yangl, { &*m_menuYangl } },
