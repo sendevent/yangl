@@ -22,14 +22,3 @@ qt_add_executable(${PROJECT_NAME} ${APP_SOURCES})
 set(YANGL_INCLUDE_DIRS "${YANGL_INCLUDE_DIRS}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
 target_include_directories(${PROJECT_NAME} PUBLIC "${YANGL_INCLUDE_DIRS}")
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt6::Core
-    Qt6::Gui
-    Qt6::Widgets
-    Qt6::Qml
-    Qt6::Quick
-    Qt6::Concurrent
-    Qt6::QuickWidgets
-    Qt6::Location
-    Qt6::Positioning
-)
