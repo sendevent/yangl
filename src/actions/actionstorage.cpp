@@ -181,9 +181,11 @@ void ActionStorage::loadBuiltinActions()
 {
     QMap<Action::NordVPN, Action::Ptr> jsonBuiltinActionsById;
     const QList<QString> &jsonBuiltinActionIds = m_json->builtinActionIds();
-    for (const auto &id : jsonBuiltinActionIds)
-        if (const auto &action = m_json->action(Action::Flow::NordVPN, id))
+    for (const auto &id : jsonBuiltinActionIds) {
+        if (const auto &action = m_json->action(Action::Flow::NordVPN, id)) {
             jsonBuiltinActionsById.insert(static_cast<Action::NordVPN>(action->type()), action);
+        }
+    }
 
     const auto &actions = Action::nvpnActions();
     for (auto actionType : actions) {
