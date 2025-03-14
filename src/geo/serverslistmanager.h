@@ -35,7 +35,7 @@ public:
     bool reload();
 
 signals:
-    void ready(const Groups &groups, const Groups &countries);
+    void ready(const ServersListManager::Groups &groups, const ServersListManager::Groups &countries);
 
 private slots:
     void onFinished();
