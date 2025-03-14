@@ -27,6 +27,9 @@
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <algorithm>
+#include <iterator>
+#include <utility>
 
 static const struct {
     const struct {
@@ -165,9 +168,9 @@ Action::Ptr ActionJson::actionFromJson(const QJsonObject &json) const
     const auto title = json[Json.Action.Title].toString();
     const auto args = [&json]() {
         QStringList strList;
-        for (const auto &str : json[Json.Action.Args].toArray()) {
-            strList << str.toString();
-        }
+        const auto &array = json[Json.Action.Args].toArray();
+        std::transform(array.cbegin(), array.constEnd(), strList.begin(),
+                       [](const auto &str) { return str.toString(); });
         return strList;
     }();
     const auto alwaysShowResult = json[Json.Action.Display].toBool();
@@ -216,9 +219,8 @@ QVector<QString> ActionJson::actionsGroup(const QString &group) const
         return {};
 
     QVector<QString> keys;
-    const QJsonObject &collection = m_json[group].toObject();
-    for (const QString &key : collection.keys())
-        keys.append(key);
+    const auto &oldkeys = m_json[group].toObject().keys();
+    std::copy(oldkeys.cbegin(), oldkeys.cend(), std::back_inserter(keys));
     return keys;
 }
 
