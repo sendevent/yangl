@@ -1,6 +1,7 @@
-import QtQuick 2.0
-import QtQuick.Controls 2.0
-import QtLocation 5.0
+import QtQuick
+import QtQuick.Controls
+import QtLocation
+import QtPositioning
 
 Rectangle {
     id: mapView
@@ -11,8 +12,12 @@ Rectangle {
 
     Plugin {
         id: mapPlugin
-//        preferred: ["mapboxgl"]
         name: pluginName
+
+        PluginParameter {
+            name: "osm.mapping.providersrepository.disabled"
+            value: "true"
+        }
     }
 
     Map {
