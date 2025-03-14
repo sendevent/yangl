@@ -57,7 +57,5 @@ protected:
 private:
     CLICall(QObject *parent = {}) = delete;
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 13, 0)
     Q_DISABLE_COPY_MOVE(CLICall);
-#endif
 };
