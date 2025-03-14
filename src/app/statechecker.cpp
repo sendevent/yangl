@@ -21,6 +21,7 @@
 #include "cli/clicaller.h"
 #include "settings/appsettings.h"
 
+#include <QFutureWatcher>
 #include <QTimer>
 #include <QtConcurrentRun>
 
@@ -94,7 +95,23 @@ void StateChecker::check()
 void StateChecker::onQueryFinish(const Action::Id & /*id*/, const QString &result, bool /*ok*/,
                                  const QString & /*info*/)
 {
-    QtConcurrent::run([this, result]() { updateState(result); });
+    auto future = QtConcurrent::run([this, result]() {
+        try {
+            updateState(result);
+        } catch (const std::exception &e) {
+            WRN << "Exception in async task:" << e.what();
+        }
+    });
+
+    auto *watcher = new QFutureWatcher<void>(this);
+    QObject::connect(watcher, &QFutureWatcher<void>::finished, this, [future, watcher]() {
+        if (future.isCanceled()) {
+            WRN << "Async task was canceled!";
+        }
+        LOG << "Async task finished.";
+        watcher->deleteLater();
+    });
+    watcher->setFuture(future);
 }
 
 void StateChecker::onTimeout()
