@@ -56,7 +56,8 @@ public:
 
     static QStringList geoServices();
 
-    static QStringList supportedMapTypesSorted(const QString &inPlugin);
+    static QStringList supportedMapTypes(const QString &inPlugin);
+    QStringList supportedMapTypes() const;
 
     void setMapType(const QString &mapTypeName);
     void setMapType(int mapTypeId);
@@ -64,7 +65,7 @@ public:
     QSize sizeHint() const override;
 
 signals:
-    void markerDoubleclicked(const AddrHandler &marker);
+    void markerDoubleclicked(const MapWidget::AddrHandler &marker);
 
 private slots:
     void onMarkerDoubleclicked(QQuickItem *item);
@@ -88,9 +89,6 @@ private:
 
     void loadJson();
     void saveJson();
-
-    QStringList supportedMapTypesSorted() const;
-    QStringList supportedMapTypes() const;
 };
 
 Q_DECLARE_METATYPE(MapWidget::AddrHandler)

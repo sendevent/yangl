@@ -37,15 +37,21 @@
 #include <QVBoxLayout>
 #include <QWindow>
 
+static QString defaultMapPluginName()
+{
+    static const auto availableProviders = MapWidget::geoServices();
+    const QString &savedName = AppSettings::Map->MapPlugin->read().toString();
+    const auto &res = availableProviders.isEmpty() ? savedName : availableProviders.first();
+    return res.isEmpty() ? "osm" : res;
+}
+
 MapWidget::MapWidget(const QString &mapPlugin, int mapType, QWidget *parent)
     : QWidget(parent)
     , m_quickView(new QQuickWidget(this))
-    , m_geoSrvProv(new QGeoServiceProvider(QStringLiteral("esri")))
+    , m_geoSrvProv(new QGeoServiceProvider(defaultMapPluginName()))
     , m_geoCoder(m_geoSrvProv->geocodingManager())
     , m_serversModel(new MapServersModel(this))
 {
-    QLocale qLocaleC(QLocale::C, QLocale::AnyCountry);
-    m_geoCoder->setLocale(qLocaleC);
 
     m_quickView->rootContext()->setContextProperty("markerModel", m_serversModel);
     m_quickView->rootContext()->setContextProperty("pluginName", mapPlugin);
@@ -53,11 +59,17 @@ MapWidget::MapWidget(const QString &mapPlugin, int mapType, QWidget *parent)
     LOG << mapPlugin << mapType;
 
     setMapType(mapType == -1 ? 0 : mapType);
-
     m_quickView->setSource(QStringLiteral("qrc:/qml/geo/qml/MapView.qml"));
     QVBoxLayout *vBox = new QVBoxLayout(this);
     vBox->addWidget(m_quickView);
     vBox->setContentsMargins(0, 0, 0, 0);
+
+    if (m_geoCoder) {
+        QLocale qLocaleC(QLocale::C, QLocale::AnyCountry);
+        m_geoCoder->setLocale(qLocaleC);
+    } else {
+        WRN << "Can't aquire geocoder" << m_geoSrvProv->geocodingManager();
+    }
 }
 
 MapWidget::~MapWidget()
@@ -81,10 +93,10 @@ void MapWidget::init()
     return QGeoServiceProvider::availableServiceProviders();
 }
 
-/*static*/ QStringList MapWidget::supportedMapTypesSorted(const QString &inPlugin)
+/*static*/ QStringList MapWidget::supportedMapTypes(const QString &inPlugin)
 {
     MapWidget mapWidget(inPlugin, 0);
-    return mapWidget.supportedMapTypesSorted();
+    return mapWidget.supportedMapTypes();
 }
 
 QStringList MapWidget::supportedMapTypes() const
@@ -95,13 +107,6 @@ QStringList MapWidget::supportedMapTypes() const
         return returnedValue.toStringList();
     }
     return {};
-}
-
-QStringList MapWidget::supportedMapTypesSorted() const
-{
-    QStringList result = supportedMapTypes();
-    //    std::sort(result.begin(), result.end());
-    return result;
 }
 
 void MapWidget::setActiveConnection(const AddrHandler &marker)
@@ -183,8 +188,14 @@ void MapWidget::requestGeo(const AddrHandler &addrHandler)
 {
     QGeoAddress addr;
     addr.setCountry(addrHandler.m_country);
-    if (addrHandler.m_city != "default")
+    if (addrHandler.m_city != "default") {
         addr.setCity(addrHandler.m_city);
+    }
+
+    if (!m_geoCoder) {
+        WRN << "GeoCoder is unavailable";
+        return;
+    }
 
     if (QGeoCodeReply *reply = m_geoCoder->geocode(addr)) {
         if (reply->isFinished() && reply->error() != QGeoCodeReply::NoError) {

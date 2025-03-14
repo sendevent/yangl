@@ -19,8 +19,9 @@
 
 #include "actions/clicallresultview.h"
 #include "app/common.h"
-#include "settings/settingsmanager.h"
 #include "app/statechecker.h"
+#include "geo/mapwidget.h"
+#include "settings/settingsmanager.h"
 
 #include <QSettings>
 #include <QStandardPaths>
@@ -72,49 +73,44 @@ GroupMonitor::GroupMonitor()
 GroupMap::GroupMap()
     : OptionsGroup(localName(),
                    {
-                       new AppSetting(QString("%1/Geometry").arg(localName()), {}),
-                               new AppSetting(QString("%1/Filter").arg(localName()), QString()),
-                               new AppSetting(QString("%1/Visible").arg(localName()), false),
-                               new AppSetting(QString("%1/CenterLat").arg(localName()), {}),
-                               new AppSetting(QString("%1/CenterLon").arg(localName()), {}),
-                               new AppSetting(QString("%1/Scale").arg(localName()), 2.5),
-#if QT_VERSION >= QT_VERSION_CHECK(5, 13, 0)
-                               new AppSetting(QString("%1/Plugin").arg(localName()), QStringLiteral("mapboxgl")),
-                               new AppSetting(QString("%1/Type").arg(localName()), 6),
-#else
-                               new AppSetting(QString("%1/Plugin").arg(localName()), QStringLiteral("esri")),
-                               new AppSetting(QString("%1/Type").arg(localName()), 6),
-#endif
+                           new AppSetting(QString("%1/Geometry").arg(localName()), {}),
+                           new AppSetting(QString("%1/Filter").arg(localName()), QString()),
+                           new AppSetting(QString("%1/Visible").arg(localName()), false),
+                           new AppSetting(QString("%1/CenterLat").arg(localName()), {}),
+                           new AppSetting(QString("%1/CenterLon").arg(localName()), {}),
+                           new AppSetting(QString("%1/Scale").arg(localName()), 2.5),
+                           new AppSetting(QString("%1/Plugin").arg(localName()), MapWidget::geoServices().first()),
+                           new AppSetting(QString("%1/Type").arg(localName()), 6),
                    },
                    {})
 {
 }
 
 GroupTray::GroupTray()
-    : OptionsGroup(
-            localName(),
-            {
-                    new AppSetting(QString("%1/MessageDuration").arg(localName()), 10),
-                    new AppSetting(QString("%1/IgnoreFirstConnected").arg(localName()), true),
-                    new AppSetting(QString("%1/MsgPlainText").arg(localName()), false),
+    : OptionsGroup(localName(),
+                   {
+                           new AppSetting(QString("%1/MessageDuration").arg(localName()), 10),
+                           new AppSetting(QString("%1/IgnoreFirstConnected").arg(localName()), true),
+                           new AppSetting(QString("%1/MsgPlainText").arg(localName()), false),
 
-                    new AppSetting(QString("%1/IcnUnknown").arg(localName()), iconPath(QStringLiteral("unknown.png"))),
-                    new AppSetting(QString("%1/IcnUnknownSub").arg(localName()),
-                                   iconPath(QStringLiteral("unknown_sub.png"))),
-                    new AppSetting(QString("%1/IcnDisconnected").arg(localName()),
-                                   iconPath(QStringLiteral("disconnected.png"))),
-                    new AppSetting(QString("%1/IcnDisconnectedSub").arg(localName()),
-                                   iconPath(QStringLiteral("disconnected_sub.png"))),
-                    new AppSetting(QString("%1/IcnConnecting").arg(localName()),
-                                   iconPath(QStringLiteral("connecting.png"))),
-                    new AppSetting(QString("%1/IcnConnectingSub").arg(localName()),
-                                   iconPath(QStringLiteral("connecting_sub.png"))),
-                    new AppSetting(QString("%1/IcnConnected").arg(localName()),
-                                   iconPath(QStringLiteral("connected.png"))),
-                    new AppSetting(QString("%1/IcnConnectedSub").arg(localName()),
-                                   iconPath(QStringLiteral("connected_sub.png"))),
-            },
-            {})
+                           new AppSetting(QString("%1/IcnUnknown").arg(localName()),
+                                          iconPath(QStringLiteral("unknown.png"))),
+                           new AppSetting(QString("%1/IcnUnknownSub").arg(localName()),
+                                          iconPath(QStringLiteral("unknown_sub.png"))),
+                           new AppSetting(QString("%1/IcnDisconnected").arg(localName()),
+                                          iconPath(QStringLiteral("disconnected.png"))),
+                           new AppSetting(QString("%1/IcnDisconnectedSub").arg(localName()),
+                                          iconPath(QStringLiteral("disconnected_sub.png"))),
+                           new AppSetting(QString("%1/IcnConnecting").arg(localName()),
+                                          iconPath(QStringLiteral("connecting.png"))),
+                           new AppSetting(QString("%1/IcnConnectingSub").arg(localName()),
+                                          iconPath(QStringLiteral("connecting_sub.png"))),
+                           new AppSetting(QString("%1/IcnConnected").arg(localName()),
+                                          iconPath(QStringLiteral("connected.png"))),
+                           new AppSetting(QString("%1/IcnConnectedSub").arg(localName()),
+                                          iconPath(QStringLiteral("connected_sub.png"))),
+                   },
+                   {})
 {
 }
 

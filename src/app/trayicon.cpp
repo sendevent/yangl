@@ -89,9 +89,7 @@
 
         QPainter p(&base);
         p.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 13, 0)
         p.setRenderHint(QPainter::LosslessImageRendering);
-#endif
         p.drawPixmap(targetRect, sub, subRect);
     }
     return QIcon(base);
