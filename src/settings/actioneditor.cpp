@@ -46,7 +46,7 @@ ActionEditor::~ActionEditor()
 
 void ActionEditor::prepareUi(Action::Flow scope)
 {
-    static const QMap<Action::Flow, QVector<int>> excludedRows {
+    static const QMap<Action::Flow, QList<int>> excludedRows {
         { Action::Flow::Yangl, { 5, 3, 2, 1, 0 } },
         { Action::Flow::NordVPN, { 1 } },
         { Action::Flow::Custom, {} },
@@ -118,7 +118,7 @@ void ActionEditor::setAction(const ActionInfoPtr &actionInfo)
 
     QMap<Action::MenuPlace, QString> anchors { { Action::MenuPlace::NoMenu, tr("Hide") },
                                                { Action::MenuPlace::Common, tr("Common") } };
-    QVector<int> excludeRows;
+    QList<int> excludeRows;
     switch (m_actionInfo->m_action->scope()) {
     case Action::Flow::Yangl: {
         anchors[Action::MenuPlace::Own] = tr("yangl");

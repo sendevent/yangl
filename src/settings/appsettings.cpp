@@ -48,8 +48,8 @@ void AppSetting::write(const QVariant &val) const
     }
 }
 
-OptionsGroup::OptionsGroup(const QString &name, const QVector<AppSetting *> &options,
-                           const QVector<OptionsGroup *> &subroups)
+OptionsGroup::OptionsGroup(const QString &name, const QList<AppSetting *> &options,
+                           const QList<OptionsGroup *> &subroups)
     : Name(name)
     , Options(options)
     , Groups(subroups)

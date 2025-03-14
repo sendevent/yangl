@@ -254,17 +254,17 @@ QString Action::key() const
     return /*scope() == Action::Scope::Builtin ? QString::number(type()) :*/ id().toString();
 }
 
-/*static*/ QVector<Action::Yangl> Action::yanglActions()
+/*static*/ QList<Action::Yangl> Action::yanglActions()
 {
-    static QVector<Action::Yangl> actions;
+    static QList<Action::Yangl> actions;
     if (actions.isEmpty())
         actions = yangl::allEnum<Action::Yangl>();
     return actions;
 }
 
-/*static*/ QVector<Action::NordVPN> Action::nvpnActions()
+/*static*/ QList<Action::NordVPN> Action::nvpnActions()
 {
-    static QVector<Action::NordVPN> actions;
+    static QList<Action::NordVPN> actions;
     if (actions.isEmpty())
         actions = yangl::allEnum<Action::NordVPN>({ Action::NordVPN::Unknown });
     return actions;

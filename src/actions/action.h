@@ -98,8 +98,8 @@ public:
     virtual Action::Flow scope() const;
     virtual int type() const;
 
-    static QVector<Action::Yangl> yanglActions();
-    static QVector<Action::NordVPN> nvpnActions();
+    static QList<Action::Yangl> yanglActions();
+    static QList<Action::NordVPN> nvpnActions();
 
     QString title() const;
     void setTitle(const QString &title);

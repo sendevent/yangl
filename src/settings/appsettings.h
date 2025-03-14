@@ -19,7 +19,7 @@
 
 #include <QString>
 #include <QVariant>
-#include <QVector>
+#include <QList>
 
 class AppSetting
 {
@@ -40,11 +40,11 @@ private:
 class OptionsGroup
 {
 public:
-    OptionsGroup(const QString &name, const QVector<AppSetting *> &options, const QVector<OptionsGroup *> &subroups);
+    OptionsGroup(const QString &name, const QList<AppSetting *> &options, const QList<OptionsGroup *> &subroups);
 
     const QString Name;
-    const QVector<AppSetting *> Options;
-    const QVector<OptionsGroup *> Groups;
+    const QList<AppSetting *> Options;
+    const QList<OptionsGroup *> Groups;
 
 private:
     OptionsGroup() = delete;
