@@ -52,8 +52,10 @@ void ActionEditor::prepareUi(Action::Flow scope)
         { Action::Flow::Custom, {} },
     };
 
-    for (int i : excludedRows[scope])
+    const auto &collection = excludedRows[scope];
+    for (int i : collection) {
         ui->formLayout->removeRow(i);
+    }
 }
 
 bool ActionEditor::ActionInfoHandler::apply()
@@ -118,7 +120,7 @@ void ActionEditor::setAction(const ActionInfoPtr &actionInfo)
 
     QMap<Action::MenuPlace, QString> anchors { { Action::MenuPlace::NoMenu, tr("Hide") },
                                                { Action::MenuPlace::Common, tr("Common") } };
-    QList<int> excludeRows;
+    // QList<int> excludeRows;
     switch (m_actionInfo->m_action->scope()) {
     case Action::Flow::Yangl: {
         anchors[Action::MenuPlace::Own] = tr("yangl");

@@ -19,8 +19,8 @@ QString VersionInfo::trio() const
 
 QString VersionInfo::commit() const
 {
-    static const QString v = QStringLiteral("%1@%2%3").arg(Branch).arg(Commit).arg(BranchDirty ? QStringLiteral("*")
-                                                                                               : QStringLiteral(""));
+    static const QString v =
+            QStringLiteral("%1@%2%3").arg(Branch, Commit, BranchDirty ? QStringLiteral("*") : QString(""));
     return v;
 }
 

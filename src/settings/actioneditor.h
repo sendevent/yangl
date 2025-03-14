@@ -61,7 +61,7 @@ public:
     void commitInfoHandler();
 
 signals:
-    void titleChanged(const QString &text) const;
+    void titleChanged(const QString &text);
 
 private:
     Ui::ActionEditor *ui;

@@ -209,7 +209,8 @@ void MapWidget::requestGeo(const AddrHandler &addrHandler)
                 });
         connect(reply, &QGeoCodeReply::finished, this, [this, addrHandler] {
             if (QGeoCodeReply *r = qobject_cast<QGeoCodeReply *>(sender())) {
-                for (auto l : r->locations()) {
+                const auto &locations = r->locations();
+                for (const auto &l : locations) {
                     putMark(addrHandler, l.coordinate());
                     break;
                 }
@@ -241,7 +242,7 @@ void MapWidget::putMark(const AddrHandler &info, const QGeoCoordinate &point)
     m_serversModel->addMarker(stripDefault(info.m_country), stripDefault(info.m_city), point);
 }
 
-static const struct {
+const struct {
     const QString latitude { "lat" };
     const QString longitude { "long" };
 } Consts;
@@ -290,14 +291,16 @@ void MapWidget::saveJson()
     }
 
     QJsonObject countriesCollectionl;
-    for (const auto &country : m_allGeo.keys()) {
+    const auto &countries = m_allGeo.keys();
+    for (const auto &country : countries) {
         QJsonObject cities;
-        for (const auto &city : m_allGeo[country].keys()) {
+        const auto &cityNames = m_allGeo[country].keys();
+        for (const auto &cityName : cityNames) {
             QJsonObject pointObj;
-            const QGeoCoordinate &point = m_allGeo[country].value(city);
+            const QGeoCoordinate &point = m_allGeo[country].value(cityName);
             pointObj[Consts.latitude] = point.latitude();
             pointObj[Consts.longitude] = point.longitude();
-            cities[city] = pointObj;
+            cities[cityName] = pointObj;
         }
         countriesCollectionl[country] = cities;
     }
