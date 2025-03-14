@@ -19,16 +19,16 @@
 
 #include <QFutureWatcher>
 #include <QObject>
-#include <QVector>
+#include <QList>
 
 class NordVpnWraper;
 class ServersListManager : public QObject
 {
     Q_OBJECT
 public:
-    using Servers = QVector<QString>;
+    using Servers = QList<QString>;
     using Group = QPair<QString, ServersListManager::Servers>;
-    using Groups = QVector<ServersListManager::Group>;
+    using Groups = QList<ServersListManager::Group>;
 
     explicit ServersListManager(NordVpnWraper *nordVpn, QObject *parent = {});
 

@@ -31,30 +31,30 @@ ActionStorage::ActionStorage(QObject *parent)
 {
 }
 
-QVector<Action::Ptr> ActionStorage::sortActionsByTitle(const QVector<Action::Ptr> &actions) const
+QList<Action::Ptr> ActionStorage::sortActionsByTitle(const QList<Action::Ptr> &actions) const
 {
-    QVector<Action::Ptr> sorted(actions);
+    QList<Action::Ptr> sorted(actions);
     std::sort(sorted.begin(), sorted.end(),
               [](const Action::Ptr &a, const Action::Ptr &b) { return a->title() < b->title(); });
     return sorted;
 }
 
-QVector<Action::Ptr> ActionStorage::yanglActions() const
+QList<Action::Ptr> ActionStorage::yanglActions() const
 {
     return sortActionsByTitle(m_yanglActions.values().toVector());
 }
 
-QVector<Action::Ptr> ActionStorage::nvpnActions() const
+QList<Action::Ptr> ActionStorage::nvpnActions() const
 {
     return sortActionsByTitle(m_nvpnActions.values().toVector());
 }
 
-QVector<Action::Ptr> ActionStorage::userActions() const
+QList<Action::Ptr> ActionStorage::userActions() const
 {
     return sortActionsByTitle(m_userActions.values().toVector());
 }
 
-QVector<Action::Ptr> ActionStorage::allActions() const
+QList<Action::Ptr> ActionStorage::allActions() const
 {
     return yanglActions() + nvpnActions() + userActions();
 }
@@ -85,7 +85,7 @@ Action::Ptr ActionStorage::action(Action::Yangl requested) const
     return found == collection.end() ? nullptr : *found;
 }
 
-QVector<Action::Ptr> ActionStorage::load(const QString &from)
+QList<Action::Ptr> ActionStorage::load(const QString &from)
 {
     QString usedPath = from.isEmpty() ? ActionJson::jsonFilePath() : from;
     QFile in(usedPath);
@@ -96,7 +96,7 @@ QVector<Action::Ptr> ActionStorage::load(const QString &from)
     return load(&in);
 }
 
-QVector<Action::Ptr> ActionStorage::load(QIODevice *from)
+QList<Action::Ptr> ActionStorage::load(QIODevice *from)
 {
     const bool jsonLoaded = m_json->load(from);
     loadActions();
@@ -152,7 +152,7 @@ void ActionStorage::loadActions()
 void ActionStorage::loadYanglActions()
 {
     QMap<Action::Yangl, Action::Ptr> jsonYanglActionsById;
-    const QVector<QString> &jsonBuiltinActionIds = m_json->yanglActionIds();
+    const QList<QString> &jsonBuiltinActionIds = m_json->yanglActionIds();
     for (const auto &id : jsonBuiltinActionIds)
         if (const auto &action = m_json->action(Action::Flow::Yangl, id))
             jsonYanglActionsById.insert(static_cast<Action::Yangl>(action->type()), action);
@@ -180,7 +180,7 @@ void ActionStorage::loadYanglActions()
 void ActionStorage::loadBuiltinActions()
 {
     QMap<Action::NordVPN, Action::Ptr> jsonBuiltinActionsById;
-    const QVector<QString> &jsonBuiltinActionIds = m_json->builtinActionIds();
+    const QList<QString> &jsonBuiltinActionIds = m_json->builtinActionIds();
     for (const auto &id : jsonBuiltinActionIds)
         if (const auto &action = m_json->action(Action::Flow::NordVPN, id))
             jsonBuiltinActionsById.insert(static_cast<Action::NordVPN>(action->type()), action);
@@ -457,13 +457,13 @@ Action::Ptr ActionStorage::createAction(Action::Flow scope, int type, const Acti
     return action;
 }
 
-bool ActionStorage::updateActions(const QVector<Action::Ptr> &actions, Action::Flow scope)
+bool ActionStorage::updateActions(const QList<Action::Ptr> &actions, Action::Flow scope)
 {
     const bool isBuiltin = scope == Action::Flow::NordVPN;
     return isBuiltin ? updateBuiltinActions(actions) : updateUserActions(actions);
 }
 
-bool ActionStorage::updateBuiltinActions(const QVector<Action::Ptr> &actions)
+bool ActionStorage::updateBuiltinActions(const QList<Action::Ptr> &actions)
 {
     QList<Action::NordVPN> savedActions;
     for (auto action : actions) {
@@ -482,7 +482,7 @@ bool ActionStorage::updateBuiltinActions(const QVector<Action::Ptr> &actions)
     return true;
 }
 
-bool ActionStorage::updateUserActions(const QVector<Action::Ptr> &actions)
+bool ActionStorage::updateUserActions(const QList<Action::Ptr> &actions)
 {
     QList<Action::Id> savedActions;
     for (auto action : actions) {

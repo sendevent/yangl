@@ -46,9 +46,9 @@ namespace yangl {
 static constexpr int OneSecondMs { 1000 };
 
 template<typename SomeQEnum>
-QVector<SomeQEnum> allEnum(const QVector<SomeQEnum> &excluded = {})
+QList<SomeQEnum> allEnum(const QList<SomeQEnum> &excluded = {})
 {
-    QVector<SomeQEnum> values;
+    QList<SomeQEnum> values;
     const QMetaEnum &me = QMetaEnum::fromType<SomeQEnum>();
     for (int i = 0; i < me.keyCount(); ++i) {
         const SomeQEnum value = static_cast<SomeQEnum>(me.value(i));

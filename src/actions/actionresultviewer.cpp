@@ -127,7 +127,7 @@ CLICallResultView *ActionResultViewer::displayForAction(Action *action)
 
     if (newLimit != m_linesLimit) {
         m_linesLimit = newLimit;
-        for (auto view : instance()->m_browsers)
+        for (auto view : std::as_const(instance()->m_browsers))
             view->setBlocksLimit(m_linesLimit);
     }
 }
