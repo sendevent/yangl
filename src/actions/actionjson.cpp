@@ -27,23 +27,18 @@
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
-#include <algorithm>
-#include <iterator>
 
-const struct {
-    const struct {
-        const QString Type { QStringLiteral("type") };
-        const QString Scope { QStringLiteral("scope") };
-        const QString Id { QStringLiteral("id") };
-        const QString App { QStringLiteral("app") };
-        const QString Title { QStringLiteral("title") };
-        const QString Args { QStringLiteral("args") };
-        const QString Display { QStringLiteral("forcedDisplay") };
-        const QString Anchor { QStringLiteral("anchor") };
-        const QString Timeout { QStringLiteral("timeout") };
-    } Action {};
-
-} Json;
+struct JsonAction {
+    static constexpr QLatin1String Type { QLatin1String("type") };
+    static constexpr QLatin1String Scope { QLatin1String("scope") };
+    static constexpr QLatin1String Id { QLatin1String("id") };
+    static constexpr QLatin1String App { QLatin1String("app") };
+    static constexpr QLatin1String Title { QLatin1String("title") };
+    static constexpr QLatin1String Args { QLatin1String("args") };
+    static constexpr QLatin1String Display { QLatin1String("forcedDisplay") };
+    static constexpr QLatin1String Anchor { QLatin1String("anchor") };
+    static constexpr QLatin1String Timeout { QLatin1String("timeout") };
+};
 
 ActionJson::ActionJson(ActionStorage *storage)
     : m_storage(storage)
@@ -160,21 +155,23 @@ Action::Ptr ActionJson::actionFromJson(const QJsonObject &json) const
     if (json.isEmpty())
         return {};
 
-    const auto scope = static_cast<Action::Flow>(json[Json.Action.Scope].toInt());
-    const auto type = json[Json.Action.Type].toInt();
-    const Action::Id id = Action::Id(json[Json.Action.Id].toString());
-    const auto app = json[Json.Action.App].toString();
-    const auto title = json[Json.Action.Title].toString();
+    const auto scope = static_cast<Action::Flow>(json[JsonAction::Scope].toInt());
+    const auto type = json[JsonAction::Type].toInt();
+    const Action::Id id = Action::Id(json[JsonAction::Id].toString());
+    const auto app = json[JsonAction::App].toString();
+    const auto title = json[JsonAction::Title].toString();
     const auto args = [&json]() {
         QStringList strList;
-        const auto &array = json[Json.Action.Args].toArray();
-        std::transform(array.cbegin(), array.constEnd(), strList.begin(),
+        const auto &array = json[JsonAction::Args].toArray();
+        strList.reserve(array.size());
+        std::transform(array.cbegin(), array.constEnd(), std::back_inserter(strList),
                        [](const auto &str) { return str.toString(); });
         return strList;
     }();
-    const auto alwaysShowResult = json[Json.Action.Display].toBool();
-    const auto anchor = static_cast<Action::MenuPlace>(json[Json.Action.Anchor].toInt());
-    const auto timeout = json[Json.Action.Timeout].toInt() * yangl::OneSecondMs;
+
+    const auto alwaysShowResult = json[JsonAction::Display].toBool();
+    const auto anchor = static_cast<Action::MenuPlace>(json[JsonAction::Anchor].toInt());
+    const auto timeout = json[JsonAction::Timeout].toInt() * yangl::OneSecondMs;
 
     return m_storage->createAction(scope, type, id, app, title, args, alwaysShowResult, anchor, timeout, m_storage);
 }
@@ -185,15 +182,15 @@ QJsonObject ActionJson::actionToJson(const Action *action) const
         return {};
 
     return {
-        { Json.Action.Scope, static_cast<int>(action->scope()) },
-        { Json.Action.Type, action->type() },
-        { Json.Action.Id, action->id().toString() },
-        { Json.Action.App, action->app() },
-        { Json.Action.Title, action->title() },
-        { Json.Action.Args, QJsonArray::fromStringList(action->args()) },
-        { Json.Action.Display, action->forcedShow() },
-        { Json.Action.Anchor, static_cast<int>(action->anchor()) },
-        { Json.Action.Timeout, action->timeout() / yangl::OneSecondMs },
+        { JsonAction::Scope, static_cast<int>(action->scope()) },
+        { JsonAction::Type, action->type() },
+        { JsonAction::Id, action->id().toString() },
+        { JsonAction::App, action->app() },
+        { JsonAction::Title, action->title() },
+        { JsonAction::Args, QJsonArray::fromStringList(action->args()) },
+        { JsonAction::Display, action->forcedShow() },
+        { JsonAction::Anchor, static_cast<int>(action->anchor()) },
+        { JsonAction::Timeout, action->timeout() / yangl::OneSecondMs },
     };
 }
 
@@ -238,7 +235,7 @@ Action::Ptr ActionJson::action(Action::Flow scope, const QString &id)
     const QJsonObject &collection = m_json[groupKey].toObject();
     for (const auto &item : collection) {
         const QJsonObject &jsonAction = item.toObject();
-        if (jsonAction[Json.Action.Id] == id)
+        if (jsonAction[JsonAction::Id] == id)
             return actionFromJson(jsonAction);
     }
 

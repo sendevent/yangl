@@ -79,10 +79,13 @@ MapWidget::~MapWidget()
 
 void MapWidget::init()
 {
-    if (QQuickItem *map = m_quickView->rootObject()) {
-        QObject::connect(map, SIGNAL(markerDoubleclicked(QQuickItem *)), this,
-                         SLOT(onMarkerDoubleclicked(QQuickItem *)));
+    if (auto *map = m_quickView->rootObject()) {
+        // clang-format off
+        QObject::connect(map, SIGNAL(markerDoubleclicked(QQuickItem*)), this,
+                         SLOT(onMarkerDoubleclicked(QQuickItem*)), Qt::AutoConnection);
+        // clang-format on
     }
+
     syncMapSize();
 
     loadJson();
@@ -242,10 +245,10 @@ void MapWidget::putMark(const AddrHandler &info, const QGeoCoordinate &point)
     m_serversModel->addMarker(stripDefault(info.m_country), stripDefault(info.m_city), point);
 }
 
-const struct {
-    const QString latitude { "lat" };
-    const QString longitude { "long" };
-} Consts;
+struct Consts {
+    static constexpr QLatin1String latitude { "lat" };
+    static constexpr QLatin1String longitude { "long" };
+};
 
 void MapWidget::loadJson()
 {
@@ -271,7 +274,7 @@ void MapWidget::loadJson()
         QJsonObject::const_iterator cities = citiesCollection.constBegin();
         while (cities != citiesCollection.constEnd()) {
             const QJsonObject &city = cities.value().toObject();
-            QGeoCoordinate coord(city.value(Consts.latitude).toDouble(), city.value(Consts.longitude).toDouble());
+            QGeoCoordinate coord(city.value(Consts::latitude).toDouble(), city.value(Consts::longitude).toDouble());
             citiesHandler.insert(cities.key(), coord);
             ++cities;
         }
@@ -298,8 +301,8 @@ void MapWidget::saveJson()
         for (const auto &cityName : cityNames) {
             QJsonObject pointObj;
             const QGeoCoordinate &point = m_allGeo[country].value(cityName);
-            pointObj[Consts.latitude] = point.latitude();
-            pointObj[Consts.longitude] = point.longitude();
+            pointObj[Consts::latitude] = point.latitude();
+            pointObj[Consts::longitude] = point.longitude();
             cities[cityName] = pointObj;
         }
         countriesCollectionl[country] = cities;

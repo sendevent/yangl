@@ -19,22 +19,20 @@
 
 #include "actions/actionresultviewer.h"
 #include "actions/actionstorage.h"
-#include "app/common.h"
 #include "app/nordvpnwraper.h"
 #include "cli/clicall.h"
 #include "cli/clicaller.h"
-#include "settings/appsettings.h"
 
 #include <QFutureWatcher>
 #include <QtConcurrentRun>
 
-const struct {
-    const QString ArgGroups = QStringLiteral("groups");
-    const QString ArgCountries = QStringLiteral("countries");
-    const QString ArgCountry = QStringLiteral("cities");
+struct Consts {
+    static constexpr QLatin1String ArgGroups = QLatin1String("groups");
+    static constexpr QLatin1String ArgCountries = QLatin1String("countries");
+    static constexpr QLatin1String ArgCountry = QLatin1String("cities");
 
-    const QString Groups = QObject::tr("Groups");
-} Consts;
+    static constexpr QLatin1String Groups = QLatin1String("Groups");
+};
 
 ServersListManager::ServersListManager(NordVpnWraper *nordVpn, QObject *parent)
     : QObject(parent)
@@ -81,17 +79,17 @@ ServersListManager::Servers ServersListManager::queryList(const QStringList &arg
 
 ServersListManager::Servers ServersListManager::queryGroups() const
 {
-    return queryList({ Consts.ArgGroups });
+    return queryList({ Consts::ArgGroups });
 }
 
 ServersListManager::Servers ServersListManager::queryCountries() const
 {
-    return queryList({ Consts.ArgCountries });
+    return queryList({ Consts::ArgCountries });
 }
 
 ServersListManager::Servers ServersListManager::queryCities(const QString &country) const
 {
-    return queryList({ Consts.ArgCountry, country });
+    return queryList({ Consts::ArgCountry, country });
 }
 
 void ServersListManager::run()
@@ -109,7 +107,7 @@ void ServersListManager::run()
 
 void ServersListManager::runSeparated()
 {
-    m_groups = { { Consts.Groups, queryGroups() } };
+    m_groups = { { Consts::Groups, queryGroups() } };
 
     const Servers countries = queryCountries();
     for (const auto &country : countries)
