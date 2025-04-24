@@ -18,8 +18,8 @@
 #pragma once
 
 #include <QFutureWatcher>
-#include <QObject>
 #include <QList>
+#include <QObject>
 
 class NordVpnWraper;
 class ServersListManager : public QObject
@@ -39,9 +39,11 @@ signals:
 
 private slots:
     void onFinished();
+    void run();
 
 private:
     NordVpnWraper *m_nordVpn;
+    QElapsedTimer m_timeCounter;
 
     Groups m_groups;
     Groups m_countries;
@@ -54,7 +56,6 @@ private:
     Servers queryCountries() const;
     Servers queryCities(const QString &country) const;
 
-    void run();
     void runSeparated();
 
     static Servers stringToServers(const QString &in);
