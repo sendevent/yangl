@@ -19,11 +19,14 @@
 
 #include "actions/actionresultviewer.h"
 #include "actions/actionstorage.h"
+#include "app/common.h"
 #include "app/nordvpnwraper.h"
 #include "cli/clicall.h"
 #include "cli/clicaller.h"
 
+#include <QFutureSynchronizer>
 #include <QFutureWatcher>
+#include <QTimer>
 #include <QtConcurrentRun>
 
 struct Consts {
@@ -46,7 +49,7 @@ ServersListManager::ServersListManager(NordVpnWraper *nordVpn, QObject *parent)
 bool ServersListManager::reload()
 {
     if (!m_futureWatcher.isRunning()) {
-        run();
+        QTimer::singleShot(0, this, &ServersListManager::run);
         return true;
     }
 
@@ -69,7 +72,9 @@ ServersListManager::Servers ServersListManager::queryList(const QStringList &arg
     action->setArgs(args);
 
     if (auto call = action->createRequest()) {
+        LOG << call->cmd();
         call->run();
+        LOG << call->result();
         if (call->success())
             result = call->result();
     }
@@ -94,27 +99,63 @@ ServersListManager::Servers ServersListManager::queryCities(const QString &count
 
 void ServersListManager::run()
 {
+    LOGT;
+
     m_groups.clear();
     m_countries.clear();
 
     m_gotGroups = false;
     m_gotCountries = false;
 
-    QFuture<void> future = QtConcurrent::run([this]() { this->runSeparated(); });
+    m_timeCounter.start();
+    LOG << "requesting...";
+
+    QFuture<void> future = QtConcurrent::run([this]() {
+        LOGT;
+        this->runSeparated();
+    });
 
     m_futureWatcher.setFuture(future);
 }
 
 void ServersListManager::runSeparated()
 {
+    LOGT;
+    QElapsedTimer counter;
+    counter.start();
+
     m_groups = { { Consts::Groups, queryGroups() } };
 
+    LOG << "groups received in" << counter.elapsed();
+    counter.restart();
+
     const Servers countries = queryCountries();
-    for (const auto &country : countries)
-        m_countries.append({ country, queryCities(country) });
+
+    LOG << countries;
+
+    // Use a thread-safe container to store results
+    QFutureSynchronizer<void> synchronizer;
+
+    for (const auto &country : countries) {
+        /*synchronizer.addFuture(*/ QtConcurrent::run([this, country]() {
+            auto cities = queryCities(country);
+            QMetaObject::invokeMethod(
+                    this, [this, country, cities]() { m_countries.append({ country, cities }); }, Qt::DirectConnection);
+        }) /*)*/;
+    }
+
+    LOG << "countries scheduled in" << counter.elapsed();
+    counter.restart();
+
+    synchronizer.waitForFinished(); // Ensure all tasks complete
+
+    LOG << "countries received in" << counter.elapsed();
 }
 
 void ServersListManager::onFinished()
 {
+    LOG << m_timeCounter.elapsed() / 1000;
+    std::sort(m_groups.begin(), m_groups.end());
+    std::sort(m_countries.begin(), m_countries.end());
     emit ready(m_groups, m_countries);
 }
