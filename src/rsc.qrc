@@ -21,4 +21,7 @@
         <file>resources/about/NordVPN.html</file>
         <file>resources/about/Qt.html</file>
     </qresource>
+    <qresource prefix="/geo">
+        <file>resources/map/cities.csv</file>
+    </qresource>
 </RCC>
