@@ -36,13 +36,26 @@
 #include <QQuickWidget>
 #include <QVBoxLayout>
 #include <QWindow>
+#include <qlatin1stringview.h>
 
 static QString defaultMapPluginName()
 {
+    static const QLatin1String nameOSM("osm");
     static const auto availableProviders = MapWidget::geoServices();
     const QString &savedName = AppSettings::Map->MapPlugin->read().toString();
-    const auto &res = availableProviders.isEmpty() ? savedName : availableProviders.first();
-    return res.isEmpty() ? "osm" : res;
+    QString result;
+    if (!savedName.isEmpty() && availableProviders.contains(savedName)) {
+        result = savedName;
+    } else if (availableProviders.contains(nameOSM)) {
+        result = nameOSM;
+    } else if (!availableProviders.isEmpty()) {
+        result = availableProviders.first();
+    } else {
+        WRN << "Failed obtaining default geo plugin name";
+    }
+
+    LOG << result;
+    return result;
 }
 
 MapWidget::MapWidget(const QString &mapPlugin, int mapType, QWidget *parent)
@@ -52,9 +65,12 @@ MapWidget::MapWidget(const QString &mapPlugin, int mapType, QWidget *parent)
     , m_geoCoder(m_geoSrvProv->geocodingManager())
     , m_serversModel(new MapServersModel(this))
 {
+    // LOGT;
 
-    m_quickView->rootContext()->setContextProperty("markerModel", m_serversModel);
-    m_quickView->rootContext()->setContextProperty("pluginName", mapPlugin);
+    setRootContextProperty("markerModel", QVariant::fromValue(m_serversModel));
+    setRootContextProperty("pluginName", mapPlugin);
+    setRootContextProperty("currenCountry", QString());
+    setRootContextProperty("currenCity", QString());
 
     LOG << mapPlugin << mapType;
 
@@ -114,10 +130,8 @@ QStringList MapWidget::supportedMapTypes() const
 
 void MapWidget::setActiveConnection(const AddrHandler &marker)
 {
-    if (auto ctx = m_quickView->rootContext()) {
-        ctx->setContextProperty("currenCountry", marker.m_country);
-        ctx->setContextProperty("currenCity", marker.m_city);
-    }
+    setRootContextProperty("currenCountry", marker.m_country);
+    setRootContextProperty("currenCity", marker.m_city);
 }
 
 void MapWidget::syncMapSize()
@@ -173,6 +187,29 @@ void MapWidget::clearMarks()
     m_serversModel->clear();
 }
 
+void MapWidget::setupMarks(const ServersListManager::Groups &groups)
+{
+    auto clearGeoName = [](const QString &geoName) -> QString { return QString(geoName).replace('_', ' '); };
+
+    for (const auto &group : groups) {
+        const bool isGroups = group.first == "Groups"; // TODO: read ServersListManager
+        if (isGroups) {
+            continue;
+        }
+
+        const QString &countryName = clearGeoName(group.first);
+        // if (!isGroups)
+        addMark(group.first, {});
+
+        for (const auto &city : group.second) {
+            const QString &cityName = clearGeoName(city);
+
+            // if (!isGroups)
+            addMark(countryName, cityName);
+        }
+    }
+}
+
 void MapWidget::addMark(const QString &country, const QString &city)
 {
     const AddrHandler addrHandler(country, city);
@@ -180,6 +217,7 @@ void MapWidget::addMark(const QString &country, const QString &city)
     if (m_allGeo.contains(addrHandler.m_country)) {
         if (m_allGeo[addrHandler.m_country].contains(addrHandler.m_city)) {
             putMark(addrHandler, m_allGeo[addrHandler.m_country][addrHandler.m_city]);
+            LOG << "Found in the cache:" << country << city;
             return;
         }
     }
@@ -194,6 +232,7 @@ void MapWidget::requestGeo(const AddrHandler &addrHandler)
     if (addrHandler.m_city != "default") {
         addr.setCity(addrHandler.m_city);
     }
+    LOG << addr.country() << addr.city();
 
     if (!m_geoCoder) {
         WRN << "GeoCoder is unavailable";
@@ -201,6 +240,8 @@ void MapWidget::requestGeo(const AddrHandler &addrHandler)
     }
 
     if (QGeoCodeReply *reply = m_geoCoder->geocode(addr)) {
+        LOG << "geocode requested:" << reply << reply->error() << reply->errorString();
+
         if (reply->isFinished() && reply->error() != QGeoCodeReply::NoError) {
             WRN << "geo reply error:" << reply->errorString();
             return;
@@ -211,9 +252,11 @@ void MapWidget::requestGeo(const AddrHandler &addrHandler)
                     WRN << "errorr for:" << addrHandler.m_country << addrHandler.m_city << error << errorString;
                 });
         connect(reply, &QGeoCodeReply::finished, this, [this, addrHandler] {
+            LOG << "geo request finished";
             if (QGeoCodeReply *r = qobject_cast<QGeoCodeReply *>(sender())) {
                 const auto &locations = r->locations();
                 for (const auto &l : locations) {
+                    LOG << l.coordinate();
                     putMark(addrHandler, l.coordinate());
                     break;
                 }
@@ -253,6 +296,7 @@ struct Consts {
 void MapWidget::loadJson()
 {
     static const QString file = QString("%1/geo.json").arg(SettingsManager::dirPath());
+    LOG << file;
     QFile in(file);
     if (!in.open(QIODevice::ReadOnly | QIODevice::Text)) {
         WRN << "Failed opening file:" << file << in.errorString();
@@ -269,17 +313,24 @@ void MapWidget::loadJson()
 
     QJsonObject::const_iterator countries = countriesCollection.constBegin();
     while (countries != countriesCollection.constEnd()) {
+        const auto &countryName = countries.key();
         const QJsonObject &citiesCollection = countries.value().toObject();
         QMap<QString, QGeoCoordinate> citiesHandler;
         QJsonObject::const_iterator cities = citiesCollection.constBegin();
         while (cities != citiesCollection.constEnd()) {
+            const auto &cityName = cities.key();
             const QJsonObject &city = cities.value().toObject();
             QGeoCoordinate coord(city.value(Consts::latitude).toDouble(), city.value(Consts::longitude).toDouble());
-            citiesHandler.insert(cities.key(), coord);
+            citiesHandler.insert(cityName, coord);
+
+            LOG << countryName << cityName << city.keys();
+            putMark({ countryName, cityName }, coord);
+
             ++cities;
         }
 
-        m_allGeo.insert(countries.key(), citiesHandler);
+        m_allGeo.insert(countryName, citiesHandler);
+
         ++countries;
     }
 }
@@ -287,6 +338,7 @@ void MapWidget::loadJson()
 void MapWidget::saveJson()
 {
     static const QString file = QString("%1/geo.json").arg(SettingsManager::dirPath());
+    LOG << file;
     QFile out(file);
     if (!out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
         WRN << "Failed opening file:" << file << out.errorString();
@@ -340,7 +392,7 @@ qreal MapWidget::scale() const
 
 void MapWidget::setMapType(int mapTypeId)
 {
-    m_quickView->rootContext()->setContextProperty("mapType", mapTypeId);
+    setRootContextProperty("mapType", mapTypeId);
 }
 
 void MapWidget::setMapType(const QString &mapTypeName)
@@ -354,4 +406,11 @@ void MapWidget::setMapType(const QString &mapTypeName)
 QSize MapWidget::sizeHint() const
 {
     return { 300, 300 };
+}
+
+void MapWidget::setRootContextProperty(const QString &name, const QVariant &value)
+{
+    if (auto ctx = m_quickView->rootContext()) {
+        ctx->setContextProperty(name, value);
+    }
 }

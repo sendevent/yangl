@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -15,33 +15,69 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "tst_statechecker.h"
+#include "actions/actionstorage.h"
+#include "app/statechecker.h"
+#include "cli/clicaller.h"
+#include "settings/appsettings.h"
 
+#include <QObject>
+#include <QSharedPointer>
 #include <QSignalSpy>
 #include <QStandardPaths>
-#include <QtTest>
+#include <QTest>
 
-tst_StateChecker::tst_StateChecker(QObject *parent)
+class TestStateChecker : public QObject
+{
+    Q_OBJECT
+public:
+    explicit TestStateChecker(QObject *parent = {});
+
+private slots:
+    void onStatusCheckPerformed(const NordVpnInfo::Status &status);
+
+    void initTestCase();
+    void init();
+
+    void test_active();
+    void test_interval();
+    void test_check_status_change();
+
+private:
+    const std::unique_ptr<CLICaller> m_caller;
+    const std::unique_ptr<ActionStorage> m_storage;
+    StateChecker::Ptr m_checker;
+    NordVpnInfo::Status m_detectedStatus;
+
+    void test_check(NordVpnInfo::Status targetStatus);
+};
+
+TestStateChecker::TestStateChecker(QObject *parent)
     : QObject(parent)
     , m_caller(new CLICaller)
     , m_storage(new ActionStorage)
 {
+}
+
+void TestStateChecker::initTestCase()
+{
+    AppSettings::init();
     m_storage->load();
     const Action::Ptr &action = m_storage->action(Action::NordVPN::CheckStatus);
-    QString statusSink(qApp->applicationFilePath());
-    statusSink = statusSink.replace(qAppName(), "test_fake_status");
-    action->setApp(statusSink);
-    action->setArgs({ "" });
+    const QFileInfo fakeStatusApp(
+            QString(qApp->applicationFilePath()).replace(qAppName(), "../../../../../tests/test_fake_status"));
+    action->setApp(fakeStatusApp.absoluteFilePath());
+    action->setArgs({ "-d" });
     action->setForcedShow(false);
-}
 
-void tst_StateChecker::init()
-{
     m_checker = StateChecker::Ptr(new StateChecker(m_caller.get(), StateChecker::DefaultIntervalMs));
-    m_checker->setCheckAction(m_storage->action(Action::NordVPN::CheckStatus));
+    m_checker->setCheckAction(action);
+
+    connect(m_checker.get(), &StateChecker::statusChanged, this, &TestStateChecker::onStatusCheckPerformed);
 }
 
-void tst_StateChecker::test_active()
+void TestStateChecker::init() { }
+
+void TestStateChecker::test_active()
 {
     QCOMPARE(m_checker->isActive(), false);
     m_checker->setActive(true);
@@ -50,7 +86,7 @@ void tst_StateChecker::test_active()
     QCOMPARE(m_checker->isActive(), false);
 }
 
-void tst_StateChecker::test_interval()
+void TestStateChecker::test_interval()
 {
     QCOMPARE(m_checker->interval(), StateChecker::DefaultIntervalMs);
     static int constexpr customInterval = 3600000;
@@ -60,7 +96,12 @@ void tst_StateChecker::test_interval()
     QCOMPARE(m_checker->interval(), StateChecker::DefaultIntervalMs);
 }
 
-void tst_StateChecker::test_check(NordVpnInfo::Status targetStatus)
+void TestStateChecker::onStatusCheckPerformed(const NordVpnInfo::Status &status)
+{
+    m_detectedStatus = status;
+}
+
+void TestStateChecker::test_check(NordVpnInfo::Status targetStatus)
 {
     const NordVpnInfo::Status sourceStatus = m_checker->state().status();
     const Action::Ptr &action = m_storage->action(Action::NordVPN::CheckStatus);
@@ -79,34 +120,36 @@ void tst_StateChecker::test_check(NordVpnInfo::Status targetStatus)
         return;
     }
 
-    NordVpnInfo::Status checkPerformed(sourceStatus);
-    connect(
-            &*m_checker, &StateChecker::statusChanged, this,
-            [&checkPerformed](const NordVpnInfo::Status &status) { checkPerformed = status; }, Qt::UniqueConnection);
+    qDebug() << action->app() << action->args();
 
-    QSignalSpy spy(&*m_checker, &StateChecker::statusChanged);
+    m_detectedStatus = sourceStatus;
+
+    QSignalSpy spy(m_checker.get(), &StateChecker::statusChanged);
 
     m_checker->check();
 
     QElapsedTimer timer;
     timer.start();
-    while (checkPerformed == sourceStatus && timer.elapsed() < 20000)
+    while (m_detectedStatus == sourceStatus && timer.elapsed() < 20000)
         QTest::qWait(50);
 
+    qDebug() << m_checker->state().toString();
     QCOMPARE(m_checker->state().status(), targetStatus);
 
     const QList<QVariant> &arguments = spy.takeLast();
-    QVERIFY(arguments.at(0).type() == QVariant::UserType);
-    QVERIFY(arguments.at(0).value<NordVpnInfo::Status>() == targetStatus);
+    const auto &arg = arguments.at(0);
+    qDebug() << arg << arg.typeId() << arg.metaType();
+    QVERIFY(arg.metaType() == QMetaType::fromType<NordVpnInfo::Status>());
+    QVERIFY(arg.value<NordVpnInfo::Status>() == targetStatus);
 }
 
-void tst_StateChecker::test_check_status_change()
+void TestStateChecker::test_check_status_change()
 {
     QCOMPARE(m_checker->state().status(), NordVpnInfo::Status::Unknown);
 
     {
-        QSignalSpy spyState(&*m_checker, &StateChecker::stateChanged);
-        QSignalSpy spyStatus(&*m_checker, &StateChecker::statusChanged);
+        QSignalSpy spyState(m_checker.get(), &StateChecker::stateChanged);
+        QSignalSpy spyStatus(m_checker.get(), &StateChecker::statusChanged);
 
         m_checker->setStatus(NordVpnInfo::Status::Connecting);
         QCOMPARE(m_checker->state().status(), NordVpnInfo::Status::Connecting);
@@ -114,14 +157,16 @@ void tst_StateChecker::test_check_status_change()
         {
             QCOMPARE(spyState.count(), 1);
             const QList<QVariant> &arguments = spyState.takeFirst();
-            QVERIFY(arguments.at(0).type() == QVariant::UserType);
-            QVERIFY(arguments.at(0).value<NordVpnInfo>().status() == NordVpnInfo::Status::Connecting);
+            const auto &arg = arguments.at(0);
+            QCOMPARE(arg.metaType(), QMetaType::fromType<NordVpnInfo>());
+            QCOMPARE(arg.value<NordVpnInfo>().status(), NordVpnInfo::Status::Connecting);
         }
         {
             QCOMPARE(spyStatus.count(), 1);
             const QList<QVariant> &arguments = spyStatus.takeFirst();
-            QVERIFY(arguments.at(0).type() == QVariant::UserType);
-            QVERIFY(arguments.at(0).value<NordVpnInfo::Status>() == NordVpnInfo::Status::Connecting);
+            const auto &arg = arguments.at(0);
+            QCOMPARE(arg.metaType(), QMetaType::fromType<NordVpnInfo::Status>());
+            QCOMPARE(arg.value<NordVpnInfo::Status>(), NordVpnInfo::Status::Connecting);
         }
     }
 
@@ -134,3 +179,6 @@ void tst_StateChecker::test_check_status_change()
     m_checker->setStatus(NordVpnInfo::Status::Connected);
     test_check(NordVpnInfo::Status::Disconnected);
 }
+
+QTEST_MAIN(TestStateChecker)
+#include "teststatechecker.moc"

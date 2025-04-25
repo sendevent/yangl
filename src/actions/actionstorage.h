@@ -43,7 +43,7 @@ public:
     QList<Action::Ptr> load(const QString &from = {});
     QList<Action::Ptr> load(QIODevice *from);
     void save(const QString &to = {});
-    void save(QIODevice *from);
+    void save(QIODevice *to);
 
     Action::Ptr createUserAction(QObject *parent = {});
     Action::Ptr createAction(Action::Flow scope, int type, const Action::Id &id, const QString &appPath,

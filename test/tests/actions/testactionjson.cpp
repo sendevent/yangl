@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -15,34 +15,51 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "tst_actionjson.h"
-
-#include "actionjson.h"
-#include "actionstorage.h"
+#include "actions/actionjson.h"
+#include "actions/actionstorage.h"
+#include "testaction.h"
 
 #include <QBuffer>
-#include <QtTest>
+#include <QTest>
 
-/*static*/ const Action::Id tst_ActionJson::TestId = Action::Id("{057c11c0-de87-48c4-a98e-93471b4290ca}");
+class TestActionJson : public QObject
+{
+    Q_OBJECT
+public:
+    explicit TestActionJson();
 
-/*static*/ const QByteArray tst_ActionJson::TestJson =
+signals:
+
+private slots:
+    void test_filePath();
+    void test_load();
+    void test_save();
+
+private:
+    static const Action::Id TestId;
+    static const QByteArray TestJson;
+};
+
+/*static*/ const Action::Id TestActionJson::TestId = Action::Id("{057c11c0-de87-48c4-a98e-93471b4290ca}");
+
+/*static*/ const QByteArray TestActionJson::TestJson =
         "{\n    \"custom\": {\n        \"{057c11c0-de87-48c4-a98e-93471b4290ca}\": {\n            \"anchor\": 0,\n     "
         "       \"app\": \"/usr/bin/ls\",\n            \"args\": [\n                \"-la\"\n            ],\n          "
         "  \"forcedDisplay\": false,\n            \"id\": \"{057c11c0-de87-48c4-a98e-93471b4290ca}\",\n            "
         "\"scope\": 2,\n            \"timeout\": 30,\n            \"title\": \"\",\n            \"type\": 0\n       "
         " }\n    }\n}\n";
 
-tst_ActionJson::tst_ActionJson() {}
+TestActionJson::TestActionJson() { }
 
-void tst_ActionJson::test_filePath()
+void TestActionJson::test_filePath()
 {
     const QString jsonFilePath = ActionJson::jsonFilePath();
     QVERIFY(jsonFilePath.endsWith(QString("%1/actions.json").arg(qAppName())));
 }
 
-void tst_ActionJson::test_load()
+void TestActionJson::test_load()
 {
-    const Action::Ptr action(new tst_Action(Action::Flow::Custom, Action::NordVPN::Unknown, {}, TestId));
+    const Action::Ptr action(new TestAction(Action::Flow::Custom, Action::NordVPN::Unknown, {}, TestId));
 
     QByteArray inputString(TestJson);
     QBuffer in(&inputString);
@@ -56,21 +73,21 @@ void tst_ActionJson::test_load()
     QCOMPARE(json.customActionIds(), { TestId.toString() });
 
     if (action) {
-        json.updateAction(&*action);
+        json.updateAction(action.get());
         QCOMPARE(action->app(), QStringLiteral("/usr/bin/ls"));
         QCOMPARE(action->args(), { QStringLiteral("-la") });
 
-        json.popAction(&*action);
+        json.popAction(action.get());
         QCOMPARE(json.customActionIds(), {});
 
-        json.putAction(&*action);
+        json.putAction(action.get());
         QCOMPARE(json.customActionIds(), { TestId.toString() });
     }
 }
 
-void tst_ActionJson::test_save()
+void TestActionJson::test_save()
 {
-    const Action::Ptr action(new tst_Action(Action::Flow::Custom, Action::NordVPN::Unknown, {}, TestId));
+    const Action::Ptr action(new TestAction(Action::Flow::Custom, Action::NordVPN::Unknown, {}, TestId));
     action->setApp("/usr/bin/ls");
     action->setArgs({ "-la" });
 
@@ -83,13 +100,13 @@ void tst_ActionJson::test_save()
     QCOMPARE(json.customActionIds(), {});
 
     if (action) {
-        json.putAction(&*action);
+        json.putAction(action.get());
         QCOMPARE(json.customActionIds(), { TestId.toString() });
 
-        json.popAction(&*action);
+        json.popAction(action.get());
         QCOMPARE(json.customActionIds(), {});
 
-        json.putAction(&*action);
+        json.putAction(action.get());
         QCOMPARE(json.customActionIds(), { TestId.toString() });
     }
 
@@ -97,3 +114,6 @@ void tst_ActionJson::test_save()
 
     QCOMPARE(outString, TestJson);
 }
+
+QTEST_MAIN(TestActionJson)
+#include "testactionjson.moc"

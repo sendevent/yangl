@@ -46,7 +46,9 @@ void StateChecker::setCheckAction(const Action::Ptr &action)
 {
     if (m_actCheck != action) {
         m_actCheck = action;
-        connect(&*m_actCheck, &Action::performed, this, &StateChecker::onQueryFinish, Qt::UniqueConnection);
+        if (m_actCheck) {
+            connect(m_actCheck.get(), &Action::performed, this, &StateChecker::onQueryFinish, Qt::UniqueConnection);
+        }
     }
 }
 
@@ -89,7 +91,7 @@ int StateChecker::interval() const
 
 void StateChecker::check()
 {
-    m_bus->performAction(&*m_actCheck);
+    m_bus->performAction(m_actCheck.get());
 }
 
 void StateChecker::onQueryFinish(const Action::Id & /*id*/, const QString &result, bool /*ok*/,

@@ -62,7 +62,7 @@ void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
     auto makeConnection = [this](const Action::Ptr &action, QMenu *menu, QAction *before) {
         QAction *qAct = menu->addAction(action->title());
         if (action)
-            qAct->setData(QVariant::fromValue(&*action));
+            qAct->setData(QVariant::fromValue(action.get()));
         menu->insertAction(before, qAct);
         connect(qAct, &QAction::triggered, this, &MenuHolder::onActionTriggered);
         return qAct;
@@ -74,9 +74,9 @@ void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
         QList<Action::Ptr> m_menuActions {};
     };
 
-    QHash<Action::Flow, ActionsHolder> actionsHolders { { Action::Flow::Yangl, { &*m_menuYangl } },
-                                                        { Action::Flow::NordVPN, { &*m_menuNordVpn } },
-                                                        { Action::Flow::Custom, { &*m_menuUser } } };
+    QHash<Action::Flow, ActionsHolder> actionsHolders { { Action::Flow::Yangl, { m_menuYangl.get() } },
+                                                        { Action::Flow::NordVPN, { m_menuNordVpn.get() } },
+                                                        { Action::Flow::Custom, { m_menuUser.get() } } };
 
     auto addActions = [this, &actionsHolders, &makeConnection](Action::Flow flow) {
         const ActionsHolder &collection = actionsHolders[flow];
@@ -87,7 +87,7 @@ void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
 
         QAction *qAct = nullptr;
         for (auto act : collection.m_topActions) {
-            QAction *added = makeConnection(act, &*m_menuRoot, {});
+            QAction *added = makeConnection(act, m_menuRoot.get(), {});
             m_qActions[flow].append(added);
             if (!qAct)
                 qAct = added;
