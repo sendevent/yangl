@@ -15,40 +15,73 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "tst_actionstorage.h"
-
-#include "action.h"
-#include "actionstorage.h"
-#include "settingsmanager.h"
+#include "actions/action.h"
+#include "actions/actionstorage.h"
+#include "settings/appsettings.h"
+#include "settings/settingsmanager.h"
 
 #include <QFile>
-#include <QtTest>
+#include <QTest>
 
-tst_ActionStorage::tst_ActionStorage(QObject *parent)
+class ActionStorage;
+class TestActionStorage : public QObject
+{
+    Q_OBJECT
+public:
+    explicit TestActionStorage(QObject *parent = {});
+
+private:
+    QVector<Action::Ptr> populateUserActions(ActionStorage *storage, int count);
+
+private slots:
+    void initTestCase();
+    void cleanupTestCase();
+
+    void init();
+    void cleanup();
+
+    void test_yanglActions();
+    void test_builtinActions();
+    void test_userActions();
+    void test_allActions();
+    void test_actionBuiltin();
+    void test_actionUser();
+    void test_saveAndLoad();
+    void test_createUserAction();
+    void test_updateActionsBuiltin();
+    void test_updateActionsUser();
+};
+
+TestActionStorage::TestActionStorage(QObject *parent)
     : QObject(parent)
 {
 }
 
-void tst_ActionStorage::cleanupTestCase()
+void TestActionStorage::initTestCase()
+{
+    AppSettings::init();
+}
+
+void TestActionStorage::cleanupTestCase()
 {
     static const QString path = SettingsManager::dirPath();
     for (const auto &file : { "actions.json", "settings.conf" })
         QFile::remove(QString("%1/%2").arg(path, file));
 }
 
-void tst_ActionStorage::init()
+void TestActionStorage::init()
 {
     ActionStorage storage;
     storage.save();
 }
 
-void tst_ActionStorage::cleanup()
+void TestActionStorage::cleanup()
 {
     ActionStorage storage;
     storage.save();
 }
 
-QVector<Action::Ptr> tst_ActionStorage::populateUserActions(ActionStorage *storage, int count)
+QVector<Action::Ptr> TestActionStorage::populateUserActions(ActionStorage *storage, int count)
 {
     QVector<Action::Ptr> userActions;
     for (int i = 0; i < count; ++i)
@@ -57,7 +90,7 @@ QVector<Action::Ptr> tst_ActionStorage::populateUserActions(ActionStorage *stora
     return userActions;
 }
 
-void tst_ActionStorage::test_yanglActions()
+void TestActionStorage::test_yanglActions()
 {
     QVector<Action::Action::Yangl> knownActions;
     for (auto i : Action::yanglActions())
@@ -75,7 +108,7 @@ void tst_ActionStorage::test_yanglActions()
     QVERIFY(knownActions.isEmpty());
 }
 
-void tst_ActionStorage::test_builtinActions()
+void TestActionStorage::test_builtinActions()
 {
     QVector<Action::Action::NordVPN> knownActions;
     for (auto i : Action::nvpnActions())
@@ -93,7 +126,7 @@ void tst_ActionStorage::test_builtinActions()
     QVERIFY(knownActions.isEmpty());
 }
 
-void tst_ActionStorage::test_userActions()
+void TestActionStorage::test_userActions()
 {
     static constexpr int UserActionCount = 3;
 
@@ -115,7 +148,7 @@ void tst_ActionStorage::test_userActions()
         QVERIFY(userActions.indexOf(userActionHandled) >= 0);
 }
 
-void tst_ActionStorage::test_allActions()
+void TestActionStorage::test_allActions()
 {
     static constexpr int UserActionCount = 3;
 
@@ -147,7 +180,7 @@ void tst_ActionStorage::test_allActions()
     }
 }
 
-void tst_ActionStorage::test_actionBuiltin()
+void TestActionStorage::test_actionBuiltin()
 {
     ActionStorage storage;
     storage.load();
@@ -162,7 +195,7 @@ void tst_ActionStorage::test_actionBuiltin()
     }
 }
 
-void tst_ActionStorage::test_actionUser()
+void TestActionStorage::test_actionUser()
 {
     static constexpr int UserActionCount = 3;
 
@@ -181,7 +214,7 @@ void tst_ActionStorage::test_actionUser()
     }
 }
 
-void tst_ActionStorage::test_saveAndLoad()
+void TestActionStorage::test_saveAndLoad()
 {
     static constexpr int UserActionCount = 3;
 
@@ -222,7 +255,7 @@ void tst_ActionStorage::test_saveAndLoad()
     }
 }
 
-void tst_ActionStorage::test_createUserAction()
+void TestActionStorage::test_createUserAction()
 {
     static constexpr int UserActionCount = 3;
 
@@ -235,7 +268,7 @@ void tst_ActionStorage::test_createUserAction()
     QCOMPARE(storage.userActions().size(), UserActionCount);
 }
 
-void tst_ActionStorage::test_updateActionsBuiltin()
+void TestActionStorage::test_updateActionsBuiltin()
 {
     ActionStorage storage;
     storage.load();
@@ -256,7 +289,7 @@ void tst_ActionStorage::test_updateActionsBuiltin()
     }
 }
 
-void tst_ActionStorage::test_updateActionsUser()
+void TestActionStorage::test_updateActionsUser()
 {
     static constexpr int UserActionCount = 3;
 
@@ -280,3 +313,6 @@ void tst_ActionStorage::test_updateActionsUser()
         QCOMPARE(action->title(), QString("UserAction_%1").arg(action->id().toString()));
     }
 }
+
+QTEST_MAIN(TestActionStorage)
+#include "testactionstorage.moc"

@@ -179,23 +179,26 @@ void ServersChartView::setupModel(const ServersListManager::Groups &groups)
     }
 
     for (const auto &group : groups) {
-        const bool isGroups = group.first == "Groups"; // TODO: read ServersListManager
+        // const bool isGroups = group.first == "Groups"; // TODO: read ServersListManager
         const QString &countryName = clearGeoName(group.first);
         QStandardItem *title = new QStandardItem(countryName);
         m_serversModel->insertRow(m_serversModel->rowCount(), QList<QStandardItem *>() << title);
 
-        if (!isGroups)
-            m_chartWidget->addMark(group.first, {});
+        // if (!isGroups)
+        //     m_chartWidget->addMark(group.first, {});
 
         for (const auto &city : group.second) {
             const QString &cityName = clearGeoName(city);
             QStandardItem *content = new QStandardItem(cityName);
             title->appendRow(content);
 
-            if (!isGroups)
-                m_chartWidget->addMark(countryName, cityName);
+            // if (!isGroups)
+            //     m_chartWidget->addMark(countryName, cityName);
         }
     }
+
+    LOG << m_serversModel << m_serversModel->rowCount();
+    m_chartWidget->setupMarks(groups);
 }
 
 void ServersChartView::onCurrentTreeItemChanged(const QModelIndex &current)

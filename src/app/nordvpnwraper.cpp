@@ -49,8 +49,8 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
     , m_mapView({})
 {
     connect(qApp, &QApplication::aboutToQuit, this, &NordVpnWraper::prepareQuit);
-    connect(&*m_checker, &StateChecker::stateChanged, m_trayIcon, &TrayIcon::setState);
-    connect(&*m_checker, &StateChecker::statusChanged, this, &NordVpnWraper::onStatusChanged);
+    connect(m_checker, &StateChecker::stateChanged, m_trayIcon, &TrayIcon::setState);
+    connect(m_checker, &StateChecker::statusChanged, this, &NordVpnWraper::onStatusChanged);
     connect(m_trayIcon, &QSystemTrayIcon::activated, this, &NordVpnWraper::onTrayIconActivated);
     connect(m_menuHolder, &MenuHolder::actionTriggered, this, &NordVpnWraper::onActionTriggered);
     connect(m_pauseTimer, &QTimer::timeout, this, &NordVpnWraper::onPauseTimer);
@@ -116,7 +116,7 @@ void NordVpnWraper::loadSettings()
 void NordVpnWraper::prepareQuit()
 {
     disconnect(m_trayIcon);
-    disconnect(&*m_checker);
+    disconnect(m_checker);
 
     const bool visible = m_mapView ? m_mapView->isVisible() : false;
     AppSettings::Map->Visible->write(visible);
@@ -168,7 +168,7 @@ void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason
         return;
 
     if (const Action::Ptr &action = m_actions->action(invokeMe))
-        onActionTriggered(&*action);
+        onActionTriggered(action.get());
 }
 
 void NordVpnWraper::onActionTriggered(Action *action)
@@ -296,7 +296,7 @@ void NordVpnWraper::pause(Action::NordVPN action)
     m_paused = duration * TimeQuantMs;
 
     if (auto disconnect = m_actions->action(Action::NordVPN::Disconnect)) {
-        onActionTriggered(&*disconnect);
+        onActionTriggered(disconnect.get());
         m_pauseTimer->start(yangl::OneSecondMs);
     }
 }
@@ -311,7 +311,7 @@ void NordVpnWraper::onPauseTimer()
         if (currentState.status() == NordVpnInfo::Status::Unknown
             || currentState.status() == NordVpnInfo::Status::Disconnected) {
             if (auto connect = m_actions->action(Action::NordVPN::Connect)) {
-                onActionTriggered(&*connect);
+                onActionTriggered(connect.get());
             }
         }
         m_paused = 0;

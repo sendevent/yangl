@@ -15,23 +15,25 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "tst_action.h"
+#include "testaction.h"
 
-#include "actionstorage.h"
-#include "clicall.h"
+#include "actions/action.h"
+#include "actions/actionstorage.h"
+#include "cli/clicall.h"
 
-#include <QtTest>
+#include <QSignalSpy>
+#include <QTest>
 
-/*static*/ int tst_Action::MetaIdMenuPlace = -1;
+/*static*/ int TestAction::MetaIdMenuPlace = -1;
 
-tst_Action::tst_Action(Action::Flow scope, NordVPN action, ActionStorage *parent, const Action::Id &id)
+TestAction::TestAction(Action::Flow scope, NordVPN action, ActionStorage *parent, const Action::Id &id)
     : Action(scope, static_cast<int>(action), parent, id)
 {
-    if (-1 == tst_Action::MetaIdMenuPlace)
-        tst_Action::MetaIdMenuPlace = qRegisterMetaType<Action::MenuPlace>();
+    if (-1 == TestAction::MetaIdMenuPlace)
+        TestAction::MetaIdMenuPlace = qRegisterMetaType<Action::MenuPlace>();
 }
 
-void tst_Action::checkAction(const Action::Ptr &action, int expectedType, Action::Flow expectedScope,
+void TestAction::checkAction(const Action::Ptr &action, int expectedType, Action::Flow expectedScope,
                              const Action::Id &expectedId) const
 {
     QCOMPARE(action->type(), expectedType);
@@ -50,119 +52,119 @@ void tst_Action::checkAction(const Action::Ptr &action, int expectedType, Action
     QCOMPARE(action->anchor(), Action::MenuPlace::NoMenu);
 }
 
-void tst_Action::testCreate_Builtin()
+void TestAction::testCreate_Builtin()
 {
     static const Action::Flow scope = Action::Flow::NordVPN;
     for (auto actionType : Action::nvpnActions()) {
         static const Action::Id &id = Action::Id::createUuid();
 
-        const Action::Ptr action(new tst_Action(scope, actionType, {}, id));
+        const Action::Ptr action(new TestAction(scope, actionType, {}, id));
         checkAction(action, static_cast<int>(actionType), scope, id);
 
-        const Action::Ptr actionNoId(new tst_Action(scope, actionType));
+        const Action::Ptr actionNoId(new TestAction(scope, actionType));
         checkAction(actionNoId, static_cast<int>(actionType), scope);
     }
 }
 
-void tst_Action::testCreate_Custom()
+void TestAction::testCreate_Custom()
 {
     static const Action::Flow scope = Action::Flow::Custom;
     static const Action::Id &id = Action::Id::createUuid();
     static const NordVPN actionType = NordVPN::Unknown;
 
-    const Action::Ptr action(new tst_Action(scope, actionType, {}, id));
+    const Action::Ptr action(new TestAction(scope, actionType, {}, id));
     checkAction(action, static_cast<int>(actionType), scope, id);
 
-    const Action::Ptr actionNoId(new tst_Action(scope, actionType));
+    const Action::Ptr actionNoId(new TestAction(scope, actionType));
     checkAction(actionNoId, static_cast<int>(actionType), scope);
 }
 
-void tst_Action::testSetTitle()
+void TestAction::testSetTitle()
 {
     static const QString testValue("test");
-    const Action::Ptr action(new tst_Action(Action::Flow::Custom, NordVPN::Unknown));
-    QSignalSpy spy(&*action, &Action::titleChanged);
+    const Action::Ptr action(new TestAction(Action::Flow::Custom, NordVPN::Unknown));
+    QSignalSpy spy(action.get(), &Action::titleChanged);
 
     action->setTitle(testValue);
 
     QCOMPARE(action->title(), testValue);
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.at(0).type() == QVariant::String);
+    QVERIFY(arguments.at(0).typeId() == QVariant::String);
     QVERIFY(arguments.at(0) == testValue);
 }
 
-void tst_Action::testSetApp()
+void TestAction::testSetApp()
 {
     static const QString testValue("/no/such/app");
-    const Action::Ptr action(new tst_Action(Action::Flow::Custom, NordVPN::Unknown));
-    QSignalSpy spy(&*action, &Action::appChanged);
+    const Action::Ptr action(new TestAction(Action::Flow::Custom, NordVPN::Unknown));
+    QSignalSpy spy(action.get(), &Action::appChanged);
 
     action->setApp(testValue);
 
     QCOMPARE(action->app(), testValue);
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.at(0).type() == QVariant::String);
+    QVERIFY(arguments.at(0).typeId() == QVariant::String);
     QVERIFY(arguments.at(0) == testValue);
 }
 
-void tst_Action::testSetArgs()
+void TestAction::testSetArgs()
 {
     static const QStringList testValue { "-a", "\"b c d\"", "e" };
-    const Action::Ptr action(new tst_Action(Action::Flow::Custom, NordVPN::Unknown));
-    QSignalSpy spy(&*action, &Action::argsChanged);
+    const Action::Ptr action(new TestAction(Action::Flow::Custom, NordVPN::Unknown));
+    QSignalSpy spy(action.get(), &Action::argsChanged);
 
     action->setArgs(testValue);
 
     QCOMPARE(action->args(), testValue);
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.at(0).type() == QVariant::StringList);
+    QVERIFY(arguments.at(0).typeId() == QVariant::StringList);
     QVERIFY(arguments.at(0) == testValue);
 }
 
-void tst_Action::testSetTimeout()
+void TestAction::testSetTimeout()
 {
     static const int testValue(1);
-    const Action::Ptr action(new tst_Action(Action::Flow::Custom, NordVPN::Unknown));
-    QSignalSpy spy(&*action, &Action::timeoutChanged);
+    const Action::Ptr action(new TestAction(Action::Flow::Custom, NordVPN::Unknown));
+    QSignalSpy spy(action.get(), &Action::timeoutChanged);
 
     action->setTimeout(testValue);
 
     QCOMPARE(action->timeout(), testValue);
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.at(0).type() == QVariant::Int);
+    QVERIFY(arguments.at(0).typeId() == QVariant::Int);
     QVERIFY(arguments.at(0) == testValue);
 }
 
-void tst_Action::testSetForcedShow()
+void TestAction::testSetForcedShow()
 {
     static const bool testValue(true);
-    const Action::Ptr action(new tst_Action(Action::Flow::Custom, NordVPN::Unknown));
-    QSignalSpy spy(&*action, &Action::forcedShowChanged);
+    const Action::Ptr action(new TestAction(Action::Flow::Custom, NordVPN::Unknown));
+    QSignalSpy spy(action.get(), &Action::forcedShowChanged);
 
     action->setForcedShow(testValue);
 
     QCOMPARE(action->forcedShow(), testValue);
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.at(0).type() == QVariant::Bool);
+    QVERIFY(arguments.at(0).typeId() == QVariant::Bool);
     QVERIFY(arguments.at(0) == testValue);
 }
 
-void tst_Action::testSetAnchor()
+void TestAction::testSetAnchor()
 {
     static const Action::MenuPlace testValue(Action::MenuPlace::Own);
-    const Action::Ptr action(new tst_Action(Action::Flow::Custom, NordVPN::Unknown));
-    QSignalSpy spy(&*action, &Action::anchorChanged);
+    const Action::Ptr action(new TestAction(Action::Flow::Custom, NordVPN::Unknown));
+    QSignalSpy spy(action.get(), &Action::anchorChanged);
 
     action->setAnchor(testValue);
 
     QCOMPARE(action->anchor(), testValue);
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.at(0).type() == QVariant::UserType);
-    QVERIFY(arguments.at(0) == static_cast<int>(testValue));
+    QCOMPARE(arguments.at(0).value<Action::MenuPlace>(), testValue);
+    QCOMPARE(arguments.at(0).toInt(), static_cast<int>(testValue));
 }

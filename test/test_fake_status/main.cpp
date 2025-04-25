@@ -18,34 +18,40 @@
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <iostream>
+#include <ostream>
+
+void printLine(const QString &line)
+{
+    std::cout << line.toStdString() << std::endl;
+}
 
 void printConnecting()
 {
-    std::cout << "Status: Connecting\n \
-                 Current server: fi88.nordvpn.com\n \
-                 Country: Finland\n \
-                 City: Helsinki\n \
-                 Your new IP: 196.196.203.67\n \
-                 Current technology: OpenVPN\n \
-                 Current protocol: UDP";
+    printLine("Status: Connecting");
+    printLine("Current server: fi88.nordvpn.com");
+    printLine("Country: Finland");
+    printLine("City: Helsinki");
+    printLine("Your new IP: 196.196.203.67");
+    printLine("Current technology: OpenVPN");
+    printLine("Current protocol: UDP");
 }
 
 void printConnected()
 {
-    std::cout << "Status: Connected\n \
-                 Current server: fi88.nordvpn.com\n \
-                 Country: Finland\n \
-                 City: Helsinki\n \
-                 Your new IP: 196.196.203.67\n \
-                 Current technology: OpenVPN\n \
-                 Current protocol: UDP\n \
-                 Transfer: 0.97 MiB received, 452.22 KiB sent\n \
-                 Uptime: 3 hours 24 minutes 5 seconds";
+    printLine("Status: Connected");
+    printLine("Current server: fi88.nordvpn.com");
+    printLine("Country: Finland");
+    printLine("City: Helsinki");
+    printLine("Your new IP: 196.196.203.67");
+    printLine("Current technology: OpenVPN");
+    printLine("Current protocol: UDP");
+    printLine("Transfer: 0.97 MiB received, 452.22 KiB sent");
+    printLine("Uptime: 3 hours 24 minutes 5 seconds");
 }
 
 void printDisconnected()
 {
-    std::cout << "Status: Disconnected\n";
+    printLine("Status: Disconnected");
 }
 
 int main(int argc, char *argv[])
@@ -53,39 +59,41 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     QCommandLineParser parser;
-    parser.setApplicationDescription("YANGL Test helper");
+    parser.setApplicationDescription(
+            "YANGL Test helper: the CLI tool to fake expected NVPN statuses and check their handling");
     parser.addHelpOption();
     parser.addVersionOption();
 
-    auto addOption = [&parser](const QString &name, const QString &description) {
-        QCommandLineOption option(name, description);
-        parser.addOption(option);
-        return option;
+    const QCommandLineOption optionConnecting { { "i", "status-connecting" },
+                                                QCoreApplication::translate("main", "Emulate \"connecting\" output") };
+    const QCommandLineOption optionConnected { { "e", "status-connected" },
+                                               QCoreApplication::translate("main", "Emulate \"connected\" output") };
+    const QCommandLineOption optionDisconnected {
+        { "d", "status-disconnected" }, QCoreApplication::translate("main", "Emulate \"disconnected\" output")
     };
 
-    const QCommandLineOption &optionConnecting =
-            addOption("status-connecting", QCoreApplication::translate("main", "Emulate \"connecting\" output"));
-    const QCommandLineOption &optionConnected =
-            addOption("status-connected", QCoreApplication::translate("main", "Emulate \"connected\" output"));
-    const QCommandLineOption &optionDisconnected =
-            addOption("status-disconnected", QCoreApplication::translate("main", "Emulate \"disconnected\" output"));
+    parser.addOptions({
+            optionConnecting,
+            optionConnected,
+            optionDisconnected,
+    });
 
     parser.process(a);
 
+    if (parser.optionNames().isEmpty()) {
+        printLine(parser.helpText());
+        return 10;
+    }
+
     if (parser.isSet(optionConnecting)) {
         printConnecting();
-        return 0;
-    }
-
-    if (parser.isSet(optionConnected)) {
+    } else if (parser.isSet(optionConnected)) {
         printConnected();
-        return 0;
-    }
-
-    if (parser.isSet(optionDisconnected)) {
+    } else if (parser.isSet(optionDisconnected)) {
         printDisconnected();
-        return 0;
+    } else {
+        return 20;
     }
 
-    return 1;
+    return 0;
 }

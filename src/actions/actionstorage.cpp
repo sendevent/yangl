@@ -119,13 +119,13 @@ void ActionStorage::save(const QString &to)
     save(&out);
 }
 
-void ActionStorage::save(QIODevice(*to))
+void ActionStorage::save(QIODevice *to)
 {
     m_json->clear();
 
     for (const auto &actionsCollection : { yanglActions(), nvpnActions(), userActions() }) {
         for (const auto &action : actionsCollection) {
-            m_json->putAction(&*action);
+            m_json->putAction(action.get());
         }
     }
 
@@ -167,13 +167,13 @@ void ActionStorage::loadYanglActions()
 
     while (!jsonYanglActionsById.isEmpty()) {
         if (const auto &action = jsonYanglActionsById.first()) {
-            m_json->popAction(&*action);
+            m_json->popAction(action.get());
             jsonYanglActionsById.remove(static_cast<Action::Yangl>(action->type()));
         }
     }
 
     for (const auto &action : std::as_const(m_nvpnActions)) {
-        m_json->putAction(&*action);
+        m_json->putAction(action.get());
     }
 }
 
@@ -199,13 +199,13 @@ void ActionStorage::loadBuiltinActions()
 
     while (!jsonBuiltinActionsById.isEmpty()) {
         if (const auto &action = jsonBuiltinActionsById.first()) {
-            m_json->popAction(&*action);
+            m_json->popAction(action.get());
             jsonBuiltinActionsById.remove(static_cast<Action::NordVPN>(action->type()));
         }
     }
 
     for (const auto &action : std::as_const(m_nvpnActions)) {
-        m_json->putAction(&*action);
+        m_json->putAction(action.get());
     }
 }
 

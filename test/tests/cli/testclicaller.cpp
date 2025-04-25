@@ -15,31 +15,37 @@
    along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "tst_clicaller.h"
-
-#include "clicaller.h"
-#include "tst_action.h"
+#include "actions/testaction.h"
+#include "cli/clicaller.h"
 
 #include <QElapsedTimer>
 #include <QSignalSpy>
-#include <QtTest>
+#include <QTest>
 #include <memory>
 
-void tst_CLICaller::test_performAction()
+class TestCLICaller : public QObject
 {
-    Action::Ptr action(new tst_Action(Action::Flow::Custom, Action::NordVPN::Unknown));
+    Q_OBJECT
+
+private slots:
+    void test_performAction();
+};
+
+void TestCLICaller::test_performAction()
+{
+    Action::Ptr action(new TestAction(Action::Flow::Custom, Action::NordVPN::Unknown));
     action->setApp("/usr/bin/ls");
     action->setArgs({ "-la" });
 
     bool actionPerformed(false);
-    connect(&*action, &Action::performed, this,
+    connect(action.get(), &Action::performed, this,
             [&actionPerformed](const Action::Id & /*id*/, const QString & /*result*/, bool /*ok*/,
                                const QString & /*info*/) { actionPerformed = true; });
 
-    QSignalSpy spy(&*action, &Action::performed);
+    QSignalSpy spy(action.get(), &Action::performed);
 
     std::unique_ptr<CLICaller> caller(new CLICaller);
-    caller->performAction(&*action);
+    caller->performAction(action.get());
 
     QElapsedTimer timer;
     timer.start();
@@ -48,9 +54,12 @@ void tst_CLICaller::test_performAction()
 
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.at(0).type() == QVariant::Uuid);
-    QVERIFY(arguments.at(1).type() == QVariant::String);
-    QVERIFY(arguments.at(2).type() == QVariant::Bool);
-    QVERIFY(arguments.at(3).type() == QVariant::String);
+    QVERIFY(arguments.at(0).typeId() == QVariant::Uuid);
+    QVERIFY(arguments.at(1).typeId() == QVariant::String);
+    QVERIFY(arguments.at(2).typeId() == QVariant::Bool);
+    QVERIFY(arguments.at(3).typeId() == QVariant::String);
     QVERIFY(arguments.at(2).toBool() == true);
 }
+
+QTEST_MAIN(TestCLICaller)
+#include "testclicaller.moc"

@@ -181,7 +181,12 @@ CLICall *Action::createRequest()
         return false;
     }
 
-    return info.isExecutable();
+    if (!info.isExecutable()) {
+        WRN << "file is not executable!" << path;
+        return false;
+    }
+
+    return true;
 }
 
 void Action::onStart(const QString &app, const QStringList &args)

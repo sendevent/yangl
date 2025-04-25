@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "serverslistmanager.h"
+
 #include <QGeoCoordinate>
 #include <QGeoServiceProvider>
 #include <QSharedPointer>
@@ -64,6 +66,8 @@ public:
 
     QSize sizeHint() const override;
 
+    void setupMarks(const ServersListManager::Groups &groups);
+
 signals:
     void markerDoubleclicked(const MapWidget::AddrHandler &marker);
 
@@ -89,6 +93,8 @@ private:
 
     void loadJson();
     void saveJson();
+
+    void setRootContextProperty(const QString &name, const QVariant &value);
 };
 
 Q_DECLARE_METATYPE(MapWidget::AddrHandler)
