@@ -66,13 +66,13 @@ ServersListManager::Servers ServersListManager::queryList(const QStringList &arg
     QString result;
 
     const Action::Ptr &action = m_nordVpn->storate()->createUserAction({});
-    ActionResultViewer::unregisterAction(&*action);
+    ActionResultViewer::unregisterAction(action.get());
     action->setTitle(tr("Servers list"));
     action->setForcedShow(false);
     action->setArgs(args);
 
     if (auto call = action->createRequest()) {
-        LOG << call->cmd();
+        // LOG << call->cmd();
         call->run();
         LOG << call->result();
         if (call->success())
@@ -99,7 +99,7 @@ ServersListManager::Servers ServersListManager::queryCities(const QString &count
 
 void ServersListManager::run()
 {
-    LOGT;
+    // LOGT;
 
     m_groups.clear();
     m_countries.clear();
@@ -108,10 +108,10 @@ void ServersListManager::run()
     m_gotCountries = false;
 
     m_timeCounter.start();
-    LOG << "requesting...";
+    // LOG << "requesting...";
 
     QFuture<void> future = QtConcurrent::run([this]() {
-        LOGT;
+        // LOGT;
         this->runSeparated();
     });
 
@@ -120,7 +120,6 @@ void ServersListManager::run()
 
 void ServersListManager::runSeparated()
 {
-    LOGT;
     QElapsedTimer counter;
     counter.start();
 
