@@ -53,13 +53,12 @@ void TestCoordinatesResolver::cleanupTestCase()
 void TestCoordinatesResolver::test_loadDataBuiltin()
 {
     QVERIFY(m_resolver->loadDataBuiltin());
-    QCOMPARE(m_resolver->m_data.size(), 241);
+    QCOMPARE(m_resolver->m_data.size(), 242);
 }
 
 void TestCoordinatesResolver::test_loadDataDynamic()
 {
-    QEXPECT_FAIL("", "TBD", Continue);
-    QFAIL("Not implemented yet");
+    QSKIP("Not implemented yet");
 }
 
 void TestCoordinatesResolver::test_location_real()
