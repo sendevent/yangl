@@ -30,11 +30,11 @@ void MapServersModel::clear()
     endResetModel();
 }
 
-void MapServersModel::addMarker(const QString &country, const QString &city, const QGeoCoordinate &coordinate)
+void MapServersModel::addMarker(const PlaceInfo &place)
 {
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
 
-    m_coordinates.append({ country, city, coordinate });
+    m_coordinates.append(place);
     endInsertRows();
 }
 
@@ -49,14 +49,14 @@ QVariant MapServersModel::data(const QModelIndex &index, int role) const
     if (row < 0 || row >= m_coordinates.count())
         return QVariant();
 
-    const Info &info = m_coordinates[row];
+    const PlaceInfo &info = m_coordinates[row];
     switch (role) {
     case MapServersModel::CountryNameRole:
         return QVariant::fromValue(info.country);
     case MapServersModel::CityNameRole:
-        return QVariant::fromValue(info.city);
+        return QVariant::fromValue(info.town);
     case MapServersModel::PositionRole:
-        return QVariant::fromValue(info.coordinates);
+        return QVariant::fromValue(info.location);
     }
 
     return QVariant();

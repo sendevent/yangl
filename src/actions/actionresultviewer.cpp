@@ -58,8 +58,11 @@ ActionResultViewer::ActionResultViewer()
         return;
 
     const Action::Id &id = action->id();
-    if (!instance()->m_actions.contains(id))
-        instance()->m_actions.insert(id, action);
+    if (auto inst = instance()) {
+        if (!inst->m_actions.contains(id)) {
+            inst->m_actions.insert(id, action);
+        }
+    }
 
     connect(action, &Action::performing, instance(), &ActionResultViewer::onActionStarted, Qt::UniqueConnection);
     connect(action, &Action::performed, instance(), &ActionResultViewer::onActionPerformed, Qt::UniqueConnection);

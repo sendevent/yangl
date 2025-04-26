@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "geo/coordinatesresolver.h"
 #include "serverslistmanager.h"
 
 #include <QGeoCoordinate>
@@ -32,12 +33,6 @@ class MapWidget : public QWidget
 {
     Q_OBJECT
 public:
-    struct AddrHandler {
-        AddrHandler(const QString &country = {}, const QString &city = {});
-        QString m_country;
-        QString m_city;
-    };
-
     explicit MapWidget(const QString &mapPlugin, int mapType, QWidget *parent = {});
     ~MapWidget();
 
@@ -54,7 +49,7 @@ public:
     void centerOn(const QString &country, const QString &city);
     void centerOn(const QGeoCoordinate &center);
 
-    void setActiveConnection(const AddrHandler &marker);
+    void setActiveConnection(const PlaceInfo &marker);
 
     static QStringList geoServices();
 
@@ -69,32 +64,28 @@ public:
     void setupMarks(const ServersListManager::Groups &groups);
 
 signals:
-    void markerDoubleclicked(const MapWidget::AddrHandler &marker);
+    void markerDoubleclicked(const PlaceInfo &marker);
 
 private slots:
     void onMarkerDoubleclicked(QQuickItem *item);
 
 private:
-    QQuickWidget *m_quickView;
+    QQuickWidget *m_quickView { nullptr };
     QSharedPointer<QGeoServiceProvider> m_geoSrvProv;
-    QGeoCodingManager *m_geoCoder;
-    MapServersModel *m_serversModel;
+    QGeoCodingManager *m_geoCoder { nullptr };
+    MapServersModel *m_serversModel { nullptr };
+    CoordinatesResolver *m_geoResolver { nullptr };
 
     void syncMapSize();
 
     void showEvent(QShowEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
-    QMap<QString, QMap<QString, QGeoCoordinate>> m_allGeo;
-    QMap<QString, QMap<QString, QGeoCoordinate>> m_coordinates;
-
-    void putMark(const AddrHandler &info, const QGeoCoordinate &point);
-    void requestGeo(const AddrHandler &info);
+    void putMark(const PlaceInfo &point);
+    void requestGeo(const PlaceInfo &info);
 
     void loadJson();
     void saveJson();
 
     void setRootContextProperty(const QString &name, const QVariant &value);
 };
-
-Q_DECLARE_METATYPE(MapWidget::AddrHandler)
