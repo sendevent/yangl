@@ -28,6 +28,7 @@
 #include <QFutureWatcher>
 #include <QTimer>
 #include <QtConcurrentRun>
+#include <qnamespace.h>
 
 struct Consts {
     static constexpr QLatin1String ArgGroups = QLatin1String("groups");
@@ -72,7 +73,6 @@ ServersListManager::Servers ServersListManager::queryList(const QStringList &arg
     action->setArgs(args);
 
     if (auto call = action->createRequest()) {
-        // LOG << call->cmd();
         call->run();
         LOG << call->result();
         if (call->success())
@@ -136,11 +136,14 @@ void ServersListManager::runSeparated()
     QFutureSynchronizer<void> synchronizer;
 
     for (const auto &country : countries) {
-        /*synchronizer.addFuture(*/ QtConcurrent::run([this, country]() {
+        synchronizer.addFuture(QtConcurrent::run([this, country]() {
             auto cities = queryCities(country);
-            QMetaObject::invokeMethod(
-                    this, [this, country, cities]() { m_countries.append({ country, cities }); }, Qt::DirectConnection);
-        }) /*)*/;
+            // QMetaObject::invokeMethod(
+            // this, [this, country, cities]() { m_countries.append({ country, cities }); },
+            // Qt::DirectConnection);
+            const Group group { country, cities };
+            QMetaObject::invokeMethod(this, &ServersListManager::commitCities, Qt::QueuedConnection, group);
+        }));
     }
 
     LOG << "countries scheduled in" << counter.elapsed();
@@ -148,7 +151,13 @@ void ServersListManager::runSeparated()
 
     synchronizer.waitForFinished(); // Ensure all tasks complete
 
-    LOG << "countries received in" << counter.elapsed();
+    LOG << m_countries.size() << "countries received in" << counter.elapsed();
+}
+
+void ServersListManager::commitCities(const ServersListManager::Group &cities)
+{
+    m_countries.append(cities);
+    emit citiesAdded(cities);
 }
 
 void ServersListManager::onFinished()

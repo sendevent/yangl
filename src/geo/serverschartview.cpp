@@ -95,6 +95,7 @@ void ServersChartView::initUi()
 void ServersChartView::initConenctions()
 {
     connect(m_listManager, &ServersListManager::ready, this, &ServersChartView::onGotServers);
+    connect(m_listManager, &ServersListManager::citiesAdded, this, &ServersChartView::onGotCities);
     connect(m_treeView->selectionModel(), &QItemSelectionModel::currentChanged, this,
             [this](const QModelIndex &current, const QModelIndex &) { onCurrentTreeItemChanged(current); });
     connect(m_treeView, &QTreeView::pressed, this, &ServersChartView::onCurrentTreeItemChanged);
@@ -147,7 +148,7 @@ void ServersChartView::requestServersList()
 
 void ServersChartView::setControlsEnabled(bool enabled)
 {
-    for (auto control : std::initializer_list<QWidget *> { m_lineEdit, m_treeView, m_chartWidget /*, buttonReload*/ })
+    for (auto control : std::initializer_list<QWidget *> { m_lineEdit, m_treeView, /*m_chartWidget , buttonReload*/ })
         control->setEnabled(enabled);
 }
 
@@ -156,19 +157,49 @@ void ServersChartView::onReloadRequested()
     requestServersList();
 }
 
+void ServersChartView::onGotCities(const ServersListManager::Group &cities)
+{
+    auto clearGeoName = [](const QString &geoName) -> QString { return QString(geoName).replace('_', ' '); };
+
+    if (m_modelPopulated) {
+        m_chartWidget->clearMarks();
+        m_serversModel->removeRows(0, m_serversModel->rowCount());
+        m_modelPopulated = false;
+    }
+
+    const QString &countryName = clearGeoName(cities.first);
+    const bool isGroups = countryName == "Groups"; // TODO: read ServersListManager
+    QStandardItem *title = new QStandardItem(countryName);
+    m_serversModel->insertRow(m_serversModel->rowCount(), QList<QStandardItem *>() << title);
+
+    if (!isGroups)
+        m_chartWidget->addMark(countryName, {});
+
+    for (const auto &city : cities.second) {
+        const QString &cityName = clearGeoName(city);
+        QStandardItem *content = new QStandardItem(cityName);
+        title->appendRow(content);
+
+        if (!isGroups)
+            m_chartWidget->addMark(countryName, cityName);
+    }
+}
+
 void ServersChartView::onGotServers(const ServersListManager::Groups &groups,
                                     const ServersListManager::Groups &countries)
 {
     setControlsEnabled(true);
 
-    setupModel(groups + countries);
+    // setupModel(groups + countries);
+
+    m_modelPopulated = true;
 }
 
 void ServersChartView::setupModel(const ServersListManager::Groups &groups)
 {
     m_chartWidget->clearMarks();
-
     m_serversModel->removeRows(0, m_serversModel->rowCount());
+
     auto clearGeoName = [](const QString &geoName) -> QString { return QString(geoName).replace('_', ' '); };
 
     if (groups.isEmpty() || (groups.size() == 1 && groups.first().second.isEmpty())) {
@@ -179,21 +210,21 @@ void ServersChartView::setupModel(const ServersListManager::Groups &groups)
     }
 
     for (const auto &group : groups) {
-        // const bool isGroups = group.first == "Groups"; // TODO: read ServersListManager
+        const bool isGroups = group.first == "Groups"; // TODO: read ServersListManager
         const QString &countryName = clearGeoName(group.first);
         QStandardItem *title = new QStandardItem(countryName);
         m_serversModel->insertRow(m_serversModel->rowCount(), QList<QStandardItem *>() << title);
 
-        // if (!isGroups)
-        //     m_chartWidget->addMark(group.first, {});
+        if (!isGroups)
+            m_chartWidget->addMark(group.first, {});
 
         for (const auto &city : group.second) {
             const QString &cityName = clearGeoName(city);
             QStandardItem *content = new QStandardItem(cityName);
             title->appendRow(content);
 
-            // if (!isGroups)
-            //     m_chartWidget->addMark(countryName, cityName);
+            if (!isGroups)
+                m_chartWidget->addMark(countryName, cityName);
         }
     }
 
@@ -227,9 +258,9 @@ void ServersChartView::onTreeItemDoubleclicked(const QModelIndex &current)
     requestConnection(country, city);
 }
 
-void ServersChartView::onMarkerDoubleclicked(const MapWidget::AddrHandler &addr)
+void ServersChartView::onMarkerDoubleclicked(const PlaceInfo &addr)
 {
-    requestConnection(addr.m_country, addr.m_city);
+    requestConnection(addr.country, addr.town);
 }
 
 void ServersChartView::requestConnection(const QString &group, const QString &server)

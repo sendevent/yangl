@@ -33,8 +33,8 @@ public:
     explicit CoordinatesResolver(QObject *parent = nullptr);
 
 public:
-    void requestCoordinates(const PlaceInfo &town);
-    void requestCoordinates(const QString &country, const QString &city);
+    PlaceInfo requestCoordinates(const PlaceInfo &town);
+    PlaceInfo requestCoordinates(const QString &country, const QString &city);
 
 signals:
     void coordinatesResoloved(const PlaceInfo &town);

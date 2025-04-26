@@ -17,16 +17,17 @@ CoordinatesResolver::CoordinatesResolver(QObject *parent)
 {
 }
 
-void CoordinatesResolver::requestCoordinates(const PlaceInfo &town)
+PlaceInfo CoordinatesResolver::requestCoordinates(const PlaceInfo &town)
 {
     ensureDataLoaded();
     const auto &result = lookupForPlace(town);
     emit coordinatesResoloved(result);
+    return result;
 }
 
-void CoordinatesResolver::requestCoordinates(const QString &country, const QString &city)
+PlaceInfo CoordinatesResolver::requestCoordinates(const QString &country, const QString &city)
 {
-    requestCoordinates({
+    return requestCoordinates({
             country,
             city,
     });

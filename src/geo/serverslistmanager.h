@@ -36,10 +36,13 @@ public:
 
 signals:
     void ready(const ServersListManager::Groups &groups, const ServersListManager::Groups &countries);
+    void citiesAdded(const ServersListManager::Group &cities);
 
 private slots:
     void onFinished();
     void run();
+
+    void commitCities(const ServersListManager::Group &cities);
 
 private:
     NordVpnWraper *m_nordVpn;

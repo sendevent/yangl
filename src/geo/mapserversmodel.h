@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "geo/coordinatesresolver.h"
+
 #include <QAbstractListModel>
 #include <QGeoCoordinate>
 
@@ -33,7 +35,7 @@ public:
     };
 
     MapServersModel(QObject *parent = {});
-    void addMarker(const QString &country, const QString &city, const QGeoCoordinate &coordinate);
+    void addMarker(const PlaceInfo &place);
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
     void clear();
@@ -43,11 +45,5 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
 private:
-    struct Info {
-        QString country;
-        QString city;
-        QGeoCoordinate coordinates;
-    };
-
-    QList<Info> m_coordinates;
+    QList<PlaceInfo> m_coordinates;
 };
