@@ -47,7 +47,7 @@ void TestCLICall::test_call()
     qDebug() << filesList;
     QVERIFY(arguments.at(0).typeId() == QVariant::String);
     QCOMPARE(filesList, receivedResult);
-    QVERIFY(filesList.contains("Test_CLI_CALL"));
+    QVERIFY(filesList.contains("Test_CLICall"));
 
     QCOMPARE(call->result(), filesList);
     QCOMPARE(call->exitCode(), 0);

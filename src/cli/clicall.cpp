@@ -42,8 +42,9 @@ CLICall::CLICall(const QString &path, const QStringList &params, int timeout, QO
 
 QString CLICall::run()
 {
-    if (m_appPath.isEmpty() || !QFile::exists(m_appPath))
+    if (m_appPath.isEmpty() || !QFile::exists(m_appPath)) {
         return setResult({}, tr("File [%1] not found").arg(m_appPath));
+    }
 
     QProcess proc;
 
@@ -59,13 +60,15 @@ QString CLICall::run()
 
     proc.start(m_appPath, m_params, QIODevice::ReadOnly);
 
-    if (!proc.waitForStarted(m_timeout))
+    if (!proc.waitForStarted(m_timeout)) {
         return setResult({}, tr("Start timeout (%1) reached for [%2]").arg(QString::number(m_timeout), m_appPath));
+    }
 
     auto stripSpinner = [](QString &in) {
         static const QString spinnerString("-\\|/ \r");
-        while (!in.isEmpty() && spinnerString.contains(in.at(0)))
+        while (!in.isEmpty() && spinnerString.contains(in.at(0))) {
             in.remove(0, 1);
+        }
         return in;
     };
 
