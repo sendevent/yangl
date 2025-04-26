@@ -42,14 +42,11 @@ private slots:
 
 void TestCoordinatesResolver::initTestCase()
 {
-    qDebug() << Q_FUNC_INFO;
     m_resolver = new CoordinatesResolver();
 }
 
 void TestCoordinatesResolver::cleanupTestCase()
 {
-    qDebug() << Q_FUNC_INFO;
-
     delete m_resolver;
 }
 
@@ -76,14 +73,12 @@ void TestCoordinatesResolver::test_location_real()
 
     const auto &response1 = m_resolver->lookupForPlace({
             "Finland",
-            "Uusimaa",
             "Helsinki",
     });
     checkResponse(response1);
 
     const auto &response2 = m_resolver->lookupForPlace({
             "Finland",
-            {},
             "Helsinki",
     });
     checkResponse(response2);
@@ -103,18 +98,16 @@ void TestCoordinatesResolver::test_location_fake()
 
     const auto &response1 = m_resolver->lookupForPlace({
             "Russia",
-            "Donetskaya oblast",
             "Mariupol",
     });
     checkResponse(response1);
 
     const auto &response2 = m_resolver->lookupForPlace({
             "Russia",
-            {},
             "Mariupol",
     });
     checkResponse(response2);
-    QVERIFY(response1 != response2);
+    QCOMPARE(response1, response2);
 
     const auto &response3 = m_resolver->lookupForPlace("Russia", "Mariupol");
     checkResponse(response3);
@@ -131,7 +124,6 @@ void TestCoordinatesResolver::test_requestCoordinates_real()
 
         QVERIFY(city.ok);
         QCOMPARE(city.country, "Finland");
-        QCOMPARE(city.region, "Uusimaa");
         QCOMPARE(city.town, "Helsinki");
         QCOMPARE(city.location.latitude(), 60.1708);
         QCOMPARE(city.location.longitude(), 24.9375);
@@ -140,13 +132,6 @@ void TestCoordinatesResolver::test_requestCoordinates_real()
 
     resolver.requestCoordinates({
             "Finland",
-            "Uusimaa",
-            "Helsinki",
-    });
-
-    resolver.requestCoordinates({
-            "Finland",
-            {},
             "Helsinki",
     });
 
@@ -169,13 +154,6 @@ void TestCoordinatesResolver::test_requestCoordinates_fake()
 
     resolver.requestCoordinates({
             "Russia",
-            "Donetskaya oblast",
-            "Mariupol",
-    });
-
-    resolver.requestCoordinates({
-            "Russia",
-            {},
             "Mariupol",
     });
 

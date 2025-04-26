@@ -6,7 +6,6 @@
 
 struct PlaceInfo {
     QString country;
-    QString region;
     QString town;
     QGeoCoordinate location;
     bool ok { false };
@@ -15,18 +14,17 @@ struct PlaceInfo {
 
 inline bool operator==(const PlaceInfo &lhs, const PlaceInfo &rhs)
 {
-    return lhs.country == rhs.country && lhs.region == rhs.region && lhs.town == rhs.town
+    return lhs.country == rhs.country && lhs.town == rhs.town
             && lhs.location == rhs.location /*&& lhs.ok == rhs.ok && lhs.message == rhs.message*/;
 }
 
 inline uint qHash(const PlaceInfo &key, uint seed = 0)
 {
-    return qHashMulti(seed, key.country, key.region, key.town, key.location.latitude(), key.location.longitude()/*,
+    return qHashMulti(seed, key.country, key.town, key.location.latitude(), key.location.longitude()/*,
                       key.ok, key.message*/);
 }
 
-using CountryInfo = QHash<QString, QMultiHash<QString, PlaceInfo>>;
-using CitiesByCountry = QHash<QString, CountryInfo>;
+using CitiesByCountry = QHash<QString, QMultiHash<QString, PlaceInfo>>;
 
 class CoordinatesResolver : public QObject
 {
