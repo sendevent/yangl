@@ -8,6 +8,7 @@ struct PlaceInfo {
     QString country;
     QString town;
     QGeoCoordinate location;
+    bool capital { false };
     bool ok { false };
     QString message;
 };
