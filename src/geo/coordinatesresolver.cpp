@@ -28,7 +28,6 @@ void CoordinatesResolver::requestCoordinates(const QString &country, const QStri
 {
     requestCoordinates({
             country,
-            {},
             city,
     });
 }
@@ -89,12 +88,11 @@ CitiesByCountry CoordinatesResolver::loadData(const QString &path)
             }
 
             const PlaceInfo place {
-                parts[0], parts[1], parts[2], coord, true, QString(),
+                parts[0], parts[2], coord, true, QString(),
             };
 
             auto &country = loaded[place.country];
-            auto &region = country[place.region];
-            region.insert(place.town, place);
+            country.insert(place.town, place);
         }
 
     } else {
@@ -131,28 +129,11 @@ PlaceInfo CoordinatesResolver::lookupForPlace(const PlaceInfo &request) const
     town.message = "Not found";
 
     if (m_data.contains(town.country)) {
-        const auto &regions = m_data[town.country];
-
-        // Try exact region match first
-        if (!town.region.isEmpty() && regions.contains(town.region)) {
-            const auto &region = regions[town.region];
-            if (region.contains(town.town)) {
-                town = region.value(town.town);
-                town.ok = true;
-                town.message.clear();
-                return town;
-            }
-        }
-
-        // Fallback: search all regions in the country for the town name
-        for (auto regionIt = regions.constBegin(); regionIt != regions.constEnd(); ++regionIt) {
-            const auto &region = regionIt.value();
-            if (region.contains(town.town)) {
-                town = region.value(town.town);
-                town.ok = true;
-                town.message = QString("Found in region: %1").arg(regionIt.key());
-                return town;
-            }
+        const auto &country = m_data[town.country];
+        if (country.contains(town.town)) {
+            town = country.value(town.town);
+            town.ok = true;
+            return town;
         }
     }
 
@@ -163,7 +144,6 @@ PlaceInfo CoordinatesResolver::lookupForPlace(const QString &country, const QStr
 {
     return lookupForPlace({
             country,
-            {},
             city,
     });
 }
