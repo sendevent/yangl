@@ -79,11 +79,18 @@ void TestStateChecker::init() { }
 
 void TestStateChecker::test_active()
 {
+    QSignalSpy spy(m_checker.get(), &StateChecker::statusChanged);
+
     QCOMPARE(m_checker->isActive(), false);
-    m_checker->setActive(true);
+    m_checker->setActive(true); // tirggers StateChecker::check which triggers StateChecker::statusChanged
+                                // which may be wrongly caught by upfollowing tests
     QCOMPARE(m_checker->isActive(), true);
     m_checker->setActive(false);
     QCOMPARE(m_checker->isActive(), false);
+
+    while (spy.count() != 1) {
+        QTest::qWait(50);
+    }
 }
 
 void TestStateChecker::test_interval()
@@ -120,8 +127,6 @@ void TestStateChecker::test_check(NordVpnInfo::Status targetStatus)
         return;
     }
 
-    qDebug() << action->app() << action->args();
-
     m_detectedStatus = sourceStatus;
 
     QSignalSpy spy(m_checker.get(), &StateChecker::statusChanged);
@@ -130,22 +135,20 @@ void TestStateChecker::test_check(NordVpnInfo::Status targetStatus)
 
     QElapsedTimer timer;
     timer.start();
-    while (m_detectedStatus == sourceStatus && timer.elapsed() < 20000)
-        QTest::qWait(50);
+    while (m_detectedStatus == sourceStatus && timer.elapsed() < CLICall::DefaultTimeoutMSecs)
+        QTest::qWait(10);
 
-    qDebug() << m_checker->state().toString();
     QCOMPARE(m_checker->state().status(), targetStatus);
 
     const QList<QVariant> &arguments = spy.takeLast();
     const auto &arg = arguments.at(0);
-    qDebug() << arg << arg.typeId() << arg.metaType();
     QVERIFY(arg.metaType() == QMetaType::fromType<NordVpnInfo::Status>());
     QVERIFY(arg.value<NordVpnInfo::Status>() == targetStatus);
 }
 
 void TestStateChecker::test_check_status_change()
 {
-    QCOMPARE(m_checker->state().status(), NordVpnInfo::Status::Unknown);
+    QCOMPARE(m_checker->state().status(), NordVpnInfo::Status::Disconnected);
 
     {
         QSignalSpy spyState(m_checker.get(), &StateChecker::stateChanged);
