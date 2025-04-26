@@ -38,6 +38,8 @@ private slots:
 
     void test_requestCoordinates_real();
     void test_requestCoordinates_fake();
+
+    void test_requestCoordinates_capital();
 };
 
 void TestCoordinatesResolver::initTestCase()
@@ -157,6 +159,42 @@ void TestCoordinatesResolver::test_requestCoordinates_fake()
     });
 
     resolver.requestCoordinates("Russia", "Mariupol");
+}
+
+void TestCoordinatesResolver::test_requestCoordinates_capital()
+{
+    auto performCheck = [this](const QString &country, const QString &city) {
+        auto checkResponse = [](const auto &response) {
+            QVERIFY(response.ok);
+            QVERIFY(response.capital);
+            QVERIFY(response.location.isValid());
+        };
+
+        const auto &response1 = m_resolver->lookupForPlace({
+                country,
+                "",
+        });
+        checkResponse(response1);
+        QCOMPARE(response1.town, city);
+
+        const auto &response2 = m_resolver->lookupForPlace({
+                country,
+                "",
+        });
+        checkResponse(response2);
+        QCOMPARE(response2.town, city);
+        QCOMPARE(response1, response2);
+    };
+
+    const QList<QPair<QString, QString>> regions {
+        { "United States", "Washington" },
+        { "Finland", "Helsinki" },
+        { "Vatican City", "Vatican City" },
+    };
+
+    for (const auto &region : regions) {
+        performCheck(region.first, region.second);
+    }
 }
 
 QTEST_MAIN(TestCoordinatesResolver)
