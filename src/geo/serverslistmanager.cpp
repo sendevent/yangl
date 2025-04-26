@@ -64,8 +64,6 @@ bool ServersListManager::reload()
 
 ServersListManager::Servers ServersListManager::queryList(const QStringList &args) const
 {
-    QString result;
-
     const Action::Ptr &action = m_nordVpn->storate()->createUserAction({});
     ActionResultViewer::unregisterAction(action.get());
     action->setTitle(tr("Servers list"));
@@ -75,11 +73,12 @@ ServersListManager::Servers ServersListManager::queryList(const QStringList &arg
     if (auto call = action->createRequest()) {
         call->run();
         LOG << call->result();
-        if (call->success())
-            result = call->result();
+        if (call->success()) {
+            return stringToServers(call->result());
+        }
     }
 
-    return stringToServers(result);
+    return {};
 }
 
 ServersListManager::Servers ServersListManager::queryGroups() const
