@@ -35,11 +35,10 @@ public:
     bool reload();
 
 signals:
-    void ready(const ServersListManager::Groups &groups, const ServersListManager::Groups &countries);
+    void ready();
     void citiesAdded(const ServersListManager::Group &cities);
 
 private slots:
-    void onFinished();
     void run();
 
     void commitCities(const ServersListManager::Group &cities);
@@ -47,11 +46,6 @@ private slots:
 private:
     NordVpnWraper *m_nordVpn;
     QElapsedTimer m_timeCounter;
-
-    Groups m_groups;
-    Groups m_countries;
-
-    bool m_gotGroups, m_gotCountries;
 
     QFutureWatcher<void> m_futureWatcher;
 
