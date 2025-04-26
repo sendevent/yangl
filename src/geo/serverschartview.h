@@ -17,8 +17,9 @@
 
 #pragma once
 
-#include "mapwidget.h"
 #include "app/nordvpninfo.h"
+#include "geo/coordinatesresolver.h"
+#include "mapwidget.h"
 #include "serverslistmanager.h"
 
 #include <QWidget>
@@ -46,10 +47,11 @@ public slots:
 private slots:
     void onReloadRequested();
     void onGotServers(const ServersListManager::Groups &groups, const ServersListManager::Groups &countries);
+    void onGotCities(const ServersListManager::Group &cities);
     void onCurrentTreeItemChanged(const QModelIndex &current);
     void onTreeItemDoubleclicked(const QModelIndex &current);
 
-    void onMarkerDoubleclicked(const MapWidget::AddrHandler &addr);
+    void onMarkerDoubleclicked(const PlaceInfo &addr);
 
 protected:
     void hideEvent(QHideEvent *event) override;
@@ -67,6 +69,8 @@ private:
     ServersListManager *m_listManager;
     QStandardItemModel *m_serversModel;
     ServersFilterModel *m_serversFilterModel;
+
+    bool m_modelPopulated { false };
 
     void initUi();
     void initConenctions();
