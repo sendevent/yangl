@@ -61,8 +61,6 @@ public:
 
     QSize sizeHint() const override;
 
-    void setupMarks(const ServersListManager::Groups &groups);
-
 signals:
     void markerDoubleclicked(const PlaceInfo &marker);
 

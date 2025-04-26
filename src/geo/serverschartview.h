@@ -46,7 +46,7 @@ public slots:
 
 private slots:
     void onReloadRequested();
-    void onGotServers(const ServersListManager::Groups &groups, const ServersListManager::Groups &countries);
+    void onGotServers();
     void onGotCities(const ServersListManager::Group &cities);
     void onCurrentTreeItemChanged(const QModelIndex &current);
     void onTreeItemDoubleclicked(const QModelIndex &current);
@@ -78,8 +78,6 @@ private:
 
     void requestServersList();
     void setControlsEnabled(bool enabled);
-
-    void setupModel(const ServersListManager::Groups &groups);
 
     void requestConnection(const QString &group, const QString &server);
 };

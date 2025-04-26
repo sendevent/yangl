@@ -180,56 +180,17 @@ void ServersChartView::onGotCities(const ServersListManager::Group &cities)
         QStandardItem *content = new QStandardItem(cityName);
         title->appendRow(content);
 
-        if (!isGroups)
+        if (!isGroups) {
             m_chartWidget->addMark(countryName, cityName);
+        }
     }
 }
 
-void ServersChartView::onGotServers(const ServersListManager::Groups &groups,
-                                    const ServersListManager::Groups &countries)
+void ServersChartView::onGotServers()
 {
     setControlsEnabled(true);
 
-    // setupModel(groups + countries);
-
     m_modelPopulated = true;
-}
-
-void ServersChartView::setupModel(const ServersListManager::Groups &groups)
-{
-    m_chartWidget->clearMarks();
-    m_serversModel->removeRows(0, m_serversModel->rowCount());
-
-    auto clearGeoName = [](const QString &geoName) -> QString { return QString(geoName).replace('_', ' '); };
-
-    if (groups.isEmpty() || (groups.size() == 1 && groups.first().second.isEmpty())) {
-        QStandardItem *title = new QStandardItem(tr("No data ☹"));
-        m_serversModel->insertRow(m_serversModel->rowCount(), QList<QStandardItem *>() << title);
-        title->setEnabled(false);
-        return;
-    }
-
-    for (const auto &group : groups) {
-        const bool isGroups = group.first == "Groups"; // TODO: read ServersListManager
-        const QString &countryName = clearGeoName(group.first);
-        QStandardItem *title = new QStandardItem(countryName);
-        m_serversModel->insertRow(m_serversModel->rowCount(), QList<QStandardItem *>() << title);
-
-        if (!isGroups)
-            m_chartWidget->addMark(group.first, {});
-
-        for (const auto &city : group.second) {
-            const QString &cityName = clearGeoName(city);
-            QStandardItem *content = new QStandardItem(cityName);
-            title->appendRow(content);
-
-            if (!isGroups)
-                m_chartWidget->addMark(countryName, cityName);
-        }
-    }
-
-    LOG << m_serversModel << m_serversModel->rowCount();
-    m_chartWidget->setupMarks(groups);
 }
 
 void ServersChartView::onCurrentTreeItemChanged(const QModelIndex &current)

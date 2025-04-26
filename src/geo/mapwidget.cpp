@@ -187,29 +187,6 @@ void MapWidget::clearMarks()
     m_serversModel->clear();
 }
 
-void MapWidget::setupMarks(const ServersListManager::Groups &groups)
-{
-    auto clearGeoName = [](const QString &geoName) -> QString { return QString(geoName).replace('_', ' '); };
-
-    for (const auto &group : groups) {
-        const bool isGroups = group.first == "Groups"; // TODO: read ServersListManager
-        if (isGroups) {
-            continue;
-        }
-
-        const QString &countryName = clearGeoName(group.first);
-        if (!isGroups)
-            addMark(group.first, {});
-
-        for (const auto &city : group.second) {
-            const QString &cityName = clearGeoName(city);
-
-            if (!isGroups)
-                addMark(countryName, cityName);
-        }
-    }
-}
-
 void MapWidget::addMark(const QString &country, const QString &city)
 {
     const auto &place = m_geoResolver->requestCoordinates(country, city);
