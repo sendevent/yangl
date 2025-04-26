@@ -9,6 +9,7 @@
 #include <qgeocoordinate.h>
 #include <qnamespace.h>
 
+// Finland,Helsinki,True,60.1708,24.9375
 static constexpr QChar CSVSeparator(',');
 static constexpr size_t CSVColumnCount(5);
 
@@ -50,6 +51,27 @@ void CoordinatesResolver::ensureDataLoaded()
 
 CitiesByCountry CoordinatesResolver::loadData(const QString &path)
 {
+    auto parseLine = [](const QString &line, QChar separator = ',') {
+        QStringList result;
+        QString field;
+        bool insideQuotes = false;
+
+        for (int i = 0; i < line.length(); ++i) {
+            const auto &c = line[i];
+
+            if (c == '"') {
+                insideQuotes = !insideQuotes;
+            } else if (c == separator && !insideQuotes) {
+                result.append(field.trimmed());
+                field.clear();
+            } else {
+                field += c;
+            }
+        }
+        result.append(field.trimmed());
+        return result;
+    };
+
     auto parseCoordinates = [](const QString &latStr, const QString &lonStr) -> std::tuple<QGeoCoordinate, bool> {
         bool parsed(false);
         QGeoCoordinate coordinate;
@@ -74,14 +96,15 @@ CitiesByCountry CoordinatesResolver::loadData(const QString &path)
     if (csv.open(QFile::ReadOnly | QFile::Text)) {
         while (!csv.atEnd()) {
             const auto &line = QString::fromUtf8(csv.readLine());
-            const auto &parts = line.split(CSVSeparator, Qt::KeepEmptyParts);
+            const auto &parts = parseLine(line, CSVSeparator);
             if (parts.size() != CSVColumnCount) {
-                WRN << QString("Invalid geo line, '%1' expected %2, got %3, ignored")
-                                .arg(CSVSeparator, QString::number(CSVColumnCount), QString::number(parts.size()));
+                WRN << QString("Invalid geo line '%1', expected %2 separators (%3) but got %4, ignored")
+                                .arg(line, QString::number(CSVColumnCount), CSVSeparator,
+                                     QString::number(parts.size()));
                 continue;
             }
 
-            // Denmark,Midtjylland,Logten,56.1643,10.1857
+            // Finland,Helsinki,True,60.1708,24.9375
             const auto [coord, parsed] = parseCoordinates(parts[3], parts[4]);
             if (!parsed) {
                 WRN << "Failed parsing lat/lon value:" << parts[3] << parts[4];
@@ -89,7 +112,7 @@ CitiesByCountry CoordinatesResolver::loadData(const QString &path)
             }
 
             const PlaceInfo place {
-                parts[0], parts[2], coord, true, QString(),
+                parts[0], parts[1], coord, parts[2] == "True", true, QString(),
             };
 
             auto &country = loaded[place.country];
