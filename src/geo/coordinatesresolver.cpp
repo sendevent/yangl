@@ -152,9 +152,17 @@ PlaceInfo CoordinatesResolver::lookupForPlace(const PlaceInfo &request) const
     town.ok = false;
     town.message = "Not found";
 
+    auto searchForTheCapital = [&town](const auto &place) { return place.capital && place.country == town.country; };
+
     if (m_data.contains(town.country)) {
         const auto &country = m_data[town.country];
-        if (country.contains(town.town)) {
+        if (town.town.isEmpty()) {
+            auto it = std::find_if(country.cbegin(), country.cend(), searchForTheCapital);
+            if (it != country.end()) {
+                return *it;
+            }
+
+        } else if (country.contains(town.town)) {
             town = country.value(town.town);
             town.ok = true;
             return town;
