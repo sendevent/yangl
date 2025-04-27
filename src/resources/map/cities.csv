@@ -1837,10 +1837,10 @@ Azerbaijan,Zabrat,False,40.4872,49.9525
 Azerbaijan,Zaqatala,False,41.6336,46.6433
 Azerbaijan,Zardab,False,40.2183,47.7083
 Azerbaijan,Zira,False,40.3636,50.2903
-"Bahamas, The",Freeport City,False,26.5286,-78.6967
-"Bahamas, The",Lucaya,False,26.5117,-78.6431
-"Bahamas, The",Nassau,True,25.0781,-77.3386
-"Bahamas, The",West End,False,26.6867,-78.975
+Bahamas,Freeport City,False,26.5286,-78.6967
+Bahamas,Lucaya,False,26.5117,-78.6431
+Bahamas,Nassau,True,25.0781,-77.3386
+Bahamas,West End,False,26.6867,-78.975
 Bahrain,Ad Diraz,False,26.2186,50.4756
 Bahrain,Al Hamalah,False,26.1497,50.4653
 Bahrain,Al Malikiyah,False,26.1008,50.4878
@@ -5838,12 +5838,12 @@ Brazil,Xaxim,False,-26.9617,-52.5347
 Brazil,Xexeu,False,-8.8019,-35.6269
 Brazil,Xinguara,False,-7.095,-49.9458
 Brazil,Xique-Xique,False,-10.8303,-42.7308
-Brunei,Bandar Seri Begawan,True,4.8903,114.9422
-Brunei,Bangar,False,4.7086,115.0739
-Brunei,Kampong Tunah Jambu,False,4.9957,115.0019
-Brunei,Kuala Belait,False,4.5828,114.1918
-Brunei,Seria,False,4.6141,114.3302
-Brunei,Tutong,False,4.8067,114.6592
+"Brunei Darussalam",Bandar Seri Begawan,True,4.8903,114.9422
+"Brunei Darussalam",Bangar,False,4.7086,115.0739
+"Brunei Darussalam",Kampong Tunah Jambu,False,4.9957,115.0019
+"Brunei Darussalam",Kuala Belait,False,4.5828,114.1918
+"Brunei Darussalam",Seria,False,4.6141,114.3302
+"Brunei Darussalam",Tutong,False,4.8067,114.6592
 Bulgaria,Asenovgrad,False,42.0167,24.8667
 Bulgaria,Aytos,False,42.7,27.25
 Bulgaria,Balchik,False,43.4269,28.1617
@@ -6014,132 +6014,132 @@ Burkina Faso,Yako,False,12.9667,-2.2667
 Burkina Faso,Zabre,False,11.1833,-0.6333
 Burkina Faso,Ziniare,False,12.5833,-1.3
 Burkina Faso,Zorgo,False,12.25,-0.6167
-Burma,Allanmyo,False,19.3783,95.2279
-Burma,Amarapura,False,21.9,96.05
-Burma,An,False,19.7833,94.0333
-Burma,Aungban,False,20.6667,96.6333
-Burma,Bago,False,17.3333,96.4833
-Burma,Bawgalegyi,False,18.9144,96.7856
-Burma,Bhamo,False,24.2667,97.2333
-Burma,Buthidaung,False,20.8667,92.5333
-Burma,Chauk,False,20.8833,94.8167
-Burma,Chaungtha,False,16.9667,94.45
-Burma,Chikha,False,23.8898,93.5335
-Burma,Dawei,False,14.0833,98.2
-Burma,Du Yar,False,15.2617,97.7819
-Burma,Falam,False,22.9136,93.6778
-Burma,Haka,False,22.9833,94.0167
-Burma,Hakha,False,22.6455,93.605
-Burma,Hinthada,False,17.6461,95.4603
-Burma,Hlaingbwe,False,17.1333,97.8333
-Burma,Hpa-An,False,16.8906,97.6333
-Burma,Hsenwi,False,23.3,97.9667
-Burma,Htison,False,15.9,98.1833
-Burma,Ingabu,False,17.8167,95.2667
-Burma,Kamamaung,False,17.3469,97.6528
-Burma,Katha,False,24.1822,96.3306
-Burma,Kawa,False,17.0897,96.4663
-Burma,Kawkareik,False,16.5556,98.24
-Burma,Kawlin,False,23.7903,95.6806
-Burma,Kawthoung,False,9.9833,98.55
-Burma,Kengtung,False,21.2917,99.6083
-Burma,Khampat,False,23.7823,94.1442
-Burma,Khaw Zar Chaung Wa,False,15.0375,97.8293
-Burma,Kyaukme,False,22.5392,97.0283
-Burma,Kyaukmyaung,False,22.5833,95.95
-Burma,Kyaukpyu,False,19.4264,93.5458
-Burma,Kyaukse,False,21.6131,96.1303
-Burma,Kyaunggon,False,17.1,95.1833
-Burma,Kyeintali,False,18.0061,94.49
-Burma,Kyonpyaw,False,17.3,95.2
-Burma,Labutta,False,16.1467,94.7611
-Burma,Lashio,False,22.9333,97.75
-Burma,Leiktho,False,19.2222,96.5811
-Burma,Letpandan,False,17.7866,95.7507
-Burma,Lewe,False,19.6333,96.1167
-Burma,Loikaw,False,19.6742,97.2092
-Burma,Magway,False,20.15,94.95
-Burma,Mahlaing,False,21.09,95.64
-Burma,Mandalay,False,21.9831,96.0844
-Burma,Maubin,False,16.73,95.65
-Burma,Maungdaw,False,20.8167,92.3667
-Burma,Mawkanin,False,15.5106,97.8533
-Burma,Mawlaik,False,23.2833,94.0833
-Burma,Mawlamyine,False,16.4847,97.6258
-Burma,Meiktila,False,20.8833,95.8833
-Burma,Minbu,False,20.18,94.87
-Burma,Minbya,False,20.3622,93.2733
-Burma,Mindat,False,21.3667,93.9833
-Burma,Mogaung,False,25.3014,96.9417
-Burma,Mogok,False,22.9167,96.5
-Burma,Mohnyin,False,24.7833,96.3667
-Burma,Mong Tun,False,20.3,98.9333
-Burma,Monywa,False,22.1083,95.1417
-Burma,Mudon,False,16.2578,97.7164
-Burma,Myanaung,False,18.2833,95.3167
-Burma,Myaungmya,False,16.6036,94.9289
-Burma,Myawadi,False,16.6878,98.5083
-Burma,Myaydo,False,19.3667,95.2167
-Burma,Myebon,False,20.05,93.3667
-Burma,Myedu,False,23.1833,95.4
-Burma,Myeik,False,12.4333,98.6
-Burma,Myingyan,False,21.46,95.3883
-Burma,Myitkyina,False,25.3833,97.4
-Burma,Namhkam,False,23.8333,97.6833
-Burma,Namtu,False,23.0925,97.4011
-Burma,Nansang,False,20.8889,97.7361
-Burma,Natogyi,False,21.4167,95.65
-Burma,Nawnghkio,False,22.3167,96.8
-Burma,Nay Pyi Taw,True,19.7475,96.115
-Burma,Ngaputaw,False,16.5378,94.6936
-Burma,Ngathainggyaung,False,17.4,95.0833
-Burma,Nyaungdon,False,17.0461,95.6374
-Burma,Nyaungu,False,21.2,94.9167
-Burma,Okpo,False,18.1167,95.6667
-Burma,Paingkyon,False,17.0242,97.9844
-Burma,Pakokku,False,21.332,95.0866
-Burma,Palaw,False,12.9597,98.6545
-Burma,Paletwa,False,21.3,92.85
-Burma,Panglong,False,24.1003,98.3139
-Burma,Pantanaw,False,16.985,95.4656
-Burma,Pathein,False,16.7842,94.7333
-Burma,Pauktaw,False,20.2128,93.1308
-Burma,Ponnagyun,False,20.3342,93.0039
-Burma,Putao,False,27.3258,97.4225
-Burma,Pyapon,False,16.286,95.6658
-Burma,Pyay,False,18.82,95.2156
-Burma,Pyinmana,False,19.75,96.2
-Burma,Pyu,False,18.4819,96.4369
-Burma,Ramree,False,19.0833,93.8667
-Burma,Rangoon,True,16.795,96.16
-Burma,Razua,False,22.0529,93.4086
-Burma,Sadon,False,25.3927,97.8996
-Burma,Sagaing,False,21.8822,95.9786
-Burma,Sami,False,21.2933,93.0965
-Burma,Shanywathit,False,17.4244,97.8878
-Burma,Shingbwiyang,False,26.6667,96.2167
-Burma,Shwebo,False,22.5667,95.7
-Burma,Sittwe,False,20.167,92.785
-Burma,Tachilek,False,20.45,99.8833
-Burma,Tamu,False,24.2167,94.3097
-Burma,Taungdwingyi,False,20.0017,95.5461
-Burma,Taunggyi,False,20.7836,97.0354
-Burma,Taungoo,False,18.9333,96.4333
-Burma,Taungup,False,18.85,94.2333
-Burma,Tawsalun,False,21.406,94.136
-Burma,Thanatpin,False,17.2942,96.58
-Burma,Thandwe,False,18.4667,94.3667
-Burma,Thanhlyin,False,16.7333,96.25
-Burma,Thaton,False,16.9333,97.3667
-Burma,Thingangyun,False,16.8281,96.1842
-Burma,Thongwa,False,16.7547,96.5193
-Burma,Tiddim,False,23.3758,93.6539
-Burma,Wakema,False,16.6,95.1833
-Burma,Wan Long,False,22.1667,99.1833
-Burma,Ye,False,15.2467,97.8556
-Burma,Yenangyaung,False,20.4597,94.8742
-Burma,Yesagyo,False,21.6333,95.2414
-Burma,Zigon,False,18.3385,95.623
+Myanmar,Allanmyo,False,19.3783,95.2279
+Myanmar,Amarapura,False,21.9,96.05
+Myanmar,An,False,19.7833,94.0333
+Myanmar,Aungban,False,20.6667,96.6333
+Myanmar,Bago,False,17.3333,96.4833
+Myanmar,Bawgalegyi,False,18.9144,96.7856
+Myanmar,Bhamo,False,24.2667,97.2333
+Myanmar,Buthidaung,False,20.8667,92.5333
+Myanmar,Chauk,False,20.8833,94.8167
+Myanmar,Chaungtha,False,16.9667,94.45
+Myanmar,Chikha,False,23.8898,93.5335
+Myanmar,Dawei,False,14.0833,98.2
+Myanmar,Du Yar,False,15.2617,97.7819
+Myanmar,Falam,False,22.9136,93.6778
+Myanmar,Haka,False,22.9833,94.0167
+Myanmar,Hakha,False,22.6455,93.605
+Myanmar,Hinthada,False,17.6461,95.4603
+Myanmar,Hlaingbwe,False,17.1333,97.8333
+Myanmar,Hpa-An,False,16.8906,97.6333
+Myanmar,Hsenwi,False,23.3,97.9667
+Myanmar,Htison,False,15.9,98.1833
+Myanmar,Ingabu,False,17.8167,95.2667
+Myanmar,Kamamaung,False,17.3469,97.6528
+Myanmar,Katha,False,24.1822,96.3306
+Myanmar,Kawa,False,17.0897,96.4663
+Myanmar,Kawkareik,False,16.5556,98.24
+Myanmar,Kawlin,False,23.7903,95.6806
+Myanmar,Kawthoung,False,9.9833,98.55
+Myanmar,Kengtung,False,21.2917,99.6083
+Myanmar,Khampat,False,23.7823,94.1442
+Myanmar,Khaw Zar Chaung Wa,False,15.0375,97.8293
+Myanmar,Kyaukme,False,22.5392,97.0283
+Myanmar,Kyaukmyaung,False,22.5833,95.95
+Myanmar,Kyaukpyu,False,19.4264,93.5458
+Myanmar,Kyaukse,False,21.6131,96.1303
+Myanmar,Kyaunggon,False,17.1,95.1833
+Myanmar,Kyeintali,False,18.0061,94.49
+Myanmar,Kyonpyaw,False,17.3,95.2
+Myanmar,Labutta,False,16.1467,94.7611
+Myanmar,Lashio,False,22.9333,97.75
+Myanmar,Leiktho,False,19.2222,96.5811
+Myanmar,Letpandan,False,17.7866,95.7507
+Myanmar,Lewe,False,19.6333,96.1167
+Myanmar,Loikaw,False,19.6742,97.2092
+Myanmar,Magway,False,20.15,94.95
+Myanmar,Mahlaing,False,21.09,95.64
+Myanmar,Mandalay,False,21.9831,96.0844
+Myanmar,Maubin,False,16.73,95.65
+Myanmar,Maungdaw,False,20.8167,92.3667
+Myanmar,Mawkanin,False,15.5106,97.8533
+Myanmar,Mawlaik,False,23.2833,94.0833
+Myanmar,Mawlamyine,False,16.4847,97.6258
+Myanmar,Meiktila,False,20.8833,95.8833
+Myanmar,Minbu,False,20.18,94.87
+Myanmar,Minbya,False,20.3622,93.2733
+Myanmar,Mindat,False,21.3667,93.9833
+Myanmar,Mogaung,False,25.3014,96.9417
+Myanmar,Mogok,False,22.9167,96.5
+Myanmar,Mohnyin,False,24.7833,96.3667
+Myanmar,Mong Tun,False,20.3,98.9333
+Myanmar,Monywa,False,22.1083,95.1417
+Myanmar,Mudon,False,16.2578,97.7164
+Myanmar,Myanaung,False,18.2833,95.3167
+Myanmar,Myaungmya,False,16.6036,94.9289
+Myanmar,Myawadi,False,16.6878,98.5083
+Myanmar,Myaydo,False,19.3667,95.2167
+Myanmar,Myebon,False,20.05,93.3667
+Myanmar,Myedu,False,23.1833,95.4
+Myanmar,Myeik,False,12.4333,98.6
+Myanmar,Myingyan,False,21.46,95.3883
+Myanmar,Myitkyina,False,25.3833,97.4
+Myanmar,Namhkam,False,23.8333,97.6833
+Myanmar,Namtu,False,23.0925,97.4011
+Myanmar,Nansang,False,20.8889,97.7361
+Myanmar,Natogyi,False,21.4167,95.65
+Myanmar,Nawnghkio,False,22.3167,96.8
+Myanmar,Nay Pyi Taw,True,19.7475,96.115
+Myanmar,Ngaputaw,False,16.5378,94.6936
+Myanmar,Ngathainggyaung,False,17.4,95.0833
+Myanmar,Nyaungdon,False,17.0461,95.6374
+Myanmar,Nyaungu,False,21.2,94.9167
+Myanmar,Okpo,False,18.1167,95.6667
+Myanmar,Paingkyon,False,17.0242,97.9844
+Myanmar,Pakokku,False,21.332,95.0866
+Myanmar,Palaw,False,12.9597,98.6545
+Myanmar,Paletwa,False,21.3,92.85
+Myanmar,Panglong,False,24.1003,98.3139
+Myanmar,Pantanaw,False,16.985,95.4656
+Myanmar,Pathein,False,16.7842,94.7333
+Myanmar,Pauktaw,False,20.2128,93.1308
+Myanmar,Ponnagyun,False,20.3342,93.0039
+Myanmar,Putao,False,27.3258,97.4225
+Myanmar,Pyapon,False,16.286,95.6658
+Myanmar,Pyay,False,18.82,95.2156
+Myanmar,Pyinmana,False,19.75,96.2
+Myanmar,Pyu,False,18.4819,96.4369
+Myanmar,Ramree,False,19.0833,93.8667
+Myanmar,Rangoon,True,16.795,96.16
+Myanmar,Razua,False,22.0529,93.4086
+Myanmar,Sadon,False,25.3927,97.8996
+Myanmar,Sagaing,False,21.8822,95.9786
+Myanmar,Sami,False,21.2933,93.0965
+Myanmar,Shanywathit,False,17.4244,97.8878
+Myanmar,Shingbwiyang,False,26.6667,96.2167
+Myanmar,Shwebo,False,22.5667,95.7
+Myanmar,Sittwe,False,20.167,92.785
+Myanmar,Tachilek,False,20.45,99.8833
+Myanmar,Tamu,False,24.2167,94.3097
+Myanmar,Taungdwingyi,False,20.0017,95.5461
+Myanmar,Taunggyi,False,20.7836,97.0354
+Myanmar,Taungoo,False,18.9333,96.4333
+Myanmar,Taungup,False,18.85,94.2333
+Myanmar,Tawsalun,False,21.406,94.136
+Myanmar,Thanatpin,False,17.2942,96.58
+Myanmar,Thandwe,False,18.4667,94.3667
+Myanmar,Thanhlyin,False,16.7333,96.25
+Myanmar,Thaton,False,16.9333,97.3667
+Myanmar,Thingangyun,False,16.8281,96.1842
+Myanmar,Thongwa,False,16.7547,96.5193
+Myanmar,Tiddim,False,23.3758,93.6539
+Myanmar,Wakema,False,16.6,95.1833
+Myanmar,Wan Long,False,22.1667,99.1833
+Myanmar,Ye,False,15.2467,97.8556
+Myanmar,Yenangyaung,False,20.4597,94.8742
+Myanmar,Yesagyo,False,21.6333,95.2414
+Myanmar,Zigon,False,18.3385,95.623
 Burundi,Bubanza,False,-3.0833,29.4
 Burundi,Bujumbura,True,-3.3833,29.3667
 Burundi,Bururi,False,-3.95,29.6167
@@ -10103,164 +10103,164 @@ Cyprus,Mesa Geitonia,False,34.7022,33.0453
 Cyprus,Nicosia,True,35.1725,33.365
 Cyprus,Paphos,False,34.7667,32.4167
 Cyprus,Paralimni,False,35.0333,33.9833
-Czechia,As,False,50.2239,12.195
-Czechia,Benesov,False,49.7828,14.6886
-Czechia,Beroun,False,49.9642,14.0739
-Czechia,Bilina,False,50.5481,13.7761
-Czechia,Blansko,False,49.3631,16.6431
-Czechia,Bohumin,False,49.9042,18.3575
-Czechia,Boskovice,False,49.4875,16.66
-Czechia,Brandys nad Labem-Stara Boleslav,False,50.1894,14.6672
-Czechia,Breclav,False,48.7589,16.8819
-Czechia,Brevnov,False,50.0833,14.3579
-Czechia,Brno,False,49.1925,16.6083
-Czechia,Bruntal,False,49.9883,17.4647
-Czechia,Bystrc,False,49.2247,16.5239
-Czechia,Caslav,False,49.9117,15.395
-Czechia,Celakovice,False,50.1606,14.75
-Czechia,Ceska Lipa,False,50.6886,14.5386
-Czechia,Ceska Trebova,False,49.9019,16.4472
-Czechia,Ceske Budejovice,False,48.9747,14.4747
-Czechia,Cesky Krumlov,False,48.8111,14.3153
-Czechia,Cesky Tesin,False,49.7461,18.6261
-Czechia,Cheb,False,50.0794,12.3706
-Czechia,Chocen,False,50.0017,16.2231
-Czechia,Chodov,False,50.2414,12.7439
-Czechia,Chomutov,False,50.4611,13.4167
-Czechia,Chotebor,False,49.7208,15.6703
-Czechia,Chrudim,False,49.9511,15.7956
-Czechia,Decin,False,50.7736,14.1961
-Czechia,Dobris,False,49.7811,14.1672
-Czechia,Domazlice,False,49.4406,12.9272
-Czechia,Duchcov,False,50.6039,13.7464
-Czechia,Dvur Kralove nad Labem,False,50.4331,15.8122
-Czechia,Frenstat pod Radhostem,False,49.5483,18.2108
-Czechia,Frydek-Mistek,False,49.6856,18.3506
-Czechia,Frydlant nad Ostravici,False,49.5928,18.3597
-Czechia,Havirov,False,49.7831,18.4228
-Czechia,Havlickuv Brod,False,49.6078,15.5808
-Czechia,Hlinsko,False,49.7622,15.9075
-Czechia,Hlucin,False,49.8967,18.1931
-Czechia,Hodonin,False,48.8489,17.1325
-Czechia,Holesov,False,49.3333,17.5783
-Czechia,Horice,False,50.3675,15.6314
-Czechia,Hostivice,False,50.0814,14.2525
-Czechia,Hradec Kralove,False,50.2092,15.8322
-Czechia,Hranice,False,49.5525,17.7683
-Czechia,Humpolec,False,49.5417,15.3572
-Czechia,Ivancice,False,49.1014,16.3775
-Czechia,Jablonec nad Nisou,False,50.7244,15.1681
-Czechia,Jaromer,False,50.3503,15.9183
-Czechia,Jesenice,False,49.9683,14.5136
-Czechia,Jesenik,False,50.2297,17.2047
-Czechia,Jicin,False,50.4367,15.3517
-Czechia,Jihlava,False,49.4003,15.5906
-Czechia,Jindrichuv Hradec,False,49.1442,15.0031
-Czechia,Jirkov,False,50.5003,13.4419
-Czechia,Kadan,False,50.3761,13.2714
-Czechia,Karlovy Vary,False,50.2306,12.8725
-Czechia,Karvina,False,49.8542,18.5428
-Czechia,Kladno,False,50.1431,14.1053
-Czechia,Klasterec nad Ohri,False,50.3903,13.1719
-Czechia,Klatovy,False,49.3953,13.295
-Czechia,Kolin,False,50.0281,15.2006
-Czechia,Koprivnice,False,49.5994,18.1447
-Czechia,Kralupy nad Vltavou,False,50.2408,14.3067
-Czechia,Kraluv Dvur,False,49.9467,14.035
-Czechia,Krnov,False,50.0906,17.6986
-Czechia,Kromeriz,False,49.2989,17.3931
-Czechia,Krupka,False,50.6844,13.8583
-Czechia,Kurim,False,49.2986,16.5314
-Czechia,Kutna Hora,False,49.9483,15.2683
-Czechia,Kyjov,False,49.0103,17.1225
-Czechia,Lanskroun,False,49.9122,16.6122
-Czechia,Liberec,False,50.7667,15.0667
-Czechia,Lisen,False,49.2075,16.6861
-Czechia,Litomerice,False,50.5342,14.1328
-Czechia,Litomysl,False,49.8719,16.3106
-Czechia,Litovel,False,49.7011,17.0761
-Czechia,Litvinov,False,50.6008,13.6111
-Czechia,Louny,False,50.3572,13.7969
-Czechia,Lovosice,False,50.515,14.0511
-Czechia,Lysa nad Labem,False,50.2014,14.8328
-Czechia,Marianske Lazne,False,49.9647,12.7011
-Czechia,Melnik,False,50.3519,14.475
-Czechia,Milovice,False,50.2289,14.8906
-Czechia,Mlada Boleslav,False,50.4125,14.9044
-Czechia,Mnichovo Hradiste,False,50.5214,14.9736
-Czechia,Mohelnice,False,49.7769,16.9194
-Czechia,Moravska Trebova,False,49.7581,16.6642
-Czechia,Most,False,50.5031,13.6367
-Czechia,Nachod,False,50.4169,16.1631
-Czechia,Neratovice,False,50.2594,14.5178
-Czechia,Nova Paka,False,50.4897,15.5136
-Czechia,Nove Mesto nad Metuji,False,50.3447,16.1517
-Czechia,Nove Mesto na Morave,False,49.5614,16.0742
-Czechia,Novy Bor,False,50.7553,14.5536
-Czechia,Novy Jicin,False,49.5944,18.0103
-Czechia,Nymburk,False,50.1861,15.0417
-Czechia,Olomouc,False,49.5939,17.2508
-Czechia,Opava,False,49.9381,17.9044
-Czechia,Orlova,False,49.8453,18.4303
-Czechia,Ostrava,False,49.8356,18.2925
-Czechia,Ostrov,False,50.3083,12.9478
-Czechia,Otrokovice,False,49.21,17.5308
-Czechia,Pardubice,False,50.0386,15.7792
-Czechia,Pelhrimov,False,49.4314,15.2233
-Czechia,Pisek,False,49.3089,14.1475
-Czechia,Plzen,False,49.7475,13.3775
-Czechia,Podebrady,False,50.1425,15.1189
-Czechia,Policka,False,49.715,16.2675
-Czechia,Prachatice,False,49.0131,13.9975
-Czechia,Prague,True,50.0875,14.4214
-Czechia,Prelouc,False,50.04,15.5603
-Czechia,Prerov,False,49.4556,17.4511
-Czechia,Pribram,False,49.6883,14.0092
-Czechia,Prostejov,False,49.4722,17.1106
-Czechia,Rakovnik,False,50.1039,13.7333
-Czechia,Ricany,False,49.9919,14.6556
-Czechia,Rokycany,False,49.7425,13.5956
-Czechia,Roudnice nad Labem,False,50.4236,14.2539
-Czechia,Roznov pod Radhostem,False,49.4586,18.1431
-Czechia,Roztoky,False,50.1614,14.3869
-Czechia,Rumburk,False,50.9517,14.5572
-Czechia,Rychnov nad Kneznou,False,50.1631,16.2744
-Czechia,Slany,False,50.2306,14.0869
-Czechia,Sokolov,False,50.1814,12.6403
-Czechia,Sternberk,False,49.7306,17.2989
-Czechia,Steti,False,50.4531,14.3742
-Czechia,Strakonice,False,49.2614,13.9025
-Czechia,Studenka,False,49.7233,18.0786
-Czechia,Sumperk,False,49.9653,16.9706
-Czechia,Susice,False,49.2311,13.5203
-Czechia,Svitavy,False,49.7556,16.4694
-Czechia,Tabor,False,49.4144,14.6578
-Czechia,Tachov,False,49.7953,12.6331
-Czechia,Teplice,False,50.6444,13.8319
-Czechia,Tisnov,False,49.3486,16.4244
-Czechia,Trebic,False,49.215,15.8817
-Czechia,Trinec,False,49.6778,18.6728
-Czechia,Trutnov,False,50.5606,15.9131
-Czechia,Turnov,False,50.5872,15.1569
-Czechia,Uherske Hradiste,False,49.0697,17.4597
-Czechia,Uhersky Brod,False,49.025,17.6472
-Czechia,Unicov,False,49.7708,17.1214
-Czechia,Usti nad Labem,False,50.6583,14.0417
-Czechia,Usti nad Orlici,False,49.9739,16.3936
-Czechia,Valasske Mezirici,False,49.4717,17.9711
-Czechia,Varnsdorf,False,50.9117,14.6183
-Czechia,Velke Mezirici,False,49.3553,16.0122
-Czechia,Veseli nad Moravou,False,48.9536,17.3764
-Czechia,Vlasim,False,49.7064,14.8989
-Czechia,Vrchlabi,False,50.6278,15.6103
-Czechia,Vsetin,False,49.3386,17.9961
-Czechia,Vyskov,False,49.2775,16.9989
-Czechia,Vysoke Myto,False,49.9533,16.1617
-Czechia,Zabreh,False,49.8825,16.8722
-Czechia,Zatec,False,50.33,13.5444
-Czechia,Zd'ar nad Sazavou,False,49.5628,15.9392
-Czechia,Zlin,False,49.2331,17.6669
-Czechia,Znojmo,False,48.8556,16.0489
+"Czech Republic",As,False,50.2239,12.195
+"Czech Republic",Benesov,False,49.7828,14.6886
+"Czech Republic",Beroun,False,49.9642,14.0739
+"Czech Republic",Bilina,False,50.5481,13.7761
+"Czech Republic",Blansko,False,49.3631,16.6431
+"Czech Republic",Bohumin,False,49.9042,18.3575
+"Czech Republic",Boskovice,False,49.4875,16.66
+"Czech Republic",Brandys nad Labem-Stara Boleslav,False,50.1894,14.6672
+"Czech Republic",Breclav,False,48.7589,16.8819
+"Czech Republic",Brevnov,False,50.0833,14.3579
+"Czech Republic",Brno,False,49.1925,16.6083
+"Czech Republic",Bruntal,False,49.9883,17.4647
+"Czech Republic",Bystrc,False,49.2247,16.5239
+"Czech Republic",Caslav,False,49.9117,15.395
+"Czech Republic",Celakovice,False,50.1606,14.75
+"Czech Republic",Ceska Lipa,False,50.6886,14.5386
+"Czech Republic",Ceska Trebova,False,49.9019,16.4472
+"Czech Republic",Ceske Budejovice,False,48.9747,14.4747
+"Czech Republic",Cesky Krumlov,False,48.8111,14.3153
+"Czech Republic",Cesky Tesin,False,49.7461,18.6261
+"Czech Republic",Cheb,False,50.0794,12.3706
+"Czech Republic",Chocen,False,50.0017,16.2231
+"Czech Republic",Chodov,False,50.2414,12.7439
+"Czech Republic",Chomutov,False,50.4611,13.4167
+"Czech Republic",Chotebor,False,49.7208,15.6703
+"Czech Republic",Chrudim,False,49.9511,15.7956
+"Czech Republic",Decin,False,50.7736,14.1961
+"Czech Republic",Dobris,False,49.7811,14.1672
+"Czech Republic",Domazlice,False,49.4406,12.9272
+"Czech Republic",Duchcov,False,50.6039,13.7464
+"Czech Republic",Dvur Kralove nad Labem,False,50.4331,15.8122
+"Czech Republic",Frenstat pod Radhostem,False,49.5483,18.2108
+"Czech Republic",Frydek-Mistek,False,49.6856,18.3506
+"Czech Republic",Frydlant nad Ostravici,False,49.5928,18.3597
+"Czech Republic",Havirov,False,49.7831,18.4228
+"Czech Republic",Havlickuv Brod,False,49.6078,15.5808
+"Czech Republic",Hlinsko,False,49.7622,15.9075
+"Czech Republic",Hlucin,False,49.8967,18.1931
+"Czech Republic",Hodonin,False,48.8489,17.1325
+"Czech Republic",Holesov,False,49.3333,17.5783
+"Czech Republic",Horice,False,50.3675,15.6314
+"Czech Republic",Hostivice,False,50.0814,14.2525
+"Czech Republic",Hradec Kralove,False,50.2092,15.8322
+"Czech Republic",Hranice,False,49.5525,17.7683
+"Czech Republic",Humpolec,False,49.5417,15.3572
+"Czech Republic",Ivancice,False,49.1014,16.3775
+"Czech Republic",Jablonec nad Nisou,False,50.7244,15.1681
+"Czech Republic",Jaromer,False,50.3503,15.9183
+"Czech Republic",Jesenice,False,49.9683,14.5136
+"Czech Republic",Jesenik,False,50.2297,17.2047
+"Czech Republic",Jicin,False,50.4367,15.3517
+"Czech Republic",Jihlava,False,49.4003,15.5906
+"Czech Republic",Jindrichuv Hradec,False,49.1442,15.0031
+"Czech Republic",Jirkov,False,50.5003,13.4419
+"Czech Republic",Kadan,False,50.3761,13.2714
+"Czech Republic",Karlovy Vary,False,50.2306,12.8725
+"Czech Republic",Karvina,False,49.8542,18.5428
+"Czech Republic",Kladno,False,50.1431,14.1053
+"Czech Republic",Klasterec nad Ohri,False,50.3903,13.1719
+"Czech Republic",Klatovy,False,49.3953,13.295
+"Czech Republic",Kolin,False,50.0281,15.2006
+"Czech Republic",Koprivnice,False,49.5994,18.1447
+"Czech Republic",Kralupy nad Vltavou,False,50.2408,14.3067
+"Czech Republic",Kraluv Dvur,False,49.9467,14.035
+"Czech Republic",Krnov,False,50.0906,17.6986
+"Czech Republic",Kromeriz,False,49.2989,17.3931
+"Czech Republic",Krupka,False,50.6844,13.8583
+"Czech Republic",Kurim,False,49.2986,16.5314
+"Czech Republic",Kutna Hora,False,49.9483,15.2683
+"Czech Republic",Kyjov,False,49.0103,17.1225
+"Czech Republic",Lanskroun,False,49.9122,16.6122
+"Czech Republic",Liberec,False,50.7667,15.0667
+"Czech Republic",Lisen,False,49.2075,16.6861
+"Czech Republic",Litomerice,False,50.5342,14.1328
+"Czech Republic",Litomysl,False,49.8719,16.3106
+"Czech Republic",Litovel,False,49.7011,17.0761
+"Czech Republic",Litvinov,False,50.6008,13.6111
+"Czech Republic",Louny,False,50.3572,13.7969
+"Czech Republic",Lovosice,False,50.515,14.0511
+"Czech Republic",Lysa nad Labem,False,50.2014,14.8328
+"Czech Republic",Marianske Lazne,False,49.9647,12.7011
+"Czech Republic",Melnik,False,50.3519,14.475
+"Czech Republic",Milovice,False,50.2289,14.8906
+"Czech Republic",Mlada Boleslav,False,50.4125,14.9044
+"Czech Republic",Mnichovo Hradiste,False,50.5214,14.9736
+"Czech Republic",Mohelnice,False,49.7769,16.9194
+"Czech Republic",Moravska Trebova,False,49.7581,16.6642
+"Czech Republic",Most,False,50.5031,13.6367
+"Czech Republic",Nachod,False,50.4169,16.1631
+"Czech Republic",Neratovice,False,50.2594,14.5178
+"Czech Republic",Nova Paka,False,50.4897,15.5136
+"Czech Republic",Nove Mesto nad Metuji,False,50.3447,16.1517
+"Czech Republic",Nove Mesto na Morave,False,49.5614,16.0742
+"Czech Republic",Novy Bor,False,50.7553,14.5536
+"Czech Republic",Novy Jicin,False,49.5944,18.0103
+"Czech Republic",Nymburk,False,50.1861,15.0417
+"Czech Republic",Olomouc,False,49.5939,17.2508
+"Czech Republic",Opava,False,49.9381,17.9044
+"Czech Republic",Orlova,False,49.8453,18.4303
+"Czech Republic",Ostrava,False,49.8356,18.2925
+"Czech Republic",Ostrov,False,50.3083,12.9478
+"Czech Republic",Otrokovice,False,49.21,17.5308
+"Czech Republic",Pardubice,False,50.0386,15.7792
+"Czech Republic",Pelhrimov,False,49.4314,15.2233
+"Czech Republic",Pisek,False,49.3089,14.1475
+"Czech Republic",Plzen,False,49.7475,13.3775
+"Czech Republic",Podebrady,False,50.1425,15.1189
+"Czech Republic",Policka,False,49.715,16.2675
+"Czech Republic",Prachatice,False,49.0131,13.9975
+"Czech Republic",Prague,True,50.0875,14.4214
+"Czech Republic",Prelouc,False,50.04,15.5603
+"Czech Republic",Prerov,False,49.4556,17.4511
+"Czech Republic",Pribram,False,49.6883,14.0092
+"Czech Republic",Prostejov,False,49.4722,17.1106
+"Czech Republic",Rakovnik,False,50.1039,13.7333
+"Czech Republic",Ricany,False,49.9919,14.6556
+"Czech Republic",Rokycany,False,49.7425,13.5956
+"Czech Republic",Roudnice nad Labem,False,50.4236,14.2539
+"Czech Republic",Roznov pod Radhostem,False,49.4586,18.1431
+"Czech Republic",Roztoky,False,50.1614,14.3869
+"Czech Republic",Rumburk,False,50.9517,14.5572
+"Czech Republic",Rychnov nad Kneznou,False,50.1631,16.2744
+"Czech Republic",Slany,False,50.2306,14.0869
+"Czech Republic",Sokolov,False,50.1814,12.6403
+"Czech Republic",Sternberk,False,49.7306,17.2989
+"Czech Republic",Steti,False,50.4531,14.3742
+"Czech Republic",Strakonice,False,49.2614,13.9025
+"Czech Republic",Studenka,False,49.7233,18.0786
+"Czech Republic",Sumperk,False,49.9653,16.9706
+"Czech Republic",Susice,False,49.2311,13.5203
+"Czech Republic",Svitavy,False,49.7556,16.4694
+"Czech Republic",Tabor,False,49.4144,14.6578
+"Czech Republic",Tachov,False,49.7953,12.6331
+"Czech Republic",Teplice,False,50.6444,13.8319
+"Czech Republic",Tisnov,False,49.3486,16.4244
+"Czech Republic",Trebic,False,49.215,15.8817
+"Czech Republic",Trinec,False,49.6778,18.6728
+"Czech Republic",Trutnov,False,50.5606,15.9131
+"Czech Republic",Turnov,False,50.5872,15.1569
+"Czech Republic",Uherske Hradiste,False,49.0697,17.4597
+"Czech Republic",Uhersky Brod,False,49.025,17.6472
+"Czech Republic",Unicov,False,49.7708,17.1214
+"Czech Republic",Usti nad Labem,False,50.6583,14.0417
+"Czech Republic",Usti nad Orlici,False,49.9739,16.3936
+"Czech Republic",Valasske Mezirici,False,49.4717,17.9711
+"Czech Republic",Varnsdorf,False,50.9117,14.6183
+"Czech Republic",Velke Mezirici,False,49.3553,16.0122
+"Czech Republic",Veseli nad Moravou,False,48.9536,17.3764
+"Czech Republic",Vlasim,False,49.7064,14.8989
+"Czech Republic",Vrchlabi,False,50.6278,15.6103
+"Czech Republic",Vsetin,False,49.3386,17.9961
+"Czech Republic",Vyskov,False,49.2775,16.9989
+"Czech Republic",Vysoke Myto,False,49.9533,16.1617
+"Czech Republic",Zabreh,False,49.8825,16.8722
+"Czech Republic",Zatec,False,50.33,13.5444
+"Czech Republic",Zd'ar nad Sazavou,False,49.5628,15.9392
+"Czech Republic",Zlin,False,49.2331,17.6669
+"Czech Republic",Znojmo,False,48.8556,16.0489
 Denmark,Aabenraa,False,55.0444,9.4181
 Denmark,Aalborg,False,57.05,9.9167
 Denmark,Aarhus,False,56.1572,10.2107
@@ -14383,7 +14383,7 @@ Greece,Agia Varvara,False,38.0,23.65
 Greece,Agioi Anargyroi,False,38.0267,23.7183
 Greece,Agios Dimitrios,False,37.9333,23.7333
 Greece,Agios Ioannis Rentis,False,37.9667,23.6667
-Greece,Agios Nikolaos,False,35.1833,25.7167
+Greece,Agios Niko"Lao Peoples Democratic Republic",False,35.1833,25.7167
 Greece,Agrinio,False,38.6167,21.4
 Greece,Aigaleo,False,37.992,23.678
 Greece,Aigio,False,38.2506,22.0811
@@ -23400,7 +23400,7 @@ Israel,Sakhnin,False,32.8667,35.3
 Israel,Sederot,False,31.5228,34.5953
 Israel,Shefar`am,False,32.8056,35.1694
 Israel,Tamra,False,32.8536,35.1978
-Israel,Tel Aviv-Yafo,False,32.08,34.78
+Israel,Tel Aviv,False,32.08,34.78
 Israel,Tiberias,False,32.7944,35.5333
 Israel,Tirat Karmel,False,32.7667,34.9667
 Israel,Umm el Fahm,False,32.5194,35.1536
@@ -26388,148 +26388,148 @@ Kenya,Wote,False,-1.7833,37.6333
 Kenya,Wundanyi,False,-3.3983,38.3603
 Kiribati,Betio,False,1.35,172.9333
 Kiribati,Tarawa,True,1.3382,173.0176
-"Korea, North",Anju,False,39.62,125.66
-"Korea, North",Chaedok,False,40.7988,129.3602
-"Korea, North",Changyon,False,38.2517,125.1021
-"Korea, North",Ch'ongjin,False,41.7833,129.7667
-"Korea, North",Chongju,False,39.65,125.3333
-"Korea, North",Ch'osan-up,False,40.8255,125.8008
-"Korea, North",Haeju,False,38.0333,125.7167
-"Korea, North",Hamhung,False,39.9167,127.5333
-"Korea, North",Hoeryong,False,42.4333,129.75
-"Korea, North",Huich'on,False,40.1707,126.2761
-"Korea, North",Hyesan,False,41.4,128.1833
-"Korea, North",Kaech'on,False,39.6986,125.9061
-"Korea, North",Kaesong,False,37.9667,126.55
-"Korea, North",Kanggye,False,40.9667,126.6
-"Korea, North",Kusong,False,39.9667,125.1667
-"Korea, North",Manpo,False,41.157,126.29
-"Korea, North",Munch'on,False,39.259,127.356
-"Korea, North",Munha-dong,False,39.3813,127.2517
-"Korea, North",Nampo,False,38.7333,125.4
-"Korea, North",Namsan,False,42.2275,129.2541
-"Korea, North",Ojok-tong,False,40.2167,124.5333
-"Korea, North",Ongjang,False,37.9371,125.3571
-"Korea, North",P'ungsan,False,40.8175,128.1553
-"Korea, North",P'yong-dong,False,39.1919,125.8178
-"Korea, North",P'yongsong-si,False,39.2605,125.8618
-"Korea, North",Pyongyang,True,39.0167,125.7475
-"Korea, North",Rajin,False,42.3444,130.3844
-"Korea, North",Sariwon,False,38.5064,125.7597
-"Korea, North",Sariwon-si,False,38.5242,125.7547
-"Korea, North",Sejiyon,False,41.8,128.3167
-"Korea, North",Sil-li,False,39.488,125.464
-"Korea, North",Sinpo,False,40.0347,128.1856
-"Korea, North",Sinuiju,False,40.1,124.4
-"Korea, North",Songnim,False,38.7542,125.645
-"Korea, North",Sunch'on,False,39.4167,125.9333
-"Korea, North",Taedong,False,40.6171,125.4501
-"Korea, North",Tanch'on,False,40.458,128.911
-"Korea, North",Wonsan,False,39.1475,127.4461
-"Korea, South",Andong,False,36.5592,128.7289
-"Korea, South",An'gang,False,35.99,129.227
-"Korea, South",Ansan,False,37.3167,126.8333
-"Korea, South",Anseong,False,37.0078,127.2797
-"Korea, South",Anyang,False,37.3833,126.9333
-"Korea, South",Asan,False,36.35,126.9167
-"Korea, South",Asan,False,36.7833,126.9833
-"Korea, South",Boryeong,False,36.3333,126.6167
-"Korea, South",Bucheon,False,37.5,126.7833
-"Korea, South",Busan,False,35.18,129.075
-"Korea, South",Changwon,False,35.2708,128.6631
-"Korea, South",Chech'on,False,37.1333,128.2167
-"Korea, South",Cheongju,False,36.6333,127.4833
-"Korea, South",Chinju,False,35.2,128.0833
-"Korea, South",Ch'onan,False,36.81,127.1475
-"Korea, South",Chuncheon,False,37.8667,127.7333
-"Korea, South",Chungju,False,36.9667,127.95
-"Korea, South",Ch'ungmu,False,34.8333,128.4167
-"Korea, South",Daean,False,35.4038,129.2788
-"Korea, South",Daegu,False,35.8717,128.6017
-"Korea, South",Daejeon,False,36.35,127.385
-"Korea, South",Dongducheon,False,37.9167,127.0667
-"Korea, South",Eonyang,False,35.5667,129.1167
-"Korea, South",Eumseong,False,36.9353,127.6897
-"Korea, South",Gangneung,False,37.75,128.9
-"Korea, South",Gimpo,False,37.7,126.6
-"Korea, South",Goyang,False,37.65,126.8
-"Korea, South",Guri,False,37.6,127.15
-"Korea, South",Guryongpo,False,35.9833,129.55
-"Korea, South",Gwacheon,False,37.4333,127.0
-"Korea, South",Gwangju,False,35.1653,126.8486
-"Korea, South",Gwangju,False,37.3667,127.2833
-"Korea, South",Gwangmyeongni,False,37.476,126.866
-"Korea, South",Gwangyang,False,34.9333,127.6833
-"Korea, South",Gyeongsan,False,35.8167,128.7333
-"Korea, South",Haeryong,False,34.9131,127.5394
-"Korea, South",Hallim,False,33.3729,126.2827
-"Korea, South",Hanam,False,37.5167,127.2
-"Korea, South",Hayang,False,35.9167,128.8167
-"Korea, South",Heunghae,False,36.1167,129.35
-"Korea, South",Hongseong,False,36.6009,126.665
-"Korea, South",Hosan,False,36.2,127.0833
-"Korea, South",Hwasu-dong,False,37.1997,126.8314
-"Korea, South",Ich'on,False,37.2667,127.4333
-"Korea, South",Iksan,False,35.9439,126.9544
-"Korea, South",Incheon,False,37.4833,126.6333
-"Korea, South",Jeju,False,33.513,126.523
-"Korea, South",Jeomchon,False,36.6028,127.3042
-"Korea, South",Jeonghae,False,35.5667,126.85
-"Korea, South",Jeonju,False,35.8167,127.15
-"Korea, South",Jicheon,False,36.1333,128.1
-"Korea, South",Kimhae,False,35.2342,128.8811
-"Korea, South",Kimje,False,35.8017,126.8889
-"Korea, South",Kujwa,False,33.5025,126.7944
-"Korea, South",Kumi,False,36.1195,128.3444
-"Korea, South",Kunp'o,False,37.35,126.95
-"Korea, South",Kunsan,False,35.9833,126.7167
-"Korea, South",Kyongju,False,35.85,129.2167
-"Korea, South",Masan,False,35.1833,128.55
-"Korea, South",Miryang,False,35.5,128.75
-"Korea, South",Mokpo,False,34.7589,126.38
-"Korea, South",Muan,False,34.9897,126.4714
-"Korea, South",Mun'gyong,False,36.5939,128.2014
-"Korea, South",Munsan,False,37.8529,126.7848
-"Korea, South",Naju,False,35.0333,126.7167
-"Korea, South",Noksan,False,36.2039,127.0847
-"Korea, South",Osan,False,37.1498,127.0771
-"Korea, South",Paju,False,37.8667,126.8
-"Korea, South",Pocheon,False,37.8947,127.2002
-"Korea, South",Pohang,False,36.0322,129.365
-"Korea, South",Pongnam,False,37.22,126.9494
-"Korea, South",Pyeongtaek,False,36.9922,127.1128
-"Korea, South",P'yongch'ang,False,37.3675,128.3958
-"Korea, South",Sach'on,False,35.0,128.15
-"Korea, South",Sa-ch'on,False,35.0667,128.0833
-"Korea, South",Samch'ok,False,37.45,129.165
-"Korea, South",Sangju,False,36.44,128.17
-"Korea, South",Sapkyo,False,36.6864,126.7367
-"Korea, South",Sejong,False,36.487,127.2822
-"Korea, South",Seogwipo,False,33.2497,126.56
-"Korea, South",Seosaeng,False,35.3536,129.3303
-"Korea, South",Seoul,True,37.56,126.99
-"Korea, South",Sihung,False,37.3799,126.8029
-"Korea, South",Sokcho,False,38.2069,128.5919
-"Korea, South",Songnam,False,37.4333,127.15
-"Korea, South",Sosan,False,36.7817,126.4522
-"Korea, South",Suncheon,False,34.9506,127.4875
-"Korea, South",Suwon,False,37.2667,127.0167
-"Korea, South",Taebaek,False,37.1667,128.9833
-"Korea, South",Tangjin,False,36.8931,126.6281
-"Korea, South",Tonghae,False,37.5248,129.1143
-"Korea, South",Tongjin,False,37.2333,127.2
-"Korea, South",Uijeongbu,False,37.7486,127.0389
-"Korea, South",Uiwang,False,37.3448,126.9683
-"Korea, South",Ulchin,False,37.002,129.4003
-"Korea, South",Ulsan,False,35.55,129.3167
-"Korea, South",Wonju,False,37.3417,127.9208
-"Korea, South",Yanggok,False,37.6333,127.2167
-"Korea, South",Yangsan,False,35.3333,129.0333
-"Korea, South",Yeonil,False,36.0,129.35
-"Korea, South",Yeosu,False,34.7333,127.7333
-"Korea, South",Yeosu,False,34.7607,127.6622
-"Korea, South",Yoju,False,37.3,127.6333
-"Korea, South",Yongju,False,36.8058,128.6239
+"North Korea",Anju,False,39.62,125.66
+"North Korea",Chaedok,False,40.7988,129.3602
+"North Korea",Changyon,False,38.2517,125.1021
+"North Korea",Ch'ongjin,False,41.7833,129.7667
+"North Korea",Chongju,False,39.65,125.3333
+"North Korea",Ch'osan-up,False,40.8255,125.8008
+"North Korea",Haeju,False,38.0333,125.7167
+"North Korea",Hamhung,False,39.9167,127.5333
+"North Korea",Hoeryong,False,42.4333,129.75
+"North Korea",Huich'on,False,40.1707,126.2761
+"North Korea",Hyesan,False,41.4,128.1833
+"North Korea",Kaech'on,False,39.6986,125.9061
+"North Korea",Kaesong,False,37.9667,126.55
+"North Korea",Kanggye,False,40.9667,126.6
+"North Korea",Kusong,False,39.9667,125.1667
+"North Korea",Manpo,False,41.157,126.29
+"North Korea",Munch'on,False,39.259,127.356
+"North Korea",Munha-dong,False,39.3813,127.2517
+"North Korea",Nampo,False,38.7333,125.4
+"North Korea",Namsan,False,42.2275,129.2541
+"North Korea",Ojok-tong,False,40.2167,124.5333
+"North Korea",Ongjang,False,37.9371,125.3571
+"North Korea",P'ungsan,False,40.8175,128.1553
+"North Korea",P'yong-dong,False,39.1919,125.8178
+"North Korea",P'yongsong-si,False,39.2605,125.8618
+"North Korea",Pyongyang,True,39.0167,125.7475
+"North Korea",Rajin,False,42.3444,130.3844
+"North Korea",Sariwon,False,38.5064,125.7597
+"North Korea",Sariwon-si,False,38.5242,125.7547
+"North Korea",Sejiyon,False,41.8,128.3167
+"North Korea",Sil-li,False,39.488,125.464
+"North Korea",Sinpo,False,40.0347,128.1856
+"North Korea",Sinuiju,False,40.1,124.4
+"North Korea",Songnim,False,38.7542,125.645
+"North Korea",Sunch'on,False,39.4167,125.9333
+"North Korea",Taedong,False,40.6171,125.4501
+"North Korea",Tanch'on,False,40.458,128.911
+"North Korea",Wonsan,False,39.1475,127.4461
+"South Korea",Andong,False,36.5592,128.7289
+"South Korea",An'gang,False,35.99,129.227
+"South Korea",Ansan,False,37.3167,126.8333
+"South Korea",Anseong,False,37.0078,127.2797
+"South Korea",Anyang,False,37.3833,126.9333
+"South Korea",Asan,False,36.35,126.9167
+"South Korea",Asan,False,36.7833,126.9833
+"South Korea",Boryeong,False,36.3333,126.6167
+"South Korea",Bucheon,False,37.5,126.7833
+"South Korea",Busan,False,35.18,129.075
+"South Korea",Changwon,False,35.2708,128.6631
+"South Korea",Chech'on,False,37.1333,128.2167
+"South Korea",Cheongju,False,36.6333,127.4833
+"South Korea",Chinju,False,35.2,128.0833
+"South Korea",Ch'onan,False,36.81,127.1475
+"South Korea",Chuncheon,False,37.8667,127.7333
+"South Korea",Chungju,False,36.9667,127.95
+"South Korea",Ch'ungmu,False,34.8333,128.4167
+"South Korea",Daean,False,35.4038,129.2788
+"South Korea",Daegu,False,35.8717,128.6017
+"South Korea",Daejeon,False,36.35,127.385
+"South Korea",Dongducheon,False,37.9167,127.0667
+"South Korea",Eonyang,False,35.5667,129.1167
+"South Korea",Eumseong,False,36.9353,127.6897
+"South Korea",Gangneung,False,37.75,128.9
+"South Korea",Gimpo,False,37.7,126.6
+"South Korea",Goyang,False,37.65,126.8
+"South Korea",Guri,False,37.6,127.15
+"South Korea",Guryongpo,False,35.9833,129.55
+"South Korea",Gwacheon,False,37.4333,127.0
+"South Korea",Gwangju,False,35.1653,126.8486
+"South Korea",Gwangju,False,37.3667,127.2833
+"South Korea",Gwangmyeongni,False,37.476,126.866
+"South Korea",Gwangyang,False,34.9333,127.6833
+"South Korea",Gyeongsan,False,35.8167,128.7333
+"South Korea",Haeryong,False,34.9131,127.5394
+"South Korea",Hallim,False,33.3729,126.2827
+"South Korea",Hanam,False,37.5167,127.2
+"South Korea",Hayang,False,35.9167,128.8167
+"South Korea",Heunghae,False,36.1167,129.35
+"South Korea",Hongseong,False,36.6009,126.665
+"South Korea",Hosan,False,36.2,127.0833
+"South Korea",Hwasu-dong,False,37.1997,126.8314
+"South Korea",Ich'on,False,37.2667,127.4333
+"South Korea",Iksan,False,35.9439,126.9544
+"South Korea",Incheon,False,37.4833,126.6333
+"South Korea",Jeju,False,33.513,126.523
+"South Korea",Jeomchon,False,36.6028,127.3042
+"South Korea",Jeonghae,False,35.5667,126.85
+"South Korea",Jeonju,False,35.8167,127.15
+"South Korea",Jicheon,False,36.1333,128.1
+"South Korea",Kimhae,False,35.2342,128.8811
+"South Korea",Kimje,False,35.8017,126.8889
+"South Korea",Kujwa,False,33.5025,126.7944
+"South Korea",Kumi,False,36.1195,128.3444
+"South Korea",Kunp'o,False,37.35,126.95
+"South Korea",Kunsan,False,35.9833,126.7167
+"South Korea",Kyongju,False,35.85,129.2167
+"South Korea",Masan,False,35.1833,128.55
+"South Korea",Miryang,False,35.5,128.75
+"South Korea",Mokpo,False,34.7589,126.38
+"South Korea",Muan,False,34.9897,126.4714
+"South Korea",Mun'gyong,False,36.5939,128.2014
+"South Korea",Munsan,False,37.8529,126.7848
+"South Korea",Naju,False,35.0333,126.7167
+"South Korea",Noksan,False,36.2039,127.0847
+"South Korea",Osan,False,37.1498,127.0771
+"South Korea",Paju,False,37.8667,126.8
+"South Korea",Pocheon,False,37.8947,127.2002
+"South Korea",Pohang,False,36.0322,129.365
+"South Korea",Pongnam,False,37.22,126.9494
+"South Korea",Pyeongtaek,False,36.9922,127.1128
+"South Korea",P'yongch'ang,False,37.3675,128.3958
+"South Korea",Sach'on,False,35.0,128.15
+"South Korea",Sa-ch'on,False,35.0667,128.0833
+"South Korea",Samch'ok,False,37.45,129.165
+"South Korea",Sangju,False,36.44,128.17
+"South Korea",Sapkyo,False,36.6864,126.7367
+"South Korea",Sejong,False,36.487,127.2822
+"South Korea",Seogwipo,False,33.2497,126.56
+"South Korea",Seosaeng,False,35.3536,129.3303
+"South Korea",Seoul,True,37.56,126.99
+"South Korea",Sihung,False,37.3799,126.8029
+"South Korea",Sokcho,False,38.2069,128.5919
+"South Korea",Songnam,False,37.4333,127.15
+"South Korea",Sosan,False,36.7817,126.4522
+"South Korea",Suncheon,False,34.9506,127.4875
+"South Korea",Suwon,False,37.2667,127.0167
+"South Korea",Taebaek,False,37.1667,128.9833
+"South Korea",Tangjin,False,36.8931,126.6281
+"South Korea",Tonghae,False,37.5248,129.1143
+"South Korea",Tongjin,False,37.2333,127.2
+"South Korea",Uijeongbu,False,37.7486,127.0389
+"South Korea",Uiwang,False,37.3448,126.9683
+"South Korea",Ulchin,False,37.002,129.4003
+"South Korea",Ulsan,False,35.55,129.3167
+"South Korea",Wonju,False,37.3417,127.9208
+"South Korea",Yanggok,False,37.6333,127.2167
+"South Korea",Yangsan,False,35.3333,129.0333
+"South Korea",Yeonil,False,36.0,129.35
+"South Korea",Yeosu,False,34.7333,127.7333
+"South Korea",Yeosu,False,34.7607,127.6622
+"South Korea",Yoju,False,37.3,127.6333
+"South Korea",Yongju,False,36.8058,128.6239
 Kosovo,Decan,False,42.5333,20.2833
 Kosovo,Dragash,False,42.0611,20.6528
 Kosovo,Dushanove,False,42.2347,20.7091
@@ -26670,28 +26670,28 @@ Kyrgyzstan,Tup,False,42.73,78.36
 Kyrgyzstan,Uch-Korgon,False,40.23,72.06
 Kyrgyzstan,Vostochnyy,False,39.9222,69.65
 Kyrgyzstan,Voyenno-Antonovka,False,42.8722,74.45
-Laos,Anouvong,False,18.8989,103.0919
-Laos,Attapu,False,14.8,106.8333
-Laos,Ban Houayxay,False,20.2631,100.4336
-Laos,Champasak,False,14.8569,105.7533
-Laos,Louang Namtha,False,20.95,101.4
-Laos,Louangphabang,False,19.89,102.1347
-Laos,Muang Sing,False,21.2,101.15
-Laos,Pakxan,False,18.3964,103.6558
-Laos,Pakxe,False,15.1167,105.7833
-Laos,Phongsali,False,21.6833,102.1
-Laos,Phon-Hong,False,18.4953,102.4153
-Laos,Phonsavan,False,19.46,103.18
-Laos,Salavan,False,15.7167,106.4167
-Laos,Savannakhet,False,16.55,104.75
-Laos,Thakhek,False,17.4,104.8
-Laos,Vangviang,False,18.9267,102.4494
-Laos,Vientiane,True,17.98,102.63
-Laos,Xai,False,20.6914,101.9861
-Laos,Xaignabouli,False,19.25,101.75
-Laos,Xam Nua,False,20.415,104.048
-Laos,Xekong,False,15.3503,106.7286
-Laos,Xiangkhoang,False,19.4167,103.5
+"Lao Peoples Democratic Republic",Anouvong,False,18.8989,103.0919
+"Lao Peoples Democratic Republic",Attapu,False,14.8,106.8333
+"Lao Peoples Democratic Republic",Ban Houayxay,False,20.2631,100.4336
+"Lao Peoples Democratic Republic",Champasak,False,14.8569,105.7533
+"Lao Peoples Democratic Republic",Louang Namtha,False,20.95,101.4
+"Lao Peoples Democratic Republic",Louangphabang,False,19.89,102.1347
+"Lao Peoples Democratic Republic",Muang Sing,False,21.2,101.15
+"Lao Peoples Democratic Republic",Pakxan,False,18.3964,103.6558
+"Lao Peoples Democratic Republic",Pakxe,False,15.1167,105.7833
+"Lao Peoples Democratic Republic",Phongsali,False,21.6833,102.1
+"Lao Peoples Democratic Republic",Phon-Hong,False,18.4953,102.4153
+"Lao Peoples Democratic Republic",Phonsavan,False,19.46,103.18
+"Lao Peoples Democratic Republic",Salavan,False,15.7167,106.4167
+"Lao Peoples Democratic Republic",Savannakhet,False,16.55,104.75
+"Lao Peoples Democratic Republic",Thakhek,False,17.4,104.8
+"Lao Peoples Democratic Republic",Vangviang,False,18.9267,102.4494
+"Lao Peoples Democratic Republic",Vientiane,True,17.98,102.63
+"Lao Peoples Democratic Republic",Xai,False,20.6914,101.9861
+"Lao Peoples Democratic Republic",Xaignabouli,False,19.25,101.75
+"Lao Peoples Democratic Republic",Xam Nua,False,20.415,104.048
+"Lao Peoples Democratic Republic",Xekong,False,15.3503,106.7286
+"Lao Peoples Democratic Republic",Xiangkhoang,False,19.4167,103.5
 Latvia,Adazi,False,57.0667,24.3333
 Latvia,Aizkraukle,False,56.6042,25.2539
 Latvia,Aluksne,False,57.4167,27.05
@@ -28813,7 +28813,7 @@ Mexico,Merida,False,20.97,-89.62
 Mexico,Metepec,False,19.2511,-99.6047
 Mexico,Mexicali,False,32.6633,-115.4678
 Mexico,Mexicaltzingo,False,19.2092,-99.5858
-Mexico,Mexico City,True,19.4333,-99.1333
+Mexico,Mexico,True,19.4333,-99.1333
 Mexico,Miacatlan,False,18.7722,-99.3547
 Mexico,Miahuatlan de Porfirio Diaz,False,16.3167,-96.5833
 Mexico,Miahuatlan,False,18.2833,-97.2833
@@ -29390,6 +29390,7 @@ Moldova,Truseni,False,47.0667,28.6833
 Moldova,Ungheni,False,47.2167,27.8167
 Moldova,Vulcanesti,False,45.6833,28.4028
 Monaco,Monaco,True,43.7333,7.4167
+Monaco,"Monte Carlo",False,43.7396,7.4276
 Mongolia,Altay,False,46.3728,96.2572
 Mongolia,Arvayheer,False,46.2661,102.7778
 Mongolia,Baruun-Urt,False,46.6814,113.2803
