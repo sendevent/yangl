@@ -88,7 +88,7 @@ Action::Ptr ActionStorage::action(Action::Yangl requested) const
 
 QList<Action::Ptr> ActionStorage::load(const QString &from)
 {
-    QString usedPath = from.isEmpty() ? ActionJson::jsonFilePath() : from;
+    const auto &usedPath = from.isEmpty() ? ActionJson::jsonFilePath() : from;
     QFile in(usedPath);
     if (!in.open(QIODevice::ReadOnly | QIODevice::Text)) {
         WRN << "failed opening file:" << usedPath << in.errorString();
@@ -109,7 +109,7 @@ QList<Action::Ptr> ActionStorage::load(QIODevice *from)
 
 void ActionStorage::save(const QString &to)
 {
-    QString usedPath = to.isEmpty() ? ActionJson::jsonFilePath() : to;
+    const auto &usedPath = to.isEmpty() ? ActionJson::jsonFilePath() : to;
     QFile out(usedPath);
     if (!out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
         WRN << "failed opening file:" << usedPath << out.errorString();

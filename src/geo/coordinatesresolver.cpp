@@ -111,8 +111,8 @@ CitiesByCountry CoordinatesResolver::loadData(const QString &path)
                 parts[0], parts[1], coord, parts[2] == "True", true, QString(),
             };
 
-            auto &country = loaded[place.country];
-            country.insert(place.town, place);
+            auto &country = loaded[place.country.toLower()];
+            country.insert(place.town.toLower(), place);
         }
 
     } else {
@@ -142,18 +142,23 @@ PlaceInfo CoordinatesResolver::lookupForPlace(const PlaceInfo &request) const
     town.ok = false;
     town.message = "Not found";
 
-    auto searchForTheCapital = [&town](const auto &place) { return place.capital && place.country == town.country; };
+    auto searchForTheCapital = [&town](const auto &place) {
+        return place.capital && place.country.toLower() == town.country.toLower();
+    };
 
-    if (m_data.contains(town.country)) {
-        const auto &country = m_data[town.country];
+    const auto &countryName = town.country.toLower();
+    const auto &cityName = town.town.toLower();
+
+    if (m_data.contains(countryName)) {
+        const auto &country = m_data[countryName];
         if (town.town.isEmpty()) {
             auto it = std::find_if(country.cbegin(), country.cend(), searchForTheCapital);
             if (it != country.end()) {
                 return *it;
             }
 
-        } else if (country.contains(town.town)) {
-            town = country.value(town.town);
+        } else if (country.contains(cityName)) {
+            town = country.value(cityName);
             town.ok = true;
             return town;
         }
