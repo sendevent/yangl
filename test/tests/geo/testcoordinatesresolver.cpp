@@ -33,6 +33,7 @@ private slots:
     void test_loadDataBuiltin();
 
     void test_location_real();
+    void test_location_real_cases();
     void test_location_fake();
 
     void test_requestCoordinates_real();
@@ -54,7 +55,7 @@ void TestCoordinatesResolver::cleanupTestCase()
 void TestCoordinatesResolver::test_loadDataBuiltin()
 {
     QVERIFY(m_resolver->loadDataBuiltin());
-    QCOMPARE(m_resolver->m_data.size(), 242);
+    QCOMPARE(m_resolver->m_data.size(), 241);
 }
 
 void TestCoordinatesResolver::test_location_real()
@@ -82,6 +83,46 @@ void TestCoordinatesResolver::test_location_real()
     const auto &response3 = m_resolver->lookupForPlace("Finland", "Helsinki");
     checkResponse(response3);
     QCOMPARE(response2, response3);
+}
+
+void TestCoordinatesResolver::test_location_real_cases()
+{
+    auto runCheck = [this](const auto &country, const auto &city) {
+        auto checkResponse = [country, city](const auto &response) {
+            qDebug() << country << city;
+            QVERIFY(response.ok);
+            QVERIFY(response.location.isValid());
+            QCOMPARE(response.location.latitude(), 60.1708);
+            QCOMPARE(response.location.longitude(), 24.9375);
+        };
+
+        const auto &response1 = m_resolver->lookupForPlace({
+                country,
+                city,
+        });
+        checkResponse(response1);
+
+        const auto &response2 = m_resolver->lookupForPlace({
+                country,
+                city,
+        });
+        checkResponse(response2);
+        QCOMPARE(response1, response2);
+
+        const auto &response3 = m_resolver->lookupForPlace("Finland", "Helsinki");
+        checkResponse(response3);
+        QCOMPARE(response2, response3);
+    };
+
+    const QList<QPair<QString, QString>> data { { "Finland", "Helsinki" }, { "finland", "Helsinki" },
+                                                { "Finland", "helsinki" }, { "finland", "helsinki" },
+                                                { "Finland", "" },         { "finland", "" } };
+
+    for (const auto &pair : data) {
+        if (pair.first == "finland" && pair.second == "")
+            int dbg = 0;
+        runCheck(pair.first, pair.second);
+    }
 }
 
 void TestCoordinatesResolver::test_location_fake()
