@@ -42,10 +42,6 @@ void CoordinatesResolver::ensureDataLoaded()
         synchronizer.addFuture(QtConcurrent::run([this]() { loadDataBuiltin(); }));
     }
 
-    if (!m_loadedDynamic) {
-        synchronizer.addFuture(QtConcurrent::run([this]() { loadDataDynamic(); }));
-    }
-
     synchronizer.waitForFinished(); // Ensure all tasks complete
 }
 
@@ -138,12 +134,6 @@ bool CoordinatesResolver::loadDataBuiltin()
     }
 
     return m_loadedBuiltin;
-}
-
-bool CoordinatesResolver::loadDataDynamic()
-{
-    WRN << "Not implemented yet";
-    return false;
 }
 
 PlaceInfo CoordinatesResolver::lookupForPlace(const PlaceInfo &request) const

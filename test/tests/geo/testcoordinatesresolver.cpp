@@ -31,7 +31,6 @@ private slots:
     void cleanupTestCase();
 
     void test_loadDataBuiltin();
-    void test_loadDataDynamic();
 
     void test_location_real();
     void test_location_fake();
@@ -56,11 +55,6 @@ void TestCoordinatesResolver::test_loadDataBuiltin()
 {
     QVERIFY(m_resolver->loadDataBuiltin());
     QCOMPARE(m_resolver->m_data.size(), 242);
-}
-
-void TestCoordinatesResolver::test_loadDataDynamic()
-{
-    QSKIP("Not implemented yet");
 }
 
 void TestCoordinatesResolver::test_location_real()
