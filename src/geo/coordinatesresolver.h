@@ -42,12 +42,10 @@ signals:
 
 private:
     bool m_loadedBuiltin { false };
-    bool m_loadedDynamic { false };
     CitiesByCountry m_data;
 
     void ensureDataLoaded();
     bool loadDataBuiltin();
-    bool loadDataDynamic();
     CitiesByCountry loadData(const QString &path);
 
     PlaceInfo lookupForPlace(const PlaceInfo &request) const;
