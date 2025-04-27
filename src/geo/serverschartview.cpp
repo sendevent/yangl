@@ -142,14 +142,16 @@ void ServersChartView::hideEvent(QHideEvent *event)
 
 void ServersChartView::requestServersList()
 {
-    if (m_listManager->reload())
+    if (m_listManager->reload()) {
         setControlsEnabled(false);
+    }
 }
 
 void ServersChartView::setControlsEnabled(bool enabled)
 {
-    for (auto control : std::initializer_list<QWidget *> { m_lineEdit, m_treeView, /*m_chartWidget , buttonReload*/ })
+    for (auto control : std::initializer_list<QWidget *> { m_lineEdit, m_treeView, /*m_chartWidget , buttonReload*/ }) {
         control->setEnabled(enabled);
+    }
 }
 
 void ServersChartView::onReloadRequested()
@@ -168,12 +170,13 @@ void ServersChartView::onGotCities(const ServersListManager::Group &cities)
     }
 
     const QString &countryName = clearGeoName(cities.first);
-    const bool isGroups = countryName == "Groups"; // TODO: read ServersListManager
+    const bool isGroups = countryName == "Groups";
     QStandardItem *title = new QStandardItem(countryName);
     m_serversModel->insertRow(m_serversModel->rowCount(), QList<QStandardItem *>() << title);
 
-    if (!isGroups)
+    if (!isGroups) {
         m_chartWidget->addMark(countryName, {});
+    }
 
     for (const auto &city : cities.second) {
         const QString &cityName = clearGeoName(city);
@@ -191,6 +194,8 @@ void ServersChartView::onGotServers()
     setControlsEnabled(true);
 
     m_modelPopulated = true;
+
+    m_chartWidget->handleServers();
 }
 
 void ServersChartView::onCurrentTreeItemChanged(const QModelIndex &current)

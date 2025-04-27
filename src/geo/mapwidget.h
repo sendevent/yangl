@@ -61,6 +61,8 @@ public:
 
     QSize sizeHint() const override;
 
+    void handleServers();
+
 signals:
     void markerDoubleclicked(const PlaceInfo &marker);
 
@@ -74,16 +76,22 @@ private:
     MapServersModel *m_serversModel { nullptr };
     CoordinatesResolver *m_geoResolver { nullptr };
 
+    QSet<PlaceInfo> m_places; // both
+    QSet<PlaceInfo> m_placesLoaded; // from JSON
+    QSet<PlaceInfo> m_placesDynamic; // from external
+
     void syncMapSize();
 
     void showEvent(QShowEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
-    void putMark(const PlaceInfo &point);
-    void requestGeo(const PlaceInfo &info);
-
-    void loadJson();
-    void saveJson();
+    void putMark(const PlaceInfo &place);
+    void requestGeo(const PlaceInfo &place);
 
     void setRootContextProperty(const QString &name, const QVariant &value);
+
+    static QString geoCacheFilePath();
+
+    bool loadJson();
+    void saveJson();
 };

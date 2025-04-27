@@ -18,15 +18,18 @@
 #include "mapwidget.h"
 
 #include "app/common.h"
+#include "geo/coordinatesresolver.h"
 #include "mapserversmodel.h"
 #include "settings/appsettings.h"
 #include "settings/settingsmanager.h"
 
 #include <QFile>
+#include <QFileInfo>
 #include <QGeoAddress>
 #include <QGeoCodingManager>
 #include <QGeoLocation>
 #include <QGeoServiceProvider>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMetaObject>
@@ -36,7 +39,6 @@
 #include <QQuickWidget>
 #include <QVBoxLayout>
 #include <QWindow>
-#include <qlatin1stringview.h>
 
 static QString defaultMapPluginName()
 {
@@ -185,6 +187,9 @@ QGeoCoordinate MapWidget::center() const
 void MapWidget::clearMarks()
 {
     m_serversModel->clear();
+    m_places.clear();
+    m_placesLoaded.clear();
+    m_placesDynamic.clear();
 }
 
 void MapWidget::addMark(const QString &country, const QString &city)
@@ -193,6 +198,7 @@ void MapWidget::addMark(const QString &country, const QString &city)
     if (place.ok) {
         LOG << "Found place:" << country << city;
         putMark(place);
+        m_placesDynamic.insert(place);
         return;
     }
 
@@ -200,13 +206,13 @@ void MapWidget::addMark(const QString &country, const QString &city)
     requestGeo(place);
 }
 
-void MapWidget::requestGeo(const PlaceInfo &addrHandler)
+void MapWidget::requestGeo(const PlaceInfo &place)
 {
     WRN << "Not implemented yet";
     // QGeoAddress addr;
-    // addr.setCountry(addrHandler.m_country);
-    // if (addrHandler.m_city != "default") {
-    //     addr.setCity(addrHandler.m_city);
+    // addr.setCountry(place.m_country);
+    // if (place.m_city != "default") {
+    //     addr.setCity(place.m_city);
     // }
     // LOG << addr.country() << addr.city();
 
@@ -224,16 +230,16 @@ void MapWidget::requestGeo(const PlaceInfo &addrHandler)
     //     }
 
     //     connect(reply, &QGeoCodeReply::errorOccurred, this,
-    //             [addrHandler](QGeoCodeReply::Error error, const QString &errorString) {
-    //                 WRN << "errorr for:" << addrHandler.m_country << addrHandler.m_city << error << errorString;
+    //             [place](QGeoCodeReply::Error error, const QString &errorString) {
+    //                 WRN << "errorr for:" << place.m_country << place.m_city << error << errorString;
     //             });
-    //     connect(reply, &QGeoCodeReply::finished, this, [this, addrHandler] {
+    //     connect(reply, &QGeoCodeReply::finished, this, [this, place] {
     //         LOG << "geo request finished";
     //         if (QGeoCodeReply *r = qobject_cast<QGeoCodeReply *>(sender())) {
     //             const auto &locations = r->locations();
     //             for (const auto &l : locations) {
     //                 LOG << l.coordinate();
-    //                 putMark(addrHandler, l.coordinate());
+    //                 putMark(place, l.coordinate());
     //                 break;
     //             }
     //             r->deleteLater();
@@ -245,87 +251,83 @@ void MapWidget::requestGeo(const PlaceInfo &addrHandler)
     // }
 }
 
-void MapWidget::putMark(const PlaceInfo &point)
+void MapWidget::putMark(const PlaceInfo &place)
 {
-    // auto stripDefault = [](const QString &from) { return from == "default" ? QString() : from; };
-    // m_serversModel->addMarker(stripDefault(info.m_country), stripDefault(info.m_city), point);
-    m_serversModel->addMarker(point);
+    if (!m_places.contains(place)) {
+        m_serversModel->addMarker(place);
+        m_places.insert(place);
+    }
 }
 
 struct Consts {
+    static constexpr QLatin1String country { "country" };
+    static constexpr QLatin1String city { "city" };
     static constexpr QLatin1String latitude { "lat" };
     static constexpr QLatin1String longitude { "long" };
 };
 
-void MapWidget::loadJson()
+/*static*/ QString MapWidget::geoCacheFilePath()
 {
-    // static const QString file = QString("%1/geo.json").arg(SettingsManager::dirPath());
-    // LOG << file;
-    // QFile in(file);
-    // if (!in.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    //     WRN << "Failed opening file:" << file << in.errorString();
-    //     return;
-    // }
+    static QString path = QString("%1/geo.json").arg(SettingsManager::dirPath());
+    return path;
+}
 
-    // QJsonParseError err;
-    // const QJsonObject &countriesCollection = QJsonDocument::fromJson(in.readAll(), &err).object();
+bool MapWidget::loadJson()
+{
+    m_placesLoaded.clear();
 
-    // if (err.error != QJsonParseError::NoError) {
-    //     WRN << "JSON parsing error:" << err.errorString();
-    //     return;
-    // }
+    QFile in(geoCacheFilePath());
+    QFileInfo fileInfo(in);
+    LOG << fileInfo.absoluteFilePath();
+    if (!in.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        WRN << "Failed opening file:" << fileInfo.absoluteFilePath() << in.errorString();
+        return false;
+    }
 
-    // QJsonObject::const_iterator countries = countriesCollection.constBegin();
-    // while (countries != countriesCollection.constEnd()) {
-    //     const auto &countryName = countries.key();
-    //     const QJsonObject &citiesCollection = countries.value().toObject();
-    //     QMap<QString, QGeoCoordinate> citiesHandler;
-    //     QJsonObject::const_iterator cities = citiesCollection.constBegin();
-    //     while (cities != citiesCollection.constEnd()) {
-    //         const auto &cityName = cities.key();
-    //         const QJsonObject &city = cities.value().toObject();
-    //         QGeoCoordinate coord(city.value(Consts::latitude).toDouble(), city.value(Consts::longitude).toDouble());
-    //         citiesHandler.insert(cityName, coord);
+    QJsonParseError err;
+    const QJsonArray &places = QJsonDocument::fromJson(in.readAll(), &err).array();
 
-    //         LOG << countryName << cityName << city.keys();
-    //         putMark({ countryName, cityName }, coord);
+    if (err.error != QJsonParseError::NoError) {
+        WRN << "JSON parsing error:" << err.errorString();
+        return false;
+    }
 
-    //         ++cities;
-    //     }
+    for (const auto &place : places) {
+        const PlaceInfo placeObj {
+            place[Consts::country].toString(),
+            place[Consts::city].toString(),
+            QGeoCoordinate(place[Consts::latitude].toDouble(), place[Consts::longitude].toDouble()),
+        };
+        putMark(placeObj);
+        m_placesLoaded.insert(placeObj);
+    }
 
-    //     m_geoPlaces.insert(countryName, citiesHandler);
-
-    //     ++countries;
-    // }
+    return true;
 }
 
 void MapWidget::saveJson()
 {
-    // static const QString file = QString("%1/geo.json").arg(SettingsManager::dirPath());
-    // LOG << file;
-    // QFile out(file);
-    // if (!out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
-    //     WRN << "Failed opening file:" << file << out.errorString();
-    //     return;
-    // }
+    QFile out(geoCacheFilePath());
+    QFileInfo fileInfo(out);
+    LOG << fileInfo.absoluteFilePath();
+    if (!out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        WRN << "Failed opening file:" << fileInfo.absoluteFilePath() << out.errorString();
+        return;
+    }
 
-    // QJsonObject countriesCollectionl;
-    // const auto &countries = m_geoPlaces.keys();
-    // for (const auto &country : countries) {
-    //     QJsonObject cities;
-    //     const auto &cityNames = m_geoPlaces[country].keys();
-    //     for (const auto &cityName : cityNames) {
-    //         QJsonObject pointObj;
-    //         const QGeoCoordinate &point = m_geoPlaces[country].value(cityName);
-    //         pointObj[Consts::latitude] = point.latitude();
-    //         pointObj[Consts::longitude] = point.longitude();
-    //         cities[cityName] = pointObj;
-    //     }
-    //     countriesCollectionl[country] = cities;
-    // }
+    QJsonArray countriesCollectionl;
+    for (const auto &place : std::as_const(m_places)) {
+        const QJsonObject pointObj {
+            { Consts::country, place.country },
+            { Consts::city, place.town },
+            { Consts::latitude, place.location.latitude() },
+            { Consts::longitude, place.location.longitude() },
+        };
+        countriesCollectionl.append(pointObj);
+    }
 
-    // const QByteArray &ba = QJsonDocument(countriesCollectionl).toJson();
-    // out.write(ba);
+    const QByteArray &ba = QJsonDocument(countriesCollectionl).toJson();
+    out.write(ba);
 }
 
 void MapWidget::onMarkerDoubleclicked(QQuickItem *item)
@@ -382,4 +384,30 @@ void MapWidget::setRootContextProperty(const QString &name, const QVariant &valu
     if (auto ctx = m_quickView->rootContext()) {
         ctx->setContextProperty(name, value);
     }
+}
+
+void MapWidget::handleServers()
+{
+    QSet<PlaceInfo> updatedPlaces = m_placesDynamic;
+
+    // Remove any places from m_placesLoaded that are NOT in updatedPlaces
+    for (auto it = m_placesLoaded.begin(); it != m_placesLoaded.end();) {
+        if (!updatedPlaces.contains(*it)) {
+            it = m_placesLoaded.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    // Add/refresh entries (new ones or updated ones)
+    for (const auto &place : updatedPlaces) {
+        m_placesLoaded.insert(place);
+    }
+
+    // Finally save the updated main collection
+    m_places = m_placesLoaded;
+    saveJson();
+
+    m_placesLoaded.clear();
+    m_placesDynamic.clear();
 }
