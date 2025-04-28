@@ -86,8 +86,6 @@ private:
     void resizeEvent(QResizeEvent *event) override;
 
     void putMark(const PlaceInfo &place);
-    void requestGeo(const PlaceInfo &place);
-
     void setRootContextProperty(const QString &name, const QVariant &value);
 
     static QString geoCacheFilePath();

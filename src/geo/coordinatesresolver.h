@@ -4,6 +4,7 @@
 #include <QObject>
 #include <qhash.h>
 
+class QGeoCodingManager;
 struct PlaceInfo {
     QString country;
     QString town;
@@ -31,11 +32,12 @@ class CoordinatesResolver : public QObject
 {
     Q_OBJECT
 public:
-    explicit CoordinatesResolver(QObject *parent = nullptr);
+    explicit CoordinatesResolver(QGeoCodingManager *geoCoder = nullptr, QObject *parent = nullptr);
 
 public:
-    PlaceInfo requestCoordinates(const PlaceInfo &town);
-    PlaceInfo requestCoordinates(const QString &country, const QString &city);
+    void requestCoordinates(const PlaceInfo &town, const std::function<void(const PlaceInfo &)> &callback = {});
+    void requestCoordinates(const QString &country, const QString &city,
+                            const std::function<void(const PlaceInfo &)> &callback = {});
 
 signals:
     void coordinatesResoloved(const PlaceInfo &town);
@@ -43,6 +45,7 @@ signals:
 private:
     bool m_loadedBuiltin { false };
     CitiesByCountry m_data;
+    QGeoCodingManager *m_geoCoder { nullptr };
 
     void ensureDataLoaded();
     bool loadDataBuiltin();
@@ -50,6 +53,8 @@ private:
 
     PlaceInfo lookupForPlace(const PlaceInfo &request) const;
     PlaceInfo lookupForPlace(const QString &country, const QString &city) const;
+
+    PlaceInfo requestGeo(const PlaceInfo &place);
 
 private slots:
 

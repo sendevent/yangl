@@ -66,7 +66,7 @@ MapWidget::MapWidget(const QString &mapPlugin, int mapType, QWidget *parent)
     , m_geoSrvProv(new QGeoServiceProvider(defaultMapPluginName()))
     , m_geoCoder(m_geoSrvProv->geocodingManager())
     , m_serversModel(new MapServersModel(this))
-    , m_geoResolver(new CoordinatesResolver(this))
+    , m_geoResolver(new CoordinatesResolver(m_geoCoder, this))
 {
     // LOGT;
 
@@ -159,13 +159,15 @@ void MapWidget::resizeEvent(QResizeEvent *event)
 
 void MapWidget::centerOn(const QString &country, const QString &city)
 {
-    const auto &place = m_geoResolver->requestCoordinates(country, city);
-    if (!place.ok) {
-        WRN << "Unknown place, ignored:" << country << city << place.message;
-        return;
-    }
+    auto handler = [this](const auto &place) {
+        if (!place.ok) {
+            WRN << "Unknown place, ignored:" << place.country << place.town << place.message;
+            return;
+        }
 
-    centerOn(place.location);
+        centerOn(place.location);
+    };
+    m_geoResolver->requestCoordinates(country, city, handler);
 }
 
 void MapWidget::centerOn(const QGeoCoordinate &center)
@@ -194,61 +196,17 @@ void MapWidget::clearMarks()
 
 void MapWidget::addMark(const QString &country, const QString &city)
 {
-    const auto &place = m_geoResolver->requestCoordinates(country, city);
-    if (place.ok) {
-        LOG << "Found place:" << country << city;
-        putMark(place);
-        m_placesDynamic.insert(place);
-        return;
-    }
+    auto handler = [this](const auto &place) {
+        if (place.ok) {
+            LOG << "Found place:" << place.country << place.town << m_places.contains(place);
+            putMark(place);
+            m_placesDynamic.insert(place);
+            return;
+        }
 
-    WRN << "Unknown place, requesting online:" << country << city << place.message;
-    requestGeo(place);
-}
-
-void MapWidget::requestGeo(const PlaceInfo &place)
-{
-    WRN << "Not implemented yet";
-    // QGeoAddress addr;
-    // addr.setCountry(place.m_country);
-    // if (place.m_city != "default") {
-    //     addr.setCity(place.m_city);
-    // }
-    // LOG << addr.country() << addr.city();
-
-    // if (!m_geoCoder) {
-    //     WRN << "GeoCoder is unavailable";
-    //     return;
-    // }
-
-    // if (QGeoCodeReply *reply = m_geoCoder->geocode(addr)) {
-    //     LOG << "geocode requested:" << reply << reply->error() << reply->errorString();
-
-    //     if (reply->isFinished() && reply->error() != QGeoCodeReply::NoError) {
-    //         WRN << "geo reply error:" << reply->errorString();
-    //         return;
-    //     }
-
-    //     connect(reply, &QGeoCodeReply::errorOccurred, this,
-    //             [place](QGeoCodeReply::Error error, const QString &errorString) {
-    //                 WRN << "errorr for:" << place.m_country << place.m_city << error << errorString;
-    //             });
-    //     connect(reply, &QGeoCodeReply::finished, this, [this, place] {
-    //         LOG << "geo request finished";
-    //         if (QGeoCodeReply *r = qobject_cast<QGeoCodeReply *>(sender())) {
-    //             const auto &locations = r->locations();
-    //             for (const auto &l : locations) {
-    //                 LOG << l.coordinate();
-    //                 putMark(place, l.coordinate());
-    //                 break;
-    //             }
-    //             r->deleteLater();
-    //         }
-    //     });
-
-    // } else {
-    //     WRN << "failed create geocode request!";
-    // }
+        WRN << "Unknown place, requesting online:" << place.country << place.town << place.message;
+    };
+    m_geoResolver->requestCoordinates(country, city, handler);
 }
 
 void MapWidget::putMark(const PlaceInfo &place)
@@ -256,6 +214,8 @@ void MapWidget::putMark(const PlaceInfo &place)
     if (!m_places.contains(place)) {
         m_serversModel->addMarker(place);
         m_places.insert(place);
+    } else {
+        LOG << place.country << place.town << m_places.contains(place);
     }
 }
 
@@ -335,14 +295,17 @@ void MapWidget::onMarkerDoubleclicked(QQuickItem *item)
     if (!item)
         return;
 
-    const auto &place = m_geoResolver->requestCoordinates(item->property("countryName").toString(),
-                                                          item->property("cityName").toString());
+    auto handler = [this](const auto &place) {
+        if (place.ok) {
+            emit markerDoubleclicked(place);
+        } else {
+            WRN << QString("Invalid server location, ignoring: `%2`@`%1`").arg(place.country, place.town)
+                << place.message;
+        }
+    };
 
-    if (place.ok) {
-        emit markerDoubleclicked(place);
-    } else {
-        WRN << QString("Invalid server location, ignoring: `%2`@`%1`").arg(place.country, place.town) << place.message;
-    }
+    m_geoResolver->requestCoordinates(item->property("countryName").toString(), item->property("cityName").toString(),
+                                      handler);
 }
 
 void MapWidget::setScale(qreal scale)
@@ -388,6 +351,15 @@ void MapWidget::setRootContextProperty(const QString &name, const QVariant &valu
 
 void MapWidget::handleServers()
 {
+
+    auto test = [](const auto &collection) {
+        const auto found = std::find_if(collection.cbegin(), collection.cend(),
+                                        [](const auto &place) { return place.town.toLower() == "Naypyidaw"; });
+        return found != collection.cend();
+    };
+
+    LOG << test(m_placesLoaded) << test(m_placesDynamic) << test(m_places);
+
     QSet<PlaceInfo> updatedPlaces = m_placesDynamic;
 
     // Remove any places from m_placesLoaded that are NOT in updatedPlaces
