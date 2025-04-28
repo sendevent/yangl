@@ -2,36 +2,46 @@
 
 #include "app/common.h"
 
+#include <QCoreApplication>
 #include <QFile>
 #include <QFutureSynchronizer>
+#include <QGeoAddress>
+#include <QGeoCodeReply>
+#include <QGeoCodingManager>
+#include <QGeoCoordinate>
+#include <QGeoLocation>
 #include <QtConcurrentRun>
-#include <cstddef>
-#include <qgeocoordinate.h>
-#include <qnamespace.h>
 
-// Finland,Helsinki,True,60.1708,24.9375
 static constexpr QChar CSVSeparator(',');
 static constexpr size_t CSVColumnCount(5);
 
-CoordinatesResolver::CoordinatesResolver(QObject *parent)
+CoordinatesResolver::CoordinatesResolver(QGeoCodingManager *geoCoder, QObject *parent)
     : QObject { parent }
+    , m_geoCoder(geoCoder)
 {
 }
 
-PlaceInfo CoordinatesResolver::requestCoordinates(const PlaceInfo &town)
+void CoordinatesResolver::requestCoordinates(const PlaceInfo &town,
+                                             const std::function<void(const PlaceInfo &)> &callback)
 {
     ensureDataLoaded();
-    const auto &result = lookupForPlace(town);
+    auto result = lookupForPlace(town);
+
+    if (!result.ok) {
+        result = requestGeo(town);
+    }
+
+    if (callback) {
+        callback(result);
+    }
+
     emit coordinatesResoloved(result);
-    return result;
 }
 
-PlaceInfo CoordinatesResolver::requestCoordinates(const QString &country, const QString &city)
+void CoordinatesResolver::requestCoordinates(const QString &country, const QString &city,
+                                             const std::function<void(const PlaceInfo &)> &callback)
 {
-    return requestCoordinates({
-            country,
-            city,
-    });
+    return requestCoordinates({ country, city }, callback);
 }
 
 void CoordinatesResolver::ensureDataLoaded()
@@ -173,4 +183,57 @@ PlaceInfo CoordinatesResolver::lookupForPlace(const QString &country, const QStr
             country,
             city,
     });
+}
+
+PlaceInfo CoordinatesResolver::requestGeo(const PlaceInfo &place)
+{
+    PlaceInfo result(place);
+    result.ok = false;
+    result.message = "Not found";
+
+    QGeoAddress addr;
+    addr.setCountry(place.country);
+    if (place.town != "default") {
+        addr.setCity(place.town);
+    }
+    LOG << addr.country() << addr.city();
+
+    if (!m_geoCoder) {
+        WRN << "GeoCoder is unavailable";
+        return result;
+    }
+
+    QGeoCodeReply *reply = m_geoCoder->geocode(addr);
+    if (!reply) {
+        WRN << "Failed to create geocode request!";
+        return result;
+    }
+
+    LOG << "Geocode requested:" << reply << reply->error() << reply->errorString();
+
+    // Wait for reply to finish
+    while (!reply->isFinished()) {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+    }
+
+    if (reply->error() != QGeoCodeReply::NoError) {
+        WRN << "Geo reply error:" << reply->errorString();
+        reply->deleteLater();
+        return result;
+    }
+
+    const auto &locations = reply->locations();
+    if (!locations.isEmpty()) {
+        const auto &l = locations.first();
+        LOG << result.country << result.town << l.coordinate();
+        result.location = l.coordinate();
+        result.ok = true;
+        result.message.clear();
+    } else {
+        WRN << "No locations found for:" << result.country << result.town;
+        result.message = "Not found";
+    }
+
+    reply->deleteLater();
+    return result;
 }
