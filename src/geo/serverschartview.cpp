@@ -161,7 +161,7 @@ void ServersChartView::onReloadRequested()
 
 void ServersChartView::onGotCities(const ServersListManager::Group &cities)
 {
-    auto clearGeoName = [](const QString &geoName) -> QString { return QString(geoName).replace('_', ' '); };
+    /*auto clearGeoName = [](const QString &geoName) -> QString { return QString(geoName).replace('_', ' '); };
 
     if (m_modelPopulated) {
         m_chartWidget->clearMarks();
@@ -186,7 +186,8 @@ void ServersChartView::onGotCities(const ServersListManager::Group &cities)
         if (!isGroups) {
             m_chartWidget->addMark(countryName, cityName);
         }
-    }
+    }*/
+    WRN << "Not implemented yet";
 }
 
 void ServersChartView::onGotServers()
@@ -208,7 +209,8 @@ void ServersChartView::onCurrentTreeItemChanged(const QModelIndex &current)
         country = current.data().toString();
     }
 
-    m_chartWidget->centerOn(country, city);
+    // m_chartWidget->centerOn(country, city);
+    WRN << "Not implemented yet";
 }
 
 void ServersChartView::onTreeItemDoubleclicked(const QModelIndex &current)

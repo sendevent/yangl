@@ -1,10 +1,14 @@
 #pragma once
 
 #include <QGeoCoordinate>
+#include <QGeoServiceProvider>
 #include <QObject>
+#include <memory>
 #include <qhash.h>
+#include <qtypes.h>
 
 class QGeoCodingManager;
+
 struct PlaceInfo {
     QString country;
     QString town;
@@ -27,36 +31,50 @@ inline uint qHash(const PlaceInfo &key, uint seed = 0)
 }
 
 using CitiesByCountry = QHash<QString, QMultiHash<QString, PlaceInfo>>;
+using RequestId = quint32;
 
 class CoordinatesResolver : public QObject
 {
     Q_OBJECT
 public:
-    explicit CoordinatesResolver(QGeoCodingManager *geoCoder = nullptr, QObject *parent = nullptr);
+    explicit CoordinatesResolver(QObject *parent = nullptr);
 
-public:
-    void requestCoordinates(const PlaceInfo &town, const std::function<void(const PlaceInfo &)> &callback = {});
-    void requestCoordinates(const QString &country, const QString &city,
-                            const std::function<void(const PlaceInfo &)> &callback = {});
+    RequestId requestCoordinates(const PlaceInfo &town);
+    RequestId requestCoordinates(const QString &country, const QString &city);
 
 signals:
-    void coordinatesResoloved(const PlaceInfo &town);
+    void coordinatesResolved(RequestId id, const PlaceInfo &town);
 
 private:
-    bool m_loadedBuiltin { false };
+    RequestId m_requestCounter { 0 };
+    RequestId m_lastRequestedId { 0 };
+
     CitiesByCountry m_data;
+
+    QSet<PlaceInfo> m_places; // both
+    QSet<PlaceInfo> m_placesLoaded; // from JSON
+    QSet<PlaceInfo> m_placesDynamic; // from external
+
+    std::unique_ptr<QGeoServiceProvider> m_geoSrvProv;
     QGeoCodingManager *m_geoCoder { nullptr };
 
     void ensureDataLoaded();
-    bool loadDataBuiltin();
+
     CitiesByCountry loadData(const QString &path);
 
-    PlaceInfo lookupForPlace(const PlaceInfo &request) const;
-    PlaceInfo lookupForPlace(const QString &country, const QString &city) const;
+    void lookupForPlaceAsync(const PlaceInfo &request, RequestId id);
 
-    PlaceInfo requestGeo(const PlaceInfo &place);
+    PlaceInfo lookupForPlace(const PlaceInfo &request) const;
+
+    void requestGeoAsync(const PlaceInfo &place, RequestId id);
+
+    static QString geoCacheFilePath();
+
+    void saveDynamic() const;
 
 private slots:
+
+    void onCoordinatesResolved(RequestId id, const PlaceInfo &town);
 
     friend class TestCoordinatesResolver;
 };

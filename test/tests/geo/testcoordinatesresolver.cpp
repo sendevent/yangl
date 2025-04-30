@@ -36,7 +36,9 @@ private slots:
     void test_location_real_cases();
     void test_location_fake();
 
-    void test_requestCoordinates_real();
+    void test_requestCoordinates_real_1();
+    void test_requestCoordinates_real_3();
+
     void test_requestCoordinates_fake();
 
     void test_requestCoordinates_capital();
@@ -54,7 +56,7 @@ void TestCoordinatesResolver::cleanupTestCase()
 
 void TestCoordinatesResolver::test_loadDataBuiltin()
 {
-    QVERIFY(m_resolver->loadDataBuiltin());
+    m_resolver->ensureDataLoaded();
     QCOMPARE(m_resolver->m_data.size(), 241);
 }
 
@@ -79,10 +81,6 @@ void TestCoordinatesResolver::test_location_real()
     });
     checkResponse(response2);
     QCOMPARE(response1, response2);
-
-    const auto &response3 = m_resolver->lookupForPlace("Finland", "Helsinki");
-    checkResponse(response3);
-    QCOMPARE(response2, response3);
 }
 
 void TestCoordinatesResolver::test_location_real_cases()
@@ -108,10 +106,6 @@ void TestCoordinatesResolver::test_location_real_cases()
         });
         checkResponse(response2);
         QCOMPARE(response1, response2);
-
-        const auto &response3 = m_resolver->lookupForPlace("Finland", "Helsinki");
-        checkResponse(response3);
-        QCOMPARE(response2, response3);
     };
 
     const QList<QPair<QString, QString>> data { { "Finland", "Helsinki" }, { "finland", "Helsinki" },
@@ -119,8 +113,6 @@ void TestCoordinatesResolver::test_location_real_cases()
                                                 { "Finland", "" },         { "finland", "" } };
 
     for (const auto &pair : data) {
-        if (pair.first == "finland" && pair.second == "")
-            int dbg = 0;
         runCheck(pair.first, pair.second);
     }
 }
@@ -133,67 +125,183 @@ void TestCoordinatesResolver::test_location_fake()
     };
 
     const auto &response1 = m_resolver->lookupForPlace({
-            "Russia",
-            "Mariupol",
+            "Oz",
+            "Emerald City",
     });
     checkResponse(response1);
 
     const auto &response2 = m_resolver->lookupForPlace({
-            "Russia",
-            "Mariupol",
+            "Oz",
+            "Emerald City",
     });
     checkResponse(response2);
     QCOMPARE(response1, response2);
-
-    const auto &response3 = m_resolver->lookupForPlace("Russia", "Mariupol");
-    checkResponse(response3);
-    QCOMPARE(response2, response3);
 }
 
-void TestCoordinatesResolver::test_requestCoordinates_real()
+const QList<QPair<QString, QString>> generateDataSet(const QString &country, const QString &city)
 {
-    CoordinatesResolver resolver;
+    /*{
+        { "Country", "City" },
+        { "country", "city" },
+        { "country", "City" },
+        { "Country", "city" },
+        { "Country", "" },
+        { "country", "" },
+    }*/
 
-    bool finished(false);
-    auto onResolved = [&finished](const PlaceInfo &city) {
-        finished = true;
+    auto capitalize = [](const QString &value) {
+        auto str(value);
+        str[0] = str[0].toUpper();
+        return str;
+    };
+    const auto &countryLower = country.toLower();
+    const auto &cityLower = city.toLower();
 
+    return {
+        { capitalize(countryLower), capitalize(cityLower) },
+        { countryLower, cityLower },
+        { countryLower, capitalize(cityLower) },
+        { capitalize(countryLower), cityLower },
+        { capitalize(countryLower), "" },
+        { countryLower, "" },
+    };
+}
+
+void TestCoordinatesResolver::test_requestCoordinates_real_1()
+{
+    auto checkResult = [](const PlaceInfo &city, const auto idRequested, const auto idReceived) {
+        QCOMPARE(idReceived, idRequested);
         QVERIFY(city.ok);
         QCOMPARE(city.country, "Finland");
         QCOMPARE(city.town, "Helsinki");
         QCOMPARE(city.location.latitude(), 60.1708);
         QCOMPARE(city.location.longitude(), 24.9375);
     };
-    connect(&resolver, &CoordinatesResolver::coordinatesResoloved, this, onResolved);
 
-    resolver.requestCoordinates({
-            "Finland",
-            "Helsinki",
-    });
+    const QList<QPair<QString, QString>> &data = ::generateDataSet("Finland", "Helsinki");
 
-    resolver.requestCoordinates("Finland", "Helsinki");
+    for (const auto &pair : data) {
+        QSignalSpy spy(m_resolver, &CoordinatesResolver::coordinatesResolved);
+
+        const auto idRequested = m_resolver->requestCoordinates({ pair.first, pair.second });
+
+        spy.wait();
+        QCOMPARE(spy.count(), 1);
+        const QList<QVariant> &arguments = spy.takeFirst();
+
+        QVERIFY(arguments.size() == 2);
+
+        QVERIFY(arguments.at(0).typeId() == QMetaType::UInt);
+
+        bool converted(false);
+        const auto idReceived = arguments.at(0).toUInt(&converted);
+        QVERIFY(converted);
+
+        const auto &result = arguments.at(1).value<PlaceInfo>();
+
+        checkResult(result, idRequested, idReceived);
+    }
+}
+
+void TestCoordinatesResolver::test_requestCoordinates_real_3()
+{
+
+    auto checkResult = [](const PlaceInfo &placeRequested, const PlaceInfo &placeReceived, const auto idRequested,
+                          const auto idReceived) {
+        QCOMPARE(idReceived, idRequested);
+        QVERIFY(placeReceived.ok);
+        QCOMPARE(placeReceived.country.toLower(), placeRequested.country.toLower());
+        if (placeRequested.town.isEmpty()) {
+            QVERIFY(!placeReceived.town.isEmpty());
+        } else {
+            QCOMPARE(placeReceived.town.toLower(), placeRequested.town.toLower());
+        }
+    };
+
+    const QList<QPair<QString, QString>> &data = ::generateDataSet("Finland", "Helsinki")
+            + ::generateDataSet("Canada", "Ottawa") + ::generateDataSet("Australia", "Canberra");
+
+    for (const auto &pair : data) {
+        QSignalSpy spy(m_resolver, &CoordinatesResolver::coordinatesResolved);
+
+        const PlaceInfo placeRequested = { pair.first, pair.second };
+        const auto idRequested = m_resolver->requestCoordinates(placeRequested);
+
+        spy.wait();
+        QCOMPARE(spy.count(), 1);
+        const QList<QVariant> &arguments = spy.takeFirst();
+
+        QVERIFY(arguments.size() == 2);
+
+        QVERIFY(arguments.at(0).typeId() == QMetaType::UInt);
+
+        bool converted(false);
+        const auto idReceived = arguments.at(0).toUInt(&converted);
+        QVERIFY(converted);
+
+        const auto &placeReceived = arguments.at(1).value<PlaceInfo>();
+
+        checkResult(placeRequested, placeReceived, idRequested, idReceived);
+    }
 }
 
 void TestCoordinatesResolver::test_requestCoordinates_fake()
 {
     CoordinatesResolver resolver;
 
-    bool finished(false);
-    auto onResolved = [&finished](const PlaceInfo &city) {
-        finished = true;
-
+    auto checkResult = [](const PlaceInfo &city, const auto idRequested, const auto idReceived) {
+        QCOMPARE(idReceived, idRequested);
         QVERIFY(!city.ok);
-        QCOMPARE(city.country, "Russia");
-        QCOMPARE(city.town, "Mariupol");
+        QCOMPARE(city.country, "Oz");
+        QCOMPARE(city.town, "Emerald City");
+        QVERIFY(!city.location.isValid());
     };
-    connect(&resolver, &CoordinatesResolver::coordinatesResoloved, this, onResolved);
 
-    resolver.requestCoordinates({
-            "Russia",
-            "Mariupol",
-    });
+    const QList<QPair<QString, QString>> &data = ::generateDataSet("Oz", "Emerald City");
 
-    resolver.requestCoordinates("Russia", "Mariupol");
+    {
+        QSignalSpy spy(&resolver, &CoordinatesResolver::coordinatesResolved);
+
+        const auto idRequested = resolver.requestCoordinates({ "Oz", "Emerald City" });
+
+        spy.wait();
+        QCOMPARE(spy.count(), 1);
+        const QList<QVariant> &arguments = spy.takeFirst();
+
+        QVERIFY(arguments.size() == 2);
+
+        QVERIFY(arguments.at(0).typeId() == QMetaType::UInt);
+
+        bool converted(false);
+        const auto idReceived = arguments.at(0).toUInt(&converted);
+        QVERIFY(converted);
+
+        const auto &result = arguments.at(1).value<PlaceInfo>();
+
+        checkResult(result, idRequested, idReceived);
+    }
+
+    {
+        QSignalSpy spy(&resolver, &CoordinatesResolver::coordinatesResolved);
+
+        const auto idRequested = resolver.requestCoordinates("Oz", "Emerald City");
+
+        spy.wait();
+        QCOMPARE(spy.count(), 1);
+        const QList<QVariant> &arguments = spy.takeFirst();
+
+        QVERIFY(arguments.size() == 2);
+
+        QVERIFY(arguments.at(0).typeId() == QMetaType::UInt);
+
+        bool converted(false);
+        const auto idReceived = arguments.at(0).toUInt(&converted);
+        QVERIFY(converted);
+
+        const auto &result = arguments.at(1).value<PlaceInfo>();
+
+        checkResult(result, idRequested, idReceived);
+    }
 }
 
 void TestCoordinatesResolver::test_requestCoordinates_capital()

@@ -45,7 +45,6 @@ private slots:
 
 private:
     NordVpnWraper *m_nordVpn;
-    QElapsedTimer m_timeCounter;
 
     QFutureWatcher<void> m_futureWatcher;
 
@@ -57,6 +56,9 @@ private:
 
     static Servers stringToServers(const QString &in);
     Servers queryList(const QStringList &args) const;
+
+    void loadLocal();
+    void saveLocal();
 };
 
 Q_DECLARE_METATYPE(ServersListManager::Servers);
