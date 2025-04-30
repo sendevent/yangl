@@ -96,8 +96,6 @@ ServersListManager::Servers ServersListManager::queryCities(const QString &count
 
 void ServersListManager::run()
 {
-    m_timeCounter.start();
-
     QFuture<void> future = QtConcurrent::run([this]() { this->runSeparated(); });
 
     m_futureWatcher.setFuture(future);
@@ -105,6 +103,8 @@ void ServersListManager::run()
 
 void ServersListManager::runSeparated()
 {
+    loadLocal();
+
     auto groups = queryGroups();
     std::sort(groups.begin(), groups.end());
     emit citiesAdded({ Consts::Groups, groups });
@@ -117,9 +117,15 @@ void ServersListManager::runSeparated()
         const Group group { country, cities };
         QMetaObject::invokeMethod(this, &ServersListManager::commitCities, Qt::QueuedConnection, group);
     }
+
+    saveLocal();
 }
 
 void ServersListManager::commitCities(const ServersListManager::Group &cities)
 {
     emit citiesAdded(cities);
 }
+
+void ServersListManager::loadLocal() { }
+
+void ServersListManager::saveLocal() { }

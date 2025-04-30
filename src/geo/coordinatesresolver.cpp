@@ -1,58 +1,86 @@
 #include "coordinatesresolver.h"
 
 #include "app/common.h"
+#include "settings/settingsmanager.h"
 
 #include <QCoreApplication>
 #include <QFile>
+#include <QFileInfo>
 #include <QFutureSynchronizer>
+#include <QFutureWatcher>
 #include <QGeoAddress>
 #include <QGeoCodeReply>
 #include <QGeoCodingManager>
 #include <QGeoCoordinate>
 #include <QGeoLocation>
+#include <QRegularExpression>
 #include <QtConcurrentRun>
+#include <memory>
+#include <qdebug.h>
+#include <utility>
 
 static constexpr QChar CSVSeparator(',');
 static constexpr size_t CSVColumnCount(5);
 
-CoordinatesResolver::CoordinatesResolver(QGeoCodingManager *geoCoder, QObject *parent)
+CoordinatesResolver::CoordinatesResolver(QObject *parent)
     : QObject { parent }
-    , m_geoCoder(geoCoder)
+    , m_geoSrvProv(std::make_unique<QGeoServiceProvider>("osm"))
+    , m_geoCoder(m_geoSrvProv->geocodingManager())
 {
+    if (m_geoCoder) {
+        QLocale qLocaleC(QLocale::C, QLocale::AnyCountry);
+        m_geoCoder->setLocale(qLocaleC);
+    } else {
+        WRN << "Can't aquire geocoder" << m_geoSrvProv->geocodingManager();
+    }
+
+    connect(this, &CoordinatesResolver::coordinatesResolved, this, &CoordinatesResolver::onCoordinatesResolved);
 }
 
-void CoordinatesResolver::requestCoordinates(const PlaceInfo &town,
-                                             const std::function<void(const PlaceInfo &)> &callback)
+quint32 CoordinatesResolver::requestCoordinates(const PlaceInfo &town)
 {
     ensureDataLoaded();
-    auto result = lookupForPlace(town);
 
-    if (!result.ok) {
-        result = requestGeo(town);
-    }
+    ++m_requestCounter; // overflow on around 4 billion requests, then goes back to the zero
 
-    if (callback) {
-        callback(result);
-    }
-
-    emit coordinatesResoloved(result);
+    lookupForPlaceAsync(town, m_requestCounter);
+    return m_requestCounter;
 }
 
-void CoordinatesResolver::requestCoordinates(const QString &country, const QString &city,
-                                             const std::function<void(const PlaceInfo &)> &callback)
+quint32 CoordinatesResolver::requestCoordinates(const QString &country, const QString &city)
 {
-    return requestCoordinates({ country, city }, callback);
+    return requestCoordinates({ country, city });
 }
 
 void CoordinatesResolver::ensureDataLoaded()
 {
     QFutureSynchronizer<void> synchronizer;
 
-    if (!m_loadedBuiltin) {
-        synchronizer.addFuture(QtConcurrent::run([this]() { loadDataBuiltin(); }));
+    static bool loadedBuiltin(false);
+    if (!loadedBuiltin) {
+        synchronizer.addFuture(QtConcurrent::run([this]() {
+            const auto &loaded = loadData(":/geo/resources/map/cities.csv");
+
+            if (!loaded.isEmpty()) {
+                m_data.insert(loaded);
+            }
+        }));
+        loadedBuiltin = true;
     }
 
-    synchronizer.waitForFinished(); // Ensure all tasks complete
+    static bool loadedDynamic(false);
+    if (!loadedDynamic) {
+        synchronizer.addFuture(QtConcurrent::run([this]() {
+            const auto &loaded = loadData(geoCacheFilePath());
+
+            if (!loaded.isEmpty()) {
+                m_data.insert(loaded);
+            }
+        }));
+        loadedDynamic = true;
+    }
+
+    synchronizer.waitForFinished();
 }
 
 CitiesByCountry CoordinatesResolver::loadData(const QString &path)
@@ -132,18 +160,24 @@ CitiesByCountry CoordinatesResolver::loadData(const QString &path)
     return loaded;
 }
 
-bool CoordinatesResolver::loadDataBuiltin()
+void CoordinatesResolver::lookupForPlaceAsync(const PlaceInfo &request, RequestId id)
 {
-    if (!m_loadedBuiltin) {
-        const auto &loaded = loadData(":/geo/resources/map/cities.csv");
+    auto future = QtConcurrent::run([this, request]() -> PlaceInfo { return lookupForPlace(request); });
 
-        if (!loaded.isEmpty()) {
-            m_data.insert(loaded);
-            m_loadedBuiltin = true;
+    auto *watcher = new QFutureWatcher<PlaceInfo>(this);
+    connect(watcher, &QFutureWatcher<PlaceInfo>::finished, this, [this, id, watcher]() {
+        QScopedPointer<QFutureWatcher<PlaceInfo>> cleanup(watcher); // Ensure deletion even if an exception occurs
+
+        const PlaceInfo &placeInfo = watcher->future().result();
+        LOG << "Async task finished, place found:" << placeInfo.country << placeInfo.town << placeInfo.ok;
+        if (placeInfo.ok) {
+            emit coordinatesResolved(id, placeInfo);
+        } else {
+            requestGeoAsync(placeInfo, id);
         }
-    }
+    });
 
-    return m_loadedBuiltin;
+    watcher->setFuture(future);
 }
 
 PlaceInfo CoordinatesResolver::lookupForPlace(const PlaceInfo &request) const
@@ -164,32 +198,29 @@ PlaceInfo CoordinatesResolver::lookupForPlace(const PlaceInfo &request) const
         if (town.town.isEmpty()) {
             auto it = std::find_if(country.cbegin(), country.cend(), searchForTheCapital);
             if (it != country.end()) {
-                return *it;
+                town = *it;
+                town.ok = true;
             }
-
         } else if (country.contains(cityName)) {
             town = country.value(cityName);
             town.ok = true;
-            return town;
         }
     }
 
     return town;
 }
 
-PlaceInfo CoordinatesResolver::lookupForPlace(const QString &country, const QString &city) const
-{
-    return lookupForPlace({
-            country,
-            city,
-    });
-}
-
-PlaceInfo CoordinatesResolver::requestGeo(const PlaceInfo &place)
+void CoordinatesResolver::requestGeoAsync(const PlaceInfo &place, RequestId id)
 {
     PlaceInfo result(place);
     result.ok = false;
     result.message = "Not found";
+
+    if (!m_geoCoder) {
+        WRN << "GeoCoder is unavailable";
+        emit coordinatesResolved(id, result);
+        return;
+    }
 
     QGeoAddress addr;
     addr.setCountry(place.country);
@@ -198,42 +229,100 @@ PlaceInfo CoordinatesResolver::requestGeo(const PlaceInfo &place)
     }
     LOG << addr.country() << addr.city();
 
-    if (!m_geoCoder) {
-        WRN << "GeoCoder is unavailable";
-        return result;
-    }
-
     QGeoCodeReply *reply = m_geoCoder->geocode(addr);
     if (!reply) {
         WRN << "Failed to create geocode request!";
-        return result;
+        emit coordinatesResolved(id, result);
+        return;
     }
 
-    LOG << "Geocode requested:" << reply << reply->error() << reply->errorString();
+    connect(reply, &QGeoCodeReply::finished, this, [this, reply, id, result]() mutable {
+        QScopedPointer<QGeoCodeReply, QScopedPointerDeleteLater> cleanup(reply); // auto deletes reply safely
 
-    // Wait for reply to finish
-    while (!reply->isFinished()) {
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
-    }
+        if (reply->error() != QGeoCodeReply::NoError) {
+            WRN << "Geo reply error:" << reply->errorString();
+            emit coordinatesResolved(id, result);
+            return;
+        }
 
-    if (reply->error() != QGeoCodeReply::NoError) {
-        WRN << "Geo reply error:" << reply->errorString();
+        const auto &locations = reply->locations();
+        if (!locations.isEmpty()) {
+            const auto &l = locations.first();
+            LOG << result.country << result.town << l.coordinate();
+            result.location = l.coordinate();
+            result.ok = true;
+            result.message.clear();
+        } else {
+            WRN << "No locations found for:" << result.country << result.town;
+            result.message = "Not found";
+        }
+
+        emit coordinatesResolved(id, result);
+    });
+
+    // Optionally handle network errors immediately
+    connect(reply, &QGeoCodeReply::errorOccurred, this, [this, reply, id, result](QGeoCodeReply::Error error) mutable {
+        WRN << "Geo reply error occurred:" << error << reply->errorString();
         reply->deleteLater();
-        return result;
+        emit coordinatesResolved(id, result);
+    });
+}
+
+/*static*/ QString CoordinatesResolver::geoCacheFilePath()
+{
+    static QString path = QString("%1/cities.csv").arg(SettingsManager::dirPath());
+    return path;
+}
+
+void CoordinatesResolver::saveDynamic() const
+{
+    QFile out(geoCacheFilePath());
+    QFileInfo fileInfo(out);
+    LOG << fileInfo.absoluteFilePath();
+    if (!out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        WRN << "Failed opening file:" << fileInfo.absoluteFilePath() << out.errorString();
+        return;
     }
 
-    const auto &locations = reply->locations();
-    if (!locations.isEmpty()) {
-        const auto &l = locations.first();
-        LOG << result.country << result.town << l.coordinate();
-        result.location = l.coordinate();
-        result.ok = true;
-        result.message.clear();
-    } else {
-        WRN << "No locations found for:" << result.country << result.town;
-        result.message = "Not found";
-    }
+    auto escape = [](const QString &str) -> QString {
+        bool needsQuotes = false;
+        for (QChar c : str) {
+            if (!c.isLetterOrNumber() && !c.isSpace()) {
+                needsQuotes = true;
+                break;
+            }
+        }
 
-    reply->deleteLater();
-    return result;
+        QString escaped = str;
+        if (needsQuotes) {
+            escaped.replace("\"", "\"\""); // Escape inner quotes
+            escaped = "\"" + escaped + "\"";
+        }
+
+        return escaped;
+    };
+
+    auto toLine = [escape](const PlaceInfo &place) {
+        return QStringList {
+            escape(place.country),
+            escape(place.town),
+            escape(place.capital ? "True" : "False"),
+            escape(QString::number(place.location.latitude(), 'g')),
+            escape(QString::number(place.location.longitude(), 'g')),
+        }
+                .join(",");
+    };
+
+    QTextStream ts(&out);
+    for (const auto &place : m_placesDynamic) {
+        ts << toLine(place);
+        Qt::endl(ts);
+    }
+}
+
+void CoordinatesResolver::onCoordinatesResolved(RequestId id, const PlaceInfo &town)
+{
+    if (town.ok) {
+        m_places.insert(town);
+    }
 }

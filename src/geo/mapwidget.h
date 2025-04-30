@@ -18,7 +18,6 @@
 #pragma once
 
 #include "geo/coordinatesresolver.h"
-#include "serverslistmanager.h"
 
 #include <QGeoCoordinate>
 #include <QGeoServiceProvider>
@@ -26,7 +25,6 @@
 #include <QWidget>
 
 class QQuickWidget;
-class QGeoCodingManager;
 class MapServersModel;
 class QQuickItem;
 class MapWidget : public QWidget
@@ -38,7 +36,7 @@ public:
 
     void init();
 
-    void addMark(const QString &country, const QString &city);
+    void addMark(const PlaceInfo &place);
 
     void clearMarks();
 
@@ -46,7 +44,6 @@ public:
     qreal scale() const;
 
     QGeoCoordinate center() const;
-    void centerOn(const QString &country, const QString &city);
     void centerOn(const QGeoCoordinate &center);
 
     void setActiveConnection(const PlaceInfo &marker);
@@ -71,14 +68,7 @@ private slots:
 
 private:
     QQuickWidget *m_quickView { nullptr };
-    QSharedPointer<QGeoServiceProvider> m_geoSrvProv;
-    QGeoCodingManager *m_geoCoder { nullptr };
     MapServersModel *m_serversModel { nullptr };
-    CoordinatesResolver *m_geoResolver { nullptr };
-
-    QSet<PlaceInfo> m_places; // both
-    QSet<PlaceInfo> m_placesLoaded; // from JSON
-    QSet<PlaceInfo> m_placesDynamic; // from external
 
     void syncMapSize();
 
@@ -87,9 +77,4 @@ private:
 
     void putMark(const PlaceInfo &place);
     void setRootContextProperty(const QString &name, const QVariant &value);
-
-    static QString geoCacheFilePath();
-
-    bool loadJson();
-    void saveJson();
 };
