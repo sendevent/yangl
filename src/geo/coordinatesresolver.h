@@ -14,23 +14,26 @@ struct PlaceInfo {
     QString town;
     QGeoCoordinate location;
     bool capital { false };
+    bool group { false };
     bool ok { false };
     QString message;
 };
 
+using Places = QList<PlaceInfo>;
+
 inline bool operator==(const PlaceInfo &lhs, const PlaceInfo &rhs)
 {
-    return lhs.country == rhs.country && lhs.town == rhs.town
-            && lhs.location == rhs.location /*&& lhs.ok == rhs.ok && lhs.message == rhs.message*/;
+    return lhs.country == rhs.country && lhs.town == rhs.town && lhs.location == rhs.location
+            && lhs.group == rhs.group /*&& lhs.message == rhs.message*/;
 }
 
 inline uint qHash(const PlaceInfo &key, uint seed = 0)
 {
-    return qHashMulti(seed, key.country, key.town, key.location.latitude(), key.location.longitude()/*,
-                      key.ok, key.message*/);
+    return qHashMulti(seed, key.country, key.town, key.location.latitude(), key.location.longitude(), key.group/*,
+                      key.message*/);
 }
 
-using CitiesByCountry = QHash<QString, QMultiHash<QString, PlaceInfo>>;
+using CitiesByCountry = QMap<QString, QMultiMap<QString, PlaceInfo>>;
 using RequestId = quint32;
 
 class CoordinatesResolver : public QObject
@@ -60,17 +63,13 @@ private:
 
     void ensureDataLoaded();
 
-    CitiesByCountry loadData(const QString &path);
-
     void lookupForPlaceAsync(const PlaceInfo &request, RequestId id);
 
     PlaceInfo lookupForPlace(const PlaceInfo &request) const;
 
     void requestGeoAsync(const PlaceInfo &place, RequestId id);
 
-    static QString geoCacheFilePath();
-
-    void saveDynamic() const;
+    static CitiesByCountry loadData(const QString &path);
 
 private slots:
 

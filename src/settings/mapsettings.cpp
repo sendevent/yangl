@@ -58,7 +58,7 @@ void MapSettings::setupMap(const QString &pluginName)
         delete m_preview;
     }
 
-    m_preview = new MapWidget(pluginName, m_comboType->currentIndex(), this);
+    m_preview = new MapWidget(pluginName, m_comboType->currentIndex(), nullptr, this);
     m_formLayout->addRow(m_preview);
 
     m_comboType->clear();

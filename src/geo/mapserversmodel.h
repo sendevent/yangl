@@ -21,29 +21,56 @@
 
 #include <QAbstractListModel>
 #include <QGeoCoordinate>
+#include <qproperty.h>
 
-class MapServersModel : public QAbstractListModel
+struct TreeItem {
+    QString name;
+    PlaceInfo data;
+    TreeItem *parent = nullptr;
+    std::vector<std::unique_ptr<TreeItem>> children;
+
+    TreeItem *child(int row) const
+    {
+        if (row >= 0 && row < children.size())
+            return children[row].get();
+        return nullptr;
+    }
+
+    int row() const
+    {
+        if (!parent)
+            return 0;
+        for (int i = 0; i < parent->children.size(); ++i) {
+            if (parent->children[i].get() == this)
+                return i;
+        }
+        return 0;
+    }
+};
+
+class MapServersModel : public QAbstractItemModel
 {
     Q_OBJECT
-
 public:
-    enum MarkerRoles
+    enum Roles
     {
-        PositionRole = Qt::UserRole + 1,
-        CountryNameRole,
-        CityNameRole,
+        PlaceInfoRole = Qt::UserRole + 1,
     };
 
-    MapServersModel(QObject *parent = {});
-    void addMarker(const PlaceInfo &place);
+    MapServersModel(QObject *parent = nullptr);
+    ~MapServersModel();
+
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+    QModelIndex parent(const QModelIndex &index) const override;
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-
-    void clear();
-
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override { return 1; }
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-    QHash<int, QByteArray> roleNames() const override;
+    void addMarker(const PlaceInfo &place);
+    void clear();
+
+    TreeItem *rootItem() const;
 
 private:
-    QList<PlaceInfo> m_coordinates;
+    TreeItem *m_root;
 };

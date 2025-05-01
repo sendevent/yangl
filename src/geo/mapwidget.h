@@ -24,21 +24,17 @@
 #include <QSharedPointer>
 #include <QWidget>
 
-class QQuickWidget;
 class MapServersModel;
+class QQuickWidget;
 class QQuickItem;
 class MapWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit MapWidget(const QString &mapPlugin, int mapType, QWidget *parent = {});
+    explicit MapWidget(const QString &mapPlugin, int mapType, MapServersModel *model, QWidget *parent = {});
     ~MapWidget();
 
     void init();
-
-    void addMark(const PlaceInfo &place);
-
-    void clearMarks();
 
     void setScale(qreal scale);
     qreal scale() const;
@@ -68,13 +64,11 @@ private slots:
 
 private:
     QQuickWidget *m_quickView { nullptr };
-    MapServersModel *m_serversModel { nullptr };
 
     void syncMapSize();
 
     void showEvent(QShowEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
-    void putMark(const PlaceInfo &place);
     void setRootContextProperty(const QString &name, const QVariant &value);
 };
