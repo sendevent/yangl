@@ -19,13 +19,13 @@
 
 #include "app/nordvpninfo.h"
 #include "geo/coordinatesresolver.h"
+#include "geo/serverlocationresolver.h"
 #include "mapwidget.h"
-#include "serverslistmanager.h"
 
 #include <QWidget>
 
 class NordVpnWraper;
-class QStandardItemModel;
+class MapServersModel;
 class ServersFilterModel;
 class QLineEdit;
 class QTreeView;
@@ -47,7 +47,7 @@ public slots:
 private slots:
     void onReloadRequested();
     void onGotServers();
-    void onGotCities(const ServersListManager::Group &cities);
+    void onGotLocation(const PlaceInfo &place);
     void onCurrentTreeItemChanged(const QModelIndex &current);
     void onTreeItemDoubleclicked(const QModelIndex &current);
 
@@ -66,8 +66,8 @@ private:
     MapWidget *m_chartWidget;
 
     NordVpnWraper *m_nordVpnWraper;
-    ServersListManager *m_listManager;
-    QStandardItemModel *m_serversModel;
+    ServerLocationResolver *m_listManager;
+    MapServersModel *m_serversModel;
     ServersFilterModel *m_serversFilterModel;
 
     bool m_modelPopulated { false };

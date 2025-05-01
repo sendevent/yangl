@@ -1,7 +1,6 @@
 #include "coordinatesresolver.h"
 
 #include "app/common.h"
-#include "settings/settingsmanager.h"
 
 #include <QCoreApplication>
 #include <QFile>
@@ -16,8 +15,6 @@
 #include <QRegularExpression>
 #include <QtConcurrentRun>
 #include <memory>
-#include <qdebug.h>
-#include <utility>
 
 static constexpr QChar CSVSeparator(',');
 static constexpr size_t CSVColumnCount(5);
@@ -66,18 +63,6 @@ void CoordinatesResolver::ensureDataLoaded()
             }
         }));
         loadedBuiltin = true;
-    }
-
-    static bool loadedDynamic(false);
-    if (!loadedDynamic) {
-        synchronizer.addFuture(QtConcurrent::run([this]() {
-            const auto &loaded = loadData(geoCacheFilePath());
-
-            if (!loaded.isEmpty()) {
-                m_data.insert(loaded);
-            }
-        }));
-        loadedDynamic = true;
     }
 
     synchronizer.waitForFinished();
@@ -146,7 +131,7 @@ CitiesByCountry CoordinatesResolver::loadData(const QString &path)
             }
 
             const PlaceInfo place {
-                parts[0], parts[1], coord, parts[2] == "True", true, QString(),
+                parts[0], parts[1], coord, parts[2] == "True", false, true, QString(),
             };
 
             auto &country = loaded[place.country.toLower()];
@@ -266,58 +251,6 @@ void CoordinatesResolver::requestGeoAsync(const PlaceInfo &place, RequestId id)
         reply->deleteLater();
         emit coordinatesResolved(id, result);
     });
-}
-
-/*static*/ QString CoordinatesResolver::geoCacheFilePath()
-{
-    static QString path = QString("%1/cities.csv").arg(SettingsManager::dirPath());
-    return path;
-}
-
-void CoordinatesResolver::saveDynamic() const
-{
-    QFile out(geoCacheFilePath());
-    QFileInfo fileInfo(out);
-    LOG << fileInfo.absoluteFilePath();
-    if (!out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
-        WRN << "Failed opening file:" << fileInfo.absoluteFilePath() << out.errorString();
-        return;
-    }
-
-    auto escape = [](const QString &str) -> QString {
-        bool needsQuotes = false;
-        for (QChar c : str) {
-            if (!c.isLetterOrNumber() && !c.isSpace()) {
-                needsQuotes = true;
-                break;
-            }
-        }
-
-        QString escaped = str;
-        if (needsQuotes) {
-            escaped.replace("\"", "\"\""); // Escape inner quotes
-            escaped = "\"" + escaped + "\"";
-        }
-
-        return escaped;
-    };
-
-    auto toLine = [escape](const PlaceInfo &place) {
-        return QStringList {
-            escape(place.country),
-            escape(place.town),
-            escape(place.capital ? "True" : "False"),
-            escape(QString::number(place.location.latitude(), 'g')),
-            escape(QString::number(place.location.longitude(), 'g')),
-        }
-                .join(",");
-    };
-
-    QTextStream ts(&out);
-    for (const auto &place : m_placesDynamic) {
-        ts << toLine(place);
-        Qt::endl(ts);
-    }
 }
 
 void CoordinatesResolver::onCoordinatesResolved(RequestId id, const PlaceInfo &town)
