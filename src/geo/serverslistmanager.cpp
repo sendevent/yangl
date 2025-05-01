@@ -23,12 +23,21 @@
 #include "app/nordvpnwraper.h"
 #include "cli/clicall.h"
 #include "cli/clicaller.h"
+#include "geo/coordinatesresolver.h"
+#include "settings/settingsmanager.h"
 
+#include <QFile>
+#include <QFileInfo>
 #include <QFutureSynchronizer>
 #include <QFutureWatcher>
+#include <QJsonArray>
+#include <QJsonParseError>
 #include <QTimer>
 #include <QtConcurrentRun>
+#include <algorithm>
+#include <qjsonobject.h>
 #include <qnamespace.h>
+#include <utility>
 
 struct Consts {
     static constexpr QLatin1String ArgGroups = QLatin1String("groups");
@@ -55,12 +64,12 @@ bool ServersListManager::reload()
     return false;
 }
 
-/*static*/ ServersListManager::Servers ServersListManager::stringToServers(const QString &in)
+/*static*/ QStringList ServersListManager::stringToServers(const QString &in)
 {
     return in.split('\n', Qt::SkipEmptyParts).toVector();
 }
 
-ServersListManager::Servers ServersListManager::queryList(const QStringList &args) const
+QStringList ServersListManager::queryList(const QStringList &args) const
 {
     const Action::Ptr &action = m_nordVpn->storate()->createUserAction({});
     ActionResultViewer::unregisterAction(action.get());
@@ -79,19 +88,47 @@ ServersListManager::Servers ServersListManager::queryList(const QStringList &arg
     return {};
 }
 
-ServersListManager::Servers ServersListManager::queryGroups() const
+PlaceInfo createPlace(const QString &country, const QString &city)
 {
-    return queryList({ Consts::ArgGroups });
+    PlaceInfo result;
+    result.country = country;
+    result.town = city;
+
+    result.ok = true;
+    result.capital = false;
+    result.group = result.country == Consts::ArgGroups;
+
+    return result;
 }
 
-ServersListManager::Servers ServersListManager::queryCountries() const
+Places ServersListManager::queryGroups() const
 {
-    return queryList({ Consts::ArgCountries });
+    const auto &names = queryList({ Consts::ArgGroups });
+    Places groups(names.size());
+    std::transform(names.begin(), names.end(), groups.begin(),
+                   [](const auto &name) { return createPlace(Consts::ArgGroups, name); });
+
+    return groups;
 }
 
-ServersListManager::Servers ServersListManager::queryCities(const QString &country) const
+Places ServersListManager::queryCountries() const
 {
-    return queryList({ Consts::ArgCountry, country });
+    const auto &names = queryList({ Consts::ArgCountries });
+    Places countries(names.size());
+    std::transform(names.begin(), names.end(), countries.begin(),
+                   [](const auto &name) { return createPlace(name, {}); });
+
+    return countries;
+}
+
+Places ServersListManager::queryCities(const QString &country) const
+{
+    const auto &names = queryList({ Consts::ArgCountry, country });
+    Places sities(names.size());
+    std::transform(names.begin(), names.end(), sities.begin(),
+                   [&country](const auto &name) { return createPlace(country, name); });
+
+    return sities;
 }
 
 void ServersListManager::run()
@@ -103,29 +140,25 @@ void ServersListManager::run()
 
 void ServersListManager::runSeparated()
 {
-    loadLocal();
-
     auto groups = queryGroups();
-    std::sort(groups.begin(), groups.end());
-    emit citiesAdded({ Consts::Groups, groups });
+    std::sort(groups.begin(), groups.end(), [](const auto &l, const auto &r) { return l.town < r.town; });
+    notifyPlacesAdded(groups);
 
     const auto &countries = queryCountries();
-    LOG << countries;
-
     for (const auto &country : countries) {
-        const auto &cities = queryCities(country);
-        const Group group { country, cities };
-        QMetaObject::invokeMethod(this, &ServersListManager::commitCities, Qt::QueuedConnection, group);
+        const auto &cities = queryCities(country.country);
+        notifyPlacesAdded(cities);
     }
-
-    saveLocal();
 }
 
-void ServersListManager::commitCities(const ServersListManager::Group &cities)
+void ServersListManager::notifyPlacesAdded(const Places &cities)
 {
-    emit citiesAdded(cities);
+    Places prepared(cities.size());
+    std::transform(cities.cbegin(), cities.cend(), prepared.begin(), [](const PlaceInfo &place) {
+        PlaceInfo edited(place);
+        edited.country = yangl::nvpnToGeo(place.country);
+        edited.town = yangl::nvpnToGeo(place.town);
+        return edited;
+    });
+    emit citiesAdded(prepared);
 }
-
-void ServersListManager::loadLocal() { }
-
-void ServersListManager::saveLocal() { }

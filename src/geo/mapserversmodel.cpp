@@ -17,56 +17,129 @@
 
 #include "mapserversmodel.h"
 
+#include "app/common.h"
+#include "geo/coordinatesresolver.h"
+
+#include <qnamespace.h>
+
 MapServersModel::MapServersModel(QObject *parent)
-    : QAbstractListModel(parent)
-    , m_coordinates()
+    : QAbstractItemModel(parent)
+    , m_root(new TreeItem { "Root" })
 {
+}
+
+MapServersModel::~MapServersModel()
+{
+    delete m_root;
+}
+
+TreeItem *MapServersModel::rootItem() const
+{
+    return m_root;
+}
+
+QModelIndex MapServersModel::index(int row, int column, const QModelIndex &parent) const
+{
+    if (!hasIndex(row, column, parent))
+        return QModelIndex();
+
+    TreeItem *parentItem = parent.isValid() ? static_cast<TreeItem *>(parent.internalPointer()) : m_root;
+    TreeItem *childItem = parentItem->child(row);
+    if (childItem)
+        return createIndex(row, column, childItem);
+    return QModelIndex();
+}
+
+QModelIndex MapServersModel::parent(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return QModelIndex();
+
+    TreeItem *childItem = static_cast<TreeItem *>(index.internalPointer());
+    TreeItem *parentItem = childItem->parent;
+
+    if (parentItem == m_root || !parentItem)
+        return QModelIndex();
+    return createIndex(parentItem->row(), 0, parentItem);
+}
+
+int MapServersModel::rowCount(const QModelIndex &parent) const
+{
+    TreeItem *parentItem = parent.isValid() ? static_cast<TreeItem *>(parent.internalPointer()) : m_root;
+    return parentItem->children.size();
+}
+
+QVariant MapServersModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid())
+        return {};
+
+    if (auto item = static_cast<TreeItem *>(index.internalPointer())) {
+
+        switch (role) {
+        case Qt::DisplayRole: {
+            return item->name;
+        }
+        case PlaceInfoRole: {
+            return QVariant::fromValue(item->data);
+        }
+        default:
+            break;
+        }
+    }
+
+    return {};
+}
+
+void MapServersModel::addMarker(const PlaceInfo &place)
+{
+    TreeItem *countryItem = nullptr;
+
+    // Find existing country
+    for (auto &child : m_root->children) {
+        if (child->name == place.country) {
+            countryItem = child.get();
+            break;
+        }
+    }
+
+    // If not found, create new country node
+    if (!countryItem) {
+        auto newCountry = std::make_unique<TreeItem>();
+        newCountry->name = place.country;
+        newCountry->parent = m_root;
+
+        countryItem = newCountry.get();
+
+        int countryRow = static_cast<int>(m_root->children.size());
+
+        LOG << "inserted group:" << newCountry->name;
+
+        beginInsertRows(QModelIndex(), countryRow, countryRow);
+        m_root->children.push_back(std::move(newCountry));
+        endInsertRows();
+    }
+
+    // Add city under country
+    int cityRow = static_cast<int>(countryItem->children.size());
+
+    QModelIndex parentIndex = createIndex(countryItem->row(), 0, countryItem);
+
+    auto newCity = std::make_unique<TreeItem>();
+    newCity->name = place.town;
+    newCity->data = place;
+    newCity->parent = countryItem;
+
+    LOG << "inserted item:" << newCity->data.country << newCity->data.town << newCity->data.location;
+
+    beginInsertRows(parentIndex, cityRow, cityRow);
+    countryItem->children.push_back(std::move(newCity));
+    endInsertRows();
 }
 
 void MapServersModel::clear()
 {
     beginResetModel();
-    m_coordinates.clear();
+    m_root->children.clear(); // unique_ptr handles recursive deletion
     endResetModel();
-}
-
-void MapServersModel::addMarker(const PlaceInfo &place)
-{
-    beginInsertRows(QModelIndex(), rowCount(), rowCount());
-
-    m_coordinates.append(place);
-    endInsertRows();
-}
-
-int MapServersModel::rowCount(const QModelIndex & /*parent*/) const
-{
-    return m_coordinates.count();
-}
-
-QVariant MapServersModel::data(const QModelIndex &index, int role) const
-{
-    const int row = index.row();
-    if (row < 0 || row >= m_coordinates.count())
-        return QVariant();
-
-    const PlaceInfo &info = m_coordinates[row];
-    switch (role) {
-    case MapServersModel::CountryNameRole:
-        return QVariant::fromValue(info.country);
-    case MapServersModel::CityNameRole:
-        return QVariant::fromValue(info.town);
-    case MapServersModel::PositionRole:
-        return QVariant::fromValue(info.location);
-    }
-
-    return QVariant();
-}
-
-QHash<int, QByteArray> MapServersModel::roleNames() const
-{
-    return {
-        { PositionRole, "position" },
-        { CountryNameRole, "country" },
-        { CityNameRole, "city" },
-    };
 }

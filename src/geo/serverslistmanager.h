@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "geo/coordinatesresolver.h"
+
 #include <QFutureWatcher>
 #include <QList>
 #include <QObject>
@@ -26,40 +28,30 @@ class ServersListManager : public QObject
 {
     Q_OBJECT
 public:
-    using Servers = QList<QString>;
-    using Group = QPair<QString, ServersListManager::Servers>;
-    using Groups = QList<ServersListManager::Group>;
-
     explicit ServersListManager(NordVpnWraper *nordVpn, QObject *parent = {});
 
     bool reload();
 
 signals:
     void ready();
-    void citiesAdded(const ServersListManager::Group &cities);
+    void citiesAdded(const Places &cities);
 
 private slots:
     void run();
 
-    void commitCities(const ServersListManager::Group &cities);
-
 private:
     NordVpnWraper *m_nordVpn;
-
     QFutureWatcher<void> m_futureWatcher;
 
-    Servers queryGroups() const;
-    Servers queryCountries() const;
-    Servers queryCities(const QString &country) const;
+    Places queryGroups() const;
+    Places queryCountries() const;
+    Places queryCities(const QString &country) const;
+
+    QStringList queryList(const QStringList &args) const;
 
     void runSeparated();
 
-    static Servers stringToServers(const QString &in);
-    Servers queryList(const QStringList &args) const;
+    static QStringList stringToServers(const QString &in);
 
-    void loadLocal();
-    void saveLocal();
+    void notifyPlacesAdded(const Places &cities);
 };
-
-Q_DECLARE_METATYPE(ServersListManager::Servers);
-Q_DECLARE_METATYPE(ServersListManager::Group);

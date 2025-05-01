@@ -38,4 +38,26 @@ QString ensureDirExists(const QString &path)
     return res;
 }
 
+QString geoToNvpn(const QString &name)
+{
+    if (name == "default")
+        return {};
+
+    if (name == "Groups")
+        return "group";
+
+    return QString(name).replace(' ', '_');
+}
+
+QString nvpnToGeo(const QString &name)
+{
+    if (name.isEmpty())
+        return "default";
+
+    if (name == "group")
+        return "Groups";
+
+    return QString(name).replace('_', ' ');
+}
+
 } // namespace yangl

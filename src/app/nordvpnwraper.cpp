@@ -30,6 +30,7 @@
 #include "settings/settingsdialog.h"
 
 #include <QApplication>
+#include <QFutureWatcher>
 #include <QInputDialog>
 #include <QTimer>
 #include <QVariant>

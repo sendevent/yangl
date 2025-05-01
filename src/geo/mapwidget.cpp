@@ -19,6 +19,7 @@
 
 #include "app/common.h"
 #include "geo/coordinatesresolver.h"
+#include "geo/flatplaceproxymodel.h"
 #include "mapserversmodel.h"
 #include "settings/appsettings.h"
 #include "settings/settingsmanager.h"
@@ -60,12 +61,17 @@ static QString defaultMapPluginName()
     return result;
 }
 
-MapWidget::MapWidget(const QString &mapPlugin, int mapType, QWidget *parent)
+MapWidget::MapWidget(const QString &mapPlugin, int mapType, MapServersModel *model, QWidget *parent)
     : QWidget(parent)
     , m_quickView(new QQuickWidget(this))
-    , m_serversModel(new MapServersModel(this))
 {
-    setRootContextProperty("markerModel", QVariant::fromValue(m_serversModel));
+    if (model) {
+        LOG << "Routing MapServersModel:" << model;
+
+        auto proxy = new FlatPlaceProxyModel(this);
+        proxy->setSourceModel(model);
+        setRootContextProperty("markerModel", QVariant::fromValue(qobject_cast<QAbstractItemModel *>(proxy)));
+    }
     setRootContextProperty("pluginName", mapPlugin);
     setRootContextProperty("currenCountry", QString());
     setRootContextProperty("currenCity", QString());
@@ -100,7 +106,7 @@ void MapWidget::init()
 
 /*static*/ QStringList MapWidget::supportedMapTypes(const QString &inPlugin)
 {
-    MapWidget mapWidget(inPlugin, 0);
+    MapWidget mapWidget(inPlugin, 0, nullptr);
     return mapWidget.supportedMapTypes();
 }
 
@@ -154,25 +160,6 @@ QGeoCoordinate MapWidget::center() const
         return map->property("mapCenter").value<QGeoCoordinate>();
     }
     return {};
-}
-
-void MapWidget::clearMarks()
-{
-    m_serversModel->clear();
-}
-
-void MapWidget::addMark(const PlaceInfo &place)
-{
-    if (place.ok) {
-        LOG << "Found place:" << place.country << place.town;
-        putMark(place);
-        return;
-    }
-}
-
-void MapWidget::putMark(const PlaceInfo &place)
-{
-    m_serversModel->addMarker(place);
 }
 
 struct Consts {

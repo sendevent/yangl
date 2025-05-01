@@ -61,4 +61,7 @@ QList<SomeQEnum> allEnum(const QList<SomeQEnum> &excluded = {})
 
 QString ensureDirExists(const QString &path);
 
+QString geoToNvpn(const QString &name);
+QString nvpnToGeo(const QString &name);
+
 } // ns yangl
