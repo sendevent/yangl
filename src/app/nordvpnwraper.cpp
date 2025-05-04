@@ -395,7 +395,7 @@ void NordVpnWraper::connectTo(const QString &country, const QString &city)
             const Action::Ptr &action = storate()->createUserAction({});
             action->setTitle(tr("Geo Connection"));
             action->setForcedShow(false);
-            action->setArgs({ "c", country == "group" ? "-g" : country, city });
+            action->setArgs({ "c", country == utils::groupsTitle() ? "-g" : country, city });
             if (auto call = action->createRequest()) {
                 call->run();
             }

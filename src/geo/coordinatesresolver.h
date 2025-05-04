@@ -17,6 +17,8 @@ struct PlaceInfo {
     bool capital { false };
     bool ok { false };
     QString message;
+
+    bool isGroup() const;
 };
 
 using Places = QList<PlaceInfo>;

@@ -49,6 +49,11 @@ void FlatPlaceProxyModel::setSourceModel(QAbstractItemModel *source)
     rebuildFlatList();
 }
 
+bool isAcceptable(const auto &place)
+{
+    return /*place.ok &&*/ !place.isGroup() && !place.town.isEmpty() && place.location.isValid();
+};
+
 void FlatPlaceProxyModel::rebuildFlatList()
 {
     beginResetModel();
@@ -61,7 +66,7 @@ void FlatPlaceProxyModel::rebuildFlatList()
             for (int subRow = 0; subRow < m_source->rowCount(topLevelIndex); ++subRow) {
                 const auto &subIndex = m_source->index(subRow, 0, topLevelIndex);
                 const auto &place = subIndex.data(MapServersModel::Roles::PlaceInfoRole).value<PlaceInfo>();
-                if (!place.town.isEmpty() && place.location.isValid()) {
+                if (isAcceptable(place)) {
                     m_places.append(place);
                 }
             }
@@ -113,10 +118,6 @@ QHash<int, QByteArray> FlatPlaceProxyModel::roleNames() const
 
 void FlatPlaceProxyModel::onRowsInserted(const QModelIndex &parent, int first, int last)
 {
-    auto isAcceptable = [](const auto &place) {
-        return place.ok && place.country.compare(utils::groupsTitle(), Qt::CaseInsensitive) && !place.town.isEmpty()
-                && place.location.isValid();
-    };
 
     QList<PlaceInfo> places;
 

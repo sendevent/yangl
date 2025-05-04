@@ -35,8 +35,8 @@ bool ServersFilterModel::lessThan(const QModelIndex &sourceLeft, const QModelInd
     const auto &leftData = sourceLeft.data(MapServersModel::Roles::PlaceInfoRole);
     const auto &rightData = sourceRight.data(MapServersModel::Roles::PlaceInfoRole);
 
-    const bool leftIsGroup = left.country == utils::groupsTitle();
-    const bool rightIsGroup = right.country == utils::groupsTitle();
+    const bool leftIsGroup = left.isGroup();
+    const bool rightIsGroup = right.isGroup();
 
     // Move "Groups" to the top
     if (leftIsGroup && !rightIsGroup) {
