@@ -109,35 +109,39 @@ void MapServersModel::addMarker(const PlaceInfo &place)
         newCountry->name = place.country;
         newCountry->parent = m_root;
         newCountry->data = place;
-        newCountry->data.town.clear();
-        // newCountry->data.group = true;
-
-        countryItem = newCountry.get();
+        newCountry->data.town.clear(); // Top-level: no town
 
         const int countryRow = static_cast<int>(m_root->children.size());
-
-        LOG << "inserted group:" << newCountry->name;
-
         beginInsertRows(QModelIndex(), countryRow, countryRow);
         m_root->children.push_back(std::move(newCountry));
         endInsertRows();
 
-        if (place.town.isEmpty()) {
+        countryItem = m_root->children.back().get(); // Now safe to use
+    }
+
+    // No town? It's a top-level item only
+    if (place.town.isEmpty()) {
+        countryItem->data = place; // Update country info
+        return;
+    }
+
+    // Check if the city already exists under this country
+    for (auto &child : countryItem->children) {
+        if (child->name == place.town) {
+            // Update existing city data
+            child->data = place;
             return;
         }
     }
 
-    // Add city under country
-    int cityRow = static_cast<int>(countryItem->children.size());
-
-    QModelIndex parentIndex = createIndex(countryItem->row(), 0, countryItem);
+    // Add new city under country
+    const int cityRow = static_cast<int>(countryItem->children.size());
+    const QModelIndex &parentIndex = createIndex(countryItem->row(), 0, countryItem);
 
     auto newCity = std::make_unique<TreeItem>();
     newCity->name = place.town;
     newCity->data = place;
     newCity->parent = countryItem;
-
-    LOG << "inserted item:" << newCity->data.country << newCity->data.town << newCity->data.location;
 
     beginInsertRows(parentIndex, cityRow, cityRow);
     countryItem->children.push_back(std::move(newCity));
