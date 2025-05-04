@@ -32,18 +32,12 @@ void FlatPlaceProxyModel::setSourceModel(QAbstractItemModel *source)
 
     if (auto srcModel = sourceModel()) {
         disconnect(srcModel, &QAbstractItemModel::rowsInserted, this, &FlatPlaceProxyModel::onRowsInserted);
-        // disconnect(srcModel, &QAbstractItemModel::rowsMoved, this, &FlatPlaceProxyModel::rebuildFlatList);
-        // disconnect(srcModel, &QAbstractItemModel::rowsRemoved, this, &FlatPlaceProxyModel::rebuildFlatList);
-        // disconnect(srcModel, &QAbstractItemModel::dataChanged, this, &FlatPlaceProxyModel::rebuildFlatList);
     }
 
     QIdentityProxyModel::setSourceModel(source);
 
-    if (auto srcModel = sourceModel()) {
+    if (auto srcModel = source) {
         connect(srcModel, &QAbstractItemModel::rowsInserted, this, &FlatPlaceProxyModel::onRowsInserted);
-        // connect(srcModel, &QAbstractItemModel::rowsMoved, this, &FlatPlaceProxyModel::rebuildFlatList);
-        // connect(srcModel, &QAbstractItemModel::rowsRemoved, this, &FlatPlaceProxyModel::rebuildFlatList);
-        // connect(srcModel, &QAbstractItemModel::dataChanged, this, &FlatPlaceProxyModel::rebuildFlatList);
     }
 
     rebuildFlatList();
