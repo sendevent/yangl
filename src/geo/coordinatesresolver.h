@@ -3,6 +3,7 @@
 #include <QGeoCoordinate>
 #include <QGeoServiceProvider>
 #include <QObject>
+#include <atomic>
 #include <memory>
 #include <qhash.h>
 #include <qtypes.h>
@@ -49,14 +50,9 @@ signals:
     void coordinatesResolved(RequestId id, const PlaceInfo &town);
 
 private:
-    RequestId m_requestCounter { 0 };
-    RequestId m_lastRequestedId { 0 };
+    std::atomic<RequestId> m_requestCounter { 0 };
 
     CitiesByCountry m_data;
-
-    QSet<PlaceInfo> m_places; // both
-    QSet<PlaceInfo> m_placesLoaded; // from JSON
-    QSet<PlaceInfo> m_placesDynamic; // from external
 
     std::unique_ptr<QGeoServiceProvider> m_geoSrvProv;
     QGeoCodingManager *m_geoCoder { nullptr };
@@ -70,10 +66,6 @@ private:
     void requestGeoAsync(const PlaceInfo &place, RequestId id);
 
     static CitiesByCountry loadData(const QString &path);
-
-private slots:
-
-    void onCoordinatesResolved(RequestId id, const PlaceInfo &town);
 
     friend class TestCoordinatesResolver;
 };
