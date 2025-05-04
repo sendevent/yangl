@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -43,8 +43,6 @@ struct JsonConsts {
     static constexpr QLatin1String ArgGroups = QLatin1String("groups");
     static constexpr QLatin1String ArgCountries = QLatin1String("countries");
     static constexpr QLatin1String ArgCountry = QLatin1String("cities");
-
-    static constexpr QLatin1String Groups = QLatin1String("Groups");
 };
 
 ServersListManager::ServersListManager(NordVpnWraper *nordVpn, QObject *parent)
@@ -96,7 +94,6 @@ PlaceInfo createPlace(const QString &country, const QString &city)
 
     result.ok = true;
     result.capital = false;
-    result.group = result.country == JsonConsts::ArgGroups;
 
     return result;
 }
@@ -106,7 +103,7 @@ Places ServersListManager::queryGroups() const
     const auto &names = queryList({ JsonConsts::ArgGroups });
     Places groups(names.size());
     std::transform(names.begin(), names.end(), groups.begin(),
-                   [](const auto &name) { return createPlace(JsonConsts::ArgGroups, name); });
+                   [](const auto &name) { return createPlace(utils::groupsTitle(), name); });
 
     return groups;
 }
@@ -140,8 +137,7 @@ void ServersListManager::run()
 
 void ServersListManager::runSeparated()
 {
-    auto groups = queryGroups();
-    std::sort(groups.begin(), groups.end(), [](const auto &l, const auto &r) { return l.town < r.town; });
+    const auto &groups = queryGroups();
     notifyPlacesAdded(groups);
 
     const auto &countries = queryCountries();
@@ -156,8 +152,8 @@ void ServersListManager::notifyPlacesAdded(const Places &cities)
     Places prepared(cities.size());
     std::transform(cities.cbegin(), cities.cend(), prepared.begin(), [](const PlaceInfo &place) {
         PlaceInfo edited(place);
-        edited.country = yangl::nvpnToGeo(place.country);
-        edited.town = yangl::nvpnToGeo(place.town);
+        edited.country = utils::nvpnToGeo(place.country);
+        edited.town = utils::nvpnToGeo(place.town);
         return edited;
     });
     emit citiesAdded(prepared);

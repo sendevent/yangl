@@ -171,7 +171,7 @@ Action::Ptr ActionJson::actionFromJson(const QJsonObject &json) const
 
     const auto alwaysShowResult = json[JsonAction::Display].toBool();
     const auto anchor = static_cast<Action::MenuPlace>(json[JsonAction::Anchor].toInt());
-    const auto timeout = json[JsonAction::Timeout].toInt() * yangl::OneSecondMs;
+    const auto timeout = json[JsonAction::Timeout].toInt() * utils::oneSecondMs();
 
     return m_storage->createAction(scope, type, id, app, title, args, alwaysShowResult, anchor, timeout, m_storage);
 }
@@ -190,7 +190,7 @@ QJsonObject ActionJson::actionToJson(const Action *action) const
         { JsonAction::Args, QJsonArray::fromStringList(action->args()) },
         { JsonAction::Display, action->forcedShow() },
         { JsonAction::Anchor, static_cast<int>(action->anchor()) },
-        { JsonAction::Timeout, action->timeout() / yangl::OneSecondMs },
+        { JsonAction::Timeout, action->timeout() / utils::oneSecondMs() },
     };
 }
 
@@ -224,7 +224,7 @@ QList<QString> ActionJson::actionsGroup(const QString &group) const
 {
     static QString jsonPath;
     if (jsonPath.isEmpty())
-        jsonPath = yangl::ensureDirExists(QString("%1/actions.json").arg(SettingsManager::dirPath()));
+        jsonPath = utils::ensureDirExists(QString("%1/actions.json").arg(SettingsManager::dirPath()));
 
     return jsonPath;
 }

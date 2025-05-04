@@ -20,6 +20,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 #include "app/common.h"
 #include "geo/mapserversmodel.h"
 
+#include <qnamespace.h>
+
 FlatPlaceProxyModel::FlatPlaceProxyModel(QObject *parent)
     : QIdentityProxyModel(parent)
 {
@@ -79,23 +81,21 @@ QVariant FlatPlaceProxyModel::data(const QModelIndex &index, int role) const
     if (index.isValid() && index.row() < m_places.size()) {
 
         const auto &place = m_places.at(index.row());
-        if (!place.group) {
-            switch (role) {
-            case Qt::DisplayRole: {
-                return place.town;
-            }
-            case PositionRole: {
-                return QVariant::fromValue(place.location);
-            }
-            case CountryNameRole: {
-                return place.country;
-            }
-            case CityNameRole: {
-                return place.town;
-            }
-            default:
-                break;
-            }
+        switch (role) {
+        case Qt::DisplayRole: {
+            return place.town;
+        }
+        case PositionRole: {
+            return QVariant::fromValue(place.location);
+        }
+        case CountryNameRole: {
+            return place.country;
+        }
+        case CityNameRole: {
+            return place.town;
+        }
+        default:
+            break;
         }
     }
 
@@ -113,13 +113,18 @@ QHash<int, QByteArray> FlatPlaceProxyModel::roleNames() const
 
 void FlatPlaceProxyModel::onRowsInserted(const QModelIndex &parent, int first, int last)
 {
+    auto isAcceptable = [](const auto &place) {
+        return place.ok && place.country.compare(utils::groupsTitle(), Qt::CaseInsensitive) && !place.town.isEmpty()
+                && place.location.isValid();
+    };
+
     QList<PlaceInfo> places;
 
     if (auto *srcModel = sourceModel()) {
         for (int row = first; row <= last; ++row) {
             const auto &id = srcModel->index(row, 0, parent);
             const auto &place = id.data(MapServersModel::Roles::PlaceInfoRole).value<PlaceInfo>();
-            if (!place.town.isEmpty() && place.location.isValid()) {
+            if (isAcceptable(place)) {
                 places.append(place);
                 LOG << row << place.country << place.town;
             }

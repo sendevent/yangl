@@ -47,7 +47,7 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
     connect(ui->checkBoxAutoActive, &QCheckBox::toggled, ui->cbIgnoreFirstConnected, &QCheckBox::setEnabled);
 
     ui->leNVPNPath->setText(AppSettings::Monitor->NVPNPath->read().toString());
-    ui->spinBoxInterval->setValue(AppSettings::Monitor->Interval->read().toInt() / yangl::OneSecondMs);
+    ui->spinBoxInterval->setValue(AppSettings::Monitor->Interval->read().toInt() / utils::oneSecondMs());
     ui->spinBoxMsgDuration->setValue(AppSettings::Tray->MessageDuration->read().toInt());
     ui->checkBoxAutoActive->setChecked(AppSettings::Monitor->Active->read().toBool());
     ui->cbIgnoreFirstConnected->setChecked(AppSettings::Tray->IgnoreFirstConnected->read().toBool());
@@ -130,7 +130,7 @@ bool SettingsDialog::saveMonitorSettings()
 
     AppSettings::Monitor->NVPNPath->write(path);
     AppSettings::Tray->MessageDuration->write(ui->spinBoxMsgDuration->value());
-    AppSettings::Monitor->Interval->write(ui->spinBoxInterval->value() * yangl::OneSecondMs);
+    AppSettings::Monitor->Interval->write(ui->spinBoxInterval->value() * utils::oneSecondMs());
     AppSettings::Monitor->Active->write(ui->checkBoxAutoActive->isChecked());
     AppSettings::Tray->IgnoreFirstConnected->write(ui->cbIgnoreFirstConnected->isChecked());
     AppSettings::Tray->MessagePlainText->write(ui->checkBoxMessagePlainText->isChecked());

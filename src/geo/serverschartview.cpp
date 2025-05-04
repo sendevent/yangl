@@ -31,6 +31,7 @@
 #include <QSplitter>
 #include <QToolButton>
 #include <QTreeView>
+#include <qnamespace.h>
 
 /*static*/ QPointer<ServersChartView> ServersChartView::m_instance = {};
 
@@ -168,8 +169,8 @@ void ServersChartView::onGotLocation(const PlaceInfo &place)
     }
 
     PlaceInfo group(place);
-    group.country = yangl::nvpnToGeo(place.country);
-    group.town = yangl::nvpnToGeo(place.town);
+    group.country = utils::nvpnToGeo(place.country);
+    group.town = utils::nvpnToGeo(place.town);
     m_serversModel->addMarker(group);
 }
 
@@ -208,8 +209,8 @@ void ServersChartView::onMarkerDoubleclicked(const PlaceInfo &addr)
 
 void ServersChartView::requestConnection(const QString &group, const QString &server)
 {
-    const QString &country = yangl::geoToNvpn(group);
-    const QString &city = yangl::geoToNvpn(server);
+    const QString &country = utils::geoToNvpn(group);
+    const QString &city = utils::geoToNvpn(server);
     if (country == "group" && city.isEmpty())
         return;
 

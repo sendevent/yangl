@@ -25,7 +25,7 @@
 #include <QTimer>
 #include <QtConcurrentRun>
 
-/*static*/ const int StateChecker::DefaultIntervalMs = yangl::OneSecondMs;
+/*static*/ const int StateChecker::DefaultIntervalMs = utils::oneSecondMs();
 
 StateChecker::StateChecker(CLICaller *bus, int intervalMs)
     : QObject()

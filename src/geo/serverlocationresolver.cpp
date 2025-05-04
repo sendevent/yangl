@@ -26,6 +26,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QTimer>
+#include <qnamespace.h>
 
 ServerLocationResolver::ServerLocationResolver(NordVpnWraper *nordVpn, QObject *parent)
     : QObject(parent)
@@ -38,7 +39,7 @@ ServerLocationResolver::ServerLocationResolver(NordVpnWraper *nordVpn, QObject *
 
     connect(this, &ServerLocationResolver::serverLocationResolved, this, &ServerLocationResolver::saveCacheDelayed);
 
-    m_saveTimer->setInterval(30000);
+    m_saveTimer->setInterval(60 * utils::oneSecondMs());
     m_saveTimer->setSingleShot(true);
     connect(m_saveTimer, &QTimer::timeout, this, &ServerLocationResolver::saveCache);
 }
@@ -66,7 +67,7 @@ void ServerLocationResolver::resolveServerLocation(const PlaceInfo &place)
         }
     }
 
-    if (place.group) {
+    if (0 == countryName.compare(utils::groupsTitle(), Qt::CaseInsensitive)) {
         onPlaceResolved(-1, place);
         return;
     }
@@ -85,7 +86,7 @@ void ServerLocationResolver::ensureCacheLoaded()
 
 static QString geoCacheFilePath()
 {
-    static QString path = QString("%1/cities.csv").arg(SettingsManager::dirPath());
+    static QString path = QString("%1/servers.json").arg(SettingsManager::dirPath());
     LOG << path;
     return path;
 }
@@ -96,7 +97,6 @@ static const QLatin1String City { "city" };
 static const QLatin1String Lat { "lat" };
 static const QLatin1String Lon { "lon" };
 static const QLatin1String Capital { "capital" };
-static const QLatin1String Group { "group" };
 };
 
 void ServerLocationResolver::loadCache()
@@ -123,7 +123,6 @@ void ServerLocationResolver::loadCache()
             jObj[JsonConsts::City].toString(),
             QGeoCoordinate { jObj[JsonConsts::Lat].toDouble(), jObj[JsonConsts::Lon].toDouble() },
             jObj[JsonConsts::Capital].toString().toLower() == "true",
-            jObj[JsonConsts::Group].toString().toLower() == "true",
             true, // ok
         };
         m_placesLoaded[place.country].insert(place.town, place);
@@ -149,7 +148,6 @@ void ServerLocationResolver::saveCache() const
                 { JsonConsts::Lat, place.location.latitude() },
                 { JsonConsts::Lon, place.location.longitude() },
                 { JsonConsts::Capital, place.capital ? "true" : "false" },
-                { JsonConsts::Group, place.group ? "true" : "false" },
             };
             jArr.append(jObj);
         }

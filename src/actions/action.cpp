@@ -263,7 +263,7 @@ QString Action::key() const
 {
     static QList<Action::Yangl> actions;
     if (actions.isEmpty())
-        actions = yangl::allEnum<Action::Yangl>();
+        actions = utils::allEnum<Action::Yangl>();
     return actions;
 }
 
@@ -271,6 +271,6 @@ QString Action::key() const
 {
     static QList<Action::NordVPN> actions;
     if (actions.isEmpty())
-        actions = yangl::allEnum<Action::NordVPN>({ Action::NordVPN::Unknown });
+        actions = utils::allEnum<Action::NordVPN>({ Action::NordVPN::Unknown });
     return actions;
 }
