@@ -39,7 +39,7 @@
 #include <qnamespace.h>
 #include <utility>
 
-struct Consts {
+struct JsonConsts {
     static constexpr QLatin1String ArgGroups = QLatin1String("groups");
     static constexpr QLatin1String ArgCountries = QLatin1String("countries");
     static constexpr QLatin1String ArgCountry = QLatin1String("cities");
@@ -96,24 +96,24 @@ PlaceInfo createPlace(const QString &country, const QString &city)
 
     result.ok = true;
     result.capital = false;
-    result.group = result.country == Consts::ArgGroups;
+    result.group = result.country == JsonConsts::ArgGroups;
 
     return result;
 }
 
 Places ServersListManager::queryGroups() const
 {
-    const auto &names = queryList({ Consts::ArgGroups });
+    const auto &names = queryList({ JsonConsts::ArgGroups });
     Places groups(names.size());
     std::transform(names.begin(), names.end(), groups.begin(),
-                   [](const auto &name) { return createPlace(Consts::ArgGroups, name); });
+                   [](const auto &name) { return createPlace(JsonConsts::ArgGroups, name); });
 
     return groups;
 }
 
 Places ServersListManager::queryCountries() const
 {
-    const auto &names = queryList({ Consts::ArgCountries });
+    const auto &names = queryList({ JsonConsts::ArgCountries });
     Places countries(names.size());
     std::transform(names.begin(), names.end(), countries.begin(),
                    [](const auto &name) { return createPlace(name, {}); });
@@ -123,7 +123,7 @@ Places ServersListManager::queryCountries() const
 
 Places ServersListManager::queryCities(const QString &country) const
 {
-    const auto &names = queryList({ Consts::ArgCountry, country });
+    const auto &names = queryList({ JsonConsts::ArgCountry, country });
     Places sities(names.size());
     std::transform(names.begin(), names.end(), sities.begin(),
                    [&country](const auto &name) { return createPlace(country, name); });

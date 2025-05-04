@@ -55,7 +55,7 @@ bool ActionJson::load(const QString &from)
     m_json = {};
 
     QFile in(from);
-    if (!in.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    if (!in.open(QFile::ReadOnly | QFile::Text)) {
         WRN << "failed opening file" << from << in.errorString();
         return false;
     }
@@ -86,7 +86,7 @@ bool ActionJson::load(QIODevice *in)
 void ActionJson::save(const QString &to)
 {
     QFile out(to);
-    if (!out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+    if (!out.open(QFile::WriteOnly | QFile::Text | QFile::Truncate)) {
         WRN << "failed opening file" << to << out.errorString();
         return;
     }

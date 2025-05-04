@@ -162,7 +162,7 @@ QGeoCoordinate MapWidget::center() const
     return {};
 }
 
-struct Consts {
+struct JsonConsts {
     static constexpr QLatin1String country { "country" };
     static constexpr QLatin1String city { "city" };
     static constexpr QLatin1String latitude { "lat" };
@@ -227,39 +227,4 @@ void MapWidget::setRootContextProperty(const QString &name, const QVariant &valu
     if (auto ctx = m_quickView->rootContext()) {
         ctx->setContextProperty(name, value);
     }
-}
-
-void MapWidget::handleServers()
-{
-
-    // auto test = [](const auto &collection) {
-    //     const auto found = std::find_if(collection.cbegin(), collection.cend(),
-    //                                     [](const auto &place) { return place.town.toLower() == "Naypyidaw"; });
-    //     return found != collection.cend();
-    // };
-
-    // LOG << test(m_placesLoaded) << test(m_placesDynamic) << test(m_places);
-
-    // QSet<PlaceInfo> updatedPlaces = m_placesDynamic;
-
-    // // Remove any places from m_placesLoaded that are NOT in updatedPlaces
-    // for (auto it = m_placesLoaded.begin(); it != m_placesLoaded.end();) {
-    //     if (!updatedPlaces.contains(*it)) {
-    //         it = m_placesLoaded.erase(it);
-    //     } else {
-    //         ++it;
-    //     }
-    // }
-
-    // // Add/refresh entries (new ones or updated ones)
-    // for (const auto &place : updatedPlaces) {
-    //     m_placesLoaded.insert(place);
-    // }
-
-    // // Finally save the updated main collection
-    // m_places = m_placesLoaded;
-    // saveJson();
-
-    // m_placesLoaded.clear();
-    // m_placesDynamic.clear();
 }

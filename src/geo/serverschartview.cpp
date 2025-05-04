@@ -161,32 +161,6 @@ void ServersChartView::onReloadRequested()
 
 void ServersChartView::onGotLocation(const PlaceInfo &place)
 {
-    /*if  (m_modelPopulated) {
-         m_chartWidget->clearMarks();
-         m_serversModel->removeRows(0, m_serversModel->rowCount());
-         m_modelPopulated = false;
-     }
-
-     const QString &countryName = yangl::nvpnToGeo(cities.first);
-     const bool isGroups = countryName == "Groups";
-     QStandardItem *title = new QStandardItem(countryName);
-     m_serversModel->insertRow(m_serversModel->rowCount(), QList<QStandardItem *>() << title);
-
-     if (!isGroups) {
-         m_chartWidget->addMark(countryName, {});
-     }
-
-     for (const auto &city : cities.second) {
-         const QString &cityName = yangl::nvpnToGeo(city);
-         QStandardItem *content = new QStandardItem(cityName);
-         title->appendRow(content);
-
-         if (!isGroups) {
-             m_chartWidget->addMark(countryName, cityName);
-         }
-     }*/
-    // m_chartWidget->addMark(place);
-
     if (!place.ok) {
         WRN << place.country << place.town << place.message;
         return;
@@ -196,15 +170,6 @@ void ServersChartView::onGotLocation(const PlaceInfo &place)
     group.country = yangl::nvpnToGeo(place.country);
     group.town = yangl::nvpnToGeo(place.town);
     m_serversModel->addMarker(group);
-}
-
-void ServersChartView::onGotServers()
-{
-    setControlsEnabled(true);
-
-    m_modelPopulated = true;
-
-    m_chartWidget->handleServers();
 }
 
 void ServersChartView::onCurrentTreeItemChanged(const QModelIndex &current)

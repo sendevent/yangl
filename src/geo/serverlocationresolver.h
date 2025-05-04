@@ -21,6 +21,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 
 #include <QObject>
 
+class QTimer;
 class NordVpnWraper;
 class ServersListManager;
 class ServerLocationResolver : public QObject
@@ -38,6 +39,9 @@ private slots:
 
     void onPlaceResolved(RequestId id, const PlaceInfo &place);
 
+    void saveCacheDelayed();
+    void saveCache() const;
+
 signals:
     void serverLocationResolved(const PlaceInfo &place);
 
@@ -46,8 +50,8 @@ private:
     CoordinatesResolver *m_geoResolver { nullptr };
     QMap<QString, QMultiMap<QString, PlaceInfo>> m_placesLoaded;
     QMap<QString, QMultiMap<QString, PlaceInfo>> m_placesChecked;
+    QTimer *m_saveTimer { nullptr };
 
     void ensureCacheLoaded();
     void loadCache();
-    void saveCache();
 };
