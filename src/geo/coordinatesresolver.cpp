@@ -89,24 +89,6 @@ CitiesByCountry CoordinatesResolver::loadData(const QString &path)
         return result;
     };
 
-    auto parseCoordinates = [](const QString &latStr, const QString &lonStr) -> std::tuple<QGeoCoordinate, bool> {
-        bool parsed(false);
-        QGeoCoordinate coordinate;
-
-        if (!latStr.isEmpty() && !lonStr.isEmpty()) {
-
-            const auto lat = latStr.toDouble(&parsed);
-            if (parsed) {
-                const auto lon = lonStr.toDouble(&parsed);
-                if (parsed) {
-                    coordinate = QGeoCoordinate(lat, lon);
-                }
-            }
-        }
-
-        return { coordinate, parsed };
-    };
-
     CitiesByCountry loaded;
 
     QFile csv(path);
@@ -121,8 +103,7 @@ CitiesByCountry CoordinatesResolver::loadData(const QString &path)
                 continue;
             }
 
-            // Finland,Helsinki,True,60.1708,24.9375
-            const auto [coord, parsed] = parseCoordinates(parts[3], parts[4]);
+            const auto [coord, parsed] = utils::parseCoordinates(parts[3], parts[4]);
             if (!parsed) {
                 WRN << "Failed parsing lat/lon value:" << parts[3] << parts[4];
                 continue;

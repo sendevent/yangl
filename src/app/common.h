@@ -19,6 +19,7 @@
 
 #include <QDateTime>
 #include <QDebug>
+#include <QGeoCoordinate>
 #include <QMetaEnum>
 #include <QObject>
 
@@ -71,4 +72,5 @@ QString ensureDirExists(const QString &path);
 QString geoToNvpn(const QString &name);
 QString nvpnToGeo(const QString &name);
 
+std::tuple<QGeoCoordinate, bool> parseCoordinates(const QString &latStr, const QString &lonStr);
 } // ns utils
