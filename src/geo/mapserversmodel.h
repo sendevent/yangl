@@ -31,18 +31,21 @@ struct TreeItem {
 
     TreeItem *child(int row) const
     {
-        if (row >= 0 && row < children.size())
+        if (row >= 0 && row < children.size()) {
             return children[row].get();
+        }
         return nullptr;
     }
 
     int row() const
     {
-        if (!parent)
+        if (!parent) {
             return 0;
+        }
         for (int i = 0; i < parent->children.size(); ++i) {
-            if (parent->children[i].get() == this)
+            if (parent->children[i].get() == this) {
                 return i;
+            }
         }
         return 0;
     }
