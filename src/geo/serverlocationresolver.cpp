@@ -53,7 +53,7 @@ void ServerLocationResolver::resolveServers(const Places &places)
 
 void ServerLocationResolver::resolveServerLocation(const PlaceInfo &place)
 {
-    LOG << place.country << place.town;
+    LOG << place.country << place.town << place.ok << place.location << place.location.isValid();
     ensureCacheLoaded();
 
     const auto &countryName = place.country;
@@ -62,16 +62,19 @@ void ServerLocationResolver::resolveServerLocation(const PlaceInfo &place)
     if (m_placesLoaded.contains(countryName)) {
         const auto &cities = m_placesLoaded[countryName];
         if (cities.contains(cityName)) {
+            LOG << place.country << place.town << "found in cache";
             onPlaceResolved(-1, cities.value(cityName));
             return;
         }
     }
 
-    if (0 == countryName.compare(utils::groupsTitle(), Qt::CaseInsensitive)) {
+    if (place.isGroup()) {
+        LOG << place.country << place.town << "it is a group";
         onPlaceResolved(-1, place);
         return;
     }
 
+    LOG << place.country << place.town << "checking online";
     m_geoResolver->requestCoordinates(place);
 }
 
@@ -170,6 +173,7 @@ bool ServerLocationResolver::refresh()
 void ServerLocationResolver::onPlaceResolved(RequestId /*id*/, const PlaceInfo &place)
 {
     if (place.ok) {
+        LOG << "added" << place.country << place.town << place.location << place.location.isValid();
         m_placesChecked[place.country.toLower()].insert(place.town.toLower(), place);
     } else {
         WRN << place.country << place.town << place.message;

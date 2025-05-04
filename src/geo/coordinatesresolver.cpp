@@ -15,9 +15,15 @@
 #include <QRegularExpression>
 #include <QtConcurrentRun>
 #include <memory>
+#include <qnamespace.h>
 
 static constexpr QChar CSVSeparator(',');
 static constexpr size_t CSVColumnCount(5);
+
+bool PlaceInfo::isGroup() const
+{
+    return 0 == country.compare(utils::groupsTitle(), Qt::CaseInsensitive);
+}
 
 CoordinatesResolver::CoordinatesResolver(QObject *parent)
     : QObject { parent }

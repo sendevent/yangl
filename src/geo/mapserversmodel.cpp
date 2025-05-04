@@ -93,9 +93,6 @@ QVariant MapServersModel::data(const QModelIndex &index, int role) const
 
 void MapServersModel::addMarker(const PlaceInfo &place)
 {
-    if (place.town.contains("americas", Qt::CaseInsensitive)) {
-        int dbg = 0;
-    }
     TreeItem *countryItem = nullptr;
 
     // Find existing country
@@ -122,6 +119,10 @@ void MapServersModel::addMarker(const PlaceInfo &place)
         countryItem = m_root->children.back().get(); // Now safe to use
     }
 
+    if (place.town.isEmpty() || !place.location.isValid()) {
+        WRN << "Suspicius city due to invalid location:" << place.country << place.town << place.location;
+    }
+
     // No town? It's a top-level item only
     if (place.town.isEmpty()) {
         countryItem->data = place; // Update country info
@@ -132,6 +133,10 @@ void MapServersModel::addMarker(const PlaceInfo &place)
     for (auto &child : countryItem->children) {
         if (child->name == place.town) {
             // Update existing city data
+            LOG << "from:" << child->data.country << child->data.town << child->data.location
+                << child->data.location.isValid();
+            LOG << "to:" << child->data.country << child->data.town << child->data.location
+                << child->data.location.isValid();
             child->data = place;
             return;
         }
