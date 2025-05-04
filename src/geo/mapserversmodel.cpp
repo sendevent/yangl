@@ -108,6 +108,9 @@ void MapServersModel::addMarker(const PlaceInfo &place)
         auto newCountry = std::make_unique<TreeItem>();
         newCountry->name = place.country;
         newCountry->parent = m_root;
+        newCountry->data = place;
+        newCountry->data.town.clear();
+        // newCountry->data.group = true;
 
         countryItem = newCountry.get();
 

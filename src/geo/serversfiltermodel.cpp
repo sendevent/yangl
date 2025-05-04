@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,23 +17,34 @@
 
 #include "serversfiltermodel.h"
 
-#include "app/common.h"
+#include "geo/mapserversmodel.h"
 
 ServersFilterModel::ServersFilterModel(QObject *parent)
     : QSortFilterProxyModel(parent)
 {
+    setDynamicSortFilter(true);
+    setRecursiveFilteringEnabled(true);
 }
 
-bool ServersFilterModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
+bool ServersFilterModel::lessThan(const QModelIndex &sourceLeft, const QModelIndex &sourceRight) const
 {
-    const auto &filter = filterRegularExpression();
-    auto isAcceptable = [&filter](const QModelIndex &id) { return id.data().toString().contains(filter); };
-    const QModelIndex &current = sourceModel()->index(sourceRow, 0, sourceParent);
+    const auto &left = sourceLeft.data(MapServersModel::Roles::PlaceInfoRole).value<PlaceInfo>();
+    const auto &right = sourceRight.data(MapServersModel::Roles::PlaceInfoRole).value<PlaceInfo>();
 
-    if (!sourceParent.isValid())
-        for (int i = 0; i < sourceModel()->rowCount(current); ++i)
-            if (isAcceptable(sourceModel()->index(i, 0, current)))
-                return true;
+    const auto &leftData = sourceLeft.data(MapServersModel::Roles::PlaceInfoRole);
+    const auto &rightData = sourceRight.data(MapServersModel::Roles::PlaceInfoRole);
 
-    return isAcceptable(current) || isAcceptable(sourceParent);
+    const bool leftIsGroup = left.country == "groups";
+    const bool rightIsGroup = right.country == "groups";
+
+    // Move "groups" to the top
+    if (leftIsGroup && !rightIsGroup) {
+        return false;
+    }
+    if (!leftIsGroup && rightIsGroup) {
+        return true;
+    }
+
+    // Default alphabetical sorting by country, then town
+    return left.country < right.country && left.town < right.town;
 }

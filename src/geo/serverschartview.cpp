@@ -67,6 +67,7 @@ void ServersChartView::initUi()
     m_treeView->setEditTriggers(QTreeView::NoEditTriggers);
     m_treeView->setAlternatingRowColors(true);
     m_treeView->setHeaderHidden(true);
+    m_treeView->setSortingEnabled(true);
 
     QHBoxLayout *hBox = new QHBoxLayout;
     hBox->setAlignment(Qt::AlignCenter);
@@ -174,6 +175,7 @@ void ServersChartView::onGotLocation(const PlaceInfo &place)
 
 void ServersChartView::onCurrentTreeItemChanged(const QModelIndex &current)
 {
+    LOG << current;
     QString country, city;
     if (current.parent().isValid()) {
         country = current.parent().data().toString();
