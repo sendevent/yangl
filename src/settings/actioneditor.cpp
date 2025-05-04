@@ -111,7 +111,7 @@ void ActionEditor::setAction(const ActionInfoPtr &actionInfo)
     if (m_leArguments)
         m_leArguments->setText(m_actionInfo->m_args.join(" "));
     if (m_spinBoxTimeout)
-        m_spinBoxTimeout->setValue(m_actionInfo->m_timeout / yangl::OneSecondMs);
+        m_spinBoxTimeout->setValue(m_actionInfo->m_timeout / utils::oneSecondMs());
     if (m_checkBoxForceShow)
         m_checkBoxForceShow->setChecked(m_actionInfo->m_forceShow);
 
@@ -176,7 +176,7 @@ void ActionEditor::commitInfoHandler()
         m_actionInfo->m_args = m_leArguments->text().trimmed().split(' ');
 
     if (m_spinBoxTimeout)
-        m_actionInfo->m_timeout = m_spinBoxTimeout->value() * yangl::OneSecondMs;
+        m_actionInfo->m_timeout = m_spinBoxTimeout->value() * utils::oneSecondMs();
 
     if (m_checkBoxForceShow)
         m_actionInfo->m_forceShow = m_checkBoxForceShow->isChecked();

@@ -20,6 +20,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QMetaEnum>
+#include <QObject>
 
 #ifndef YANGL_TIMESTAMP
 #define YANGL_TIMESTAMP QDateTime::currentDateTime().toString("t hh:mm:ss.zzz:")
@@ -41,9 +42,15 @@
 #define NIY WRN << "Not implemented yet"
 #endif // NIY
 
-namespace yangl {
+namespace utils {
+Q_NAMESPACE
 
-static constexpr int OneSecondMs { 1000 };
+inline int oneSecondMs()
+{
+    return 1000;
+}
+
+QString groupsTitle();
 
 template<typename SomeQEnum>
 QList<SomeQEnum> allEnum(const QList<SomeQEnum> &excluded = {})
@@ -64,4 +71,4 @@ QString ensureDirExists(const QString &path);
 QString geoToNvpn(const QString &name);
 QString nvpnToGeo(const QString &name);
 
-} // ns yangl
+} // ns utils

@@ -129,7 +129,7 @@ CitiesByCountry CoordinatesResolver::loadData(const QString &path)
             }
 
             const PlaceInfo place {
-                parts[0], parts[1], coord, parts[2] == "True", false, true, QString(),
+                parts[0], parts[1], coord, parts[2] == "True", true, QString(),
             };
 
             auto &country = loaded[place.country.toLower()];

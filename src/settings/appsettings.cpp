@@ -120,7 +120,7 @@ GroupTray::GroupTray()
 
 /*static*/ QString GroupTray::iconPath(const QString &iconFile)
 {
-    return yangl::ensureDirExists(QString("%1/tray/%2").arg(SettingsManager::dirPath(), iconFile));
+    return utils::ensureDirExists(QString("%1/tray/%2").arg(SettingsManager::dirPath(), iconFile));
 }
 
 /*static*/ void AppSettings::sync()

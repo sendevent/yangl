@@ -93,14 +93,17 @@ QVariant MapServersModel::data(const QModelIndex &index, int role) const
 
 void MapServersModel::addMarker(const PlaceInfo &place)
 {
+    if (place.town.contains("americas", Qt::CaseInsensitive)) {
+        int dbg = 0;
+    }
     TreeItem *countryItem = nullptr;
 
     // Find existing country
-    for (auto &child : m_root->children) {
-        if (child->name == place.country) {
-            countryItem = child.get();
-            break;
-        }
+    const auto found = std::find_if(m_root->children.cbegin(), m_root->children.cend(),
+                                    [&place](const auto &otherPlace) { return otherPlace->name == place.country; });
+
+    if (found != m_root->children.cend()) {
+        countryItem = found->get();
     }
 
     // If not found, create new country node
