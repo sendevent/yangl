@@ -20,7 +20,13 @@
 #include <QDir>
 #include <QFileInfo>
 
-namespace yangl {
+namespace utils {
+
+QString groupsTitle()
+{
+    static const QString &title = QObject::tr("Groups");
+    return title;
+}
 
 QString ensureDirExists(const QString &path)
 {
@@ -43,7 +49,7 @@ QString geoToNvpn(const QString &name)
     if (name == "default")
         return {};
 
-    if (name == "Groups")
+    if (name == groupsTitle())
         return "group";
 
     return QString(name).replace(' ', '_');
@@ -55,9 +61,9 @@ QString nvpnToGeo(const QString &name)
         return "default";
 
     if (name == "group")
-        return "Groups";
+        return groupsTitle();
 
     return QString(name).replace('_', ' ');
 }
 
-} // namespace yangl
+} // namespace utils

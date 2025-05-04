@@ -36,8 +36,6 @@
 #include <QVariant>
 #include <QtConcurrentRun>
 
-static constexpr int TimeQuantMs = 60 * yangl::OneSecondMs;
-
 NordVpnWraper::NordVpnWraper(QObject *parent)
     : QObject(parent)
     , m_bus(new CLICaller(this))
@@ -108,7 +106,7 @@ void NordVpnWraper::start()
 void NordVpnWraper::loadSettings()
 {
     m_checker->setInterval(AppSettings::Monitor->Interval->read().toInt());
-    m_trayIcon->setMessageDuration(AppSettings::Tray->MessageDuration->read().toInt() * yangl::OneSecondMs);
+    m_trayIcon->setMessageDuration(AppSettings::Tray->MessageDuration->read().toInt() * utils::oneSecondMs());
 
     if (AppSettings::Map->Visible->read().toBool())
         showMapView();
@@ -294,17 +292,17 @@ void NordVpnWraper::pause(Action::NordVPN action)
     if (!duration)
         return;
 
-    m_paused = duration * TimeQuantMs;
+    m_paused = duration * 60 * utils::oneSecondMs();
 
     if (auto disconnect = m_actions->action(Action::NordVPN::Disconnect)) {
         onActionTriggered(disconnect.get());
-        m_pauseTimer->start(yangl::OneSecondMs);
+        m_pauseTimer->start(utils::oneSecondMs());
     }
 }
 
 void NordVpnWraper::onPauseTimer()
 {
-    m_paused -= yangl::OneSecondMs;
+    m_paused -= utils::oneSecondMs();
 
     if (m_paused <= 0) {
         m_pauseTimer->stop();

@@ -33,7 +33,7 @@ SettingsManager *SettingsManager::m_instance = {};
     static QString path;
 
     if (path.isEmpty()) {
-        path = yangl::ensureDirExists(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation));
+        path = utils::ensureDirExists(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation));
         if (!path.endsWith(qAppName()))
             path = QStringLiteral("%1/%2").arg(path, qAppName());
     }

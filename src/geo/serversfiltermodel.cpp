@@ -17,6 +17,7 @@
 
 #include "serversfiltermodel.h"
 
+#include "app/common.h"
 #include "geo/mapserversmodel.h"
 
 ServersFilterModel::ServersFilterModel(QObject *parent)
@@ -34,10 +35,10 @@ bool ServersFilterModel::lessThan(const QModelIndex &sourceLeft, const QModelInd
     const auto &leftData = sourceLeft.data(MapServersModel::Roles::PlaceInfoRole);
     const auto &rightData = sourceRight.data(MapServersModel::Roles::PlaceInfoRole);
 
-    const bool leftIsGroup = left.country == "groups";
-    const bool rightIsGroup = right.country == "groups";
+    const bool leftIsGroup = left.country == utils::groupsTitle();
+    const bool rightIsGroup = right.country == utils::groupsTitle();
 
-    // Move "groups" to the top
+    // Move "Groups" to the top
     if (leftIsGroup && !rightIsGroup) {
         return false;
     }
