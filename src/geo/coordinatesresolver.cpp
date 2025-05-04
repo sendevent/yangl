@@ -199,10 +199,6 @@ void CoordinatesResolver::requestGeoAsync(const PlaceInfo &place, RequestId id)
     result.ok = false;
     result.message = "Not found";
 
-    WRN << "temporary disabled";
-    emit coordinatesResolved(id, result);
-    return;
-
     if (!m_geoCoder) {
         WRN << "GeoCoder is unavailable";
         emit coordinatesResolved(id, result);
