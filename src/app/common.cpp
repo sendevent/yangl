@@ -49,9 +49,6 @@ QString geoToNvpn(const QString &name)
     if (name == "default")
         return {};
 
-    if (name == groupsTitle())
-        return "group";
-
     return QString(name).replace(' ', '_');
 }
 
@@ -59,9 +56,6 @@ QString nvpnToGeo(const QString &name)
 {
     if (name.isEmpty())
         return "default";
-
-    if (name == "group")
-        return groupsTitle();
 
     return QString(name).replace('_', ' ');
 }

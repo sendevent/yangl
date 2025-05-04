@@ -32,6 +32,7 @@
 #include <QSplitter>
 #include <QToolButton>
 #include <QTreeView>
+#include <qabstractitemmodel.h>
 #include <qnamespace.h>
 
 /*static*/ QPointer<ServersChartView> ServersChartView::m_instance = {};
@@ -56,13 +57,14 @@ ServersChartView::~ServersChartView() { }
 
 void ServersChartView::initUi()
 {
-    setWindowTitle(tr("Yet Another NordVPN GUI for Linux"));
+    setWindowTitle(tr("%1 — Yet Another NordVPN GUI for Linux").arg(qApp->applicationName()));
 
     QWidget *leftView = new QWidget(this);
     QVBoxLayout *leftVBox = new QVBoxLayout(leftView);
     leftVBox->setContentsMargins(0, 0, 0, 0);
     m_lineEdit = new QLineEdit(leftView);
     m_lineEdit->setPlaceholderText(QStringLiteral("F"));
+
     m_lineEdit->setToolTip(tr("Filter by country/city"));
     m_treeView = new QTreeView(leftView);
     m_treeView->setModel(m_serversFilterModel);
@@ -168,6 +170,7 @@ void ServersChartView::onReloadRequested()
 
 void ServersChartView::onGotLocation(const PlaceInfo &place)
 {
+    LOG << place.country << place.town << place.location;
     if (!place.ok) {
         WRN << place.country << place.town << place.message;
         return;
@@ -182,7 +185,7 @@ void ServersChartView::onGotLocation(const PlaceInfo &place)
 void ServersChartView::onCurrentTreeItemChanged(const QModelIndex &current)
 {
     const auto &place = current.data(MapServersModel::Roles::PlaceInfoRole).value<PlaceInfo>();
-    if (place.location.isValid()) {
+    if (!place.isGroup() && place.location.isValid()) {
         m_chartWidget->centerOn(place.location);
     }
 }
@@ -200,7 +203,7 @@ void ServersChartView::onMarkerDoubleclicked(const PlaceInfo &place)
 
 void ServersChartView::requestConnection(const PlaceInfo &place)
 {
-    if (place.ok) {
+    if (!place.ok) {
         WRN << "invalid place, ignored:" << place.country << place.town << place.message;
         return;
     }
@@ -208,7 +211,7 @@ void ServersChartView::requestConnection(const PlaceInfo &place)
     const auto &country = utils::geoToNvpn(place.country);
     const auto &city = utils::geoToNvpn(place.town);
 
-    if (country == "group" && city.isEmpty())
+    if (place.isGroup() && city.isEmpty())
         return;
 
     m_nordVpnWraper->connectTo(country, city);
