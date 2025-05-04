@@ -55,8 +55,8 @@ void ServerLocationResolver::resolveServerLocation(const PlaceInfo &place)
     LOG << place.country << place.town;
     ensureCacheLoaded();
 
-    const auto &countryName = place.country.toLower();
-    const auto &cityName = place.town.toLower();
+    const auto &countryName = place.country;
+    const auto &cityName = place.town;
 
     if (m_placesLoaded.contains(countryName)) {
         const auto &cities = m_placesLoaded[countryName];
