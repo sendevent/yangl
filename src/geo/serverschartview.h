@@ -76,5 +76,5 @@ private:
     void requestServersList();
     void setControlsEnabled(bool enabled);
 
-    void requestConnection(const QString &group, const QString &server);
+    void requestConnection(const PlaceInfo &place);
 };

@@ -66,4 +66,22 @@ QString nvpnToGeo(const QString &name)
     return QString(name).replace('_', ' ');
 }
 
+std::tuple<QGeoCoordinate, bool> parseCoordinates(const QString &latStr, const QString &lonStr)
+{
+    bool parsed(false);
+    QGeoCoordinate coordinate;
+
+    if (!latStr.isEmpty() && !lonStr.isEmpty()) {
+
+        const auto lat = latStr.toDouble(&parsed);
+        if (parsed) {
+            const auto lon = lonStr.toDouble(&parsed);
+            if (parsed) {
+                coordinate = QGeoCoordinate(lat, lon);
+            }
+        }
+    }
+
+    return { coordinate, parsed };
+};
 } // namespace utils

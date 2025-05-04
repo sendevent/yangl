@@ -131,8 +131,7 @@ void FlatPlaceProxyModel::onRowsInserted(const QModelIndex &parent, int first, i
         }
     }
 
-    const int newCount = places.size();
-    if (newCount) {
+    if (const int newCount = places.size()) {
         const int currentCount = rowCount();
         LOG << currentCount << newCount;
         beginInsertRows(QModelIndex(), currentCount, currentCount + newCount - 1);
