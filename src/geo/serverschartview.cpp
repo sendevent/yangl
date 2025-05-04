@@ -19,6 +19,7 @@
 
 #include "app/common.h"
 #include "app/nordvpnwraper.h"
+#include "geo/coordinatesresolver.h"
 #include "geo/mapserversmodel.h"
 #include "serversfiltermodel.h"
 #include "settings/appsettings.h"
@@ -112,13 +113,17 @@ void ServersChartView::loadSettings()
 {
     m_lineEdit->setText(AppSettings::Map->Filter->read().toString());
 
-    const qreal lat = AppSettings::Map->CenterLat->read().toDouble();
-    const qreal lon = AppSettings::Map->CenterLon->read().toDouble();
-    QGeoCoordinate coord;
-    coord.setLatitude(lat);
-    coord.setLongitude(lon);
-    m_chartWidget->centerOn(coord);
-    m_chartWidget->setScale(AppSettings::Map->Scale->read().toDouble());
+    const auto [coord, parsed] = utils::parseCoordinates(AppSettings::Map->CenterLat->read().toString(),
+                                                         AppSettings::Map->CenterLon->read().toString());
+    if (parsed) {
+        m_chartWidget->centerOn(coord);
+    }
+
+    bool ok(false);
+    const double scale = AppSettings::Map->Scale->read().toDouble(&ok);
+    if (ok) {
+        m_chartWidget->setScale(scale);
+    }
 
     restoreGeometry(AppSettings::Map->Geometry->read().toByteArray());
     setVisible(AppSettings::Map->Visible->read().toBool());
@@ -176,41 +181,33 @@ void ServersChartView::onGotLocation(const PlaceInfo &place)
 
 void ServersChartView::onCurrentTreeItemChanged(const QModelIndex &current)
 {
-    LOG << current;
-    QString country, city;
-    if (current.parent().isValid()) {
-        country = current.parent().data().toString();
-        city = current.data().toString();
-    } else {
-        country = current.data().toString();
+    const auto &place = current.data(MapServersModel::Roles::PlaceInfoRole).value<PlaceInfo>();
+    if (place.location.isValid()) {
+        m_chartWidget->centerOn(place.location);
     }
-
-    // m_chartWidget->centerOn(country, city);
-    WRN << "Not implemented yet";
 }
 
 void ServersChartView::onTreeItemDoubleclicked(const QModelIndex &current)
 {
-    QString country, city;
+    const auto &place = current.data(MapServersModel::Roles::PlaceInfoRole).value<PlaceInfo>();
+    requestConnection(place);
+}
 
-    if (current.parent().isValid()) {
-        country = current.parent().data().toString();
-        city = current.data().toString();
-    } else {
-        country = current.data().toString();
+void ServersChartView::onMarkerDoubleclicked(const PlaceInfo &place)
+{
+    requestConnection(place);
+}
+
+void ServersChartView::requestConnection(const PlaceInfo &place)
+{
+    if (place.ok) {
+        WRN << "invalid place, ignored:" << place.country << place.town << place.message;
+        return;
     }
-    requestConnection(country, city);
-}
 
-void ServersChartView::onMarkerDoubleclicked(const PlaceInfo &addr)
-{
-    requestConnection(addr.country, addr.town);
-}
+    const auto &country = utils::geoToNvpn(place.country);
+    const auto &city = utils::geoToNvpn(place.town);
 
-void ServersChartView::requestConnection(const QString &group, const QString &server)
-{
-    const QString &country = utils::geoToNvpn(group);
-    const QString &city = utils::geoToNvpn(server);
     if (country == "group" && city.isEmpty())
         return;
 
