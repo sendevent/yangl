@@ -30,8 +30,6 @@ CoordinatesResolver::CoordinatesResolver(QObject *parent)
     } else {
         WRN << "Can't aquire geocoder" << m_geoSrvProv->geocodingManager();
     }
-
-    connect(this, &CoordinatesResolver::coordinatesResolved, this, &CoordinatesResolver::onCoordinatesResolved);
 }
 
 quint32 CoordinatesResolver::requestCoordinates(const PlaceInfo &town)
@@ -201,6 +199,10 @@ void CoordinatesResolver::requestGeoAsync(const PlaceInfo &place, RequestId id)
     result.ok = false;
     result.message = "Not found";
 
+    WRN << "temporary disabled";
+    emit coordinatesResolved(id, result);
+    return;
+
     if (!m_geoCoder) {
         WRN << "GeoCoder is unavailable";
         emit coordinatesResolved(id, result);
@@ -251,11 +253,4 @@ void CoordinatesResolver::requestGeoAsync(const PlaceInfo &place, RequestId id)
         reply->deleteLater();
         emit coordinatesResolved(id, result);
     });
-}
-
-void CoordinatesResolver::onCoordinatesResolved(RequestId id, const PlaceInfo &town)
-{
-    if (town.ok) {
-        m_places.insert(town);
-    }
 }

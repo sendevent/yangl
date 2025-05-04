@@ -79,21 +79,23 @@ QVariant FlatPlaceProxyModel::data(const QModelIndex &index, int role) const
     if (index.isValid() && index.row() < m_places.size()) {
 
         const auto &place = m_places.at(index.row());
-        switch (role) {
-        case Qt::DisplayRole: {
-            return place.town;
-        }
-        case PositionRole: {
-            return QVariant::fromValue(place.location);
-        }
-        case CountryNameRole: {
-            return place.country;
-        }
-        case CityNameRole: {
-            return place.town;
-        }
-        default:
-            break;
+        if (!place.group) {
+            switch (role) {
+            case Qt::DisplayRole: {
+                return place.town;
+            }
+            case PositionRole: {
+                return QVariant::fromValue(place.location);
+            }
+            case CountryNameRole: {
+                return place.country;
+            }
+            case CityNameRole: {
+                return place.town;
+            }
+            default:
+                break;
+            }
         }
     }
 

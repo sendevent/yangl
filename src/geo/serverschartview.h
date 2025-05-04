@@ -46,7 +46,6 @@ public slots:
 
 private slots:
     void onReloadRequested();
-    void onGotServers();
     void onGotLocation(const PlaceInfo &place);
     void onCurrentTreeItemChanged(const QModelIndex &current);
     void onTreeItemDoubleclicked(const QModelIndex &current);
@@ -69,8 +68,6 @@ private:
     ServerLocationResolver *m_listManager;
     MapServersModel *m_serversModel;
     ServersFilterModel *m_serversFilterModel;
-
-    bool m_modelPopulated { false };
 
     void initUi();
     void initConenctions();

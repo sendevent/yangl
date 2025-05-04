@@ -111,13 +111,17 @@ void MapServersModel::addMarker(const PlaceInfo &place)
 
         countryItem = newCountry.get();
 
-        int countryRow = static_cast<int>(m_root->children.size());
+        const int countryRow = static_cast<int>(m_root->children.size());
 
         LOG << "inserted group:" << newCountry->name;
 
         beginInsertRows(QModelIndex(), countryRow, countryRow);
         m_root->children.push_back(std::move(newCountry));
         endInsertRows();
+
+        if (place.town.isEmpty()) {
+            return;
+        }
     }
 
     // Add city under country

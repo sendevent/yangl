@@ -54,8 +54,6 @@ public:
 
     QSize sizeHint() const override;
 
-    void handleServers();
-
 signals:
     void markerDoubleclicked(const PlaceInfo &marker);
 
