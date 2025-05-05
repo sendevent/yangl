@@ -19,10 +19,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 
 #include "geo/coordinatesresolver.h"
 
-#include <QIdentityProxyModel>
+#include <QAbstractProxyModel>
 
-class QTimer;
-class FlatPlaceProxyModel : public QIdentityProxyModel
+class FlatPlaceProxyModel : public QAbstractProxyModel
 {
     Q_OBJECT
 
@@ -41,10 +40,19 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    QModelIndex mapFromSource(const QModelIndex &sourceIndex) const override;
+    QModelIndex mapToSource(const QModelIndex &proxyIndex) const override;
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+    QModelIndex parent(const QModelIndex &child) const override;
+
 private:
-    QVector<PlaceInfo> m_places;
+    QVector<QModelIndex> m_places;
+
+    void insertSubtree(const QModelIndex &parent);
 
 private slots:
     void rebuildFlatList();
     void onRowsInserted(const QModelIndex &parent, int first, int last);
+    void onRowsRemoved(const QModelIndex &parent, int first, int last);
 };

@@ -20,66 +20,130 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 #include "app/common.h"
 #include "geo/mapserversmodel.h"
 
-#include <qnamespace.h>
-
 FlatPlaceProxyModel::FlatPlaceProxyModel(QObject *parent)
-    : QIdentityProxyModel(parent)
+    : QAbstractProxyModel(parent)
 {
 }
 
-void FlatPlaceProxyModel::setSourceModel(QAbstractItemModel *source)
-{
-
-    if (auto srcModel = sourceModel()) {
-        disconnect(srcModel, &QAbstractItemModel::rowsInserted, this, &FlatPlaceProxyModel::onRowsInserted);
-    }
-
-    QIdentityProxyModel::setSourceModel(source);
-
-    if (auto srcModel = source) {
-        connect(srcModel, &QAbstractItemModel::rowsInserted, this, &FlatPlaceProxyModel::onRowsInserted);
-    }
-
-    rebuildFlatList();
-}
-
-bool isAcceptable(const auto &place)
-{
-    return /*place.ok &&*/ !place.isGroup() && !place.town.isEmpty() && place.location.isValid();
-};
-
-void FlatPlaceProxyModel::rebuildFlatList()
+void FlatPlaceProxyModel::setSourceModel(QAbstractItemModel *model)
 {
     beginResetModel();
 
-    m_places.clear();
-
-    if (auto *m_source = sourceModel()) {
-        for (int topLevelRow = 0; topLevelRow < m_source->rowCount(); ++topLevelRow) {
-            const auto &topLevelIndex = m_source->index(topLevelRow, 0);
-            for (int subRow = 0; subRow < m_source->rowCount(topLevelIndex); ++subRow) {
-                const auto &subIndex = m_source->index(subRow, 0, topLevelIndex);
-                const auto &place = subIndex.data(MapServersModel::Roles::PlaceInfoRole).value<PlaceInfo>();
-                if (isAcceptable(place)) {
-                    m_places.append(place);
-                }
-            }
-        }
+    if (auto srcModel = sourceModel()) {
+        disconnect(srcModel, nullptr, this, nullptr);
     }
+
+    QAbstractProxyModel::setSourceModel(model);
+
+    if (model) {
+        connect(model, &QAbstractItemModel::rowsInserted, this, &FlatPlaceProxyModel::onRowsInserted);
+        connect(model, &QAbstractItemModel::rowsRemoved, this, &FlatPlaceProxyModel::onRowsRemoved);
+        connect(model, &QAbstractItemModel::modelReset, this, &FlatPlaceProxyModel::rebuildFlatList);
+    }
+
+    rebuildFlatList();
 
     endResetModel();
 }
 
-int FlatPlaceProxyModel::rowCount(const QModelIndex &) const
+bool isAcceptable(const auto &place)
 {
-    return m_places.size();
+    return place.ok && !place.isGroup() && !place.town.isEmpty() && place.location.isValid();
+}
+
+void FlatPlaceProxyModel::rebuildFlatList()
+{
+    m_places.clear();
+    insertSubtree(QModelIndex());
+}
+
+void FlatPlaceProxyModel::insertSubtree(const QModelIndex &parent)
+{
+    const int rows = sourceModel()->rowCount(parent);
+    for (int i = 0; i < rows; ++i) {
+        const QModelIndex &child = sourceModel()->index(i, 0, parent);
+        m_places.append(child);
+        insertSubtree(child);
+    }
+}
+
+int FlatPlaceProxyModel::rowCount(const QModelIndex &parent) const
+{
+    return parent.isValid() ? 0 : m_places.size();
+}
+
+int FlatPlaceProxyModel::columnCount(const QModelIndex & /*parent*/) const
+{
+    return 1;
+}
+
+QModelIndex FlatPlaceProxyModel::index(int row, int column, const QModelIndex &parent) const
+{
+    if (parent.isValid() || row < 0 || row >= m_places.size()) {
+        return QModelIndex();
+    }
+
+    return createIndex(row, column);
+}
+
+QModelIndex FlatPlaceProxyModel::parent(const QModelIndex &) const
+{
+    return QModelIndex(); // Flat
+}
+
+QModelIndex FlatPlaceProxyModel::mapToSource(const QModelIndex &proxyIndex) const
+{
+    if (!proxyIndex.isValid() || proxyIndex.row() >= m_places.size()) {
+        return QModelIndex();
+    }
+
+    const QModelIndex &src = m_places[proxyIndex.row()];
+    return src.sibling(src.row(), proxyIndex.column());
+}
+
+QModelIndex FlatPlaceProxyModel::mapFromSource(const QModelIndex &sourceIndex) const
+{
+    const int row = m_places.indexOf(sourceIndex);
+    return row != -1 ? createIndex(row, sourceIndex.column()) : QModelIndex();
+}
+
+void FlatPlaceProxyModel::onRowsRemoved(const QModelIndex &parent, int first, int last)
+{
+    // Recalculate and remove affected rows
+    QVector<QModelIndex> toRemove;
+    for (int row = first; row <= last; ++row) {
+        QModelIndex child = sourceModel()->index(row, 0, parent);
+        toRemove.append(child);
+        QList<QModelIndex> stack = { child };
+        while (!stack.isEmpty()) {
+            QModelIndex current = stack.takeLast();
+            toRemove.append(current);
+            const int childCount = sourceModel()->rowCount(current);
+            for (int i = 0; i < childCount; ++i)
+                stack.append(sourceModel()->index(i, 0, current));
+        }
+    }
+
+    for (const QModelIndex &idx : toRemove) {
+        const int row = m_places.indexOf(idx);
+        if (row >= 0) {
+            beginRemoveRows(QModelIndex(), row, row);
+            m_places.removeAt(row);
+            endRemoveRows();
+        }
+    }
 }
 
 QVariant FlatPlaceProxyModel::data(const QModelIndex &index, int role) const
 {
     if (index.isValid() && index.row() < m_places.size()) {
 
-        const auto &place = m_places.at(index.row());
+        const auto &placeIndex = m_places.at(index.row());
+        if (!placeIndex.isValid()) {
+            WRN << "Invalid source index for row:" << index.row() << placeIndex;
+            return {};
+        }
+        const auto &place = placeIndex.data(MapServersModel::PlaceInfoRole).value<PlaceInfo>();
         switch (role) {
         case Qt::DisplayRole: {
             return place.town;
@@ -98,7 +162,7 @@ QVariant FlatPlaceProxyModel::data(const QModelIndex &index, int role) const
         }
     }
 
-    return QIdentityProxyModel::data(index, role);
+    return {};
 }
 
 QHash<int, QByteArray> FlatPlaceProxyModel::roleNames() const
@@ -113,26 +177,33 @@ QHash<int, QByteArray> FlatPlaceProxyModel::roleNames() const
 void FlatPlaceProxyModel::onRowsInserted(const QModelIndex &parent, int first, int last)
 {
 
-    QList<PlaceInfo> places;
+    QList<QModelIndex> places;
 
-    if (auto *srcModel = sourceModel()) {
-        for (int row = first; row <= last; ++row) {
-            const auto &id = srcModel->index(row, 0, parent);
-            const auto &place = id.data(MapServersModel::Roles::PlaceInfoRole).value<PlaceInfo>();
-            if (isAcceptable(place)) {
-                places.append(place);
-                LOG << row << place.country << place.town;
-            }
+    auto placeFromSource = [](const QModelIndex &index) -> PlaceInfo {
+        if (!index.isValid()) {
+            WRN << "Invalid index, ignored:" << index;
+            return {};
+        }
+
+        return index.data(MapServersModel::PlaceInfoRole).value<PlaceInfo>();
+    };
+
+    const auto *model = parent.model() ? parent.model() : sourceModel();
+    if (!model) {
+        WRN << "No source model is set";
+        return;
+    }
+
+    for (int row = first; row <= last; ++row) {
+        const auto &child = model->index(row, 0, parent);
+        if (isAcceptable(placeFromSource(child))) {
+            places.append(child);
         }
     }
 
-    if (const int newCount = places.size()) {
-        const int currentCount = rowCount();
-        LOG << currentCount << newCount;
-        beginInsertRows(QModelIndex(), currentCount, currentCount + newCount - 1);
-
+    if (places.size()) {
+        beginInsertRows(QModelIndex(), m_places.size(), m_places.size() + places.size() - 1);
         m_places.append(places);
-
         endInsertRows();
     }
 }
