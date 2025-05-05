@@ -95,12 +95,11 @@ void MapServersModel::addMarker(const PlaceInfo &place)
 {
     TreeItem *countryItem = nullptr;
 
-    // Find existing country
-    const auto found = std::find_if(m_root->children.cbegin(), m_root->children.cend(),
-                                    [&place](const auto &otherPlace) { return otherPlace->name == place.country; });
-
-    if (found != m_root->children.cend()) {
-        countryItem = found->get();
+    const auto foundCountry =
+            std::find_if(m_root->children.cbegin(), m_root->children.cend(),
+                         [&place](const auto &otherPlace) { return otherPlace->name == place.country; });
+    if (foundCountry != m_root->children.cend()) {
+        countryItem = foundCountry->get();
     }
 
     // If not found, create new country node
@@ -130,14 +129,11 @@ void MapServersModel::addMarker(const PlaceInfo &place)
     }
 
     // Check if the city already exists under this country
-    for (auto &child : countryItem->children) {
-        if (child->name == place.town) {
-            // Update existing city data
-            LOG << "from:" << child->data.country << child->data.town << child->data.location
-                << child->data.location.isValid();
-            LOG << "to:" << child->data.country << child->data.town << child->data.location
-                << child->data.location.isValid();
-            child->data = place;
+    const auto foundCity = std::find_if(countryItem->children.cbegin(), countryItem->children.cend(),
+                                        [&place](const auto &otherPlace) { return otherPlace->name == place.town; });
+    if (foundCity != countryItem->children.cend()) {
+        if (auto child = foundCity->get(); child->data != place) {
+            child->data = place; // And just update existing city data
             return;
         }
     }
