@@ -22,6 +22,7 @@
 
 #include <QApplication>
 #include <QFileInfo>
+#include <QLatin1StringView>
 #include <QMetaEnum>
 #include <QPainter>
 #include <QPixmap>
@@ -80,10 +81,10 @@
 
     if (!info.m_sub.isEmpty()) {
         const QRect baseRect(base.rect());
-        QPixmap sub = QPixmap(info.m_sub)
-                              .scaled(baseRect.width() / 2, baseRect.height() / 2, Qt::KeepAspectRatio,
-                                      Qt::SmoothTransformation);
-        const QRect subRect = sub.rect();
+        const QPixmap &sub = QPixmap(info.m_sub)
+                                     .scaled(baseRect.width() / 2, baseRect.height() / 2, Qt::KeepAspectRatio,
+                                             Qt::SmoothTransformation);
+        const QRect &subRect = sub.rect();
         QRect targetRect(subRect);
         targetRect.moveTopLeft(base.rect().center());
 
@@ -102,7 +103,7 @@ TrayIcon::TrayIcon(QObject *parent)
     deployDefaults();
     reloadIcons();
 
-    setIcon(iconForStatus(NordVpnInfo::Status::Unknown));
+    updateIcon(NordVpnInfo::Status::Unknown);
 }
 
 /*static*/ QIcon TrayIcon::iconForState(const NordVpnInfo &state)
@@ -156,19 +157,19 @@ void TrayIcon::deployDefaults() const
 {
     static const QString rscPath(":/icn/resources/tray/%1");
 
-    for (const auto &fsFile : {
-                 GroupTray::iconPath(QStringLiteral("unknown.png")),
-                 GroupTray::iconPath(QStringLiteral("unknown_sub.png")),
-                 GroupTray::iconPath(QStringLiteral("disconnected.png")),
-                 GroupTray::iconPath(QStringLiteral("disconnected_sub.png")),
-                 GroupTray::iconPath(QStringLiteral("connecting.png")),
-                 GroupTray::iconPath(QStringLiteral("connecting_sub.png")),
-                 GroupTray::iconPath(QStringLiteral("connected.png")),
-                 GroupTray::iconPath(QStringLiteral("connected_sub.png")),
+    for (const auto &part : {
+                 QLatin1String("unknown"),
+                 QLatin1String("disconnected"),
+                 QLatin1String("connecting"),
+                 QLatin1String("connected"),
          }) {
-
-        const QFileInfo info(fsFile);
-        if (!info.exists())
-            QFile::copy(rscPath.arg(info.fileName()), fsFile);
+        for (const auto &suffix : { QLatin1String(), QLatin1String("_sub") }) {
+            const auto &fsFile = GroupTray::iconPath(QString("%1%2.png").arg(part, suffix));
+            const QFileInfo info(fsFile);
+            if (!info.exists()) {
+                const auto &resourceFile = rscPath.arg(info.fileName());
+                QFile::copy(resourceFile, fsFile);
+            }
+        }
     }
 }
