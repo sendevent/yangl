@@ -54,7 +54,6 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
     connect(m_menuHolder, &MenuHolder::actionTriggered, this, &NordVpnWraper::onActionTriggered);
     connect(m_pauseTimer, &QTimer::timeout, this, &NordVpnWraper::onPauseTimer);
 
-    initMenu();
     m_trayIcon->setVisible(true);
 }
 
