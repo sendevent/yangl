@@ -35,6 +35,7 @@ public:
 signals:
     void ready();
     void citiesAdded(const Places &cities);
+    void citiesCount(int count);
 
 private slots:
     void run();

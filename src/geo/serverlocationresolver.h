@@ -32,6 +32,7 @@ public:
 
 public slots:
     bool refresh();
+    void saveCache() const;
 
 private slots:
     void resolveServerLocation(const PlaceInfo &place);
@@ -39,19 +40,19 @@ private slots:
 
     void onPlaceResolved(RequestId id, const PlaceInfo &place);
 
-    void saveCacheDelayed();
-    void saveCache() const;
-
 signals:
-    void serverLocationResolved(const PlaceInfo &place);
+    void serverLocationResolved(const PlaceInfo &place, int current, int total);
 
 private:
     ServersListManager *m_listManager { nullptr };
     CoordinatesResolver *m_geoResolver { nullptr };
     QMap<QString, QMultiMap<QString, PlaceInfo>> m_placesLoaded;
     QMap<QString, QMultiMap<QString, PlaceInfo>> m_placesChecked;
-    QTimer *m_saveTimer { nullptr };
+    int m_serversFound { 0 };
+    int m_serversResolved { 0 };
 
     void ensureCacheLoaded();
     void loadCache();
+
+    void notifyPlace(const PlaceInfo &place);
 };

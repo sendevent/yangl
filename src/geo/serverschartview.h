@@ -30,6 +30,7 @@ class ServersFilterModel;
 class QLineEdit;
 class QTreeView;
 class QToolButton;
+class QProgressBar;
 
 class ServersChartView : public QWidget
 {
@@ -46,7 +47,7 @@ public slots:
 
 private slots:
     void onReloadRequested();
-    void onGotLocation(const PlaceInfo &place);
+    void onGotLocation(const PlaceInfo &place, int current, int total);
     void onCurrentTreeItemChanged(const QModelIndex &current);
     void onTreeItemDoubleclicked(const QModelIndex &current);
 
@@ -62,6 +63,7 @@ private:
     QLineEdit *m_lineEdit;
     QTreeView *m_treeView;
     QToolButton *m_buttonReload;
+    QProgressBar *m_progressBar;
     MapWidget *m_chartWidget;
 
     NordVpnWraper *m_nordVpnWraper;
@@ -77,4 +79,6 @@ private:
     void setControlsEnabled(bool enabled);
 
     void requestConnection(const PlaceInfo &place);
+
+    void handleLocationReadingPorgress(int current, int total);
 };

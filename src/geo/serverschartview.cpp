@@ -29,7 +29,9 @@
 #include <QHideEvent>
 #include <QItemSelectionModel>
 #include <QLineEdit>
+#include <QProgressBar>
 #include <QSplitter>
+#include <QTimer>
 #include <QToolButton>
 #include <QTreeView>
 #include <qabstractitemmodel.h>
@@ -79,6 +81,11 @@ void ServersChartView::initUi()
     m_buttonReload->setText("Reload");
     m_buttonReload->setToolTip(tr("Update available servers list"));
     hBox->addWidget(m_buttonReload);
+
+    m_progressBar = new QProgressBar(leftView);
+    m_progressBar->setRange(0, 0);
+    hBox->addWidget(m_progressBar);
+    m_progressBar->hide();
 
     m_chartWidget = new MapWidget(AppSettings::Map->MapPlugin->read().toString(),
                                   AppSettings::Map->MapType->read().toInt(), m_serversModel, this);
@@ -165,12 +172,16 @@ void ServersChartView::setControlsEnabled(bool enabled)
 
 void ServersChartView::onReloadRequested()
 {
+    handleLocationReadingPorgress(1, 150);
     requestServersList();
 }
 
-void ServersChartView::onGotLocation(const PlaceInfo &place)
+void ServersChartView::onGotLocation(const PlaceInfo &place, int current, int total)
 {
-    LOG << place.country << place.town << place.location;
+    LOG << place.country << place.town << place.location << current << total;
+
+    handleLocationReadingPorgress(current, total);
+
     if (!place.ok) {
         WRN << place.country << place.town << place.message;
         return;
@@ -237,5 +248,29 @@ void ServersChartView::onStateChanged(const NordVpnInfo &info)
         m_instance->show();
         m_instance->activateWindow();
         m_instance->raise();
+    }
+}
+
+void ServersChartView::handleLocationReadingPorgress(int current, int total)
+{
+    static QTimer *t = nullptr;
+    if (!t) {
+        t = new QTimer(this);
+        t->setInterval(3 * utils::oneSecondMs());
+        t->setSingleShot(true);
+        connect(t, &QTimer::timeout, this, [this]() {
+            m_progressBar->setHidden(true);
+            m_buttonReload->setVisible(true);
+            m_listManager->saveCache();
+        });
+    }
+
+    const bool finished = current == total;
+    if (finished) {
+        t->stop();
+        t->start();
+    } else {
+        m_progressBar->setHidden(false);
+        m_buttonReload->setVisible(false);
     }
 }
