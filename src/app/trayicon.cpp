@@ -123,30 +123,32 @@ void TrayIcon::setMessageDuration(int durationSecs)
 void TrayIcon::updateIcon(NordVpnInfo::Status status)
 {
     const QIcon &icn = iconForStatus(status);
-    if (!icn.isNull())
+    if (!icn.isNull()) {
         setIcon(icn);
+    }
 }
 
 void TrayIcon::setState(const NordVpnInfo &state)
 {
-    const QString description = AppSettings::Tray->MessagePlainText->read().toBool()
-            ? QTextDocumentFragment::fromHtml(state.toString()).toPlainText()
-            : state.toString();
-
     if (m_state.status() != state.status() && !qApp->isSavingSession()) {
         updateIcon(state.status());
 
         bool skeepMessage(false);
         if (m_isFirstChange && state.status() == NordVpnInfo::Status::Connected)
             if (AppSettings::Monitor->Active->read().toBool()
-                && AppSettings::Tray->IgnoreFirstConnected->read().toBool())
+                && AppSettings::Tray->IgnoreFirstConnected->read().toBool()) {
                 skeepMessage = true;
+            }
 
-        if (!skeepMessage)
+        if (!skeepMessage) {
+            const QString &description = AppSettings::Tray->MessagePlainText->read().toBool()
+                    ? QTextDocumentFragment::fromHtml(state.toString()).toPlainText()
+                    : state.toString();
             showMessage(qApp->applicationDisplayName(), description, iconForState(state), m_duration);
+        }
     }
 
-    setToolTip(description);
+    setToolTip(state.toString()); // always plaintext
 
     m_state = state;
     m_isFirstChange = false;
@@ -155,14 +157,16 @@ void TrayIcon::setState(const NordVpnInfo &state)
 void TrayIcon::deployDefaults() const
 {
     static const QString rscPath(":/icn/resources/tray/%1");
+    static const QStringList names {
+        QLatin1String("unknown"),
+        QLatin1String("disconnected"),
+        QLatin1String("connecting"),
+        QLatin1String("connected"),
+    };
+    static const QStringList suffixes { QLatin1String(), QLatin1String("_sub") };
 
-    for (const auto &part : {
-                 QLatin1String("unknown"),
-                 QLatin1String("disconnected"),
-                 QLatin1String("connecting"),
-                 QLatin1String("connected"),
-         }) {
-        for (const auto &suffix : { QLatin1String(), QLatin1String("_sub") }) {
+    for (const auto &part : names) {
+        for (const auto &suffix : suffixes) {
             const auto &fsFile = GroupTray::iconPath(QString("%1%2.png").arg(part, suffix));
             const QFileInfo info(fsFile);
             if (!info.exists()) {
