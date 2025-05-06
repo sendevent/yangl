@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>407</width>
-    <height>283</height>
+    <width>640</width>
+    <height>480</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -28,7 +28,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap resource="rsc.qrc">:/icn/resources/online.png</pixmap>
+        <pixmap resource="../rsc.qrc">:/icn/resources/map/online_map.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -75,17 +75,17 @@
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Close</set>
+      <set>QDialogButtonBox::StandardButton::Close</set>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
  <resources>
-  <include location="rsc.qrc"/>
+  <include location="../rsc.qrc"/>
  </resources>
  <connections>
   <connection>
