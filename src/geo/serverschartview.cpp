@@ -65,10 +65,10 @@ void ServersChartView::initUi()
     QWidget *leftView = new QWidget(this);
     QVBoxLayout *leftVBox = new QVBoxLayout(leftView);
     leftVBox->setContentsMargins(0, 0, 0, 0);
-    m_lineEdit = new QLineEdit(leftView);
-    m_lineEdit->setPlaceholderText(QStringLiteral("F"));
+    m_searchBox = new QLineEdit(leftView);
+    m_searchBox->setPlaceholderText(QStringLiteral("F"));
 
-    m_lineEdit->setToolTip(tr("Filter by country/city"));
+    m_searchBox->setToolTip(tr("Filter by country/city"));
     m_treeView = new QTreeView(leftView);
     m_treeView->setModel(m_serversFilterModel);
     m_treeView->setEditTriggers(QTreeView::NoEditTriggers);
@@ -92,7 +92,7 @@ void ServersChartView::initUi()
                                   AppSettings::Map->MapType->read().toInt(), m_serversModel, this);
     m_chartWidget->init();
 
-    leftVBox->addWidget(m_lineEdit);
+    leftVBox->addWidget(m_searchBox);
     leftVBox->addWidget(m_treeView);
     leftVBox->addItem(hBox);
     QSplitter *splitter = new QSplitter(this);
@@ -113,7 +113,7 @@ void ServersChartView::initConenctions()
             [this](const QModelIndex &current, const QModelIndex &) { onCurrentTreeItemChanged(current); });
     connect(m_treeView, &QTreeView::pressed, this, &ServersChartView::onCurrentTreeItemChanged);
     connect(m_treeView, &QTreeView::doubleClicked, this, &ServersChartView::onTreeItemDoubleclicked);
-    connect(m_lineEdit, &QLineEdit::textChanged, this,
+    connect(m_searchBox, &QLineEdit::textChanged, this,
             [this](const QString &text) { m_serversFilterModel->setFilterRegularExpression(text); });
     connect(m_chartWidget, &MapWidget::markerDoubleclicked, this, &ServersChartView::onMarkerDoubleclicked);
     connect(m_buttonReload, &QToolButton::clicked, this, &ServersChartView::onReloadRequested);
@@ -125,7 +125,7 @@ void ServersChartView::initConenctions()
 
 void ServersChartView::loadSettings()
 {
-    m_lineEdit->setText(AppSettings::Map->Filter->read().toString());
+    m_searchBox->setText(AppSettings::Map->Filter->read().toString());
 
     const auto [coord, parsed] = utils::parseCoordinates(AppSettings::Map->CenterLat->read().toString(),
                                                          AppSettings::Map->CenterLon->read().toString());
@@ -146,7 +146,7 @@ void ServersChartView::loadSettings()
 void ServersChartView::saveSettings()
 {
     AppSettings::Map->Geometry->write(saveGeometry());
-    AppSettings::Map->Filter->write(m_lineEdit->text());
+    AppSettings::Map->Filter->write(m_searchBox->text());
 
     const QGeoCoordinate coord = m_chartWidget->center();
     AppSettings::Map->CenterLat->write(coord.latitude());
