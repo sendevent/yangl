@@ -382,8 +382,9 @@ void NordVpnWraper::updateActions(bool connected)
         }
     };
 
-    if (auto rootMenu = m_trayIcon->contextMenu())
+    if (auto rootMenu = m_trayIcon->contextMenu()) {
         manageMenuActionsEnablement(rootMenu);
+    }
 }
 
 void NordVpnWraper::connectTo(const QString &country, const QString &city)

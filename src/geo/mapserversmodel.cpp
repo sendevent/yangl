@@ -134,8 +134,8 @@ void MapServersModel::addMarker(const PlaceInfo &place)
     if (foundCity != countryItem->children.cend()) {
         if (auto child = foundCity->get(); child->data != place) {
             child->data = place; // And just update existing city data
-            return;
-        }
+        } // or simply ignore if the data is the same
+        return;
     }
 
     // Add new city under country
