@@ -41,7 +41,6 @@ public:
     Action::Ptr action(const Action::Id &userAction) const;
 
     QList<Action::Ptr> load(const QString &from = {});
-    QList<Action::Ptr> load(QIODevice *from);
     void save(const QString &to = {});
     void save(QIODevice *to);
 
