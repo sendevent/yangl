@@ -71,6 +71,13 @@ void ServersChartView::initUi()
     auto serversProxyModle = new FlatPlaceProxyModel(this);
     serversProxyModle->setSourceModel(m_serversModel);
 
+    m_searchBox = new QLineEdit(leftView);
+    auto focusAction = new QAction(m_searchBox);
+    focusAction->setShortcut(QKeySequence("Ctrl+F"));
+    connect(focusAction, &QAction::triggered, this, [this]() { m_searchBox->setFocus(); });
+    m_searchBox->addAction(focusAction);
+
+    m_searchBox->setPlaceholderText(tr("Filter servers (%1)").arg(focusAction->shortcut().toString()));
     m_searchBox->setToolTip(tr("Filter by country/city"));
     m_searchBox->setClearButtonEnabled(true);
     m_searchBox->setCompleter([this, serversProxyModle]() {
