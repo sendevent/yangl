@@ -19,7 +19,6 @@
 
 #include "app/common.h"
 #include "geo/flatplaceproxymodel.h"
-#include "mapserversmodel.h"
 #include "settings/appsettings.h"
 
 #include <QGeoServiceProvider>
@@ -49,16 +48,12 @@ static QString defaultMapPluginName()
     return result;
 }
 
-MapWidget::MapWidget(const QString &mapPlugin, int mapType, MapServersModel *model, QWidget *parent)
+MapWidget::MapWidget(const QString &mapPlugin, int mapType, FlatPlaceProxyModel *model, QWidget *parent)
     : QWidget(parent)
     , m_quickView(new QQuickWidget(this))
 {
     if (model) {
-        LOG << "Routing MapServersModel:" << model;
-
-        auto proxy = new FlatPlaceProxyModel(this);
-        proxy->setSourceModel(model);
-        setRootContextProperty("markerModel", QVariant::fromValue(qobject_cast<QAbstractItemModel *>(proxy)));
+        setRootContextProperty("markerModel", QVariant::fromValue(model));
     }
     setRootContextProperty("pluginName", mapPlugin);
     setRootContextProperty("currenCountry", QString());

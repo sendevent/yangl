@@ -22,7 +22,7 @@
 #include <QGeoCoordinate>
 #include <QWidget>
 
-class MapServersModel;
+class FlatPlaceProxyModel;
 class QQuickWidget;
 class QQuickItem;
 
@@ -30,7 +30,7 @@ class MapWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit MapWidget(const QString &mapPlugin, int mapType, MapServersModel *model, QWidget *parent = {});
+    explicit MapWidget(const QString &mapPlugin, int mapType, FlatPlaceProxyModel *model, QWidget *parent = {});
     ~MapWidget();
 
     void init();
