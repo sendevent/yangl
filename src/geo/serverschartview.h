@@ -76,7 +76,6 @@ private:
     void loadSettings();
 
     void requestServersList();
-    void setControlsEnabled(bool enabled);
 
     void requestConnection(const PlaceInfo &place);
 

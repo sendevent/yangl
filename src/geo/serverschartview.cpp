@@ -158,16 +158,7 @@ void ServersChartView::hideEvent(QHideEvent *event)
 
 void ServersChartView::requestServersList()
 {
-    if (m_listManager->refresh()) {
-        // setControlsEnabled(false);
-    }
-}
-
-void ServersChartView::setControlsEnabled(bool enabled)
-{
-    for (auto control : std::initializer_list<QWidget *> { m_lineEdit, m_treeView, /*m_chartWidget , buttonReload*/ }) {
-        control->setEnabled(enabled);
-    }
+    m_listManager->refresh();
 }
 
 void ServersChartView::onReloadRequested()
