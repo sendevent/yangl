@@ -20,13 +20,14 @@
 #include "actions/action.h"
 #include "apppatheditor.h"
 
-#include <QCheckBox>
-#include <QComboBox>
-#include <QLineEdit>
 #include <QPointer>
 #include <QSharedPointer>
-#include <QSpinBox>
 #include <QWidget>
+
+class QCheckBox;
+class QComboBox;
+class QLineEdit;
+class QSpinBox;
 
 namespace Ui {
 class ActionEditor;

@@ -17,12 +17,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 
 #pragma once
 
-#include "coordinatesresolver.h"
+#include "geo/placeinfo.h"
 
 #include <QObject>
 
 class NordVpnWraper;
 class ServersListManager;
+class CoordinatesResolver;
+
 class ServerLocationResolver : public QObject
 {
     Q_OBJECT

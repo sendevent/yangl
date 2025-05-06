@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "statechecker.h"
+#include "app/nordvpninfo.h"
 
 #include <QSystemTrayIcon>
 

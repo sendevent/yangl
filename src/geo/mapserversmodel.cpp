@@ -18,9 +18,6 @@
 #include "mapserversmodel.h"
 
 #include "app/common.h"
-#include "geo/coordinatesresolver.h"
-
-#include <qnamespace.h>
 
 MapServersModel::MapServersModel(QObject *parent)
     : QAbstractItemModel(parent)

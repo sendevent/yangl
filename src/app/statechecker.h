@@ -21,10 +21,10 @@
 #include "nordvpninfo.h"
 
 #include <QObject>
-#include <QQueue>
 
 class CLICaller;
 class QTimer;
+
 class StateChecker : public QObject
 {
     Q_OBJECT

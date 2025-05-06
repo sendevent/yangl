@@ -18,11 +18,9 @@
 
 #include "settingsdialog.h"
 
-#include "actioneditor.h"
 #include "actions/action.h"
 #include "actions/actionstorage.h"
 #include "app/common.h"
-#include "geo/mapwidget.h"
 #include "settings/appsettings.h"
 #include "settings/mapsettings.h"
 #include "ui_settingsdialog.h"
@@ -30,7 +28,6 @@
 #include <QApplication>
 #include <QIcon>
 #include <QMessageBox>
-#include <QMetaEnum>
 
 /*static*/ QPointer<SettingsDialog> SettingsDialog::m_instance = {};
 

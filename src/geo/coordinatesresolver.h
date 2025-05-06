@@ -19,13 +19,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 
 #include "geo/placeinfo.h"
 
-#include <QGeoCoordinate>
 #include <QGeoServiceProvider>
+#include <QHash>
 #include <QObject>
 #include <atomic>
-#include <memory>
-#include <qhash.h>
-#include <qtypes.h>
 
 class QGeoCodingManager;
 
@@ -39,9 +36,6 @@ inline uint qHash(const PlaceInfo &key, uint seed = 0)
     return qHashMulti(seed, key.country, key.town, key.location.latitude(), key.location.longitude()/*,
                       key.message*/);
 }
-
-using CitiesByCountry = QMap<QString, QMultiMap<QString, PlaceInfo>>;
-using RequestId = quint32;
 
 class CoordinatesResolver : public QObject
 {

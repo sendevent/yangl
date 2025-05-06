@@ -17,14 +17,7 @@
 
 #include "clicall.h"
 
-#include "app/common.h"
-#include "clicaller.h"
-
-#include <QDateTime>
-#include <QDebug>
 #include <QFile>
-#include <QFileInfo>
-#include <QThread>
 
 /*static*/ constexpr int CLICall::DefaultTimeoutMSecs;
 

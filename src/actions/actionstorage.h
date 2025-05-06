@@ -22,7 +22,6 @@
 
 #include <QHash>
 #include <QObject>
-#include <memory>
 
 class ActionStorage : public QObject
 {

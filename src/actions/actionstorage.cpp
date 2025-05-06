@@ -22,9 +22,8 @@
 #include "cli/clicall.h"
 #include "settings/appsettings.h"
 
-#include <QFileInfo>
-#include <quuid.h>
-#include <utility>
+#include <QFile>
+#include <QUuid>
 
 ActionStorage::ActionStorage(QObject *parent)
     : QObject(parent)

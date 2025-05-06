@@ -23,7 +23,6 @@
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QTextBlock>
-#include <QTextDocument>
 
 /*static*/ constexpr int CLICallResultView::MaxBlocksCountDefault;
 

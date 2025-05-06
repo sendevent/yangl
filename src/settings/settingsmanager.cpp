@@ -20,9 +20,6 @@
 #include "app/common.h"
 
 #include <QApplication>
-#include <QDebug>
-#include <QDir>
-#include <QFileInfo>
 #include <QSettings>
 #include <QStandardPaths>
 

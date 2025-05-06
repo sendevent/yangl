@@ -19,20 +19,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 
 #include "app/common.h"
 
-#include <QCoreApplication>
 #include <QFile>
-#include <QFileInfo>
 #include <QFutureSynchronizer>
 #include <QFutureWatcher>
 #include <QGeoAddress>
 #include <QGeoCodeReply>
 #include <QGeoCodingManager>
-#include <QGeoCoordinate>
 #include <QGeoLocation>
-#include <QRegularExpression>
 #include <QtConcurrentRun>
-#include <memory>
-#include <qnamespace.h>
 
 static constexpr QChar CSVSeparator(',');
 static constexpr size_t CSVColumnCount(5);

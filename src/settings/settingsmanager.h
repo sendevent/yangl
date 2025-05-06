@@ -20,6 +20,7 @@
 #include <QObject>
 
 class QSettings;
+
 class SettingsManager : public QObject
 {
     Q_OBJECT

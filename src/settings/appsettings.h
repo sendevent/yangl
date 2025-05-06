@@ -17,9 +17,7 @@
 
 #pragma once
 
-#include <QString>
 #include <QVariant>
-#include <QList>
 
 class AppSetting
 {

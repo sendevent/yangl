@@ -33,7 +33,6 @@
 #include <QFutureWatcher>
 #include <QInputDialog>
 #include <QTimer>
-#include <QVariant>
 #include <QtConcurrentRun>
 
 NordVpnWraper::NordVpnWraper(QObject *parent)

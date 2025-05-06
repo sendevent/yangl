@@ -17,13 +17,10 @@
 
 #include "actionstab.h"
 
-#include "actioneditor.h"
 #include "actions/actionstorage.h"
-#include "app/common.h"
 #include "ui_actionstab.h"
 
 #include <QStandardItemModel>
-#include <utility>
 
 /*static*/ const int ActionsTab::ActionPointerDataRole = Qt::UserRole + 1;
 

@@ -21,6 +21,14 @@
 #include "app/common.h"
 #include "ui_actioneditor.h"
 
+#include <QCheckBox>
+#include <QComboBox>
+#include <QLineEdit>
+#include <QPointer>
+#include <QSharedPointer>
+#include <QSpinBox>
+#include <QWidget>
+
 ActionEditor::ActionEditor(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ActionEditor)

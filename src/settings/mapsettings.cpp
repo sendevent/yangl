@@ -23,9 +23,6 @@
 
 #include <QComboBox>
 #include <QFormLayout>
-#include <QGridLayout>
-#include <QGroupBox>
-#include <QLabel>
 
 MapSettings::MapSettings(QWidget *parent)
     : QWidget(parent)

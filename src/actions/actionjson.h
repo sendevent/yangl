@@ -23,6 +23,7 @@
 
 class QIODevice;
 class ActionStorage;
+
 class ActionJson
 {
 public:
