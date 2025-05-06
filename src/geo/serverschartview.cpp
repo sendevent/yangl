@@ -20,11 +20,13 @@
 #include "app/common.h"
 #include "app/nordvpnwraper.h"
 #include "app/statechecker.h"
+#include "geo/flatplaceproxymodel.h"
 #include "geo/mapserversmodel.h"
 #include "serversfiltermodel.h"
 #include "settings/appsettings.h"
 
 #include <QBoxLayout>
+#include <QCompleter>
 #include <QHideEvent>
 #include <QItemSelectionModel>
 #include <QLineEdit>
@@ -65,10 +67,21 @@ void ServersChartView::initUi()
     QWidget *leftView = new QWidget(this);
     QVBoxLayout *leftVBox = new QVBoxLayout(leftView);
     leftVBox->setContentsMargins(0, 0, 0, 0);
-    m_searchBox = new QLineEdit(leftView);
-    m_searchBox->setPlaceholderText(QStringLiteral("F"));
+
+    auto serversProxyModle = new FlatPlaceProxyModel(this);
+    serversProxyModle->setSourceModel(m_serversModel);
 
     m_searchBox->setToolTip(tr("Filter by country/city"));
+    m_searchBox->setClearButtonEnabled(true);
+    m_searchBox->setCompleter([this, serversProxyModle]() {
+        auto *completer = new QCompleter(serversProxyModle, this);
+        completer->setCompletionColumn(0);
+        completer->setCaseSensitivity(Qt::CaseInsensitive);
+        completer->setFilterMode(Qt::MatchContains);
+        completer->setCompletionRole(Qt::DisplayRole);
+        return completer;
+    }());
+
     m_treeView = new QTreeView(leftView);
     m_treeView->setModel(m_serversFilterModel);
     m_treeView->setEditTriggers(QTreeView::NoEditTriggers);
@@ -89,7 +102,7 @@ void ServersChartView::initUi()
     m_progressBar->hide();
 
     m_chartWidget = new MapWidget(AppSettings::Map->MapPlugin->read().toString(),
-                                  AppSettings::Map->MapType->read().toInt(), m_serversModel, this);
+                                  AppSettings::Map->MapType->read().toInt(), serversProxyModle, this);
     m_chartWidget->init();
 
     leftVBox->addWidget(m_searchBox);
