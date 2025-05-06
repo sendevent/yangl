@@ -138,12 +138,18 @@ void ServersListManager::run()
 void ServersListManager::runSeparated()
 {
     const auto &groups = queryGroups();
+    int total = groups.size();
+    emit citiesCount(total);
     notifyPlacesAdded(groups);
 
+    QList<Places> chunks { groups };
     const auto &countries = queryCountries();
     for (const auto &country : countries) {
-        const auto &cities = queryCities(country.country);
-        notifyPlacesAdded(cities);
+        const auto &chunk = queryCities(country.country);
+        total += chunk.size();
+        emit citiesCount(total);
+
+        notifyPlacesAdded(chunk);
     }
 }
 
