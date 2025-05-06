@@ -45,6 +45,10 @@ bool ServersFilterModel::lessThan(const QModelIndex &sourceLeft, const QModelInd
         return true;
     }
 
+    if (left.country == right.country) {
+        return left.town < right.town;
+    }
+
     // Default alphabetical sorting by country, then town
-    return left.country < right.country && left.town < right.town;
+    return left.country > right.country;
 }

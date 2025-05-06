@@ -180,7 +180,6 @@ QHash<int, QByteArray> FlatPlaceProxyModel::roleNames() const
 
 void FlatPlaceProxyModel::onRowsInserted(const QModelIndex &parent, int first, int last)
 {
-
     QList<QModelIndex> places;
 
     auto placeFromSource = [](const QModelIndex &index) -> PlaceInfo {
