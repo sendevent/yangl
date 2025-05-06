@@ -16,43 +16,50 @@ git clone https://github.com/sendevent/yangl.git .
 ## Prerequisites
 ### Qt
 #### Version
-Should be compilable with >= 5.7, but you may need to tune versions of used qml imports in [MapView.qml](app/geo/qml/MapView.qml)
-While tested with 5.12, the primary development version for now is 5.15.
+6.8+
 
 #### Modules
 
-* base (core, gui, widgets, concurrent)
-* qml (quick, quickwidgets)
-* geo (location, positioning)
+* base (Core, Gui, Network, Concurrent)
+* qml (Qml, Quick, QuickWidgets)
+* geo (Location, Positioning)
 
-Here's how to install these on Debian:
+Here's how the install command may look on Debian:
+
 
 ```
-sudo apt install qt5-default \
-                qtbase5-dev \
-                qtdeclarative5-dev \
-                qtquickcontrols2-5-dev \
-                qtlocation5-dev \
-                qtpositioning5-dev
+sudo apt install \
+                qt6-base-dev \
+                qt6-base-dev-tools \
+                qt6-base-private-dev \
+                qt6-declarative-dev \
+                qt6-declarative-dev-tools \
+                qt6-declarative-private-dev \
+                qt6-tools-dev \
+                qt6-tools-dev-tools \
+                qt6-tools-private-dev \
+                qt6-location-dev \
+                qt6-positioning-dev \
+                qt6-positioning-private-dev
 ```
 
 Please refer to your distro manual to get the related packages.
 
 ### C++
 
-Relatively modern (c++14-capable) compiller — gcc 9.3 or clang 8 would be enough.
+The most-modern-as-for-today (c++23-capable) compiller — gcc 14.2.0 or clang 19.1.7 would be enough.
 
 ## Building
 
 ### QtCreator
 
-Open [yangl.pro](yangl.pro) and build it as a regular project.
+Open [CMakeLists.txt](CMakeLists.txt) and build it as a regular project.
 
 ### Shell
 
 #### Build script
 
-[build.sh](build.sh) performs the build process in the sub directory ./build (created automatically). On success, the directory would contain yangl executable:
+[build.sh](build.sh) performs the build process in the sub directory ./scriptbuild (created automatically). On success, the directory would contain yangl executable:
 ```
 chmod +x ./build.sh && ./build.sh
 ```
@@ -60,8 +67,8 @@ chmod +x ./build.sh && ./build.sh
 #### Manual steps
 
 ```
-mkdir ./build
-cd ./build
-qmake -r ../yangl.pro #or qmake-qt5, depending on your Linux distro
+mkdir ./manualbuild
+cd ./manualbuild
+cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j`nproc`
 ```
