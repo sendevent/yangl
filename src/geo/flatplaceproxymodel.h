@@ -30,7 +30,8 @@ public:
     {
         PositionRole = Qt::UserRole + 1,
         CountryNameRole,
-        CityNameRole
+        CityNameRole,
+        PlaceInfoRole,
     };
 
     explicit FlatPlaceProxyModel(QObject *parent = nullptr);
