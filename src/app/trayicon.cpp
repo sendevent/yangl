@@ -148,7 +148,7 @@ void TrayIcon::setState(const NordVpnInfo &state)
         }
     }
 
-    setToolTip(state.toString()); // always plaintext
+    setToolTip(QTextDocumentFragment::fromHtml(state.toString()).toPlainText()); // always plaintext
 
     m_state = state;
     m_isFirstChange = false;
