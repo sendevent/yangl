@@ -10,7 +10,7 @@ Rectangle {
     property alias mapCenter : map.center
     property alias mapScale: map.zoomLevel
 
-    signal markerDoubleclicked(PlaceInfo anObject)
+    signal markerDoubleclicked(placeInfo anObject)
 
     Plugin {
         id: mapPlugin
@@ -91,7 +91,7 @@ Rectangle {
                 id: marker
                 anchorPoint.x: image.width/2
                 anchorPoint.y: image.height
-                property PlaceInfo place: placeInfo
+                property placeInfo place: placeInfo
                 coordinate: place.location
 
                 sourceItem: Rectangle
