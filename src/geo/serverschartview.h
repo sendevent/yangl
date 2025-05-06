@@ -31,6 +31,7 @@ class QLineEdit;
 class QTreeView;
 class QToolButton;
 class QProgressBar;
+class QTimer;
 
 class ServersChartView : public QWidget
 {
@@ -52,6 +53,7 @@ private slots:
     void onTreeItemDoubleclicked(const QModelIndex &current);
 
     void onMarkerDoubleclicked(const PlaceInfo &addr);
+    void saveServerLocationsCache();
 
 protected:
     void hideEvent(QHideEvent *event) override;
@@ -70,6 +72,7 @@ private:
     ServerLocationResolver *m_listManager;
     MapServersModel *m_serversModel;
     ServersFilterModel *m_serversFilterModel;
+    QTimer *m_timer { nullptr };
 
     void initUi();
     void initConenctions();
