@@ -22,7 +22,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 #include <qqml.h>
 
 static const int registered = []() {
-    qmlRegisterUncreatableType<PlaceInfo>("yangl", 2, 0, "PlaceInfo", "PlaceInfo is used for data only");
+    qmlRegisterUncreatableType<PlaceInfo>("yangl", 2, 0, "placeInfo", "PlaceInfo is used for data only");
     return qRegisterMetaType<PlaceInfo>("PlaceInfo");
 }();
 
