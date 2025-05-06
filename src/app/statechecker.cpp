@@ -110,7 +110,6 @@ void StateChecker::onQueryFinish(const Action::Id & /*id*/, const QString &resul
         if (future.isCanceled()) {
             WRN << "Async task was canceled!";
         }
-        LOG << "Async task finished.";
         watcher->deleteLater();
     });
     watcher->setFuture(future);

@@ -44,6 +44,7 @@ public:
     {
         Unknown,
 
+        LogIn,
         CheckStatus,
         Connect,
         Disconnect,
