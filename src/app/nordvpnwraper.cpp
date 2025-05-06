@@ -360,7 +360,8 @@ void NordVpnWraper::updateActions(bool connected)
                 case Action::NordVPN::Rate3:
                 case Action::NordVPN::Rate4:
                 case Action::NordVPN::Rate5:
-                case Action::NordVPN::Connect: {
+                case Action::NordVPN::Connect:
+                case Action::NordVPN::LogIn: {
                     qAction->setEnabled(!connected);
                     break;
                 }

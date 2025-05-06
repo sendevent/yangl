@@ -284,6 +284,13 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
     auto wordsToList = [&args](const QString &noQuotes) { args << noQuotes.split(' '); };
 
     switch (actionType) {
+    case Action::NordVPN::LogIn: {
+        title = QObject::tr("Login");
+        wordsToList(QStringLiteral("login"));
+        menuPlace = Action::MenuPlace::Own;
+        forceShow = true;
+        break;
+    }
     case Action::NordVPN::CheckStatus: {
         title = QObject::tr("Check status");
         wordsToList(QStringLiteral("status"));

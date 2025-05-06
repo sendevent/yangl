@@ -270,7 +270,8 @@ QString Action::key() const
 /*static*/ QList<Action::NordVPN> Action::nvpnActions()
 {
     static QList<Action::NordVPN> actions;
-    if (actions.isEmpty())
+    if (actions.isEmpty()) {
         actions = utils::allEnum<Action::NordVPN>({ Action::NordVPN::Unknown });
+    }
     return actions;
 }
