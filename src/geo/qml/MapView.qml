@@ -3,12 +3,14 @@ import QtQuick.Controls
 import QtLocation
 import QtPositioning
 
+import yangl 2.0
+
 Rectangle {
     id: mapView
     property alias mapCenter : map.center
     property alias mapScale: map.zoomLevel
 
-    signal markerDoubleclicked(Item anObject)
+    signal markerDoubleclicked(PlaceInfo anObject)
 
     Plugin {
         id: mapPlugin
@@ -89,17 +91,14 @@ Rectangle {
                 id: marker
                 anchorPoint.x: image.width/2
                 anchorPoint.y: image.height
-                coordinate: position
+                property PlaceInfo place: placeInfo
+                coordinate: place.location
 
                 sourceItem: Rectangle
                 {
                     id: markerRect
 
-                    property string countryName: country
-                    property string cityName: city
-                    property alias location: marker.coordinate
-
-                    property bool active: countryName === currenCountry && cityName === currenCity;
+                    property bool active: marker.place.country === currenCountry && marker.place.town === currenCity;
 
                     clip: true
 
@@ -136,16 +135,16 @@ Rectangle {
                                 var tooltipStr = isActive ? qsTr("Currently connected") : qsTr("Doubleclick to connect")
                                 var addrStr = "";
 
-                                if(!markerRect.cityName.length !== 0)
+                                if(!marker.place.town.length !== 0)
                                 {
-                                    addrStr += markerRect.cityName
+                                    addrStr += marker.place.town
                                 }
 
-                                if(!markerRect.countryName.length !== 0)
+                                if(!marker.place.country.length !== 0)
                                 {
                                     if(addrStr.length !== 0)
                                         addrStr += ", "
-                                    addrStr += markerRect.countryName;
+                                    addrStr += marker.place.country;
                                 }
 
                                 if(addrStr.length === 0)
@@ -155,8 +154,8 @@ Rectangle {
                             }
 
                             onDoubleClicked: {
-                                console.log('double-clicked')
-                                mapView.markerDoubleclicked(markerRect)
+                                console.log('double-clicked ' + marker.place.country + ' ' + marker.place.town)
+                                mapView.markerDoubleclicked(marker.place)
                             }
                         }
                     }
