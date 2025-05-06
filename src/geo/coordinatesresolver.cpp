@@ -187,7 +187,7 @@ void CoordinatesResolver::requestGeoAsync(const PlaceInfo &place, RequestId id)
     result.message = "Not found";
 
     if (!m_geoCoder) {
-        WRN << "GeoCoder is unavailable";
+        WRN << "GeoCoder is unavailable" << place.country << place.town;
         emit coordinatesResolved(id, result);
         return;
     }
@@ -201,7 +201,8 @@ void CoordinatesResolver::requestGeoAsync(const PlaceInfo &place, RequestId id)
 
     QGeoCodeReply *reply = m_geoCoder->geocode(addr);
     if (!reply) {
-        WRN << "Failed to create geocode request!";
+        result.message = "Failed to create geocode request!";
+        WRN << result.message;
         emit coordinatesResolved(id, result);
         return;
     }
@@ -210,7 +211,7 @@ void CoordinatesResolver::requestGeoAsync(const PlaceInfo &place, RequestId id)
         QScopedPointer<QGeoCodeReply, QScopedPointerDeleteLater> cleanup(reply); // auto deletes reply safely
 
         if (reply->error() != QGeoCodeReply::NoError) {
-            WRN << "Geo reply error:" << reply->errorString();
+            result.message = QString("Geo reply error: %1").arg(reply->errorString());
             emit coordinatesResolved(id, result);
             return;
         }
@@ -223,17 +224,18 @@ void CoordinatesResolver::requestGeoAsync(const PlaceInfo &place, RequestId id)
             result.ok = true;
             result.message.clear();
         } else {
-            WRN << "No locations found for:" << result.country << result.town;
-            result.message = "Not found";
+            result.message = QString("No locations found for: `%1` `%2`").arg(result.country, result.town);
+            WRN << result.message;
         }
 
         emit coordinatesResolved(id, result);
     });
 
     // Optionally handle network errors immediately
-    connect(reply, &QGeoCodeReply::errorOccurred, this, [this, reply, id, result](QGeoCodeReply::Error error) mutable {
-        WRN << "Geo reply error occurred:" << error << reply->errorString();
-        reply->deleteLater();
-        emit coordinatesResolved(id, result);
-    });
+    // connect(reply, &QGeoCodeReply::errorOccurred, this, [this, reply, id, result](QGeoCodeReply::Error error) mutable
+    // {
+    //     WRN << "Geo reply error occurred:" << error << reply->errorString();
+    //     reply->deleteLater();
+    //     emit coordinatesResolved(id, result);
+    // });
 }

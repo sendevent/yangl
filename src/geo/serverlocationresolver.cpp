@@ -32,16 +32,12 @@ ServerLocationResolver::ServerLocationResolver(NordVpnWraper *nordVpn, QObject *
     : QObject(parent)
     , m_listManager(new ServersListManager(nordVpn, this))
     , m_geoResolver(new CoordinatesResolver(this))
-    , m_saveTimer(new QTimer(this))
 {
     connect(m_listManager, &ServersListManager::citiesAdded, this, &ServerLocationResolver::resolveServers);
+    connect(m_listManager, &ServersListManager::citiesCount, this, [this](int total) { m_serversFound = total; });
     connect(m_geoResolver, &CoordinatesResolver::coordinatesResolved, this, &ServerLocationResolver::onPlaceResolved);
 
-    connect(this, &ServerLocationResolver::serverLocationResolved, this, &ServerLocationResolver::saveCacheDelayed);
-
-    m_saveTimer->setInterval(60 * utils::oneSecondMs());
-    m_saveTimer->setSingleShot(true);
-    connect(m_saveTimer, &QTimer::timeout, this, &ServerLocationResolver::saveCache);
+    // connect(this, &ServerLocationResolver::serverLocationResolved, this, &ServerLocationResolver::saveCacheDelayed);
 }
 
 void ServerLocationResolver::resolveServers(const Places &places)
@@ -76,6 +72,24 @@ void ServerLocationResolver::resolveServerLocation(const PlaceInfo &place)
 
     LOG << place.country << place.town << "checking online";
     m_geoResolver->requestCoordinates(place);
+}
+
+void ServerLocationResolver::onPlaceResolved(RequestId id, const PlaceInfo &place)
+{
+    LOG << id << place.country << place.town;
+
+    if (place.town == "Saint Louis") {
+        int dbg = 0;
+    }
+
+    if (place.ok) {
+        LOG << "added" << place.location << place.location.isValid();
+        m_placesChecked[place.country.toLower()].insert(place.town.toLower(), place);
+    } else {
+        WRN << place.message;
+    }
+
+    notifyPlace(place);
 }
 
 void ServerLocationResolver::ensureCacheLoaded()
@@ -120,6 +134,8 @@ void ServerLocationResolver::loadCache()
     }
 
     const auto &jArr = jDoc.array();
+    m_serversFound = jArr.size();
+
     for (const auto &jObj : jArr) {
         const PlaceInfo place {
             jObj[JsonConsts::Country].toString(),
@@ -129,7 +145,8 @@ void ServerLocationResolver::loadCache()
             true, // ok
         };
         m_placesLoaded[place.country].insert(place.town, place);
-        emit serverLocationResolved(place);
+
+        notifyPlace(place);
     }
 }
 
@@ -167,24 +184,17 @@ bool ServerLocationResolver::refresh()
 {
     ensureCacheLoaded();
 
+    m_serversFound = 0;
+    m_serversResolved = 0;
+
     return m_listManager->reload();
 }
 
-void ServerLocationResolver::onPlaceResolved(RequestId /*id*/, const PlaceInfo &place)
+void ServerLocationResolver::notifyPlace(const PlaceInfo &place)
 {
-    if (place.ok) {
-        LOG << "added" << place.country << place.town << place.location << place.location.isValid();
-        m_placesChecked[place.country.toLower()].insert(place.town.toLower(), place);
-    } else {
-        WRN << place.country << place.town << place.message;
-    }
+    ++m_serversResolved;
 
-    emit serverLocationResolved(place);
-}
+    LOG << m_serversResolved << m_serversFound;
 
-void ServerLocationResolver::saveCacheDelayed()
-{
-    LOG;
-    m_saveTimer->stop();
-    m_saveTimer->start();
+    emit serverLocationResolved(place, m_serversResolved, m_serversFound);
 }
