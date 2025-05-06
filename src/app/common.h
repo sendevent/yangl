@@ -21,7 +21,6 @@
 #include <QDebug>
 #include <QGeoCoordinate>
 #include <QMetaEnum>
-#include <QObject>
 
 #ifndef YANGL_TIMESTAMP
 #define YANGL_TIMESTAMP QDateTime::currentDateTime().toString("t hh:mm:ss.zzz:")

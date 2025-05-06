@@ -17,11 +17,8 @@
 
 #pragma once
 
-#include "app/statechecker.h"
-
 #include <QDialog>
 #include <QPointer>
-#include <QSystemTrayIcon>
 
 namespace Ui {
 class SettingsDialog;

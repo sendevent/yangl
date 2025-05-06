@@ -17,12 +17,12 @@
 
 #pragma once
 
-#include <QGroupBox>
-#include <QObject>
+#include <QWidget>
 
 class QComboBox;
 class MapWidget;
 class QFormLayout;
+
 class MapSettings : public QWidget
 {
     Q_OBJECT

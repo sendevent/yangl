@@ -17,7 +17,6 @@
 
 #include "trayicon.h"
 
-#include "app/common.h"
 #include "settings/appsettings.h"
 
 #include <QApplication>

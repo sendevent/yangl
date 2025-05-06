@@ -22,22 +22,9 @@
 #include "app/common.h"
 #include "app/nordvpnwraper.h"
 #include "cli/clicall.h"
-#include "cli/clicaller.h"
-#include "geo/coordinatesresolver.h"
-#include "settings/settingsmanager.h"
 
-#include <QFile>
-#include <QFileInfo>
-#include <QFutureSynchronizer>
-#include <QFutureWatcher>
-#include <QJsonArray>
-#include <QJsonParseError>
 #include <QTimer>
 #include <QtConcurrentRun>
-#include <algorithm>
-#include <qjsonobject.h>
-#include <qnamespace.h>
-#include <utility>
 
 struct JsonConsts {
     static constexpr QLatin1String ArgGroups = QLatin1String("groups");

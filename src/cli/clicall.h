@@ -19,7 +19,6 @@
 
 #include <QObject>
 #include <QProcess>
-#include <QSharedPointer>
 #include <QStringList>
 
 class CLICall : public QObject

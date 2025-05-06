@@ -21,7 +21,6 @@
 
 #include <QMenu>
 #include <QObject>
-#include <memory>
 
 class MenuHolder : public QObject
 {

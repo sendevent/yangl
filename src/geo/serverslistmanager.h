@@ -17,10 +17,9 @@
 
 #pragma once
 
-#include "geo/coordinatesresolver.h"
+#include "geo/placeinfo.h"
 
 #include <QFutureWatcher>
-#include <QList>
 #include <QObject>
 
 class NordVpnWraper;

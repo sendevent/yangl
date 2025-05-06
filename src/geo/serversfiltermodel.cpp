@@ -17,7 +17,6 @@
 
 #include "serversfiltermodel.h"
 
-#include "app/common.h"
 #include "geo/mapserversmodel.h"
 
 ServersFilterModel::ServersFilterModel(QObject *parent)

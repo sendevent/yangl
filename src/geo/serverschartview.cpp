@@ -19,13 +19,12 @@
 
 #include "app/common.h"
 #include "app/nordvpnwraper.h"
-#include "geo/coordinatesresolver.h"
+#include "app/statechecker.h"
 #include "geo/mapserversmodel.h"
 #include "serversfiltermodel.h"
 #include "settings/appsettings.h"
 
 #include <QBoxLayout>
-#include <QGeoCoordinate>
 #include <QHideEvent>
 #include <QItemSelectionModel>
 #include <QLineEdit>
@@ -34,8 +33,6 @@
 #include <QTimer>
 #include <QToolButton>
 #include <QTreeView>
-#include <qabstractitemmodel.h>
-#include <qnamespace.h>
 
 /*static*/ QPointer<ServersChartView> ServersChartView::m_instance = {};
 

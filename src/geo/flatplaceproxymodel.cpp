@@ -20,8 +20,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 #include "app/common.h"
 #include "geo/mapserversmodel.h"
 
-#include <qvariant.h>
-
 FlatPlaceProxyModel::FlatPlaceProxyModel(QObject *parent)
     : QAbstractProxyModel(parent)
 {

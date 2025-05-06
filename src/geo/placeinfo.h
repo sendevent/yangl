@@ -39,5 +39,7 @@ private:
 };
 
 using Places = QList<PlaceInfo>;
+using CitiesByCountry = QMap<QString, QMultiMap<QString, PlaceInfo>>;
+using RequestId = quint32;
 
 Q_DECLARE_METATYPE(PlaceInfo)

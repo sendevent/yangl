@@ -22,9 +22,7 @@
 #include "app/common.h"
 #include "settings/settingsmanager.h"
 
-#include <QDir>
 #include <QFile>
-#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
 

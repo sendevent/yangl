@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <QMetaEnum>
 #include <QObject>
 #include <QPointer>
 #include <QSharedPointer>
