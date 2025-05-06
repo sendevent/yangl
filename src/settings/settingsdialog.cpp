@@ -25,7 +25,6 @@
 #include "settings/mapsettings.h"
 #include "ui_settingsdialog.h"
 
-#include <QApplication>
 #include <QIcon>
 #include <QMessageBox>
 
@@ -39,7 +38,7 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
 {
     ui->setupUi(this);
 
-    setWindowTitle(tr("%1 — Settings").arg(qApp->applicationDisplayName()));
+    setWindowTitle(utils::composeTitle("Settings"));
 
     connect(ui->checkBoxAutoActive, &QCheckBox::toggled, ui->cbIgnoreFirstConnected, &QCheckBox::setEnabled);
 

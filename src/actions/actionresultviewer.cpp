@@ -20,7 +20,6 @@
 #include "app/common.h"
 #include "settings/appsettings.h"
 
-#include <QApplication>
 #include <QGridLayout>
 #include <QTabWidget>
 
@@ -40,7 +39,7 @@ ActionResultViewer::ActionResultViewer()
     QGridLayout *layout = new QGridLayout(this);
     layout->addWidget(m_tabWidget);
 
-    setWindowTitle(tr("%1 — CLI Log").arg(qApp->applicationDisplayName()));
+    setWindowTitle(utils::composeTitle("CLI Log"));
 }
 
 /*static*/ ActionResultViewer *ActionResultViewer::instance()

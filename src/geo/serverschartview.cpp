@@ -60,7 +60,7 @@ ServersChartView::~ServersChartView()
 
 void ServersChartView::initUi()
 {
-    setWindowTitle(tr("%1 — Yet Another NordVPN GUI for Linux").arg(qApp->applicationName()));
+    setWindowTitle(utils::composeTitle("Yet Another NordVPN GUI for Linux"));
 
     QWidget *leftView = new QWidget(this);
     QVBoxLayout *leftVBox = new QVBoxLayout(leftView);

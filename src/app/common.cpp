@@ -17,6 +17,9 @@
 
 #include "common.h"
 
+#include "version/appversiondefs.h"
+
+#include <QApplication>
 #include <QDir>
 #include <QFileInfo>
 
@@ -78,4 +81,10 @@ std::tuple<QGeoCoordinate, bool> parseCoordinates(const QString &latStr, const Q
 
     return { coordinate, parsed };
 };
+
+QString composeTitle(const QString &payload)
+{
+    return QObject::tr("%1 %2 — %3").arg(qApp->applicationName(), yangl::V.trio(), payload);
+}
+
 } // namespace utils

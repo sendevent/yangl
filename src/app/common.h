@@ -72,4 +72,7 @@ QString geoToNvpn(const QString &name);
 QString nvpnToGeo(const QString &name);
 
 std::tuple<QGeoCoordinate, bool> parseCoordinates(const QString &latStr, const QString &lonStr);
+
+QString composeTitle(const QString &payload);
+
 } // ns utils
