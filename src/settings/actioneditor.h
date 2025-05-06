@@ -18,7 +18,7 @@
 #pragma once
 
 #include "actions/action.h"
-#include "apppatheditor.h"
+#include "settings/apppatheditor.h"
 
 #include <QPointer>
 #include <QSharedPointer>

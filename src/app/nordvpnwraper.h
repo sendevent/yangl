@@ -18,7 +18,7 @@
 #pragma once
 
 #include "actions/action.h"
-#include "nordvpninfo.h"
+#include "app/nordvpninfo.h"
 
 #include <QObject>
 #include <QPointer>
