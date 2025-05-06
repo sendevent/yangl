@@ -3,9 +3,12 @@
 [![cpp11](https://img.shields.io/badge/c%2B%2B-14-brightgreen)](https://shields.io/)
 
 # yangl
+
 ### **Y**et **A**nother **N**ordVPN **G**UI for **L**inux
 
 ![yangl](./readme_images/overview.gif)
+
+**TL;DR: [BUILD.md](./BUILD.md)**
 
 This is unofficial GUI for [NordVPN CLI](https://nordvpn.com/download/linux/) desktop client.
 It is written for my own purpose, and I am not affiliated to the [NordVPN](https://nordvpn.com/) team in no way. Used titles, logo and so on are the property of legal rights holders. The [NordVPN](https://nordvpn.com/) has no responsibility for this application nor the results of its usage. Neither I have:
