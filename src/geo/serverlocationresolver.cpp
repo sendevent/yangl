@@ -22,6 +22,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 #include "settings/settingsmanager.h"
 
 #include <QFile>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonParseError>
@@ -36,8 +37,6 @@ ServerLocationResolver::ServerLocationResolver(NordVpnWraper *nordVpn, QObject *
     connect(m_listManager, &ServersListManager::citiesAdded, this, &ServerLocationResolver::resolveServers);
     connect(m_listManager, &ServersListManager::citiesCount, this, [this](int total) { m_serversFound = total; });
     connect(m_geoResolver, &CoordinatesResolver::coordinatesResolved, this, &ServerLocationResolver::onPlaceResolved);
-
-    // connect(this, &ServerLocationResolver::serverLocationResolved, this, &ServerLocationResolver::saveCacheDelayed);
 }
 
 void ServerLocationResolver::resolveServers(const Places &places)
@@ -92,20 +91,37 @@ void ServerLocationResolver::onPlaceResolved(RequestId id, const PlaceInfo &plac
     notifyPlace(place);
 }
 
-void ServerLocationResolver::ensureCacheLoaded()
-{
-    static bool loadedBuiltin(false);
-    if (!loadedBuiltin) {
-        loadedBuiltin = true;
-        loadCache();
-    }
-}
-
 static QString geoCacheFilePath()
 {
     static QString path = QString("%1/servers.json").arg(SettingsManager::dirPath());
     LOG << path;
     return path;
+}
+
+bool ServerLocationResolver::ensureCacheLoaded()
+{
+    bool needsActualization = false;
+
+    if (!m_cacheLoaded) {
+        m_serversFound = 0;
+        m_serversResolved = 0;
+
+        m_cacheLoaded = true;
+        loadCache();
+    }
+
+    if (!m_serversFound || !m_serversResolved || m_serversFound != m_serversResolved) {
+        needsActualization = true;
+    } else {
+        QFileInfo fi(geoCacheFilePath());
+        needsActualization = fi.lastModified().daysTo(QDateTime::currentDateTime()) >= 1;
+    }
+
+    if (!needsActualization) {
+        m_placesChecked = m_placesLoaded;
+    }
+
+    return needsActualization;
 }
 
 namespace JsonConsts {
@@ -118,6 +134,7 @@ static const QLatin1String Capital { "capital" };
 
 void ServerLocationResolver::loadCache()
 {
+    LOG;
     static const auto &from = geoCacheFilePath();
     QFile in(from);
     if (!in.open(QFile::ReadOnly | QFile::Text)) {
@@ -152,6 +169,10 @@ void ServerLocationResolver::loadCache()
 
 void ServerLocationResolver::saveCache() const
 {
+    if (m_placesLoaded == m_placesChecked) {
+        return;
+    }
+
     static const auto &to = geoCacheFilePath();
     QFile out(to);
     if (!out.open(QFile::WriteOnly | QFile::Text | QFile::Truncate) || !out.isWritable()) {
@@ -180,14 +201,16 @@ void ServerLocationResolver::saveCache() const
     }
 }
 
-bool ServerLocationResolver::refresh()
+void ServerLocationResolver::refresh()
 {
-    ensureCacheLoaded();
+    const bool needActualization = ensureCacheLoaded();
 
-    m_serversFound = 0;
-    m_serversResolved = 0;
+    if (needActualization) {
+        m_serversFound = 0;
+        m_serversResolved = 0;
 
-    return m_listManager->reload();
+        m_listManager->reload();
+    }
 }
 
 void ServerLocationResolver::notifyPlace(const PlaceInfo &place)
