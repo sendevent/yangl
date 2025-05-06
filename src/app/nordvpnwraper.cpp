@@ -279,9 +279,15 @@ void NordVpnWraper::pause(Action::NordVPN action)
         duration = 60;
         break;
     case Action::NordVPN::PauseCustom: {
-        duration = QInputDialog::getInt({}, tr("%1 — pause VPN for").arg(qApp->applicationDisplayName()),
-                                        tr("Minutes:"), 1, 1, 1440);
-        break;
+        {
+            bool ok(false);
+            duration = QInputDialog::getInt({}, qApp->applicationDisplayName(), tr("Pause VPN for minutes:"), 1, 1,
+                                            1440, 1, &ok);
+            if (!ok) {
+                duration = 0;
+            }
+            break;
+        }
     }
     default:
         return;
