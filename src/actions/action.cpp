@@ -60,8 +60,9 @@ Action::Action(Action::Flow scope, int type, QObject *parent, const Action::Id &
     , m_forceShow(false)
     , m_menuPlace(MenuPlace::NoMenu)
 {
-    if (-1 == MetaIdId)
+    if (-1 == MetaIdId) {
         MetaIdId = qRegisterMetaType<Action::Id>("Action::Id");
+    }
 
     connect(this, &Action::titleChanged, this, &Action::changed);
     connect(this, &Action::appChanged, this, &Action::changed);
@@ -158,8 +159,9 @@ void Action::setForcedShow(bool forced)
 
 CLICall *Action::createRequest()
 {
-    if (!isValidAppPath(app()))
+    if (!isValidAppPath(app())) {
         return {};
+    }
 
     auto call = new CLICall(app(), args(), timeout(), this);
     this->QObject::connect(call, &CLICall::ready, this, &Action::onResult);
@@ -209,12 +211,15 @@ void Action::onResult(const QString &result)
     }
 
     QString info = QString("%1 ").arg(YANGL_TIMESTAMP);
-    if (!result.isEmpty())
+    if (!result.isEmpty()) {
         info.append(QString("<b>Result:</b><br>%1<br>").arg(QString(result).replace("\n", "<br>")));
-    if (exitCode)
+    }
+    if (exitCode) {
         info.append(QString("<b>Exit code:</b> %1<br>").arg(exitCode));
-    if (!errors.isEmpty())
+    }
+    if (!errors.isEmpty()) {
         info.append(QString("<b>Errors:</b> %1<br>").arg(errors));
+    }
 
     emit performed(m_id, result, !hasErrors, info);
 }
@@ -240,12 +245,15 @@ void Action::setAnchor(MenuPlace place)
 /*static*/ QString Action::groupKey(Action::Flow flow)
 {
     switch (flow) {
-    case Action::Flow::Yangl:
+    case Action::Flow::Yangl: {
         return GroupKeyYangl;
-    case Action::Flow::NordVPN:
+    }
+    case Action::Flow::NordVPN: {
         return GroupKeyBuiltin;
-    default:
+    }
+    default: {
         return GroupKeyCustom;
+    }
     }
 }
 
@@ -262,8 +270,9 @@ QString Action::key() const
 /*static*/ QList<Action::Yangl> Action::yanglActions()
 {
     static QList<Action::Yangl> actions;
-    if (actions.isEmpty())
+    if (actions.isEmpty()) {
         actions = utils::allEnum<Action::Yangl>();
+    }
     return actions;
 }
 
