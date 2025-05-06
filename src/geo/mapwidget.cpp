@@ -79,6 +79,7 @@ MapWidget::MapWidget(const QString &mapPlugin, int mapType, MapServersModel *mod
     LOG << mapPlugin << mapType;
 
     setMapType(mapType == -1 ? 0 : mapType);
+
     m_quickView->setSource(QStringLiteral("qrc:/qml/geo/qml/MapView.qml"));
     QVBoxLayout *vBox = new QVBoxLayout(this);
     vBox->addWidget(m_quickView);
@@ -91,8 +92,8 @@ void MapWidget::init()
 {
     if (auto *map = m_quickView->rootObject()) {
         // clang-format off
-        QObject::connect(map, SIGNAL(markerDoubleclicked(QQuickItem*)), this,
-                         SLOT(onMarkerDoubleclicked(QQuickItem*)), Qt::AutoConnection);
+        QObject::connect(map, SIGNAL(markerDoubleclicked(const PlaceInfo&)), this,
+                         SIGNAL(markerDoubleclicked(const PlaceInfo&)), Qt::AutoConnection);
         // clang-format on
     }
 
@@ -168,25 +169,6 @@ struct JsonConsts {
     static constexpr QLatin1String latitude { "lat" };
     static constexpr QLatin1String longitude { "long" };
 };
-
-void MapWidget::onMarkerDoubleclicked(QQuickItem *item)
-{
-    if (!item)
-        return;
-
-    auto handler = [this](const auto &place) {
-        if (place.ok) {
-            emit markerDoubleclicked(place);
-        } else {
-            WRN << QString("Invalid server location, ignoring: `%2`@`%1`").arg(place.country, place.town)
-                << place.message;
-        }
-    };
-
-    // m_geoResolver->requestCoordinates(item->property("countryName").toString(),
-    // item->property("cityName").toString(),
-    //                                   handler);
-}
 
 void MapWidget::setScale(qreal scale)
 {

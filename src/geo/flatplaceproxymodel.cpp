@@ -20,6 +20,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 #include "app/common.h"
 #include "geo/mapserversmodel.h"
 
+#include <qvariant.h>
+
 FlatPlaceProxyModel::FlatPlaceProxyModel(QObject *parent)
     : QAbstractProxyModel(parent)
 {
@@ -148,14 +150,17 @@ QVariant FlatPlaceProxyModel::data(const QModelIndex &index, int role) const
         case Qt::DisplayRole: {
             return place.town;
         }
-        case PositionRole: {
+        case FlatPlaceProxyModel::Roles::PositionRole: {
             return QVariant::fromValue(place.location);
         }
-        case CountryNameRole: {
+        case FlatPlaceProxyModel::Roles::CountryNameRole: {
             return place.country;
         }
-        case CityNameRole: {
+        case FlatPlaceProxyModel::Roles::CityNameRole: {
             return place.town;
+        }
+        case FlatPlaceProxyModel::Roles::PlaceInfoRole: {
+            return QVariant::fromValue(place);
         }
         default:
             break;
@@ -171,6 +176,7 @@ QHash<int, QByteArray> FlatPlaceProxyModel::roleNames() const
         { PositionRole, "position" },
         { CountryNameRole, "country" },
         { CityNameRole, "city" },
+        { PlaceInfoRole, "placeInfo" },
     };
 }
 

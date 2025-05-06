@@ -55,10 +55,7 @@ public:
     QSize sizeHint() const override;
 
 signals:
-    void markerDoubleclicked(const PlaceInfo &marker);
-
-private slots:
-    void onMarkerDoubleclicked(QQuickItem *item);
+    void markerDoubleclicked(const PlaceInfo &place);
 
 private:
     QQuickWidget *m_quickView { nullptr };

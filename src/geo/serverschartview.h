@@ -52,7 +52,7 @@ private slots:
     void onCurrentTreeItemChanged(const QModelIndex &current);
     void onTreeItemDoubleclicked(const QModelIndex &current);
 
-    void onMarkerDoubleclicked(const PlaceInfo &addr);
+    void onMarkerDoubleclicked(const PlaceInfo &place);
     void saveServerLocationsCache();
 
 protected:
