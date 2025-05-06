@@ -17,15 +17,20 @@
 
 #pragma once
 
-#include "trayicon.h"
+#include "actions/action.h"
+#include "nordvpninfo.h"
 
 #include <QObject>
+#include <QPointer>
+#include <QSystemTrayIcon>
 
 class CLICaller;
 class ActionStorage;
 class StateChecker;
 class MenuHolder;
 class QTimer;
+class TrayIcon;
+
 class NordVpnWraper : public QObject
 {
     Q_OBJECT

@@ -22,6 +22,7 @@
 class QLineEdit;
 class QToolButton;
 class QLabel;
+
 class IconLineEdit : public QWidget
 {
     Q_OBJECT

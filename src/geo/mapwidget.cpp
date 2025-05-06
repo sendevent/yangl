@@ -18,28 +18,16 @@
 #include "mapwidget.h"
 
 #include "app/common.h"
-#include "geo/coordinatesresolver.h"
 #include "geo/flatplaceproxymodel.h"
 #include "mapserversmodel.h"
 #include "settings/appsettings.h"
-#include "settings/settingsmanager.h"
 
-#include <QFile>
-#include <QFileInfo>
-#include <QGeoAddress>
-#include <QGeoCodingManager>
-#include <QGeoLocation>
 #include <QGeoServiceProvider>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QMetaObject>
 #include <QQmlContext>
-#include <QQmlProperty>
 #include <QQuickItem>
 #include <QQuickWidget>
 #include <QVBoxLayout>
-#include <QWindow>
 
 static QString defaultMapPluginName()
 {

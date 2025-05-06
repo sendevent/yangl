@@ -20,8 +20,6 @@
 #include "geo/coordinatesresolver.h"
 
 #include <QAbstractListModel>
-#include <QGeoCoordinate>
-#include <qproperty.h>
 
 struct TreeItem {
     QString name;

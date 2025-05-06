@@ -21,10 +21,7 @@
 #include "app/common.h"
 #include "cli/clicall.h"
 
-#include <QApplication>
-#include <QDebug>
 #include <QFileInfo>
-#include <QTextBrowser>
 
 /*static*/ const QString Action::GroupKeyYangl { QStringLiteral("yangl") };
 /*static*/ const QString Action::GroupKeyBuiltin { QStringLiteral("builtin") };

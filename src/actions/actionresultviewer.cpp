@@ -23,7 +23,6 @@
 #include <QApplication>
 #include <QGridLayout>
 #include <QTabWidget>
-#include <QTextBrowser>
 
 /*static*/ ActionResultViewer *ActionResultViewer::m_instance = {};
 /*static*/ int ActionResultViewer::m_linesLimit = CLICallResultView::MaxBlocksCountDefault;

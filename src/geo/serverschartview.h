@@ -18,7 +18,7 @@
 #pragma once
 
 #include "app/nordvpninfo.h"
-#include "geo/coordinatesresolver.h"
+#include "geo/placeinfo.h"
 #include "geo/serverlocationresolver.h"
 #include "mapwidget.h"
 

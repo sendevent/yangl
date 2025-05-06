@@ -17,16 +17,15 @@
 
 #pragma once
 
-#include "geo/coordinatesresolver.h"
+#include "geo/placeinfo.h"
 
 #include <QGeoCoordinate>
-#include <QGeoServiceProvider>
-#include <QSharedPointer>
 #include <QWidget>
 
 class MapServersModel;
 class QQuickWidget;
 class QQuickItem;
+
 class MapWidget : public QWidget
 {
     Q_OBJECT

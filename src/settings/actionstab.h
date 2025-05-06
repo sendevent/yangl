@@ -21,7 +21,6 @@
 #include "settings/actioneditor.h"
 
 #include <QList>
-#include <QMap>
 #include <QWidget>
 
 namespace Ui {
