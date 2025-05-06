@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "action.h"
-#include "clicallresultview.h"
+#include "actions/action.h"
+#include "actions/clicallresultview.h"
 
 #include <QMap>
 #include <QPointer>

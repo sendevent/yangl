@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "clicall.h"
+#include "cli/clicall.h"
 
 #include <QObject>
 

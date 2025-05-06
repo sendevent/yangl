@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "action.h"
-#include "actionjson.h"
+#include "actions/action.h"
+#include "actions/actionjson.h"
 
 #include <QHash>
 #include <QObject>

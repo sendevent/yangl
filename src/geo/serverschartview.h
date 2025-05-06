@@ -18,9 +18,9 @@
 #pragma once
 
 #include "app/nordvpninfo.h"
+#include "geo/mapwidget.h"
 #include "geo/placeinfo.h"
 #include "geo/serverlocationresolver.h"
-#include "mapwidget.h"
 
 #include <QWidget>
 
@@ -62,16 +62,16 @@ private:
     static QPointer<ServersChartView> m_instance;
     explicit ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent = {});
 
-    QLineEdit *m_lineEdit;
-    QTreeView *m_treeView;
-    QToolButton *m_buttonReload;
-    QProgressBar *m_progressBar;
-    MapWidget *m_chartWidget;
+    QLineEdit *m_searchBox { nullptr };
+    QTreeView *m_treeView { nullptr };
+    QToolButton *m_buttonReload { nullptr };
+    QProgressBar *m_progressBar { nullptr };
+    MapWidget *m_chartWidget { nullptr };
 
-    NordVpnWraper *m_nordVpnWraper;
-    ServerLocationResolver *m_listManager;
-    MapServersModel *m_serversModel;
-    ServersFilterModel *m_serversFilterModel;
+    NordVpnWraper *m_nordVpnWraper { nullptr };
+    ServerLocationResolver *m_listManager { nullptr };
+    MapServersModel *m_serversModel { nullptr };
+    ServersFilterModel *m_serversFilterModel { nullptr };
     QTimer *m_timer { nullptr };
 
     void initUi();
