@@ -45,6 +45,7 @@ ServersChartView::ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent
     , m_listManager(new ServerLocationResolver(m_nordVpnWraper, this))
     , m_serversModel(new MapServersModel(this))
     , m_serversFilterModel(new ServersFilterModel(this))
+    , m_timer(new QTimer(this))
 {
     m_serversFilterModel->setSourceModel(m_serversModel);
 
@@ -55,7 +56,10 @@ ServersChartView::ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent
     requestServersList();
 }
 
-ServersChartView::~ServersChartView() { }
+ServersChartView::~ServersChartView()
+{
+    m_timer->stop();
+}
 
 void ServersChartView::initUi()
 {
@@ -116,6 +120,10 @@ void ServersChartView::initConenctions()
             [this](const QString &text) { m_serversFilterModel->setFilterRegularExpression(text); });
     connect(m_chartWidget, &MapWidget::markerDoubleclicked, this, &ServersChartView::onMarkerDoubleclicked);
     connect(m_buttonReload, &QToolButton::clicked, this, &ServersChartView::onReloadRequested);
+
+    m_timer->setInterval(3 * utils::oneSecondMs());
+    m_timer->setSingleShot(true);
+    connect(m_timer, &QTimer::timeout, this, &ServersChartView::saveServerLocationsCache);
 }
 
 void ServersChartView::loadSettings()
@@ -244,24 +252,16 @@ void ServersChartView::onStateChanged(const NordVpnInfo &info)
 
 void ServersChartView::handleLocationReadingPorgress(int current, int total)
 {
-    static QTimer *t = nullptr;
-    if (!t) {
-        t = new QTimer(this);
-        t->setInterval(3 * utils::oneSecondMs());
-        t->setSingleShot(true);
-        connect(t, &QTimer::timeout, this, [this]() {
-            m_progressBar->setHidden(true);
-            m_buttonReload->setVisible(true);
-            m_listManager->saveCache();
-        });
-    }
-
     const bool finished = current == total;
     if (finished) {
-        t->stop();
-        t->start();
-    } else {
-        m_progressBar->setHidden(false);
-        m_buttonReload->setVisible(false);
+        m_timer->stop();
+        m_timer->start();
     }
+}
+
+void ServersChartView::saveServerLocationsCache()
+{
+    m_progressBar->setHidden(true);
+    m_buttonReload->setVisible(true);
+    m_listManager->saveCache();
 }
