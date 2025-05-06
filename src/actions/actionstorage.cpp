@@ -94,15 +94,11 @@ QList<Action::Ptr> ActionStorage::load(const QString &from)
         WRN << "failed opening file:" << usedPath << in.errorString();
     }
 
-    return load(&in);
-}
-
-QList<Action::Ptr> ActionStorage::load(QIODevice *from)
-{
-    const bool jsonLoaded = m_json->load(from);
+    const bool jsonLoaded = m_json->load(usedPath);
     loadActions();
-    if (!jsonLoaded)
-        m_json->save(from);
+    if (!jsonLoaded) {
+        m_json->save(usedPath);
+    }
 
     return allActions();
 }

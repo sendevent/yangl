@@ -67,12 +67,18 @@ bool ActionJson::load(QIODevice *in)
 {
     m_json = {};
 
-    if (!in || !in->isReadable())
+    if (!in || !in->isReadable()) {
         return false;
+    }
 
     const QByteArray &data = in->readAll();
+    if (data.isEmpty()) {
+        WRN << "No JSON to load";
+        return false;
+    }
+
     QJsonParseError err;
-    const QJsonDocument &jDoc = QJsonDocument::fromJson(data, &err);
+    const QJsonDocument &jDoc = QJsonDocument::fromJson(std::move(data), &err);
     if (err.error != QJsonParseError::NoError) {
         WRN << "error parsing document:" << err.errorString();
         return false;
