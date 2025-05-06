@@ -71,6 +71,9 @@ public:
         CyberSecOff,
         ObfuscateOn,
         ObfuscateOff,
+
+        NativeTrayOff,
+        NativeTrayOn,
     };
 
     Q_ENUM(NordVPN);

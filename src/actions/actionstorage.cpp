@@ -426,6 +426,19 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
         wordsToList(QStringLiteral("set obfuscate 0"));
         break;
     }
+    case Action::NordVPN::NativeTrayOff: {
+        title = QObject::tr("Native Icon OFF");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set tray 0"));
+        break;
+    }
+    case Action::NordVPN::NativeTrayOn: {
+        title = QObject::tr("Native Icon ON");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set tray 1"));
+        break;
+    }
+
     default:
         scope = Action::Flow::Custom;
         forceShow = true;
