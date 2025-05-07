@@ -188,9 +188,12 @@ QString NordVpnInfo::toString() const
     }
 
     auto add = [&text](const QString &str, const QString &delim = QStringLiteral("<br>")) {
-        if (!text.isEmpty())
-            text.append(delim);
-        text.append(str);
+        if (!str.isEmpty()) {
+            if (!text.isEmpty()) {
+                text.append(delim);
+            }
+            text.append(str);
+        }
         return text;
     };
 
