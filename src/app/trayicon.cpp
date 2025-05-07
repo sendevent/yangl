@@ -130,6 +130,7 @@ void TrayIcon::updateIcon(NordVpnInfo::Status status)
 
 void TrayIcon::setState(const NordVpnInfo &state)
 {
+    const auto &stateText = state.toString();
     if (m_state.status() != state.status() && !qApp->isSavingSession()) {
         updateIcon(state.status());
 
@@ -142,13 +143,13 @@ void TrayIcon::setState(const NordVpnInfo &state)
 
         if (!skeepMessage) {
             const QString &description = AppSettings::Tray->MessagePlainText->read().toBool()
-                    ? QTextDocumentFragment::fromHtml(state.toString()).toPlainText()
-                    : state.toString();
+                    ? QTextDocumentFragment::fromHtml(stateText).toPlainText()
+                    : stateText;
             showMessage(qApp->applicationDisplayName(), description, iconForState(state), m_duration);
         }
     }
 
-    setToolTip(QTextDocumentFragment::fromHtml(state.toString()).toPlainText()); // always plaintext
+    setToolTip(QTextDocumentFragment::fromHtml(stateText).toPlainText()); // always plaintext
 
     m_state = state;
     m_isFirstChange = false;
