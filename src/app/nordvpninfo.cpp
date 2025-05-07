@@ -26,10 +26,12 @@
 
 NordVpnInfo::NordVpnInfo()
 {
-    if (-1 == NordVpnInfo::MetaIdClass)
+    if (-1 == NordVpnInfo::MetaIdClass) {
         NordVpnInfo::MetaIdClass = qRegisterMetaType<NordVpnInfo>();
-    if (-1 == NordVpnInfo::MetaIdEnum)
+    }
+    if (-1 == NordVpnInfo::MetaIdEnum) {
         NordVpnInfo::MetaIdEnum = qRegisterMetaType<NordVpnInfo::Status>();
+    }
 
     clear();
 }
@@ -54,8 +56,9 @@ NordVpnInfo::Status NordVpnInfo::status() const
 
 void NordVpnInfo::setStatus(NordVpnInfo::Status status)
 {
-    if (status != m_status)
+    if (status != m_status) {
         m_status = status;
+    }
 }
 
 bool NordVpnInfo::operator==(const NordVpnInfo &other) const
@@ -72,9 +75,14 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
 
 /*static*/ NordVpnInfo NordVpnInfo::fromString(const QString &text)
 {
+    LOG << text;
+    if (text.contains("connecting", Qt::CaseInsensitive)) {
+        int dbg = 0;
+    }
     NordVpnInfo updatedState;
-    if (text.isEmpty())
+    if (text.isEmpty()) {
         return updatedState;
+    }
 
     const QStringList &pairs = text.split('\n', Qt::SkipEmptyParts);
     for (const QString &line : pairs) {
@@ -87,26 +95,27 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
         const QString &name = pair.first().simplified();
         const QString &value = pair.last().simplified();
 
-        if (name == QStringLiteral("Status"))
+        if (name == QStringLiteral("Status")) {
             updatedState.m_status = textToStatus(value);
-        else if (name == QStringLiteral("Current server"))
+        } else if (name == QStringLiteral("Current server")) {
             updatedState.m_server = value;
-        else if (name == QStringLiteral("Country"))
+        } else if (name == QStringLiteral("Country")) {
             updatedState.m_country = value;
-        else if (name == QStringLiteral("City"))
+        } else if (name == QStringLiteral("City")) {
             updatedState.m_city = value;
-        else if (name == QStringLiteral("Your new IP"))
+        } else if (name == QStringLiteral("Your new IP")) {
             updatedState.m_ip = value;
-        else if (name == QStringLiteral("Current technology"))
+        } else if (name == QStringLiteral("Current technology")) {
             updatedState.m_technology = value;
-        else if (name == QStringLiteral("Current protocol"))
+        } else if (name == QStringLiteral("Current protocol")) {
             updatedState.m_protocol = value;
-        else if (name == QStringLiteral("Transfer")) {
+        } else if (name == QStringLiteral("Transfer")) {
             updatedState.m_traffic = value;
             updatedState.m_traffic.replace(QStringLiteral("received"), QStringLiteral("↓"));
             updatedState.m_traffic.replace(QStringLiteral("sent"), QStringLiteral("↑"));
-        } else if (name == QStringLiteral("Uptime"))
+        } else if (name == QStringLiteral("Uptime")) {
             updatedState.m_uptime = parseUptime(value.simplified());
+        }
     }
 
     return updatedState;
@@ -114,8 +123,9 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
 
 /*static*/ NordVpnInfo::Status NordVpnInfo::textToStatus(const QString &from)
 {
-    if (from.isEmpty())
+    if (from.isEmpty()) {
         return NordVpnInfo::Status::Unknown;
+    }
 
     const QMetaEnum me = QMetaEnum::fromType<NordVpnInfo::Status>();
     bool found(false);
@@ -133,12 +143,14 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
 {
     QString result;
 
-    if (from.isEmpty())
+    if (from.isEmpty()) {
         return result;
+    }
 
     auto add = [&result](int value, int width = 2) {
-        if (!result.isEmpty())
+        if (!result.isEmpty()) {
             result.append(QChar(':'));
+        }
         result += QString("%1").arg(value, width, 10, QChar('0'));
     };
 
@@ -146,19 +158,22 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
     for (int i = 0; i <= parts.size() - 2; ++i) {
         bool converted(false);
         const int value = parts.at(i).toInt(&converted);
-        if (!converted)
+        if (!converted) {
             continue;
+        }
 
         const QString &units = parts.at(++i);
 
-        if (units.startsWith(QStringLiteral("day")))
+        if (units.startsWith(QStringLiteral("day"))) {
             add(value, 3);
-        else
+        } else {
             add(value, 2);
+        }
     }
 
-    if (result.count(QChar(':')) <= 2)
+    if (result.count(QChar(':')) <= 2) {
         result.prepend(QStringLiteral("00:"));
+    }
 
     return result;
 }
@@ -168,8 +183,9 @@ QString NordVpnInfo::toString() const
     QString text;
     text.append(QObject::tr("<b>%1</b>").arg(statusToText(m_status)));
 
-    if (m_status != NordVpnInfo::Status::Connected && m_status != NordVpnInfo::Status::Connecting)
+    if (m_status != NordVpnInfo::Status::Connected && m_status != NordVpnInfo::Status::Connecting) {
         return text;
+    }
 
     auto add = [&text](const QString &str, const QString &delim = QStringLiteral("<br>")) {
         if (!text.isEmpty())
@@ -178,8 +194,10 @@ QString NordVpnInfo::toString() const
         return text;
     };
 
-    if (!m_uptime.isEmpty())
+    if (!m_uptime.isEmpty()) {
         text = add(m_uptime, QStringLiteral(" "));
+    }
+
     text = add(m_server);
     text = add(m_city, QStringLiteral(" — "));
     text = add(m_country, QStringLiteral(", "));
