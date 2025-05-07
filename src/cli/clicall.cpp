@@ -84,11 +84,13 @@ QString CLICall::result() const
 
 QString CLICall::setResult(const QString &result, const QString &errors)
 {
-    if (errors != m_errors)
+    if (errors != m_errors) {
         m_errors = errors;
+    }
 
-    if (result != m_result)
+    if (result != m_result) {
         m_result = result;
+    }
 
     emit ready(m_result);
 
