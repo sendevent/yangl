@@ -80,8 +80,9 @@ void StateChecker::setInterval(int msecs)
     m_timer->stop();
     m_timer->setInterval(msecs);
 
-    if (wasActive)
+    if (wasActive) {
         m_timer->start();
+    }
 }
 
 int StateChecker::interval() const
@@ -134,8 +135,9 @@ void StateChecker::setState(const NordVpnInfo &state)
 {
     if (this->state() != state) {
         if (m_state.status() != state.status() || m_state.country() != state.country()
-            || m_state.city() != state.city())
+            || m_state.city() != state.city()) {
             emit statusChanged(state.status());
+        }
 
         m_state = state;
         emit stateChanged(m_state);
@@ -146,8 +148,9 @@ void StateChecker::setStatus(NordVpnInfo::Status status)
 {
     if (m_state.status() != status) {
         NordVpnInfo state;
-        if (status != NordVpnInfo::Status::Unknown)
+        if (status != NordVpnInfo::Status::Unknown) {
             state = m_state;
+        }
 
         state.setStatus(status);
         setState(state);

@@ -43,12 +43,11 @@ CLICaller::CLICaller(QObject *parent)
 
 bool CLICaller::performAction(Action *action)
 {
-    if (!action)
-        return false;
-
-    if (auto call = action->createRequest()) {
-        runQuery(call);
-        return true;
+    if (action) {
+        if (auto call = action->createRequest()) {
+            runQuery(call);
+            return true;
+        }
     }
 
     return false;
@@ -56,9 +55,7 @@ bool CLICaller::performAction(Action *action)
 
 void CLICaller::runQuery(CLICall *call)
 {
-    if (!call)
-        return;
-
-    RunCallTask *task = new RunCallTask(call);
-    QThreadPool::globalInstance()->start(task);
+    if (call) {
+        QThreadPool::globalInstance()->start(new RunCallTask(call));
+    }
 }
