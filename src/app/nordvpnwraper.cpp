@@ -59,8 +59,9 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
 void NordVpnWraper::initMenu()
 {
     QList<Action::Ptr> actions = m_actions->load();
-    if (actions.isEmpty())
+    if (actions.isEmpty()) {
         actions = m_actions->load({});
+    }
     QMenu *menu = m_menuHolder->createMenu(actions);
     m_trayIcon->setContextMenu(menu);
 }
@@ -106,8 +107,9 @@ void NordVpnWraper::loadSettings()
     m_checker->setInterval(AppSettings::Monitor->Interval->read().toInt());
     m_trayIcon->setMessageDuration(AppSettings::Tray->MessageDuration->read().toInt() * utils::oneSecondMs());
 
-    if (AppSettings::Map->Visible->read().toBool())
+    if (AppSettings::Map->Visible->read().toBool()) {
         showMapView();
+    }
 }
 
 void NordVpnWraper::prepareQuit()
@@ -130,9 +132,9 @@ void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason
     Action::NordVPN invokeMe(Action::NordVPN::Unknown);
     switch (reason) {
     case QSystemTrayIcon::Trigger: {
-        if (!m_mapView)
+        if (!m_mapView) {
             showMapView();
-        else {
+        } else {
             m_mapView->activateWindow();
             m_mapView->raise();
         }
@@ -161,25 +163,31 @@ void NordVpnWraper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason
         return;
     }
 
-    if (invokeMe == Action::NordVPN::Unknown)
+    if (invokeMe == Action::NordVPN::Unknown) {
         return;
+    }
 
-    if (const Action::Ptr &action = m_actions->action(invokeMe))
+    if (const Action::Ptr &action = m_actions->action(invokeMe)) {
         onActionTriggered(action.get());
+    }
 }
 
 void NordVpnWraper::onActionTriggered(Action *action)
 {
-    if (!action)
+    if (!action) {
         return;
+    }
 
     switch (action->scope()) {
-    case Action::Flow::Yangl:
+    case Action::Flow::Yangl: {
         return processYangleAction(action);
-    case Action::Flow::NordVPN:
+    }
+    case Action::Flow::NordVPN: {
         return processNordVpnAction(action);
-    case Action::Flow::Custom:
+    }
+    case Action::Flow::Custom: {
         return processUserAction(action);
+    }
     }
 }
 
@@ -204,29 +212,37 @@ void NordVpnWraper::onActionTriggered(Action *action)
 
 void NordVpnWraper::processYangleAction(Action *action)
 {
-    if (!isAcceptableAction(action, Action::Flow::Yangl, Q_FUNC_INFO))
+    if (!isAcceptableAction(action, Action::Flow::Yangl, Q_FUNC_INFO)) {
         return;
+    }
 
     const Action::Yangl actType = static_cast<Action::Yangl>(action->type());
     switch (actType) {
-    case Action::Yangl::ShowMap:
+    case Action::Yangl::ShowMap: {
         showMapView();
         break;
-    case Action::Yangl::ShowSettings:
+    }
+    case Action::Yangl::ShowSettings: {
         showSettingsEditor();
         break;
-    case Action::Yangl::ShowLog:
+    }
+    case Action::Yangl::ShowLog: {
         showLog();
         break;
-    case Action::Yangl::Activated:
+    }
+    case Action::Yangl::Activated: {
         m_checker->setActive(!m_checker->isActive());
         break;
-    case Action::Yangl::ShowAbout:
+    }
+    case Action::Yangl::ShowAbout: {
         showAbout();
         break;
+    }
     case Action::Yangl::Quit: {
-        qApp->quit();
-        break;
+        {
+            qApp->quit();
+            break;
+        }
     }
     default:
         break;
@@ -235,16 +251,18 @@ void NordVpnWraper::processYangleAction(Action *action)
 
 void NordVpnWraper::processUserAction(Action *action)
 {
-    if (!isAcceptableAction(action, Action::Flow::Custom, Q_FUNC_INFO))
+    if (!isAcceptableAction(action, Action::Flow::Custom, Q_FUNC_INFO)) {
         return;
+    }
 
     m_bus->performAction(action);
 }
 
 void NordVpnWraper::processNordVpnAction(Action *action)
 {
-    if (!isAcceptableAction(action, Action::Flow::NordVPN, Q_FUNC_INFO))
+    if (!isAcceptableAction(action, Action::Flow::NordVPN, Q_FUNC_INFO)) {
         return;
+    }
 
     const Action::NordVPN actType = static_cast<Action::NordVPN>(action->type());
     switch (actType) {
@@ -264,37 +282,40 @@ void NordVpnWraper::processNordVpnAction(Action *action)
 
 void NordVpnWraper::pause(Action::NordVPN action)
 {
-    if (m_paused)
+    if (m_paused) {
         return;
+    }
 
     int duration(0);
     switch (action) {
-    case Action::NordVPN::Pause05:
+    case Action::NordVPN::Pause05: {
         duration = 5;
         break;
-    case Action::NordVPN::Pause30:
+    }
+    case Action::NordVPN::Pause30: {
         duration = 30;
         break;
-    case Action::NordVPN::Pause60:
+    }
+    case Action::NordVPN::Pause60: {
         duration = 60;
         break;
+    }
     case Action::NordVPN::PauseCustom: {
-        {
-            bool ok(false);
-            duration = QInputDialog::getInt({}, qApp->applicationDisplayName(), tr("Pause VPN for minutes:"), 1, 1,
-                                            1440, 1, &ok);
-            if (!ok) {
-                duration = 0;
-            }
-            break;
+        bool ok(false);
+        duration = QInputDialog::getInt({}, qApp->applicationDisplayName(), tr("Pause VPN for minutes:"), 1, 1, 1440, 1,
+                                        &ok);
+        if (!ok) {
+            duration = 0;
         }
+        break;
     }
     default:
         return;
     }
 
-    if (!duration)
+    if (!duration) {
         return;
+    }
 
     m_paused = duration * 60 * utils::oneSecondMs();
 
@@ -308,17 +329,19 @@ void NordVpnWraper::onPauseTimer()
 {
     m_paused -= utils::oneSecondMs();
 
-    if (m_paused <= 0) {
-        m_pauseTimer->stop();
-        const NordVpnInfo &currentState = m_checker->state();
-        if (currentState.status() == NordVpnInfo::Status::Unknown
-            || currentState.status() == NordVpnInfo::Status::Disconnected) {
-            if (auto connect = m_actions->action(Action::NordVPN::Connect)) {
-                onActionTriggered(connect.get());
-            }
-        }
-        m_paused = 0;
+    if (m_paused > 0) {
+        return;
     }
+
+    m_pauseTimer->stop();
+    const NordVpnInfo &currentState = m_checker->state();
+    if (currentState.status() == NordVpnInfo::Status::Unknown
+        || currentState.status() == NordVpnInfo::Status::Disconnected) {
+        if (auto connect = m_actions->action(Action::NordVPN::Connect)) {
+            onActionTriggered(connect.get());
+        }
+    }
+    m_paused = 0;
 }
 
 void NordVpnWraper::onStatusChanged(NordVpnInfo::Status status)
@@ -345,8 +368,9 @@ void NordVpnWraper::updateActions(bool connected)
 {
     std::function<void(QMenu *)> manageMenuActionsEnablement;
     manageMenuActionsEnablement = [connected, &manageMenuActionsEnablement, this](QMenu *menu) {
-        if (!menu)
+        if (!menu) {
             return;
+        }
 
         const auto &actions = menu->actions();
         for (const auto qAction : actions) {
@@ -356,8 +380,9 @@ void NordVpnWraper::updateActions(bool connected)
             }
 
             if (auto action = qAction->data().value<Action *>()) {
-                if (action->scope() != Action::Flow::NordVPN)
+                if (action->scope() != Action::Flow::NordVPN) {
                     continue;
+                }
                 switch (static_cast<Action::NordVPN>(action->type())) {
                 case Action::NordVPN::Rate1:
                 case Action::NordVPN::Rate2:

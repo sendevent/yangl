@@ -74,14 +74,7 @@ void ServerLocationResolver::resolveServerLocation(const PlaceInfo &place)
 
 void ServerLocationResolver::onPlaceResolved(RequestId id, const PlaceInfo &place)
 {
-    LOG << id << place.country << place.town;
-
-    if (place.town == "Saint Louis") {
-        int dbg = 0;
-    }
-
     if (place.ok) {
-        LOG << "added" << place.location << place.location.isValid();
         m_placesChecked[place.country.toLower()].insert(place.town.toLower(), place);
     } else {
         WRN << place.message;
@@ -93,7 +86,6 @@ void ServerLocationResolver::onPlaceResolved(RequestId id, const PlaceInfo &plac
 static QString geoCacheFilePath()
 {
     static QString path = QString("%1/servers.json").arg(SettingsManager::dirPath());
-    LOG << path;
     return path;
 }
 

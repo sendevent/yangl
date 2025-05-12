@@ -75,10 +75,6 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
 
 /*static*/ NordVpnInfo NordVpnInfo::fromString(const QString &text)
 {
-    LOG << text;
-    if (text.contains("connecting", Qt::CaseInsensitive)) {
-        int dbg = 0;
-    }
     NordVpnInfo updatedState;
     if (text.isEmpty()) {
         return updatedState;
