@@ -17,6 +17,7 @@
 
 #include "trayicon.h"
 
+#include "app/common.h"
 #include "settings/appsettings.h"
 
 #include <QApplication>
@@ -149,7 +150,7 @@ void TrayIcon::setState(const NordVpnInfo &state)
         }
     }
 
-    setToolTip(QTextDocumentFragment::fromHtml(stateText).toPlainText()); // always plaintext
+    updateTooltip(stateText);
 
     m_state = state;
     m_isFirstChange = false;
@@ -176,4 +177,11 @@ void TrayIcon::deployDefaults() const
             }
         }
     }
+}
+
+void TrayIcon::updateTooltip(const QString &text)
+{
+    const bool forcePlainText = AppSettings::Tray->MessagePlainText->read().toBool();
+    const QString &sanitized = forcePlainText ? QTextDocumentFragment::fromHtml(text).toPlainText() : text;
+    setToolTip(sanitized);
 }

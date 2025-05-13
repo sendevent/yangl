@@ -17,11 +17,13 @@
 
 #include "common.h"
 
+#include "settings/appsettings.h"
 #include "version/appversiondefs.h"
 
 #include <QApplication>
 #include <QDir>
 #include <QFileInfo>
+#include <QLatin1StringView>
 
 namespace utils {
 
@@ -85,6 +87,47 @@ std::tuple<QGeoCoordinate, bool> parseCoordinates(const QString &latStr, const Q
 QString composeTitle(const QString &payload)
 {
     return QObject::tr("%1 %2 — %3").arg(qApp->applicationName(), yangl::V.trio(), payload);
+}
+
+QString composeMessage(const Action::RunInfo &actionInfo)
+{
+    static const QLatin1String br("<br/>");
+    static const QLatin1String nl("\n");
+
+    const bool usePlainText = AppSettings::Tray->MessagePlainText->read().toBool();
+    const QLatin1String lineSeparator = usePlainText ? nl : br;
+
+    static const QString tmplHtml("<b>%1:</b>");
+    static const QString tmplPlainText("%1: ");
+    auto wrappPart = [&usePlainText](const QString &value) {
+        return QString(usePlainText ? tmplPlainText : tmplHtml).arg(value);
+    };
+
+    const QMap<QString, QString> parts {
+        { QObject::tr("Result"), actionInfo.result },
+        { QObject::tr("Exit code"), actionInfo.exitCode },
+        { QObject::tr("Errors"), actionInfo.errors },
+    };
+
+    QString message = QString("%1 ").arg(actionInfo.timeStamp);
+    for (const auto [key, value] : parts.asKeyValueRange()) {
+
+        const auto &scopeLines = value.split('\n');
+        const auto &line = scopeLines.join(lineSeparator);
+        if (!line.isEmpty()) {
+            message.append(wrappPart(key));
+
+            if (scopeLines.size() > 1) {
+                message.append(lineSeparator);
+            }
+
+            message.append(QString("%1%2").arg(line, lineSeparator));
+        }
+    }
+
+    message = QString("%1:%2%3").arg(qApp->applicationDisplayName(), lineSeparator, message);
+
+    return message;
 }
 
 } // namespace utils

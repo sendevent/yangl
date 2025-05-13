@@ -53,7 +53,7 @@ signals:
 
 private slots:
     void onTimeout();
-    void onQueryFinish(const Action::Id &id, const QString &result, bool ok, const QString &info);
+    void onQueryFinish(const Action::Id &id, const QString &result, bool ok, const Action::RunInfo &info);
 
 protected:
     CLICaller *m_bus;

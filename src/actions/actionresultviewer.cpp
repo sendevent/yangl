@@ -21,6 +21,7 @@
 #include "settings/appsettings.h"
 
 #include <QGridLayout>
+#include <QLatin1StringView>
 #include <QTabWidget>
 
 /*static*/ ActionResultViewer *ActionResultViewer::m_instance = {};
@@ -83,18 +84,19 @@ void ActionResultViewer::onActionStarted(const Action::Id &id, const QString & /
 }
 
 void ActionResultViewer::onActionPerformed(const Action::Id &id, const QString & /*result*/, bool ok,
-                                           const QString &info)
+                                           const Action::RunInfo &info)
 {
     if (auto action = m_actions.value(id)) {
         const bool forceShow = action->forcedShow();
 
-        if (auto display = displayForAction(action))
-            display->append(info);
+        if (auto display = displayForAction(action)) {
+            display->append(utils::composeMessage(info));
+        }
 
         if (forceShow || !ok) {
-            if (!isVisible())
+            if (!isVisible()) {
                 this->show();
-            else {
+            } else {
                 m_tabWidget->setCurrentIndex(m_tabWidget->indexOf(m_browsers.value(id)));
             }
         }
