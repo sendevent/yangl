@@ -58,10 +58,7 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
 
 void NordVpnWraper::initMenu()
 {
-    QList<Action::Ptr> actions = m_actions->load();
-    if (actions.isEmpty()) {
-        actions = m_actions->load({});
-    }
+    const auto &actions = m_actions->load();
     QMenu *menu = m_menuHolder->createMenu(actions);
     m_trayIcon->setContextMenu(menu);
 }
