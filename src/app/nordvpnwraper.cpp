@@ -515,6 +515,6 @@ void NordVpnWraper::showAbout()
 void NordVpnWraper::notifyError(const QString &errorMessage)
 {
     WRN << errorMessage;
-    m_trayIcon->showMessage(qApp->applicationDisplayName(), errorMessage, QSystemTrayIcon::Warning);
-    m_trayIcon->updateTooltip(errorMessage); // till the next error or the actual status
+    // shows message and updates tooltip till the next error or the actual status
+    m_trayIcon->updateStateText(errorMessage, QSystemTrayIcon::Warning);
 }
