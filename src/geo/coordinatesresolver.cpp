@@ -138,22 +138,13 @@ CitiesByCountry CoordinatesResolver::loadData(const QString &path)
 
 void CoordinatesResolver::lookupForPlaceAsync(const PlaceInfo &request, RequestId id)
 {
-    auto future = QtConcurrent::run([this, request]() -> PlaceInfo { return lookupForPlace(request); });
-
-    auto *watcher = new QFutureWatcher<PlaceInfo>(this);
-    connect(watcher, &QFutureWatcher<PlaceInfo>::finished, this, [this, id, watcher]() {
-        QScopedPointer<QFutureWatcher<PlaceInfo>> cleanup(watcher); // Ensure deletion even if an exception occurs
-
-        const PlaceInfo &placeInfo = watcher->future().result();
-        LOG << "Async task finished, place found:" << placeInfo.country << placeInfo.town << placeInfo.ok;
-        if (placeInfo.ok) {
-            emit coordinatesResolved(id, placeInfo);
-        } else {
-            requestGeoAsync(placeInfo, id);
-        }
-    });
-
-    watcher->setFuture(future);
+    const PlaceInfo &placeInfo = lookupForPlace(request);
+    LOG << "place found:" << placeInfo.country << placeInfo.town << placeInfo.ok;
+    if (placeInfo.ok) {
+        emit coordinatesResolved(id, placeInfo);
+    } else {
+        requestGeoAsync(placeInfo, id);
+    }
 }
 
 PlaceInfo CoordinatesResolver::lookupForPlace(const PlaceInfo &request) const
