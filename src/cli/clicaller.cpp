@@ -45,17 +45,19 @@ bool CLICaller::performAction(Action *action)
 {
     if (action) {
         if (auto call = action->createRequest()) {
-            runQuery(call);
-            return true;
+            return runQuery(call);
         }
     }
 
     return false;
 }
 
-void CLICaller::runQuery(CLICall *call)
+bool CLICaller::runQuery(CLICall *call)
 {
     if (call) {
         QThreadPool::globalInstance()->start(new RunCallTask(call));
+        return true;
     }
+
+    return false;
 }

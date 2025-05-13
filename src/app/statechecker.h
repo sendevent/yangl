@@ -49,6 +49,7 @@ public slots:
 signals:
     void stateChanged(const NordVpnInfo &state);
     void statusChanged(const NordVpnInfo::Status status);
+    void error(const QString &message);
 
 private slots:
     void onTimeout();
@@ -64,6 +65,10 @@ protected:
     void setStatus(NordVpnInfo::Status status);
 
     void updateState(const QString &from);
+
+    void notifyError(const QString &errorMessage);
+
+    void stopTimer();
 
     friend class TestStateChecker;
     friend class NordVpnWraper;

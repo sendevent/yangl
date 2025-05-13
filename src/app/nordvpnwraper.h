@@ -61,6 +61,8 @@ private slots:
     void onStatusChanged(NordVpnInfo::Status status);
     void onPauseTimer();
 
+    void notifyError(const QString &errorMessage);
+
 private:
     CLICaller *m_bus;
     ActionStorage *m_actions;
