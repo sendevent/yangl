@@ -59,11 +59,11 @@ private:
 
     void ensureDataLoaded();
 
-    void lookupForPlaceAsync(const PlaceInfo &request, RequestId id);
+    void lookupForPlaceAsync(RequestId id, const PlaceInfo &request);
 
     PlaceInfo lookupForPlace(const PlaceInfo &request) const;
 
-    void requestGeoAsync(const PlaceInfo &place, RequestId id);
+    void requestGeoAsync(RequestId id, const PlaceInfo &place);
 
     static CitiesByCountry loadData(const QString &path);
 

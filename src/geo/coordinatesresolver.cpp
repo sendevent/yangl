@@ -50,7 +50,7 @@ quint32 CoordinatesResolver::requestCoordinates(const PlaceInfo &town)
 
     ++m_requestCounter; // overflow on around 4 billion requests, then goes back to the zero
 
-    lookupForPlaceAsync(town, m_requestCounter);
+    lookupForPlaceAsync(m_requestCounter, town);
     return m_requestCounter;
 }
 
@@ -136,14 +136,14 @@ CitiesByCountry CoordinatesResolver::loadData(const QString &path)
     return loaded;
 }
 
-void CoordinatesResolver::lookupForPlaceAsync(const PlaceInfo &request, RequestId id)
+void CoordinatesResolver::lookupForPlaceAsync(RequestId id, const PlaceInfo &request)
 {
     const PlaceInfo &placeInfo = lookupForPlace(request);
     LOG << "place found:" << placeInfo.country << placeInfo.town << placeInfo.ok;
     if (placeInfo.ok) {
         emit coordinatesResolved(id, placeInfo);
     } else {
-        requestGeoAsync(placeInfo, id);
+        requestGeoAsync(id, placeInfo);
     }
 }
 
@@ -177,7 +177,7 @@ PlaceInfo CoordinatesResolver::lookupForPlace(const PlaceInfo &request) const
     return town;
 }
 
-void CoordinatesResolver::requestGeoAsync(const PlaceInfo &place, RequestId id)
+void CoordinatesResolver::requestGeoAsync(RequestId id, const PlaceInfo &place)
 {
     PlaceInfo result(place);
     result.ok = false;
