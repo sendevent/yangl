@@ -24,6 +24,7 @@
 #include <QFutureWatcher>
 #include <QTimer>
 #include <QtConcurrentRun>
+#include <qlatin1stringview.h>
 
 /*static*/ const int StateChecker::DefaultIntervalMs = utils::oneSecondMs();
 
@@ -96,37 +97,27 @@ int StateChecker::interval() const
 
 void StateChecker::check()
 {
-    QString errorMessage;
     if (!m_actCheck) {
-        errorMessage = tr("Invalid Status-check Action instance");
+        notifyError(tr("Invalid Status-check Action instance"));
     } else if (!m_bus->performAction(m_actCheck.get())) {
-        errorMessage = tr("Status-check Action invocation scheduling failed");
-    }
-
-    if (!errorMessage.isEmpty()) {
-        notifyError(errorMessage);
+        stopTimer(); // sets Status::Unknown
     }
 }
 
-void StateChecker::onQueryFinish(const Action::Id & /*id*/, const QString &result, bool /*ok*/,
-                                 const QString & /*info*/)
+void StateChecker::onQueryFinish(const Action::Id &id, const QString &result, bool ok, const Action::RunInfo &info)
 {
-    auto future = QtConcurrent::run([this, result]() {
-        try {
-            updateState(result);
-        } catch (const std::exception &e) {
-            WRN << "Exception in async task:" << e.what();
+    if (ok) {
+        updateState(result);
+    } else {
+        QString message = tr("Action ivocation `%1` failed:").arg(id.toString());
+        if (!info.errors.isEmpty()) {
+            const auto &lineSeparator =
+                    QLatin1String(AppSettings::Tray->MessagePlainText->read().toBool() ? "\n" : "<br>");
+            message.append(lineSeparator);
+            message.append(utils::composeMessage(info));
         }
-    });
-
-    auto *watcher = new QFutureWatcher<void>(this);
-    QObject::connect(watcher, &QFutureWatcher<void>::finished, this, [future, watcher]() {
-        if (future.isCanceled()) {
-            WRN << "Async task was canceled!";
-        }
-        watcher->deleteLater();
-    });
-    watcher->setFuture(future);
+        notifyError(message);
+    }
 }
 
 void StateChecker::onTimeout()

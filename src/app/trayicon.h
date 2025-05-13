@@ -34,6 +34,8 @@ public:
 
     void updateIcon(NordVpnInfo::Status status);
 
+    void updateTooltip(const QString &text);
+
 public slots:
     void setState(const NordVpnInfo &state);
 

@@ -95,6 +95,13 @@ public:
         Own
     };
 
+    struct RunInfo {
+        QString timeStamp;
+        QString result;
+        QString exitCode;
+        QString errors;
+    };
+
     virtual ~Action();
     Id id() const;
 
@@ -119,9 +126,9 @@ public:
     bool forcedShow() const;
     void setForcedShow(bool forced);
 
-    CLICall *createRequest();
+    CLICall *createRequest(QString *errorMessageHandler = nullptr);
 
-    static bool isValidAppPath(const QString &path);
+    static bool isValidAppPath(const QString &path, QString *reason = nullptr);
 
     bool isAnchorable() const;
     void setAnchor(MenuPlace place);
@@ -133,7 +140,7 @@ public:
 
 signals:
     void performing(const Action::Id &id, const QString &app, const QStringList &args);
-    void performed(const Action::Id &id, const QString &result, bool ok, const QString &description);
+    void performed(const Action::Id &id, const QString &result, bool ok, const RunInfo &info);
     void changed();
 
     void titleChanged(const QString &title);
@@ -142,6 +149,8 @@ signals:
     void timeoutChanged(int timeout);
     void forcedShowChanged(bool forced);
     void anchorChanged(Action::MenuPlace place);
+
+    void invocationError(const QString &reason);
 
 protected slots:
     virtual void onStart(const QString &app, const QStringList &args);
