@@ -33,5 +33,5 @@ public:
 signals:
 
 private:
-    void runQuery(CLICall *call);
+    bool runQuery(CLICall *call);
 };

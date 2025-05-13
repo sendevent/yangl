@@ -49,6 +49,7 @@ NordVpnWraper::NordVpnWraper(QObject *parent)
     connect(qApp, &QApplication::aboutToQuit, this, &NordVpnWraper::prepareQuit);
     connect(m_checker, &StateChecker::stateChanged, m_trayIcon, &TrayIcon::setState);
     connect(m_checker, &StateChecker::statusChanged, this, &NordVpnWraper::onStatusChanged);
+    connect(m_checker, &StateChecker::error, this, &NordVpnWraper::notifyError);
     connect(m_trayIcon, &QSystemTrayIcon::activated, this, &NordVpnWraper::onTrayIconActivated);
     connect(m_menuHolder, &MenuHolder::actionTriggered, this, &NordVpnWraper::onActionTriggered);
     connect(m_pauseTimer, &QTimer::timeout, this, &NordVpnWraper::onPauseTimer);
@@ -210,6 +211,7 @@ void NordVpnWraper::onActionTriggered(Action *action)
 void NordVpnWraper::processYangleAction(Action *action)
 {
     if (!isAcceptableAction(action, Action::Flow::Yangl, Q_FUNC_INFO)) {
+        WRN << "Unexpected Yangle action:" << action;
         return;
     }
 
@@ -241,23 +243,32 @@ void NordVpnWraper::processYangleAction(Action *action)
             break;
         }
     }
-    default:
+    default: {
+        WRN << "Unhandled Yangl action:" << actType;
         break;
+    }
     }
 }
 
 void NordVpnWraper::processUserAction(Action *action)
 {
+    QString errorMessage;
     if (!isAcceptableAction(action, Action::Flow::Custom, Q_FUNC_INFO)) {
-        return;
+        errorMessage = tr("Received instance is not a valid User Action");
+    } else if (!m_bus->performAction(action)) {
+        errorMessage = tr("User Action invocation scheduling failed");
     }
 
-    m_bus->performAction(action);
+    if (!errorMessage.isEmpty()) {
+        notifyError(errorMessage);
+    }
 }
 
 void NordVpnWraper::processNordVpnAction(Action *action)
 {
     if (!isAcceptableAction(action, Action::Flow::NordVPN, Q_FUNC_INFO)) {
+
+        notifyError(tr("Unexpected NordVpn action"));
         return;
     }
 
@@ -270,11 +281,15 @@ void NordVpnWraper::processNordVpnAction(Action *action)
         pause(actType);
         return;
     }
-    default:
+    default: {
+        notifyError(tr("Unhandled NordVpn action: %1").arg(action->type()));
         break;
     }
+    }
 
-    m_bus->performAction(action);
+    if (!m_bus->performAction(action)) {
+        notifyError(tr("NordVPN Action invocation scheduling failed"));
+    }
 }
 
 void NordVpnWraper::pause(Action::NordVPN action)
@@ -306,8 +321,10 @@ void NordVpnWraper::pause(Action::NordVPN action)
         }
         break;
     }
-    default:
+    default: {
+        notifyError(tr("Unexpected pause type: %1").arg(static_cast<int>(action)));
         return;
+    }
     }
 
     if (!duration) {
@@ -475,4 +492,11 @@ void NordVpnWraper::showLog()
 void NordVpnWraper::showAbout()
 {
     AboutDialog::makeVisible(nullptr);
+}
+
+void NordVpnWraper::notifyError(const QString &errorMessage)
+{
+    WRN << "TODO: add message propagation";
+    WRN << errorMessage;
+    m_trayIcon->showMessage(qApp->applicationDisplayName(), errorMessage, QSystemTrayIcon::Warning);
 }

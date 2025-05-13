@@ -45,7 +45,12 @@ StateChecker::~StateChecker() { }
 void StateChecker::setCheckAction(const Action::Ptr &action)
 {
     if (m_actCheck != action) {
+        if (m_actCheck) {
+            disconnect(m_actCheck.get(), &Action::performed, this, &StateChecker::onQueryFinish);
+        }
+
         m_actCheck = action;
+
         if (m_actCheck) {
             connect(m_actCheck.get(), &Action::performed, this, &StateChecker::onQueryFinish, Qt::UniqueConnection);
         }
@@ -60,8 +65,7 @@ void StateChecker::setActive(bool active)
             check();
             m_timer->start();
         } else {
-            m_timer->stop();
-            setStatus(NordVpnInfo::Status::Unknown);
+            stopTimer();
         }
 
         AppSettings::Monitor->Active->write(active);
@@ -92,7 +96,16 @@ int StateChecker::interval() const
 
 void StateChecker::check()
 {
-    m_bus->performAction(m_actCheck.get());
+    QString errorMessage;
+    if (!m_actCheck) {
+        errorMessage = tr("Invalid Status-check Action instance");
+    } else if (!m_bus->performAction(m_actCheck.get())) {
+        errorMessage = tr("Status-check Action invocation scheduling failed");
+    }
+
+    if (!errorMessage.isEmpty()) {
+        notifyError(errorMessage);
+    }
 }
 
 void StateChecker::onQueryFinish(const Action::Id & /*id*/, const QString &result, bool /*ok*/,
@@ -155,4 +168,17 @@ void StateChecker::setStatus(NordVpnInfo::Status status)
         state.setStatus(status);
         setState(state);
     }
+}
+
+void StateChecker::notifyError(const QString &errorMessage)
+{
+    WRN << errorMessage;
+    stopTimer(); // sets Status::Unknown
+    emit error(errorMessage);
+}
+
+void StateChecker::stopTimer()
+{
+    m_timer->stop();
+    setStatus(NordVpnInfo::Status::Unknown);
 }
