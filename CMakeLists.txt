@@ -1,6 +1,15 @@
 cmake_minimum_required(VERSION 3.31)
 
-project(yangl LANGUAGES CXX)
+include(YanglVersionGen.cmake)
+include(CPackConfig.cmake)
+include(CollectSourceFiles.cmake)
+
+project(yangl
+  VERSION ${YANGL_VERSION}
+  DESCRIPTION "Yet Another NordVPN GUI for Linux: A lightweight, unofficial system tray app for NordVPN client on Linux"
+  HOMEPAGE_URL "https://github.com/sendevent/yangl/"
+  LANGUAGES CXX
+)
 
 find_package(Qt6 REQUIRED COMPONENTS
     Core
@@ -25,8 +34,6 @@ set(CMAKE_AUTORCC ON)
 
 qt_standard_project_setup()
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/CollectSourceFiles.cmake)
-
 add_subdirectory(src)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -49,3 +56,6 @@ if(NOT DISABLE_TESTS)
     add_subdirectory(test)
 endif()
 
+install(TARGETS yangl
+    RUNTIME DESTINATION bin
+)
