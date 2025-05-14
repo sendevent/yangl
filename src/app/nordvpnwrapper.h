@@ -31,15 +31,15 @@ class MenuHolder;
 class QTimer;
 class TrayIcon;
 
-class NordVpnWraper : public QObject
+class NordVpnWrapper : public QObject
 {
     Q_OBJECT
 public:
-    static NordVpnWraper *instance();
+    static NordVpnWrapper *instance();
     static void init();
 
     CLICaller *bus() const;
-    ActionStorage *storate() const;
+    ActionStorage *storage() const;
     StateChecker *stateChecker() const;
 
     void connectTo(const QString &country, const QString &city);
@@ -65,7 +65,7 @@ private slots:
     void notifyError(const QString &errorMessage);
 
 private:
-    explicit NordVpnWraper(QObject *parent = {});
+    explicit NordVpnWrapper(QObject *parent = {});
 
     CLICaller *m_bus;
     ActionStorage *m_actions;
@@ -85,7 +85,7 @@ private:
 
     void start();
 
-    void processYangleAction(Action *action);
+    void processYanglAction(Action *action);
     void processNordVpnAction(Action *action);
     void processUserAction(Action *action);
 

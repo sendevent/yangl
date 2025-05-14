@@ -71,5 +71,5 @@ protected:
     void stopTimer();
 
     friend class TestStateChecker;
-    friend class NordVpnWraper;
+    friend class NordVpnWrapper;
 };

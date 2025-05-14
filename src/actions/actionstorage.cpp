@@ -391,7 +391,7 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
         wordsToList(QStringLiteral("set killswitch 1"));
         break;
     }
-    case Action::NordVPN::KillSwithcOff: {
+    case Action::NordVPN::KillSwitchOff: {
         title = QObject::tr("Kill Switch OFF");
         menuPlace = Action::MenuPlace::Own;
         wordsToList(QStringLiteral("set killswitch 0"));

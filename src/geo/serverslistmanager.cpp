@@ -20,7 +20,7 @@
 #include "actions/actionresultviewer.h"
 #include "actions/actionstorage.h"
 #include "app/common.h"
-#include "app/nordvpnwraper.h"
+#include "app/nordvpnwrapper.h"
 #include "cli/clicall.h"
 
 #include <QTimer>
@@ -32,7 +32,7 @@ struct JsonConsts {
     static constexpr QLatin1String ArgCountry = QLatin1String("cities");
 };
 
-ServersListManager::ServersListManager(NordVpnWraper *nordVpn, QObject *parent)
+ServersListManager::ServersListManager(NordVpnWrapper *nordVpn, QObject *parent)
     : QObject(parent)
     , m_nordVpn(nordVpn)
 {
@@ -61,7 +61,7 @@ bool ServersListManager::reload()
 
 QStringList ServersListManager::queryList(const QStringList &args) const
 {
-    const Action::Ptr &action = m_nordVpn->storate()->createUserAction({});
+    const Action::Ptr &action = m_nordVpn->storage()->createUserAction({});
     ActionResultViewer::unregisterAction(action.get());
     action->setTitle(tr("Servers list"));
     action->setForcedShow(false);
@@ -113,11 +113,11 @@ Places ServersListManager::queryCountries() const
 Places ServersListManager::queryCities(const QString &country) const
 {
     const auto &names = queryList({ JsonConsts::ArgCountry, country });
-    Places sities(names.size());
-    std::transform(names.begin(), names.end(), sities.begin(),
+    Places cities(names.size());
+    std::transform(names.begin(), names.end(), cities.begin(),
                    [&country](const auto &name) { return createPlace(country, name); });
 
-    return sities;
+    return cities;
 }
 
 void ServersListManager::run()

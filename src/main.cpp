@@ -15,7 +15,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
 */
 
-#include "app/nordvpnwraper.h"
+#include "app/nordvpnwrapper.h"
 #include "settings/appsettings.h"
 
 #include <QApplication>
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     a.setQuitOnLastWindowClosed(false);
 
     AppSettings::init();
-    NordVpnWraper::init();
+    NordVpnWrapper::init();
 
     return a.exec();
 }

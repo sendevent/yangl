@@ -24,7 +24,7 @@
 
 #include <QWidget>
 
-class NordVpnWraper;
+class NordVpnWrapper;
 class MapServersModel;
 class ServersFilterModel;
 class QLineEdit;
@@ -39,7 +39,7 @@ class ServersChartView : public QWidget
 
 public:
     ~ServersChartView();
-    static void makeVisible(NordVpnWraper *nordVpnWraper);
+    static void makeVisible(NordVpnWrapper *nordVpnWraper);
 
     void saveSettings();
 
@@ -60,7 +60,7 @@ protected:
 
 private:
     static QPointer<ServersChartView> m_instance;
-    explicit ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent = {});
+    explicit ServersChartView(NordVpnWrapper *nordVpnWraper, QWidget *parent = {});
 
     QLineEdit *m_searchBox { nullptr };
     QTreeView *m_treeView { nullptr };
@@ -68,14 +68,14 @@ private:
     QProgressBar *m_progressBar { nullptr };
     MapWidget *m_chartWidget { nullptr };
 
-    NordVpnWraper *m_nordVpnWraper { nullptr };
+    NordVpnWrapper *m_nordVpnWraper { nullptr };
     ServerLocationResolver *m_listManager { nullptr };
     MapServersModel *m_serversModel { nullptr };
     ServersFilterModel *m_serversFilterModel { nullptr };
     QTimer *m_timer { nullptr };
 
     void initUi();
-    void initConenctions();
+    void initConnections();
     void loadSettings();
 
     void requestServersList();
