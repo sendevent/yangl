@@ -18,7 +18,7 @@
 #include "serverschartview.h"
 
 #include "app/common.h"
-#include "app/nordvpnwraper.h"
+#include "app/nordvpnwrapper.h"
 #include "app/statechecker.h"
 #include "geo/flatplaceproxymodel.h"
 #include "geo/mapserversmodel.h"
@@ -38,7 +38,7 @@
 
 /*static*/ QPointer<ServersChartView> ServersChartView::m_instance = {};
 
-ServersChartView::ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent)
+ServersChartView::ServersChartView(NordVpnWrapper *nordVpnWraper, QWidget *parent)
     : QWidget(parent)
     , m_nordVpnWraper(nordVpnWraper)
     , m_listManager(new ServerLocationResolver(m_nordVpnWraper, this))
@@ -49,7 +49,7 @@ ServersChartView::ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent
     m_serversFilterModel->setSourceModel(m_serversModel);
 
     initUi();
-    initConenctions();
+    initConnections();
     loadSettings();
 
     requestServersList();
@@ -125,7 +125,7 @@ void ServersChartView::initUi()
     grid->addWidget(splitter);
 }
 
-void ServersChartView::initConenctions()
+void ServersChartView::initConnections()
 {
     connect(m_listManager, &ServerLocationResolver::serverLocationResolved, this, &ServersChartView::onGotLocation);
 
@@ -249,7 +249,7 @@ void ServersChartView::onStateChanged(const NordVpnInfo &info)
     m_chartWidget->setActiveConnection({ info.country(), info.city() });
 }
 
-/*static*/ void ServersChartView::makeVisible(NordVpnWraper *nordVpnWraper)
+/*static*/ void ServersChartView::makeVisible(NordVpnWrapper *nordVpnWraper)
 {
     if (!m_instance) {
         m_instance = new ServersChartView(nordVpnWraper);

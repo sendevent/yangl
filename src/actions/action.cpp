@@ -19,7 +19,7 @@
 
 #include "actionresultviewer.h"
 #include "app/common.h"
-#include "app/nordvpnwraper.h"
+#include "app/nordvpnwrapper.h"
 #include "cli/clicall.h"
 
 #include <QFileInfo>
@@ -69,7 +69,7 @@ Action::Action(Action::Flow scope, int type, QObject *parent, const Action::Id &
     connect(this, &Action::anchorChanged, this, &Action::changed);
 
     ActionResultViewer::registerAction(this);
-    NordVpnWraper::registerAction(this);
+    NordVpnWrapper::registerAction(this);
 }
 Action::~Action()
 {

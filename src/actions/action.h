@@ -65,7 +65,7 @@ public:
         SetNotifyOn,
 
         KillSwitchOn,
-        KillSwithcOff,
+        KillSwitchOff,
         CyberSecOn,
         CyberSecOff,
         ObfuscateOn,

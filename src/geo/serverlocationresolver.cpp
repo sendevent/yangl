@@ -28,7 +28,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 #include <QJsonObject>
 #include <QJsonParseError>
 
-ServerLocationResolver::ServerLocationResolver(NordVpnWraper *nordVpn, QObject *parent)
+ServerLocationResolver::ServerLocationResolver(NordVpnWrapper *nordVpn, QObject *parent)
     : QObject(parent)
     , m_listManager(new ServersListManager(nordVpn, this))
     , m_geoResolver(new CoordinatesResolver(this))
