@@ -19,6 +19,7 @@
 
 #include "actions/action.h"
 
+#include <QPointer>
 #include <QRunnable>
 #include <QThreadPool>
 
@@ -31,9 +32,14 @@ public:
     }
 
 private:
-    CLICall *m_call;
+    QPointer<CLICall> m_call;
 
-    void run() override { m_call->run(); }
+    void run() override
+    {
+        if (m_call) {
+            m_call->run();
+        }
+    }
 };
 
 CLICaller::CLICaller(QObject *parent)

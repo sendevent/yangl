@@ -28,6 +28,7 @@ class ServersListManager : public QObject
     Q_OBJECT
 public:
     explicit ServersListManager(NordVpnWraper *nordVpn, QObject *parent = {});
+    ~ServersListManager() override;
 
     bool reload();
 
