@@ -73,8 +73,11 @@ qrc_*.cpp
 *.dll
 *.exe
 
-# Manual build dir
+# Build dirs
 build
+manbuild/
+scriptbuild/
+.cache/
 
 #versioning
 *appversiondefs.h
