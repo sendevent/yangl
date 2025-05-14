@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.31)
 
 include(YanglVersionGen.cmake)
-include(CPackConfig.cmake)
 include(CollectSourceFiles.cmake)
 
 project(yangl
@@ -55,7 +54,3 @@ option(DISABLE_TESTS "Disable unit tests" ON)
 if(NOT DISABLE_TESTS)
     add_subdirectory(test)
 endif()
-
-install(TARGETS yangl
-    RUNTIME DESTINATION bin
-)

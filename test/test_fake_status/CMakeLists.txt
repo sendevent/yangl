@@ -16,5 +16,3 @@ target_include_directories(test_fake_status PRIVATE ${Qt6Core_INCLUDE_DIRS})
 set_target_properties(test_fake_status PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../tests"
 )
-
-# install(TARGETS test_fake_status DESTINATION /opt/test_fake_status/bin)
