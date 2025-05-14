@@ -39,6 +39,11 @@ ServersListManager::ServersListManager(NordVpnWraper *nordVpn, QObject *parent)
     connect(&m_futureWatcher, &QFutureWatcher<void>::finished, this, &ServersListManager::ready);
 }
 
+ServersListManager::~ServersListManager()
+{
+    m_futureWatcher.waitForFinished();
+}
+
 bool ServersListManager::reload()
 {
     if (!m_futureWatcher.isRunning()) {
