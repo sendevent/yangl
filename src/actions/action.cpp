@@ -180,7 +180,7 @@ CLICall *Action::createRequest(QString *errorMessageHandler)
 /*static*/ bool Action::isValidAppPath(const QString &path, QString *reason /*= nullptr*/)
 {
     if (path.isEmpty()) {
-        const QString msg = tr("Target binary path is empty");
+        const QString &msg = tr("Target binary path is empty");
         WRN << msg;
         if (reason) {
             *reason = msg;
@@ -190,7 +190,7 @@ CLICall *Action::createRequest(QString *errorMessageHandler)
 
     const QFileInfo info(path);
     if (!info.exists()) {
-        const QString msg = tr("Target binary file not exists: <br><b>`%1`</b>").arg(path);
+        const QString &msg = tr("Target binary file not exists: <br><b>`%1`</b>").arg(path);
         WRN << msg;
         if (reason) {
             *reason = msg;
@@ -199,7 +199,7 @@ CLICall *Action::createRequest(QString *errorMessageHandler)
     }
 
     if (!info.isExecutable()) {
-        const QString msg = tr("Target binary file file is not executable: `%1`").arg(path);
+        const QString &msg = tr("Target binary file file is not executable: `%1`").arg(path);
         WRN << msg;
         if (reason) {
             *reason = msg;

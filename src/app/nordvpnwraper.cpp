@@ -288,7 +288,6 @@ void NordVpnWraper::processUserAction(Action *action)
 void NordVpnWraper::processNordVpnAction(Action *action)
 {
     if (!isAcceptableAction(action, Action::Flow::NordVPN, Q_FUNC_INFO)) {
-
         notifyError(tr("Unexpected NordVpn action"));
         return;
     }
@@ -316,37 +315,28 @@ void NordVpnWraper::pause(Action::NordVPN action)
         return;
     }
 
-    int duration(0);
-    switch (action) {
-    case Action::NordVPN::Pause05: {
-        duration = 5;
-        break;
+    static const QHash<Action::NordVPN, int> durations {
+        { Action::NordVPN::PauseCustom, 0 },
+        { Action::NordVPN::Pause05, 5 },
+        { Action::NordVPN::Pause30, 30 },
+        { Action::NordVPN::Pause60, 60 },
+    };
+
+    int duration = durations.value(action, -1);
+    if (-1 == duration) {
+        notifyError(tr("Unexpected pause type: %1").arg(static_cast<int>(action)));
+        return;
     }
-    case Action::NordVPN::Pause30: {
-        duration = 30;
-        break;
-    }
-    case Action::NordVPN::Pause60: {
-        duration = 60;
-        break;
-    }
-    case Action::NordVPN::PauseCustom: {
+
+    if (0 == duration) {
         bool ok(false);
         duration = QInputDialog::getInt({}, qApp->applicationDisplayName(), tr("Pause VPN for minutes:"), 1, 1, 1440, 1,
                                         &ok);
         if (!ok) {
-            duration = 0;
+            return;
         }
-        break;
-    }
-    default: {
-        notifyError(tr("Unexpected pause type: %1").arg(static_cast<int>(action)));
-        return;
-    }
-    }
 
-    if (!duration) {
-        return;
+        // TODO: validate interval to be something sane
     }
 
     m_paused = duration * 60 * utils::oneSecondMs();

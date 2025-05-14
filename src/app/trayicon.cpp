@@ -26,8 +26,8 @@
 #include <QMetaEnum>
 #include <QPainter>
 #include <QPixmap>
+#include <QSystemTrayIcon>
 #include <QTextDocumentFragment>
-#include <qsystemtrayicon.h>
 
 /*static*/ QMap<NordVpnInfo::Status, TrayIcon::IconInfo> TrayIcon::m_allIcons = {};
 /*static*/ QMap<NordVpnInfo::Status, QIcon> TrayIcon::m_composedIcons = {};

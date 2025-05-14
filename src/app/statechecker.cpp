@@ -22,9 +22,9 @@
 #include "settings/appsettings.h"
 
 #include <QFutureWatcher>
+#include <QLatin1StringView>
 #include <QTimer>
 #include <QtConcurrentRun>
-#include <qlatin1stringview.h>
 
 /*static*/ const int StateChecker::DefaultIntervalMs = utils::oneSecondMs();
 
@@ -66,7 +66,7 @@ void StateChecker::setActive(bool active)
             check();
             m_timer->start();
         } else {
-            stopTimer();
+            stopTimer(); // sets Status::Unknown
         }
 
         AppSettings::Monitor->Active->write(active);
