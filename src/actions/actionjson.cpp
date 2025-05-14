@@ -50,6 +50,7 @@ void ActionJson::clear()
 
 bool ActionJson::load(const QString &from)
 {
+    LOG << from;
     m_json = {};
 
     QFile in(from);

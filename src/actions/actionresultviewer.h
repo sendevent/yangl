@@ -36,7 +36,7 @@ public:
 
 private slots:
     void onActionStarted(const Action::Id &id, const QString &app, const QStringList &args);
-    void onActionPerformed(const Action::Id &id, const QString &result, bool ok, const QString &info);
+    void onActionPerformed(const Action::Id &id, const QString &result, bool ok, const Action::RunInfo &info);
 
 private:
     static ActionResultViewer *instance();

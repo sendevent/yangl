@@ -19,6 +19,7 @@
 
 #include "actionresultviewer.h"
 #include "app/common.h"
+#include "app/nordvpnwraper.h"
 #include "cli/clicall.h"
 
 #include <QFileInfo>
@@ -68,6 +69,7 @@ Action::Action(Action::Flow scope, int type, QObject *parent, const Action::Id &
     connect(this, &Action::anchorChanged, this, &Action::changed);
 
     ActionResultViewer::registerAction(this);
+    NordVpnWraper::registerAction(this);
 }
 Action::~Action()
 {
@@ -153,35 +155,60 @@ void Action::setForcedShow(bool forced)
     }
 }
 
-CLICall *Action::createRequest()
+CLICall *Action::createRequest(QString *errorMessageHandler)
 {
-    if (!isValidAppPath(app())) {
-        return {};
+    CLICall *call { nullptr };
+
+    QString errorMessage;
+
+    if (isValidAppPath(app(), &errorMessage)) {
+        call = new CLICall(app(), args(), timeout(), this);
+        this->QObject::connect(call, &CLICall::ready, this, &Action::onResult);
+        this->QObject::connect(call, &CLICall::starting, this, &Action::onStart);
     }
 
-    auto call = new CLICall(app(), args(), timeout(), this);
-    this->QObject::connect(call, &CLICall::ready, this, &Action::onResult);
-    this->QObject::connect(call, &CLICall::starting, this, &Action::onStart);
+    if (!errorMessage.isEmpty()) {
+        if (errorMessageHandler) {
+            *errorMessageHandler = errorMessage;
+        }
+        emit invocationError(errorMessage);
+    }
 
     return call;
 }
 
-/*static*/ bool Action::isValidAppPath(const QString &path)
+/*static*/ bool Action::isValidAppPath(const QString &path, QString *reason /*= nullptr*/)
 {
     if (path.isEmpty()) {
-        WRN << "Emtpy path!";
+        const QString &msg = tr("Target binary path is empty");
+        WRN << msg;
+        if (reason) {
+            *reason = msg;
+        }
         return false;
     }
 
     const QFileInfo info(path);
     if (!info.exists()) {
-        WRN << "file not exists!" << path;
+        const QString &msg = tr("Target binary file not exists: <br><b>`%1`</b>").arg(path);
+        WRN << msg;
+        if (reason) {
+            *reason = msg;
+        }
         return false;
     }
 
     if (!info.isExecutable()) {
-        WRN << "file is not executable!" << path;
+        const QString &msg = tr("Target binary file file is not executable: `%1`").arg(path);
+        WRN << msg;
+        if (reason) {
+            *reason = msg;
+        }
         return false;
+    }
+
+    if (reason) {
+        *reason = {};
     }
 
     return true;
@@ -206,16 +233,12 @@ void Action::onResult(const QString &result)
         call->deleteLater();
     }
 
-    QString info = QString("%1 ").arg(YANGL_TIMESTAMP);
-    if (!result.isEmpty()) {
-        info.append(QString("<b>Result:</b><br>%1<br>").arg(QString(result).replace("\n", "<br>")));
-    }
-    if (exitCode) {
-        info.append(QString("<b>Exit code:</b> %1<br>").arg(exitCode));
-    }
-    if (!errors.isEmpty()) {
-        info.append(QString("<b>Errors:</b> %1<br>").arg(errors));
-    }
+    const RunInfo info {
+        YANGL_TIMESTAMP,
+        result,
+        exitCode ? QString::number(exitCode) : QString(),
+        errors,
+    };
 
     emit performed(m_id, result, !hasErrors, info);
 }

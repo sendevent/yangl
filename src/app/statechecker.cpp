@@ -22,6 +22,7 @@
 #include "settings/appsettings.h"
 
 #include <QFutureWatcher>
+#include <QLatin1StringView>
 #include <QTimer>
 #include <QtConcurrentRun>
 
@@ -45,7 +46,12 @@ StateChecker::~StateChecker() { }
 void StateChecker::setCheckAction(const Action::Ptr &action)
 {
     if (m_actCheck != action) {
+        if (m_actCheck) {
+            disconnect(m_actCheck.get(), &Action::performed, this, &StateChecker::onQueryFinish);
+        }
+
         m_actCheck = action;
+
         if (m_actCheck) {
             connect(m_actCheck.get(), &Action::performed, this, &StateChecker::onQueryFinish, Qt::UniqueConnection);
         }
@@ -60,8 +66,7 @@ void StateChecker::setActive(bool active)
             check();
             m_timer->start();
         } else {
-            m_timer->stop();
-            setStatus(NordVpnInfo::Status::Unknown);
+            stopTimer(); // sets Status::Unknown
         }
 
         AppSettings::Monitor->Active->write(active);
@@ -80,8 +85,9 @@ void StateChecker::setInterval(int msecs)
     m_timer->stop();
     m_timer->setInterval(msecs);
 
-    if (wasActive)
+    if (wasActive) {
         m_timer->start();
+    }
 }
 
 int StateChecker::interval() const
@@ -91,28 +97,27 @@ int StateChecker::interval() const
 
 void StateChecker::check()
 {
-    m_bus->performAction(m_actCheck.get());
+    if (!m_actCheck) {
+        notifyError(tr("Invalid Status-check Action instance"));
+    } else if (!m_bus->performAction(m_actCheck.get())) {
+        stopTimer(); // sets Status::Unknown
+    }
 }
 
-void StateChecker::onQueryFinish(const Action::Id & /*id*/, const QString &result, bool /*ok*/,
-                                 const QString & /*info*/)
+void StateChecker::onQueryFinish(const Action::Id &id, const QString &result, bool ok, const Action::RunInfo &info)
 {
-    auto future = QtConcurrent::run([this, result]() {
-        try {
-            updateState(result);
-        } catch (const std::exception &e) {
-            WRN << "Exception in async task:" << e.what();
+    if (ok) {
+        updateState(result);
+    } else {
+        QString message = tr("Action ivocation `%1` failed:").arg(id.toString());
+        if (!info.errors.isEmpty()) {
+            const auto &lineSeparator =
+                    QLatin1String(AppSettings::Tray->MessagePlainText->read().toBool() ? "\n" : "<br>");
+            message.append(lineSeparator);
+            message.append(utils::composeMessage(info));
         }
-    });
-
-    auto *watcher = new QFutureWatcher<void>(this);
-    QObject::connect(watcher, &QFutureWatcher<void>::finished, this, [future, watcher]() {
-        if (future.isCanceled()) {
-            WRN << "Async task was canceled!";
-        }
-        watcher->deleteLater();
-    });
-    watcher->setFuture(future);
+        notifyError(message);
+    }
 }
 
 void StateChecker::onTimeout()
@@ -134,8 +139,9 @@ void StateChecker::setState(const NordVpnInfo &state)
 {
     if (this->state() != state) {
         if (m_state.status() != state.status() || m_state.country() != state.country()
-            || m_state.city() != state.city())
+            || m_state.city() != state.city()) {
             emit statusChanged(state.status());
+        }
 
         m_state = state;
         emit stateChanged(m_state);
@@ -146,10 +152,24 @@ void StateChecker::setStatus(NordVpnInfo::Status status)
 {
     if (m_state.status() != status) {
         NordVpnInfo state;
-        if (status != NordVpnInfo::Status::Unknown)
+        if (status != NordVpnInfo::Status::Unknown) {
             state = m_state;
+        }
 
         state.setStatus(status);
         setState(state);
     }
+}
+
+void StateChecker::notifyError(const QString &errorMessage)
+{
+    WRN << errorMessage;
+    stopTimer(); // sets Status::Unknown
+    emit error(errorMessage);
+}
+
+void StateChecker::stopTimer()
+{
+    m_timer->stop();
+    setStatus(NordVpnInfo::Status::Unknown);
 }
