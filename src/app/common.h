@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "actions/action.h"
+
 #include <QDateTime>
 #include <QDebug>
 #include <QGeoCoordinate>
@@ -75,4 +77,5 @@ std::tuple<QGeoCoordinate, bool> parseCoordinates(const QString &latStr, const Q
 
 QString composeTitle(const QString &payload);
 
+QString composeMessage(const Action::RunInfo &actionInfo);
 } // ns utils

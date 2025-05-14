@@ -49,10 +49,11 @@ public slots:
 signals:
     void stateChanged(const NordVpnInfo &state);
     void statusChanged(const NordVpnInfo::Status status);
+    void error(const QString &message);
 
 private slots:
     void onTimeout();
-    void onQueryFinish(const Action::Id &id, const QString &result, bool ok, const QString &info);
+    void onQueryFinish(const Action::Id &id, const QString &result, bool ok, const Action::RunInfo &info);
 
 protected:
     CLICaller *m_bus;
@@ -64,6 +65,10 @@ protected:
     void setStatus(NordVpnInfo::Status status);
 
     void updateState(const QString &from);
+
+    void notifyError(const QString &errorMessage);
+
+    void stopTimer();
 
     friend class TestStateChecker;
     friend class NordVpnWraper;

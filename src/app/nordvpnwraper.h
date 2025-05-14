@@ -35,15 +35,16 @@ class NordVpnWraper : public QObject
 {
     Q_OBJECT
 public:
-    explicit NordVpnWraper(QObject *parent = {});
-
-    void start();
+    static NordVpnWraper *instance();
+    static void init();
 
     CLICaller *bus() const;
     ActionStorage *storate() const;
     StateChecker *stateChecker() const;
 
     void connectTo(const QString &country, const QString &city);
+
+    static void registerAction(Action *act);
 
 private slots:
     void prepareQuit();
@@ -61,7 +62,11 @@ private slots:
     void onStatusChanged(NordVpnInfo::Status status);
     void onPauseTimer();
 
+    void notifyError(const QString &errorMessage);
+
 private:
+    explicit NordVpnWraper(QObject *parent = {});
+
     CLICaller *m_bus;
     ActionStorage *m_actions;
     StateChecker *m_checker;
@@ -77,6 +82,8 @@ private:
     void updateActions(bool connected);
 
     void initMenu();
+
+    void start();
 
     void processYangleAction(Action *action);
     void processNordVpnAction(Action *action);

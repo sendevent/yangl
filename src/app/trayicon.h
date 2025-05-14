@@ -34,6 +34,10 @@ public:
 
     void updateIcon(NordVpnInfo::Status status);
 
+    void updateTooltip(const QString &text);
+    void updateStateText(const QString &message, QSystemTrayIcon::MessageIcon messageType);
+    void updateStateText(const QString &message, const QIcon &icon);
+
 public slots:
     void setState(const NordVpnInfo &state);
 

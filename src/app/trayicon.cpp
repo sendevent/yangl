@@ -17,6 +17,7 @@
 
 #include "trayicon.h"
 
+#include "app/common.h"
 #include "settings/appsettings.h"
 
 #include <QApplication>
@@ -25,6 +26,7 @@
 #include <QMetaEnum>
 #include <QPainter>
 #include <QPixmap>
+#include <QSystemTrayIcon>
 #include <QTextDocumentFragment>
 
 /*static*/ QMap<NordVpnInfo::Status, TrayIcon::IconInfo> TrayIcon::m_allIcons = {};
@@ -96,13 +98,15 @@
 }
 
 TrayIcon::TrayIcon(QObject *parent)
-    : QSystemTrayIcon(iconForStatus(NordVpnInfo::Status::Unknown), parent)
+    : QSystemTrayIcon(parent)
     , m_isFirstChange(true)
 {
     deployDefaults();
     reloadIcons();
 
-    updateIcon(NordVpnInfo::Status::Unknown);
+    const auto &icon = iconForStatus(NordVpnInfo::Status::Unknown);
+    updateStateText(tr("State: Unknown"), icon);
+    setIcon(icon);
 }
 
 /*static*/ QIcon TrayIcon::iconForState(const NordVpnInfo &state)
@@ -131,25 +135,22 @@ void TrayIcon::updateIcon(NordVpnInfo::Status status)
 void TrayIcon::setState(const NordVpnInfo &state)
 {
     const auto &stateText = state.toString();
+    bool skeepMessage(false);
     if (m_state.status() != state.status() && !qApp->isSavingSession()) {
         updateIcon(state.status());
 
-        bool skeepMessage(false);
         if (m_isFirstChange && state.status() == NordVpnInfo::Status::Connected)
             if (AppSettings::Monitor->Active->read().toBool()
                 && AppSettings::Tray->IgnoreFirstConnected->read().toBool()) {
                 skeepMessage = true;
             }
-
-        if (!skeepMessage) {
-            const QString &description = AppSettings::Tray->MessagePlainText->read().toBool()
-                    ? QTextDocumentFragment::fromHtml(stateText).toPlainText()
-                    : stateText;
-            showMessage(qApp->applicationDisplayName(), description, iconForState(state), m_duration);
-        }
     }
 
-    setToolTip(QTextDocumentFragment::fromHtml(stateText).toPlainText()); // always plaintext
+    if (skeepMessage) {
+        updateTooltip(stateText);
+    } else {
+        updateStateText(stateText, iconForState(state));
+    }
 
     m_state = state;
     m_isFirstChange = false;
@@ -175,5 +176,35 @@ void TrayIcon::deployDefaults() const
                 QFile::copy(resourceFile, fsFile);
             }
         }
+    }
+}
+
+void TrayIcon::updateTooltip(const QString &text)
+{
+    const QString &sanitized = QTextDocumentFragment::fromHtml(text).toPlainText();
+    setToolTip(sanitized);
+}
+
+void TrayIcon::updateStateText(const QString &message, QSystemTrayIcon::MessageIcon messageType)
+{
+    const QString &tooltip = QTextDocumentFragment::fromHtml(message).toPlainText();
+    setToolTip(tooltip);
+
+    if (messageType != QSystemTrayIcon::NoIcon) {
+        const bool forcePlainText = AppSettings::Tray->MessagePlainText->read().toBool();
+        const auto &sanitized = forcePlainText ? tooltip : message;
+        showMessage(qApp->applicationDisplayName(), sanitized, messageType, m_duration);
+    }
+}
+
+void TrayIcon::updateStateText(const QString &message, const QIcon &icon)
+{
+    const QString &tooltip = QTextDocumentFragment::fromHtml(message).toPlainText();
+    setToolTip(tooltip);
+
+    if (!icon.isNull()) {
+        const bool forcePlainText = AppSettings::Tray->MessagePlainText->read().toBool();
+        const auto &sanitized = forcePlainText ? tooltip : message;
+        showMessage(qApp->applicationDisplayName(), sanitized, icon, m_duration);
     }
 }
