@@ -1,6 +1,6 @@
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
-[![qt5](https://img.shields.io/badge/qt-5-green.svg)](https://shields.io/)
-[![cpp11](https://img.shields.io/badge/c%2B%2B-14-brightgreen)](https://shields.io/)
+[![qt6](https://img.shields.io/badge/qt-6-green.svg)](https://www.qt.io/)
+[![cpp23](https://img.shields.io/badge/c%2B%2B-23-brightgreen)](https://en.cppreference.com/w/cpp/23)
 
 # yangl
 
@@ -103,6 +103,3 @@ Its messages and tooltip (when in *Connected* state) provide advanced info about
 
 # Build
 See [BUILD.md](./BUILD.md)
-
-# Install 
-See [INSTALL.md](./INSTALL.md) **(TBD)**

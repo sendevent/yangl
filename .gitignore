@@ -38,14 +38,7 @@ qrc_*.cpp
 *.creator.user
 *.creator.user.*
 *.creator.*
-*.pro.user*
-*.qbs.user
-*.qbs.user.*
-/.qmake.cache
-/.qmake.stash
 *.prl
-
-lgpl.lic.qtc
 
 # xemacs temporary files
 *.flc
@@ -82,10 +75,6 @@ lgpl.lic.qtc
 
 # Manual build dir
 build
-
-#SNAP's
-*.snap
-yangl.metainfo.xml
 
 #versioning
 *appversiondefs.h
