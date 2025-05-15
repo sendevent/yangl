@@ -17,18 +17,16 @@
 
 #include "nordvpnwrapper.h"
 
-#include "aboutdialog.h"
 #include "actions/actionresultviewer.h"
 #include "actions/actionstorage.h"
+#include "app/appuicoordinator.h"
 #include "app/common.h"
 #include "app/menuholder.h"
 #include "app/pausecontroller.h"
 #include "app/statechecker.h"
 #include "app/trayicon.h"
 #include "cli/clicaller.h"
-#include "geo/serverschartview.h"
 #include "settings/appsettings.h"
-#include "settings/settingsdialog.h"
 
 #include <QApplication>
 #include <QFutureWatcher>
@@ -42,15 +40,21 @@ NordVpnWrapper::NordVpnWrapper(QObject *parent)
     , m_trayIcon(new TrayIcon(this))
     , m_menuHolder(new MenuHolder(this))
     , m_pauseCtrl(new PauseController(m_actions, m_checker, this))
-    , m_mapView({})
+    , m_uiCoordinator(new AppUiCoordinator(this, m_actions, m_checker, this))
 {
     connect(qApp, &QApplication::aboutToQuit, this, &NordVpnWrapper::prepareQuit);
     connect(m_pauseCtrl, &PauseController::requestAction, this, &NordVpnWrapper::onActionTriggered);
     connect(m_checker, &StateChecker::stateChanged, m_trayIcon, &TrayIcon::setState);
     connect(m_checker, &StateChecker::statusChanged, this, &NordVpnWrapper::onStatusChanged);
     connect(m_checker, &StateChecker::error, this, &NordVpnWrapper::notifyError);
-    connect(m_trayIcon, &QSystemTrayIcon::activated, this, &NordVpnWrapper::onTrayIconActivated);
+    connect(m_trayIcon, &QSystemTrayIcon::activated, m_uiCoordinator, &AppUiCoordinator::onTrayIconActivated);
     connect(m_menuHolder, &MenuHolder::actionTriggered, this, &NordVpnWrapper::onActionTriggered);
+    connect(m_uiCoordinator, &AppUiCoordinator::settingsAccepted, this, [this]() { start(); });
+    connect(m_uiCoordinator, &AppUiCoordinator::actionRequested, this, [this](int actionType) {
+        if (const Action::Ptr &action = m_actions->action(static_cast<Action::NordVPN>(actionType))) {
+            onActionTriggered(action.get());
+        }
+    });
 
     m_trayIcon->setVisible(true);
 }
@@ -125,7 +129,7 @@ void NordVpnWrapper::loadSettings()
     m_trayIcon->setMessageDuration(AppSettings::Tray->MessageDuration->read().toInt() * utils::oneSecondMs());
 
     if (AppSettings::Map->Visible->read().toBool()) {
-        showMapView();
+        m_uiCoordinator->showMapView();
     }
 }
 
@@ -134,59 +138,13 @@ void NordVpnWrapper::prepareQuit()
     disconnect(m_trayIcon);
     disconnect(m_checker);
 
-    const bool visible = m_mapView ? m_mapView->isVisible() : false;
-    AppSettings::Map->Visible->write(visible);
+    m_uiCoordinator->saveState();
     AppSettings::sync();
 }
 
 void NordVpnWrapper::performStatusCheck()
 {
     m_checker->check();
-}
-
-void NordVpnWrapper::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason)
-{
-    Action::NordVPN invokeMe(Action::NordVPN::Unknown);
-    switch (reason) {
-    case QSystemTrayIcon::Trigger: {
-        if (!m_mapView) {
-            showMapView();
-        } else {
-            m_mapView->activateWindow();
-            m_mapView->raise();
-        }
-        return;
-    }
-    case QSystemTrayIcon::MiddleClick: {
-        switch (m_checker->state().status()) {
-        case NordVpnInfo::Status::Connected: {
-            invokeMe = Action::NordVPN::Disconnect;
-            break;
-        }
-        case NordVpnInfo::Status::Disconnected: {
-            invokeMe = Action::NordVPN::Connect;
-            break;
-        }
-        case NordVpnInfo::Status::Unknown: {
-            invokeMe = Action::NordVPN::CheckStatus;
-            break;
-        }
-        default:
-            return;
-        }
-        break;
-    }
-    default:
-        return;
-    }
-
-    if (invokeMe == Action::NordVPN::Unknown) {
-        return;
-    }
-
-    if (const Action::Ptr &action = m_actions->action(invokeMe)) {
-        onActionTriggered(action.get());
-    }
 }
 
 void NordVpnWrapper::onActionTriggered(Action *action)
@@ -237,15 +195,15 @@ void NordVpnWrapper::processYanglAction(Action *action)
     const Action::Yangl actType = static_cast<Action::Yangl>(action->type());
     switch (actType) {
     case Action::Yangl::ShowMap: {
-        showMapView();
+        m_uiCoordinator->showMapView();
         break;
     }
     case Action::Yangl::ShowSettings: {
-        showSettingsEditor();
+        m_uiCoordinator->showSettingsEditor();
         break;
     }
     case Action::Yangl::ShowLog: {
-        showLog();
+        m_uiCoordinator->showLog();
         break;
     }
     case Action::Yangl::Activated: {
@@ -253,7 +211,7 @@ void NordVpnWrapper::processYanglAction(Action *action)
         break;
     }
     case Action::Yangl::ShowAbout: {
-        showAbout();
+        m_uiCoordinator->showAbout();
         break;
     }
     case Action::Yangl::Quit: {
@@ -399,33 +357,6 @@ void NordVpnWrapper::connectTo(const QString &country, const QString &city)
         watcher->deleteLater();
     });
     watcher->setFuture(future);
-}
-
-void NordVpnWrapper::showMapView()
-{
-    ServersChartView::makeVisible(this);
-}
-
-void NordVpnWrapper::showSettingsEditor()
-{
-    if (auto dlg = SettingsDialog::makeVisible(m_actions)) {
-        connect(dlg, &QDialog::finished, this, [this](int result) {
-            if (result == QDialog::Accepted) {
-                start();
-            }
-        });
-        dlg->open();
-    }
-}
-
-void NordVpnWrapper::showLog()
-{
-    ActionResultViewer::makeVisible();
-}
-
-void NordVpnWrapper::showAbout()
-{
-    AboutDialog::makeVisible(nullptr);
 }
 
 void NordVpnWrapper::notifyError(const QString &errorMessage)

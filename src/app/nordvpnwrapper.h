@@ -21,9 +21,9 @@
 #include "app/nordvpninfo.h"
 
 #include <QObject>
-#include <QPointer>
 #include <QSystemTrayIcon>
 
+class AppUiCoordinator;
 class CLICaller;
 class ActionStorage;
 class StateChecker;
@@ -49,14 +49,7 @@ public:
 private slots:
     void prepareQuit();
 
-    void showMapView();
-    void showSettingsEditor();
-    void showLog();
-    void showAbout();
-
     void performStatusCheck();
-
-    void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
     void onActionTriggered(Action *action);
     void onStatusChanged(NordVpnInfo::Status status);
@@ -72,7 +65,7 @@ private:
     TrayIcon *m_trayIcon;
     MenuHolder *m_menuHolder;
     PauseController *m_pauseCtrl;
-    QPointer<QWidget> m_mapView;
+    AppUiCoordinator *m_uiCoordinator;
     void loadSettings();
 
     void updateActions(bool connected);
