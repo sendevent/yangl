@@ -75,6 +75,8 @@ QString nvpnToGeo(const QString &name);
 
 std::tuple<QGeoCoordinate, bool> parseCoordinates(const QString &latStr, const QString &lonStr);
 
+bool isValidAppPath(const QString &path, QString *reason = nullptr);
+
 QString composeTitle(const QString &payload);
 
 QString composeMessage(const Action::RunInfo &actionInfo);
