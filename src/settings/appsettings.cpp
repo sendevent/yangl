@@ -17,7 +17,6 @@
 
 #include "appsettings.h"
 
-#include "actions/clicallresultview.h"
 #include "app/common.h"
 #include "app/statechecker.h"
 #include "geo/mapwidget.h"
@@ -64,7 +63,7 @@ GroupMonitor::GroupMonitor()
                            new AppSetting(QString("%1/Active").arg(localName()), false),
                            new AppSetting(QString("%1/EditorGeometry").arg(localName())),
                            new AppSetting(QString("%1/LogLinesLimit").arg(localName()),
-                                          CLICallResultView::MaxBlocksCountDefault),
+                                          utils::DefaultLogLinesLimit),
                    },
                    {})
 {

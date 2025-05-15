@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "app/common.h"
+
 #include <QTextBrowser>
 
 class QAction;
@@ -24,7 +26,7 @@ class CLICallResultView : public QTextBrowser
 {
     Q_OBJECT
 public:
-    static constexpr int MaxBlocksCountDefault = 1000;
+    static constexpr int MaxBlocksCountDefault = utils::DefaultLogLinesLimit;
 
     CLICallResultView(int maxBlcockCount = CLICallResultView::MaxBlocksCountDefault, QWidget *parent = nullptr);
 
