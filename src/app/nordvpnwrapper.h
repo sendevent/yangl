@@ -21,7 +21,6 @@
 #include "app/nordvpninfo.h"
 
 #include <QObject>
-#include <QSystemTrayIcon>
 
 class AppUiCoordinator;
 class CLICaller;
@@ -48,8 +47,6 @@ public:
 
 private slots:
     void prepareQuit();
-
-    void performStatusCheck();
 
     void onActionTriggered(Action *action);
     void onStatusChanged(NordVpnInfo::Status status);

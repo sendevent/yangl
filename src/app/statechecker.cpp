@@ -21,10 +21,7 @@
 #include "cli/clicaller.h"
 #include "settings/appsettings.h"
 
-#include <QFutureWatcher>
-#include <QLatin1StringView>
 #include <QTimer>
-#include <QtConcurrentRun>
 
 /*static*/ const int StateChecker::DefaultIntervalMs = utils::oneSecondMs();
 
