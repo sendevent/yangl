@@ -17,9 +17,7 @@
 
 #include "action.h"
 
-#include "actionresultviewer.h"
 #include "app/common.h"
-#include "app/nordvpnwrapper.h"
 #include "cli/clicall.h"
 
 
@@ -66,14 +64,9 @@ Action::Action(Action::Flow scope, int type, QObject *parent, const Action::Id &
     connect(this, &Action::timeoutChanged, this, &Action::changed);
     connect(this, &Action::forcedShowChanged, this, &Action::changed);
     connect(this, &Action::anchorChanged, this, &Action::changed);
+}
+Action::~Action() = default;
 
-    ActionResultViewer::registerAction(this);
-    NordVpnWrapper::registerAction(this);
-}
-Action::~Action()
-{
-    ActionResultViewer::unregisterAction(this);
-}
 Action::Flow Action::scope() const
 {
     return m_scope;

@@ -18,7 +18,9 @@
 #include "actionstorage.h"
 
 #include "actionjson.h"
+#include "actionresultviewer.h"
 #include "app/common.h"
+#include "app/nordvpnwrapper.h"
 #include "cli/clicall.h"
 #include "settings/appsettings.h"
 
@@ -463,8 +465,11 @@ Action::Ptr ActionStorage::createAction(Action::Flow scope, int type, const Acti
         break;
     }
 
-    if (!action)
+    if (!action) {
         action = Action::Ptr(new Action(scope, type, parent, id));
+        ActionResultViewer::registerAction(action.get());
+        NordVpnWrapper::registerAction(action.get());
+    }
 
     if (!appPath.isEmpty())
         action->setApp(appPath);
