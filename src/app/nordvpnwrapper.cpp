@@ -142,11 +142,6 @@ void NordVpnWrapper::prepareQuit()
     AppSettings::sync();
 }
 
-void NordVpnWrapper::performStatusCheck()
-{
-    m_checker->check();
-}
-
 void NordVpnWrapper::onActionTriggered(Action *action)
 {
     if (!action) {
