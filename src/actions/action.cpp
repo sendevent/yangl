@@ -22,7 +22,6 @@
 #include "app/nordvpnwrapper.h"
 #include "cli/clicall.h"
 
-#include <QFileInfo>
 
 /*static*/ const QString Action::GroupKeyYangl { QStringLiteral("yangl") };
 /*static*/ const QString Action::GroupKeyBuiltin { QStringLiteral("builtin") };
@@ -161,7 +160,7 @@ CLICall *Action::createRequest(QString *errorMessageHandler)
 
     QString errorMessage;
 
-    if (isValidAppPath(app(), &errorMessage)) {
+    if (utils::isValidAppPath(app(), &errorMessage)) {
         call = new CLICall(app(), args(), timeout(), this);
         this->QObject::connect(call, &CLICall::ready, this, &Action::onResult);
         this->QObject::connect(call, &CLICall::starting, this, &Action::onStart);
@@ -177,41 +176,9 @@ CLICall *Action::createRequest(QString *errorMessageHandler)
     return call;
 }
 
-/*static*/ bool Action::isValidAppPath(const QString &path, QString *reason /*= nullptr*/)
+/*static*/ bool Action::isValidAppPath(const QString &path, QString *reason)
 {
-    if (path.isEmpty()) {
-        const QString &msg = tr("Target binary path is empty");
-        WRN << msg;
-        if (reason) {
-            *reason = msg;
-        }
-        return false;
-    }
-
-    const QFileInfo info(path);
-    if (!info.exists()) {
-        const QString &msg = tr("Target binary file not exists: <br><b>`%1`</b>").arg(path);
-        WRN << msg;
-        if (reason) {
-            *reason = msg;
-        }
-        return false;
-    }
-
-    if (!info.isExecutable()) {
-        const QString &msg = tr("Target binary file file is not executable: `%1`").arg(path);
-        WRN << msg;
-        if (reason) {
-            *reason = msg;
-        }
-        return false;
-    }
-
-    if (reason) {
-        *reason = {};
-    }
-
-    return true;
+    return utils::isValidAppPath(path, reason);
 }
 
 void Action::onStart(const QString &app, const QStringList &args)
