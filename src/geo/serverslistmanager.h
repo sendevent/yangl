@@ -22,12 +22,12 @@
 #include <QFutureWatcher>
 #include <QObject>
 
-class NordVpnWrapper;
+class ActionStorage;
 class ServersListManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit ServersListManager(NordVpnWrapper *nordVpn, QObject *parent = {});
+    explicit ServersListManager(ActionStorage *actionStorage, QObject *parent = {});
     ~ServersListManager() override;
 
     bool reload();
@@ -41,7 +41,7 @@ private slots:
     void run();
 
 private:
-    NordVpnWrapper *m_nordVpn;
+    ActionStorage *m_actionStorage;
     QFutureWatcher<void> m_futureWatcher;
 
     Places queryGroups() const;

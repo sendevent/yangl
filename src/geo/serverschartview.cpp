@@ -17,6 +17,7 @@
 
 #include "serverschartview.h"
 
+#include "actions/actionstorage.h"
 #include "app/common.h"
 #include "app/nordvpnwrapper.h"
 #include "app/statechecker.h"
@@ -41,7 +42,7 @@
 ServersChartView::ServersChartView(NordVpnWrapper *nordVpnWraper, QWidget *parent)
     : QWidget(parent)
     , m_nordVpnWraper(nordVpnWraper)
-    , m_listManager(new ServerLocationResolver(m_nordVpnWraper, this))
+    , m_listManager(new ServerLocationResolver(m_nordVpnWraper->storage(), this))
     , m_serversModel(new MapServersModel(this))
     , m_serversFilterModel(new ServersFilterModel(this))
     , m_timer(new QTimer(this))

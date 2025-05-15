@@ -20,7 +20,6 @@
 #include "actions/actionresultviewer.h"
 #include "actions/actionstorage.h"
 #include "app/common.h"
-#include "app/nordvpnwrapper.h"
 #include "cli/clicall.h"
 
 #include <QTimer>
@@ -32,9 +31,9 @@ struct JsonConsts {
     static constexpr QLatin1String ArgCountry = QLatin1String("cities");
 };
 
-ServersListManager::ServersListManager(NordVpnWrapper *nordVpn, QObject *parent)
+ServersListManager::ServersListManager(ActionStorage *actionStorage, QObject *parent)
     : QObject(parent)
-    , m_nordVpn(nordVpn)
+    , m_actionStorage(actionStorage)
 {
     connect(&m_futureWatcher, &QFutureWatcher<void>::finished, this, &ServersListManager::ready);
 }
@@ -61,7 +60,7 @@ bool ServersListManager::reload()
 
 QStringList ServersListManager::queryList(const QStringList &args) const
 {
-    const Action::Ptr &action = m_nordVpn->storage()->createUserAction({});
+    const Action::Ptr &action = m_actionStorage->createUserAction({});
     ActionResultViewer::unregisterAction(action.get());
     action->setTitle(tr("Servers list"));
     action->setForcedShow(false);

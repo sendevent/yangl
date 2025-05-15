@@ -21,7 +21,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 
 #include <QObject>
 
-class NordVpnWrapper;
+class ActionStorage;
 class ServersListManager;
 class CoordinatesResolver;
 
@@ -29,7 +29,7 @@ class ServerLocationResolver : public QObject
 {
     Q_OBJECT
 public:
-    ServerLocationResolver(NordVpnWrapper *nordVpn, QObject *parent = {});
+    ServerLocationResolver(ActionStorage *actionStorage, QObject *parent = {});
 
 public slots:
     void refresh();
