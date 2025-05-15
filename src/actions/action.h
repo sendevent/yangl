@@ -22,7 +22,6 @@
 #include <QSharedPointer>
 #include <QUuid>
 
-class QTextBrowser;
 class CLICall;
 class ActionStorage;
 class Action : public QObject
@@ -176,7 +175,6 @@ protected:
     QStringList m_args;
     int m_timeout;
     bool m_forceShow;
-    QPointer<QTextBrowser> m_display;
     MenuPlace m_menuPlace;
 };
 
