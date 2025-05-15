@@ -17,6 +17,7 @@
 
 #include "common.h"
 
+#include "geo/placeinfo.h"
 #include "settings/appsettings.h"
 #include "version/appversiondefs.h"
 
@@ -29,8 +30,7 @@ namespace utils {
 
 QString groupsTitle()
 {
-    static const QString &title = QObject::tr("Groups");
-    return title;
+    return geo::groupsTitle();
 }
 
 QString ensureDirExists(const QString &path)
