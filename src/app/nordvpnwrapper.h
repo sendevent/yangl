@@ -28,7 +28,7 @@ class CLICaller;
 class ActionStorage;
 class StateChecker;
 class MenuHolder;
-class QTimer;
+class PauseController;
 class TrayIcon;
 
 class NordVpnWrapper : public QObject
@@ -60,7 +60,6 @@ private slots:
 
     void onActionTriggered(Action *action);
     void onStatusChanged(NordVpnInfo::Status status);
-    void onPauseTimer();
 
     void notifyError(const QString &errorMessage);
 
@@ -72,12 +71,9 @@ private:
     StateChecker *m_checker;
     TrayIcon *m_trayIcon;
     MenuHolder *m_menuHolder;
-    QTimer *m_pauseTimer;
-    int m_paused;
+    PauseController *m_pauseCtrl;
     QPointer<QWidget> m_mapView;
     void loadSettings();
-
-    void pause(Action::NordVPN action);
 
     void updateActions(bool connected);
 
