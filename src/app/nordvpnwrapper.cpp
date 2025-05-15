@@ -22,6 +22,7 @@
 #include "actions/actionstorage.h"
 #include "app/common.h"
 #include "app/menuholder.h"
+#include "app/pausecontroller.h"
 #include "app/statechecker.h"
 #include "app/trayicon.h"
 #include "cli/clicaller.h"
@@ -31,8 +32,6 @@
 
 #include <QApplication>
 #include <QFutureWatcher>
-#include <QInputDialog>
-#include <QTimer>
 #include <QtConcurrentRun>
 
 NordVpnWrapper::NordVpnWrapper(QObject *parent)
@@ -42,17 +41,16 @@ NordVpnWrapper::NordVpnWrapper(QObject *parent)
     , m_checker(new StateChecker(m_bus, AppSettings::Monitor->Interval->read().toInt()))
     , m_trayIcon(new TrayIcon(this))
     , m_menuHolder(new MenuHolder(this))
-    , m_pauseTimer(new QTimer(this))
-    , m_paused(0)
+    , m_pauseCtrl(new PauseController(m_actions, m_checker, this))
     , m_mapView({})
 {
     connect(qApp, &QApplication::aboutToQuit, this, &NordVpnWrapper::prepareQuit);
+    connect(m_pauseCtrl, &PauseController::requestAction, this, &NordVpnWrapper::onActionTriggered);
     connect(m_checker, &StateChecker::stateChanged, m_trayIcon, &TrayIcon::setState);
     connect(m_checker, &StateChecker::statusChanged, this, &NordVpnWrapper::onStatusChanged);
     connect(m_checker, &StateChecker::error, this, &NordVpnWrapper::notifyError);
     connect(m_trayIcon, &QSystemTrayIcon::activated, this, &NordVpnWrapper::onTrayIconActivated);
     connect(m_menuHolder, &MenuHolder::actionTriggered, this, &NordVpnWrapper::onActionTriggered);
-    connect(m_pauseTimer, &QTimer::timeout, this, &NordVpnWrapper::onPauseTimer);
 
     m_trayIcon->setVisible(true);
 }
@@ -298,7 +296,7 @@ void NordVpnWrapper::processNordVpnAction(Action *action)
     case Action::NordVPN::Pause30:
     case Action::NordVPN::Pause60:
     case Action::NordVPN::PauseCustom: {
-        pause(actType);
+        m_pauseCtrl->pause(actType);
         return;
     }
     default: {
@@ -309,81 +307,9 @@ void NordVpnWrapper::processNordVpnAction(Action *action)
     m_bus->runCall(action->createRequest());
 }
 
-void NordVpnWrapper::pause(Action::NordVPN action)
-{
-    if (m_paused) {
-        return;
-    }
-
-    static const QHash<Action::NordVPN, int> durations {
-        { Action::NordVPN::PauseCustom, 0 },
-        { Action::NordVPN::Pause05, 5 },
-        { Action::NordVPN::Pause30, 30 },
-        { Action::NordVPN::Pause60, 60 },
-    };
-
-    int duration = durations.value(action, -1);
-    if (-1 == duration) {
-        notifyError(tr("Unexpected pause type: %1").arg(static_cast<int>(action)));
-        return;
-    }
-
-    if (0 == duration) {
-        bool ok(false);
-        duration = QInputDialog::getInt({}, qApp->applicationDisplayName(), tr("Pause VPN for minutes:"), 1, 1, 1440, 1,
-                                        &ok);
-        if (!ok) {
-            return;
-        }
-
-        // TODO: validate interval to be something sane
-    }
-
-    m_paused = duration * 60 * utils::oneSecondMs();
-
-    if (auto disconnect = m_actions->action(Action::NordVPN::Disconnect)) {
-        onActionTriggered(disconnect.get());
-        m_pauseTimer->start(utils::oneSecondMs());
-    }
-}
-
-void NordVpnWrapper::onPauseTimer()
-{
-    m_paused -= utils::oneSecondMs();
-
-    if (m_paused > 0) {
-        return;
-    }
-
-    m_pauseTimer->stop();
-    const NordVpnInfo &currentState = m_checker->state();
-    if (currentState.status() == NordVpnInfo::Status::Unknown
-        || currentState.status() == NordVpnInfo::Status::Disconnected) {
-        if (auto connect = m_actions->action(Action::NordVPN::Connect)) {
-            onActionTriggered(connect.get());
-        }
-    }
-    m_paused = 0;
-}
-
 void NordVpnWrapper::onStatusChanged(NordVpnInfo::Status status)
 {
-    bool connected = false;
-
-    switch (status) {
-    case NordVpnInfo::Status::Connected: {
-        connected = true;
-        if (m_pauseTimer->isActive()) {
-            m_pauseTimer->stop();
-            m_paused = 0;
-        }
-        break;
-    }
-    default:
-        break;
-    }
-
-    updateActions(connected);
+    updateActions(status == NordVpnInfo::Status::Connected);
 }
 
 void NordVpnWrapper::updateActions(bool connected)
@@ -424,7 +350,7 @@ void NordVpnWrapper::updateActions(bool connected)
                 case Action::NordVPN::Pause30:
                 case Action::NordVPN::Pause60:
                 case Action::NordVPN::PauseCustom: {
-                    qAction->setEnabled(connected && !m_pauseTimer->isActive());
+                    qAction->setEnabled(connected && !m_pauseCtrl->isPaused());
                     break;
                 }
                 default:
