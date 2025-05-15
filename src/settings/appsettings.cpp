@@ -19,7 +19,7 @@
 
 #include "app/common.h"
 #include "app/statechecker.h"
-#include "geo/mapwidget.h"
+#include <QGeoServiceProvider>
 #include "settings/settingsmanager.h"
 
 #include <QSettings>
@@ -80,7 +80,7 @@ GroupMap::GroupMap()
                            new AppSetting(QString("%1/Scale").arg(localName()), 2.5),
                            new AppSetting(QString("%1/Plugin").arg(localName()),
                                           []() {
-                                              const auto &plugins = MapWidget::geoServices();
+                                              const auto &plugins = QGeoServiceProvider::availableServiceProviders();
                                               return plugins.size() ? plugins.first() : "osm";
                                           }()),
                            new AppSetting(QString("%1/Type").arg(localName()), 6),
