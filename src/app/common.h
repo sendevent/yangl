@@ -52,6 +52,8 @@ inline int oneSecondMs()
     return 1000;
 }
 
+constexpr int DefaultLogLinesLimit = 1000;
+
 QString groupsTitle();
 
 template<typename SomeQEnum>
