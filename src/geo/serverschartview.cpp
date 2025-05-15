@@ -268,6 +268,11 @@ void ServersChartView::onStateChanged(const NordVpnInfo &info)
     }
 }
 
+/*static*/ ServersChartView *ServersChartView::instance()
+{
+    return m_instance;
+}
+
 void ServersChartView::handleLocationReadingPorgress(int current, int total)
 {
     const bool finished = current == total;

@@ -40,6 +40,7 @@ class ServersChartView : public QWidget
 public:
     ~ServersChartView();
     static void makeVisible(NordVpnWrapper *nordVpnWraper);
+    static ServersChartView *instance();
 
     void saveSettings();
 
