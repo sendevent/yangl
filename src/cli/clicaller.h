@@ -21,17 +21,13 @@
 
 #include <QObject>
 
-class Action;
 class CLICaller : public QObject
 {
     Q_OBJECT
 public:
     explicit CLICaller(QObject *parent = {});
 
-    bool performAction(Action *action);
+    bool runCall(CLICall *call);
 
 signals:
-
-private:
-    bool runQuery(CLICall *call);
 };
