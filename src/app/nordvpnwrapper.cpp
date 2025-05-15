@@ -277,7 +277,7 @@ void NordVpnWrapper::processUserAction(Action *action)
     if (!isAcceptableAction(action, Action::Flow::Custom, Q_FUNC_INFO)) {
         errorMessage = tr("Received instance is not a valid User Action");
     } else {
-        m_bus->performAction(action);
+        m_bus->runCall(action->createRequest());
     }
 
     if (!errorMessage.isEmpty()) {
@@ -306,7 +306,7 @@ void NordVpnWrapper::processNordVpnAction(Action *action)
     }
     }
 
-    m_bus->performAction(action);
+    m_bus->runCall(action->createRequest());
 }
 
 void NordVpnWrapper::pause(Action::NordVPN action)
