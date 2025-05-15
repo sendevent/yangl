@@ -54,6 +54,7 @@ inline int oneSecondMs()
 
 constexpr int DefaultLogLinesLimit = 1000;
 
+// Deprecated: use geo::groupsTitle() from geo/placeinfo.h instead
 QString groupsTitle();
 
 template<typename SomeQEnum>

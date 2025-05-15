@@ -17,8 +17,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 
 #include "placeinfo.h"
 
-#include "app/common.h"
-
 #include <qqml.h>
 
 static const int registered = []() {
@@ -26,7 +24,17 @@ static const int registered = []() {
     return qRegisterMetaType<PlaceInfo>("PlaceInfo");
 }();
 
+namespace geo {
+
+QString groupsTitle()
+{
+    static const QString &title = QObject::tr("Groups");
+    return title;
+}
+
+} // namespace geo
+
 bool PlaceInfo::isGroup() const
 {
-    return 0 == country.compare(utils::groupsTitle(), Qt::CaseInsensitive);
+    return 0 == country.compare(geo::groupsTitle(), Qt::CaseInsensitive);
 }
