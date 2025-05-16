@@ -115,7 +115,7 @@ Rectangle {
                 {
                     id: markerRect
 
-                    property bool active: marker.place.country === currenCountry && marker.place.town === currenCity;
+                    property bool active: isActiveConnection || false
 
                     clip: true
 

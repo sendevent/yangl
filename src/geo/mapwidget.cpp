@@ -51,13 +51,12 @@ static QString defaultMapPluginName()
 MapWidget::MapWidget(const QString &mapPlugin, int mapType, FlatPlaceProxyModel *model, QWidget *parent)
     : QWidget(parent)
     , m_quickView(new QQuickWidget(this))
+    , m_markerModel(model)
 {
     if (model) {
         setRootContextProperty("markerModel", QVariant::fromValue(model));
     }
     setRootContextProperty("pluginName", mapPlugin);
-    setRootContextProperty("currenCountry", QString());
-    setRootContextProperty("currenCity", QString());
 
     LOG << mapPlugin << mapType;
 
@@ -106,8 +105,9 @@ QStringList MapWidget::supportedMapTypes() const
 
 void MapWidget::setActiveConnection(const PlaceInfo &marker)
 {
-    setRootContextProperty("currenCountry", marker.country);
-    setRootContextProperty("currenCity", marker.town);
+    if (m_markerModel) {
+        m_markerModel->setActivePlace(marker.country, marker.town);
+    }
 }
 
 void MapWidget::syncMapSize()

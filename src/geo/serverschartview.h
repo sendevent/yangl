@@ -85,6 +85,7 @@ private:
 
     void requestServersList();
 
+    PlaceInfo findActivePlace(const QString &country, const QString &city) const;
     void requestConnection(const PlaceInfo &place);
 
     void handleLocationReadingPorgress(int current, int total);

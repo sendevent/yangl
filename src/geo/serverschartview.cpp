@@ -256,7 +256,7 @@ void ServersChartView::requestConnection(const PlaceInfo &place)
 
 void ServersChartView::onStateChanged(const NordVpnInfo &info)
 {
-    m_chartWidget->setActiveConnection({ info.country(), info.city() });
+    m_chartWidget->setActiveConnection(findActivePlace(info.country(), info.city()));
     m_activeState = info;
 
     if (info.status() == NordVpnInfo::Status::Connected && !info.country().isEmpty()) {
@@ -284,7 +284,7 @@ void ServersChartView::navigateToConnection()
     for (int i = 0; i < m_serversModel->rowCount(); ++i) {
         const auto &countryIndex = m_serversModel->index(i, 0);
         const auto &place = countryIndex.data(MapServersModel::Roles::PlaceInfoRole).value<PlaceInfo>();
-        if (place.country != country) {
+        if (place.country.compare(country, Qt::CaseInsensitive) != 0) {
             continue;
         }
 
@@ -292,7 +292,7 @@ void ServersChartView::navigateToConnection()
         for (int j = 0; j < m_serversModel->rowCount(countryIndex); ++j) {
             const auto &cityIndex = m_serversModel->index(j, 0, countryIndex);
             const auto &cityPlace = cityIndex.data(MapServersModel::Roles::PlaceInfoRole).value<PlaceInfo>();
-            if (cityPlace.town == city) {
+            if (cityPlace.town.compare(city, Qt::CaseInsensitive) == 0) {
                 targetIndex = cityIndex;
                 break;
             }
@@ -310,6 +310,37 @@ void ServersChartView::navigateToConnection()
         m_treeView->setCurrentIndex(filterIndex);
         m_treeView->scrollTo(filterIndex, QTreeView::PositionAtCenter);
     }
+}
+
+PlaceInfo ServersChartView::findActivePlace(const QString &country, const QString &city) const
+{
+    if (country.isEmpty()) {
+        return {};
+    }
+
+    for (int i = 0; i < m_serversModel->rowCount(); ++i) {
+        const auto &countryIndex = m_serversModel->index(i, 0);
+        const auto &countryPlace = countryIndex.data(MapServersModel::Roles::PlaceInfoRole).value<PlaceInfo>();
+        if (countryPlace.country.compare(country, Qt::CaseInsensitive) != 0) {
+            continue;
+        }
+
+        if (city.isEmpty()) {
+            return countryPlace;
+        }
+
+        for (int j = 0; j < m_serversModel->rowCount(countryIndex); ++j) {
+            const auto &cityIndex = m_serversModel->index(j, 0, countryIndex);
+            const auto &cityPlace = cityIndex.data(MapServersModel::Roles::PlaceInfoRole).value<PlaceInfo>();
+            if (cityPlace.town.compare(city, Qt::CaseInsensitive) == 0) {
+                return cityPlace;
+            }
+        }
+
+        return countryPlace;
+    }
+
+    return {};
 }
 
 /*static*/ void ServersChartView::makeVisible(NordVpnWrapper *nordVpnWraper)
