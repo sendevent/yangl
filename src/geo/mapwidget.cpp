@@ -171,7 +171,7 @@ qreal MapWidget::scale() const
 
 void MapWidget::setMapType(int mapTypeId)
 {
-    setRootContextProperty("mapType", mapTypeId);
+    setRootContextProperty("mapType", qMax(0, mapTypeId));
 }
 
 void MapWidget::setMapType(const QString &mapTypeName)
