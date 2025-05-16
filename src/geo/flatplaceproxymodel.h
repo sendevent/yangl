@@ -30,6 +30,7 @@ public:
         CountryNameRole,
         CityNameRole,
         PlaceInfoRole,
+        ActiveRole,
     };
 
     explicit FlatPlaceProxyModel(QObject *parent = nullptr);
@@ -45,8 +46,12 @@ public:
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
     QModelIndex parent(const QModelIndex &child) const override;
 
+    void setActivePlace(const QString &country, const QString &city);
+
 private:
     QVector<QModelIndex> m_places;
+    QString m_activeCountry;
+    QString m_activeCity;
 
     void insertSubtree(const QModelIndex &parent);
 

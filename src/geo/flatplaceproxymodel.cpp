@@ -160,6 +160,9 @@ QVariant FlatPlaceProxyModel::data(const QModelIndex &index, int role) const
         case FlatPlaceProxyModel::Roles::PlaceInfoRole: {
             return QVariant::fromValue(place);
         }
+        case FlatPlaceProxyModel::Roles::ActiveRole: {
+            return place.country == m_activeCountry && place.town == m_activeCity;
+        }
         default:
             break;
         }
@@ -175,6 +178,7 @@ QHash<int, QByteArray> FlatPlaceProxyModel::roleNames() const
         { CountryNameRole, "country" },
         { CityNameRole, "city" },
         { PlaceInfoRole, "placeInfo" },
+        { ActiveRole, "isActiveConnection" },
     };
 }
 
@@ -208,5 +212,39 @@ void FlatPlaceProxyModel::onRowsInserted(const QModelIndex &parent, int first, i
         beginInsertRows(QModelIndex(), m_places.size(), m_places.size() + places.size() - 1);
         m_places.append(places);
         endInsertRows();
+    }
+}
+
+void FlatPlaceProxyModel::setActivePlace(const QString &country, const QString &city)
+{
+    if (m_activeCountry == country && m_activeCity == city) {
+        return;
+    }
+
+    int oldRow = -1;
+    int newRow = -1;
+    for (int i = 0; i < m_places.size(); ++i) {
+        const auto &place = m_places.at(i).data(MapServersModel::PlaceInfoRole).value<PlaceInfo>();
+        if (oldRow < 0 && place.country == m_activeCountry && place.town == m_activeCity) {
+            oldRow = i;
+        }
+        if (newRow < 0 && place.country == country && place.town == city) {
+            newRow = i;
+        }
+        if (oldRow >= 0 && newRow >= 0) {
+            break;
+        }
+    }
+
+    m_activeCountry = country;
+    m_activeCity = city;
+
+    if (oldRow >= 0) {
+        const auto &idx = index(oldRow, 0);
+        emit dataChanged(idx, idx, { ActiveRole });
+    }
+    if (newRow >= 0) {
+        const auto &idx = index(newRow, 0);
+        emit dataChanged(idx, idx, { ActiveRole });
     }
 }
