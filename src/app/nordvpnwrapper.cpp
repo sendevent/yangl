@@ -83,7 +83,7 @@ NordVpnWrapper::NordVpnWrapper(QObject *parent)
 void NordVpnWrapper::initMenu()
 {
     const auto &actions = m_actions->load();
-    QMenu *menu = m_menuHolder->createMenu(actions);
+    auto *const menu = m_menuHolder->createMenu(actions);
     m_trayIcon->setContextMenu(menu);
 }
 
@@ -274,13 +274,13 @@ void NordVpnWrapper::updateActions(bool connected)
         }
 
         const auto &actions = menu->actions();
-        for (const auto qAction : actions) {
+        for (auto *qAction : actions) {
             if (auto subMenu = qAction->menu()) {
                 manageMenuActionsEnablement(subMenu);
                 continue;
             }
 
-            if (auto action = qAction->data().value<Action *>()) {
+            if (const auto *action = qAction->data().value<Action *>()) {
                 if (action->scope() != Action::Flow::NordVPN) {
                     continue;
                 }
@@ -322,7 +322,7 @@ void NordVpnWrapper::connectTo(const QString &country, const QString &city)
 {
     LOG << country << city;
 
-    auto future = QtConcurrent::run([country, city, this]() -> bool {
+    const auto &future = QtConcurrent::run([country, city, this]() -> bool {
         try {
             const Action::Ptr &action = storage()->createUserAction({});
             action->setTitle(tr("Geo Connection"));

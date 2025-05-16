@@ -45,7 +45,7 @@ QString ensureDirExists(const QString &path)
     if (!dir.exists())
         dir.mkpath(dir.absolutePath());
 
-    const QString res = info.absoluteFilePath();
+    const QString &res = info.absoluteFilePath();
     return res;
 }
 
