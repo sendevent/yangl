@@ -34,9 +34,8 @@ PauseController::PauseController(ActionStorage *storage, StateChecker *checker, 
     , m_paused(0)
 {
     connect(m_pauseTimer, &QTimer::timeout, this, &PauseController::onPauseTimer);
-    connect(m_checker, &StateChecker::statusChanged, this, [this](NordVpnInfo::Status status) {
-        onStatusChanged(static_cast<int>(status));
-    });
+    connect(m_checker, &StateChecker::statusChanged, this,
+            [this](NordVpnInfo::Status status) { onStatusChanged(static_cast<int>(status)); });
 }
 
 bool PauseController::isPaused() const

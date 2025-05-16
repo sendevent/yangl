@@ -162,7 +162,7 @@ void NordVpnWrapper::onActionTriggered(Action *action)
 }
 
 /*static*/ bool NordVpnWrapper::isAcceptableAction(const Action *action, Action::Flow expectedFlow,
-                                                  const QString &callerInfo)
+                                                   const QString &callerInfo)
 {
     if (!action) {
         WRN << "No action!" << callerInfo;
