@@ -27,6 +27,7 @@
 class NordVpnWrapper;
 class MapServersModel;
 class ServersFilterModel;
+class QLabel;
 class QLineEdit;
 class QTreeView;
 class QToolButton;
@@ -54,6 +55,7 @@ private slots:
     void onTreeItemDoubleclicked(const QModelIndex &current);
 
     void onMarkerDoubleclicked(const PlaceInfo &place);
+    void navigateToConnection();
     void saveServerLocationsCache();
 
 protected:
@@ -63,6 +65,7 @@ private:
     static QPointer<ServersChartView> m_instance;
     explicit ServersChartView(NordVpnWrapper *nordVpnWraper, QWidget *parent = {});
 
+    QLabel *m_connectionLabel { nullptr };
     QLineEdit *m_searchBox { nullptr };
     QTreeView *m_treeView { nullptr };
     QToolButton *m_buttonReload { nullptr };
@@ -74,6 +77,7 @@ private:
     MapServersModel *m_serversModel { nullptr };
     ServersFilterModel *m_serversFilterModel { nullptr };
     QTimer *m_timer { nullptr };
+    NordVpnInfo m_activeState;
 
     void initUi();
     void initConnections();
