@@ -128,6 +128,8 @@ void NordVpnWrapper::loadSettings()
     m_checker->setInterval(AppSettings::Monitor->Interval->read().toInt());
     m_trayIcon->setMessageDuration(AppSettings::Tray->MessageDuration->read().toInt() * utils::oneSecondMs());
 
+    m_lastServer = AppSettings::Monitor->LastServer->read().toString();
+
     if (AppSettings::Map->Visible->read().toBool()) {
         m_uiCoordinator->showMapView();
     }
@@ -252,6 +254,17 @@ void NordVpnWrapper::processNordVpnAction(Action *action)
         m_pauseCtrl->pause(actType);
         return;
     }
+    case Action::NordVPN::Connect: {
+        if (!m_lastServer.isEmpty()) {
+            const Action::Ptr &reconnect = m_actions->createUserAction({});
+            reconnect->setTitle(tr("Reconnect"));
+            reconnect->setForcedShow(false);
+            reconnect->setArgs({ QStringLiteral("c"), m_lastServer });
+            m_bus->runCall(reconnect->createRequest());
+            return;
+        }
+        break;
+    }
     default: {
         break;
     }
@@ -262,6 +275,14 @@ void NordVpnWrapper::processNordVpnAction(Action *action)
 
 void NordVpnWrapper::onStatusChanged(NordVpnInfo::Status status)
 {
+    if (status == NordVpnInfo::Status::Connected) {
+        const auto &server = m_checker->state().server();
+        if (!server.isEmpty()) {
+            m_lastServer = server;
+            AppSettings::Monitor->LastServer->write(m_lastServer);
+        }
+    }
+
     updateActions(status == NordVpnInfo::Status::Connected);
 }
 
