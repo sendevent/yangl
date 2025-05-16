@@ -28,7 +28,7 @@ MenuHolder::MenuHolder(QObject *parent)
 {
 }
 
-QAction *MenuHolder::yangleAction(Action::Yangl act) const
+QAction *MenuHolder::yanglAction(Action::Yangl act) const
 {
     const auto &collection = m_qActions[Action::Flow::Yangl];
     const auto found = std::find_if(collection.cbegin(), collection.cend(), [&act](const QAction *qAction) {

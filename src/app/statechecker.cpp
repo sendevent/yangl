@@ -21,10 +21,7 @@
 #include "cli/clicaller.h"
 #include "settings/appsettings.h"
 
-#include <QFutureWatcher>
-#include <QLatin1StringView>
 #include <QTimer>
-#include <QtConcurrentRun>
 
 /*static*/ const int StateChecker::DefaultIntervalMs = utils::oneSecondMs();
 
@@ -99,7 +96,7 @@ void StateChecker::check()
 {
     if (!m_actCheck) {
         notifyError(tr("Invalid Status-check Action instance"));
-    } else if (!m_bus->performAction(m_actCheck.get())) {
+    } else if (!m_bus->runCall(m_actCheck->createRequest())) {
         stopTimer(); // sets Status::Unknown
     }
 }

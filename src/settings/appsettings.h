@@ -60,6 +60,7 @@ public:
     const AppSetting *Active = Options[2];
     const AppSetting *SettingsDialog = Options[3];
     const AppSetting *LogLinesLimit = Options[4];
+    const AppSetting *LastServer = Options[5];
 
 private:
     GroupMonitor(const GroupMonitor &) = delete;

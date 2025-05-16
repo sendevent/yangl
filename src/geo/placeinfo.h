@@ -20,6 +20,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 #include <QGeoCoordinate>
 #include <QObject>
 
+namespace geo {
+QString groupsTitle();
+} // namespace geo
+
 struct PlaceInfo {
 
     QString country;

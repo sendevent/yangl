@@ -17,7 +17,7 @@
 
 #include "apppatheditor.h"
 
-#include "actions/action.h"
+#include "app/common.h"
 
 #include <QFileDialog>
 #include <QHBoxLayout>
@@ -57,7 +57,7 @@ void AppPathEditor::onAppPathChanged(const QString &text)
     m_pathEdit->setToolTip(text);
     QPalette p = m_pathEdit->palette();
     const QColor clr =
-            Action::isValidAppPath(text) ? m_pathEdit->style()->standardPalette().color(QPalette::Base) : Qt::red;
+            utils::isValidAppPath(text) ? m_pathEdit->style()->standardPalette().color(QPalette::Base) : Qt::red;
     if (p.color(QPalette::Base) != clr) {
         p.setColor(QPalette::Base, clr);
         m_pathEdit->setPalette(p);

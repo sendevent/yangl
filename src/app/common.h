@@ -52,6 +52,9 @@ inline int oneSecondMs()
     return 1000;
 }
 
+constexpr int DefaultLogLinesLimit = 1000;
+
+// Deprecated: use geo::groupsTitle() from geo/placeinfo.h instead
 QString groupsTitle();
 
 template<typename SomeQEnum>
@@ -74,6 +77,8 @@ QString geoToNvpn(const QString &name);
 QString nvpnToGeo(const QString &name);
 
 std::tuple<QGeoCoordinate, bool> parseCoordinates(const QString &latStr, const QString &lonStr);
+
+bool isValidAppPath(const QString &path, QString *reason = nullptr);
 
 QString composeTitle(const QString &payload);
 
