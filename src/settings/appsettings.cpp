@@ -19,9 +19,9 @@
 
 #include "app/common.h"
 #include "app/statechecker.h"
-#include <QGeoServiceProvider>
 #include "settings/settingsmanager.h"
 
+#include <QGeoServiceProvider>
 #include <QSettings>
 #include <QStandardPaths>
 
@@ -62,8 +62,7 @@ GroupMonitor::GroupMonitor()
                            new AppSetting(QString("%1/Interval").arg(localName()), StateChecker::DefaultIntervalMs),
                            new AppSetting(QString("%1/Active").arg(localName()), false),
                            new AppSetting(QString("%1/EditorGeometry").arg(localName())),
-                           new AppSetting(QString("%1/LogLinesLimit").arg(localName()),
-                                          utils::DefaultLogLinesLimit),
+                           new AppSetting(QString("%1/LogLinesLimit").arg(localName()), utils::DefaultLogLinesLimit),
                    },
                    {})
 {

@@ -20,7 +20,6 @@
 #include "app/common.h"
 #include "cli/clicall.h"
 
-
 /*static*/ const QString Action::GroupKeyYangl { QStringLiteral("yangl") };
 /*static*/ const QString Action::GroupKeyBuiltin { QStringLiteral("builtin") };
 /*static*/ const QString Action::GroupKeyCustom { QStringLiteral("custom") };
