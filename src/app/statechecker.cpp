@@ -135,12 +135,14 @@ NordVpnInfo StateChecker::state() const
 void StateChecker::setState(const NordVpnInfo &state)
 {
     if (this->state() != state) {
-        if (m_state.status() != state.status() || m_state.country() != state.country()
-            || m_state.city() != state.city()) {
-            emit statusChanged(state.status());
-        }
+        const bool statusDetailsChanged = m_state.status() != state.status()
+                || m_state.country() != state.country() || m_state.city() != state.city();
 
         m_state = state;
+
+        if (statusDetailsChanged) {
+            emit statusChanged(state.status());
+        }
         emit stateChanged(m_state);
     }
 }
