@@ -121,7 +121,7 @@ Places ServersListManager::queryCities(const QString &country) const
 
 void ServersListManager::run()
 {
-    QFuture<void> future = QtConcurrent::run([this]() { this->runSeparated(); });
+    const auto &future = QtConcurrent::run([this]() { this->runSeparated(); });
 
     m_futureWatcher.setFuture(future);
 }
@@ -133,7 +133,6 @@ void ServersListManager::runSeparated()
     emit citiesCount(total);
     notifyPlacesAdded(groups);
 
-    QList<Places> chunks { groups };
     const auto &countries = queryCountries();
     for (const auto &country : countries) {
         const auto &chunk = queryCities(country.country);

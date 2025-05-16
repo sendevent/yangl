@@ -153,7 +153,7 @@ void ActionStorage::loadYanglActions()
             jsonYanglActionsById.insert(static_cast<Action::Yangl>(action->type()), action);
 
     const auto &actionTypes = Action::yanglActions();
-    for (auto actionType : actionTypes) {
+    for (const auto actionType : actionTypes) {
         if (const auto &action = jsonYanglActionsById.value(actionType, {})) {
             m_yanglActions[actionType] = action;
             jsonYanglActionsById.remove(actionType);
@@ -185,7 +185,7 @@ void ActionStorage::loadBuiltinActions()
     }
 
     const auto &actions = Action::nvpnActions();
-    for (auto actionType : actions) {
+    for (const auto actionType : actions) {
         if (const auto &action = jsonBuiltinActionsById.value(actionType, {})) {
             m_nvpnActions[actionType] = action;
             jsonBuiltinActionsById.remove(actionType);

@@ -148,8 +148,8 @@ void ServersChartView::loadSettings()
 {
     m_searchBox->setText(AppSettings::Map->Filter->read().toString());
 
-    const auto [coord, parsed] = utils::parseCoordinates(AppSettings::Map->CenterLat->read().toString(),
-                                                         AppSettings::Map->CenterLon->read().toString());
+    const auto &[coord, parsed] = utils::parseCoordinates(AppSettings::Map->CenterLat->read().toString(),
+                                                          AppSettings::Map->CenterLon->read().toString());
     if (parsed) {
         m_chartWidget->centerOn(coord);
     }
@@ -169,7 +169,7 @@ void ServersChartView::saveSettings()
     AppSettings::Map->Geometry->write(saveGeometry());
     AppSettings::Map->Filter->write(m_searchBox->text());
 
-    const QGeoCoordinate coord = m_chartWidget->center();
+    const QGeoCoordinate &coord = m_chartWidget->center();
     AppSettings::Map->CenterLat->write(coord.latitude());
     AppSettings::Map->CenterLon->write(coord.longitude());
 

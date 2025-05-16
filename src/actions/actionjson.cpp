@@ -162,10 +162,10 @@ Action::Ptr ActionJson::actionFromJson(const QJsonObject &json) const
 
     const auto scope = static_cast<Action::Flow>(json[JsonAction::Scope].toInt());
     const auto type = json[JsonAction::Type].toInt();
-    const Action::Id id = Action::Id(json[JsonAction::Id].toString());
-    const auto app = json[JsonAction::App].toString();
-    const auto title = json[JsonAction::Title].toString();
-    const auto args = [&json]() {
+    const Action::Id &id = Action::Id(json[JsonAction::Id].toString());
+    const auto &app = json[JsonAction::App].toString();
+    const auto &title = json[JsonAction::Title].toString();
+    const auto &args = [&json]() {
         QStringList strList;
         const auto &array = json[JsonAction::Args].toArray();
         strList.reserve(array.size());
