@@ -76,4 +76,6 @@ private:
     void processUserAction(Action *action);
 
     static bool isAcceptableAction(const Action *action, Action::Flow expectedFlow, const QString &callerInfo);
+
+    QString m_lastServer;
 };

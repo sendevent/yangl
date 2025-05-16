@@ -208,6 +208,11 @@ QString NordVpnInfo::toString() const
     return text;
 }
 
+QString NordVpnInfo::server() const
+{
+    return m_server;
+}
+
 QString NordVpnInfo::country() const
 {
     return m_country;
