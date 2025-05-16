@@ -82,7 +82,7 @@ GroupMap::GroupMap()
                                               const auto &plugins = QGeoServiceProvider::availableServiceProviders();
                                               return plugins.size() ? plugins.first() : "osm";
                                           }()),
-                           new AppSetting(QString("%1/Type").arg(localName()), 6),
+                           new AppSetting(QString("%1/Type").arg(localName()), 0),
                    },
                    {})
 {

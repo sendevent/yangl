@@ -9,8 +9,19 @@ Rectangle {
     id: mapView
     property alias mapCenter : map.center
     property alias mapScale: map.zoomLevel
+    property var validMapTypes: []
 
     signal markerDoubleclicked(placeInfo anObject)
+
+    function updateValidMapTypes() {
+        var result = [];
+        for (var i = 0; i < map.supportedMapTypes.length; ++i) {
+            if (map.supportedMapTypes[i].style !== MapType.NoMap) {
+                result.push(map.supportedMapTypes[i]);
+            }
+        }
+        validMapTypes = result;
+    }
 
     Plugin {
         id: mapPlugin
@@ -26,10 +37,16 @@ Rectangle {
         id: map
         anchors.fill: parent
         plugin: mapPlugin
-        activeMapType: supportedMapTypes[ mapType ]
+        activeMapType: {
+            var idx = Math.max(0, Math.min(mapType, mapView.validMapTypes.length - 1));
+            if (mapView.validMapTypes.length > 0)
+                return mapView.validMapTypes[idx];
+            return supportedMapTypes[0];
+        }
         zoomLevel: 2.5
         property geoCoordinate startCentroid
 
+        onSupportedMapTypesChanged: mapView.updateValidMapTypes()
 
         MapItemView{
             model: markerModel
@@ -166,8 +183,8 @@ Rectangle {
     function listMapTypes()
     {
         var res = [];
-        for( var i = 0; i < map.supportedMapTypes.length; ++i)
-            res[i] = map.supportedMapTypes[i].name
+        for (var i = 0; i < validMapTypes.length; ++i)
+            res[i] = validMapTypes[i].name;
 
         return res;
     }
