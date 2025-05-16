@@ -63,7 +63,8 @@ GroupMonitor::GroupMonitor()
                            new AppSetting(QString("%1/Active").arg(localName()), false),
                            new AppSetting(QString("%1/EditorGeometry").arg(localName())),
                            new AppSetting(QString("%1/LogLinesLimit").arg(localName()), utils::DefaultLogLinesLimit),
-                           new AppSetting(QString("%1/LastServer").arg(localName()), QString()),
+                           new AppSetting(QString("%1/LastCountry").arg(localName()), QString()),
+                           new AppSetting(QString("%1/LastCity").arg(localName()), QString()),
                    },
                    {})
 {
