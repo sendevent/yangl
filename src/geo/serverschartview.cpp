@@ -17,8 +17,9 @@
 
 #include "serverschartview.h"
 
+#include "actions/actionstorage.h"
 #include "app/common.h"
-#include "app/nordvpnwraper.h"
+#include "app/nordvpnwrapper.h"
 #include "app/statechecker.h"
 #include "geo/flatplaceproxymodel.h"
 #include "geo/mapserversmodel.h"
@@ -29,6 +30,7 @@
 #include <QCompleter>
 #include <QHideEvent>
 #include <QItemSelectionModel>
+#include <QLabel>
 #include <QLineEdit>
 #include <QProgressBar>
 #include <QSplitter>
@@ -38,10 +40,10 @@
 
 /*static*/ QPointer<ServersChartView> ServersChartView::m_instance = {};
 
-ServersChartView::ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent)
+ServersChartView::ServersChartView(NordVpnWrapper *nordVpnWraper, QWidget *parent)
     : QWidget(parent)
     , m_nordVpnWraper(nordVpnWraper)
-    , m_listManager(new ServerLocationResolver(m_nordVpnWraper, this))
+    , m_listManager(new ServerLocationResolver(m_nordVpnWraper->storage(), this))
     , m_serversModel(new MapServersModel(this))
     , m_serversFilterModel(new ServersFilterModel(this))
     , m_timer(new QTimer(this))
@@ -49,7 +51,7 @@ ServersChartView::ServersChartView(NordVpnWraper *nordVpnWraper, QWidget *parent
     m_serversFilterModel->setSourceModel(m_serversModel);
 
     initUi();
-    initConenctions();
+    initConnections();
     loadSettings();
 
     requestServersList();
@@ -70,6 +72,12 @@ void ServersChartView::initUi()
 
     auto serversProxyModle = new FlatPlaceProxyModel(this);
     serversProxyModle->setSourceModel(m_serversModel);
+
+    m_connectionLabel = new QLabel(leftView);
+    m_connectionLabel->setTextFormat(Qt::RichText);
+    m_connectionLabel->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+    m_connectionLabel->setCursor(Qt::PointingHandCursor);
+    m_connectionLabel->setVisible(false);
 
     m_searchBox = new QLineEdit(leftView);
     auto focusAction = new QAction(m_searchBox);
@@ -112,6 +120,7 @@ void ServersChartView::initUi()
                                   AppSettings::Map->MapType->read().toInt(), serversProxyModle, this);
     m_chartWidget->init();
 
+    leftVBox->addWidget(m_connectionLabel);
     leftVBox->addWidget(m_searchBox);
     leftVBox->addWidget(m_treeView);
     leftVBox->addItem(hBox);
@@ -125,9 +134,10 @@ void ServersChartView::initUi()
     grid->addWidget(splitter);
 }
 
-void ServersChartView::initConenctions()
+void ServersChartView::initConnections()
 {
     connect(m_listManager, &ServerLocationResolver::serverLocationResolved, this, &ServersChartView::onGotLocation);
+    connect(m_connectionLabel, &QLabel::linkActivated, this, &ServersChartView::navigateToConnection);
 
     connect(m_treeView->selectionModel(), &QItemSelectionModel::currentChanged, this,
             [this](const QModelIndex &current, const QModelIndex &) { onCurrentTreeItemChanged(current); });
@@ -147,8 +157,8 @@ void ServersChartView::loadSettings()
 {
     m_searchBox->setText(AppSettings::Map->Filter->read().toString());
 
-    const auto [coord, parsed] = utils::parseCoordinates(AppSettings::Map->CenterLat->read().toString(),
-                                                         AppSettings::Map->CenterLon->read().toString());
+    const auto &[coord, parsed] = utils::parseCoordinates(AppSettings::Map->CenterLat->read().toString(),
+                                                          AppSettings::Map->CenterLon->read().toString());
     if (parsed) {
         m_chartWidget->centerOn(coord);
     }
@@ -168,7 +178,7 @@ void ServersChartView::saveSettings()
     AppSettings::Map->Geometry->write(saveGeometry());
     AppSettings::Map->Filter->write(m_searchBox->text());
 
-    const QGeoCoordinate coord = m_chartWidget->center();
+    const QGeoCoordinate &coord = m_chartWidget->center();
     AppSettings::Map->CenterLat->write(coord.latitude());
     AppSettings::Map->CenterLon->write(coord.longitude());
 
@@ -247,9 +257,62 @@ void ServersChartView::requestConnection(const PlaceInfo &place)
 void ServersChartView::onStateChanged(const NordVpnInfo &info)
 {
     m_chartWidget->setActiveConnection({ info.country(), info.city() });
+    m_activeState = info;
+
+    if (info.status() == NordVpnInfo::Status::Connected && !info.country().isEmpty()) {
+        const auto &label = info.city().isEmpty() ? info.country()
+                                                  : QString("%1 — %2").arg(info.country(), info.city());
+        m_connectionLabel->setText(
+                tr("<a href='#' style='text-decoration:none; color:palette(link)'>&#9889; %1</a>").arg(label));
+        m_connectionLabel->setToolTip(info.server().isEmpty() ? label : info.server());
+        m_connectionLabel->setVisible(true);
+    } else {
+        m_connectionLabel->setVisible(false);
+    }
 }
 
-/*static*/ void ServersChartView::makeVisible(NordVpnWraper *nordVpnWraper)
+void ServersChartView::navigateToConnection()
+{
+    if (m_activeState.status() != NordVpnInfo::Status::Connected) {
+        return;
+    }
+
+    const auto &country = m_activeState.country();
+    const auto &city = m_activeState.city();
+
+    QModelIndex targetIndex;
+    for (int i = 0; i < m_serversModel->rowCount(); ++i) {
+        const auto &countryIndex = m_serversModel->index(i, 0);
+        const auto &place = countryIndex.data(MapServersModel::Roles::PlaceInfoRole).value<PlaceInfo>();
+        if (place.country != country) {
+            continue;
+        }
+
+        targetIndex = countryIndex;
+        for (int j = 0; j < m_serversModel->rowCount(countryIndex); ++j) {
+            const auto &cityIndex = m_serversModel->index(j, 0, countryIndex);
+            const auto &cityPlace = cityIndex.data(MapServersModel::Roles::PlaceInfoRole).value<PlaceInfo>();
+            if (cityPlace.town == city) {
+                targetIndex = cityIndex;
+                break;
+            }
+        }
+        break;
+    }
+
+    if (!targetIndex.isValid()) {
+        return;
+    }
+
+    const auto &filterIndex = m_serversFilterModel->mapFromSource(targetIndex);
+    if (filterIndex.isValid()) {
+        m_treeView->expand(filterIndex.parent());
+        m_treeView->setCurrentIndex(filterIndex);
+        m_treeView->scrollTo(filterIndex, QTreeView::PositionAtCenter);
+    }
+}
+
+/*static*/ void ServersChartView::makeVisible(NordVpnWrapper *nordVpnWraper)
 {
     if (!m_instance) {
         m_instance = new ServersChartView(nordVpnWraper);
@@ -265,6 +328,11 @@ void ServersChartView::onStateChanged(const NordVpnInfo &info)
         m_instance->activateWindow();
         m_instance->raise();
     }
+}
+
+/*static*/ ServersChartView *ServersChartView::instance()
+{
+    return m_instance;
 }
 
 void ServersChartView::handleLocationReadingPorgress(int current, int total)

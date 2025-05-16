@@ -20,7 +20,6 @@
 #include "actions/actionresultviewer.h"
 #include "actions/actionstorage.h"
 #include "app/common.h"
-#include "app/nordvpnwraper.h"
 #include "cli/clicall.h"
 
 #include <QTimer>
@@ -32,9 +31,9 @@ struct JsonConsts {
     static constexpr QLatin1String ArgCountry = QLatin1String("cities");
 };
 
-ServersListManager::ServersListManager(NordVpnWraper *nordVpn, QObject *parent)
+ServersListManager::ServersListManager(ActionStorage *actionStorage, QObject *parent)
     : QObject(parent)
-    , m_nordVpn(nordVpn)
+    , m_actionStorage(actionStorage)
 {
     connect(&m_futureWatcher, &QFutureWatcher<void>::finished, this, &ServersListManager::ready);
 }
@@ -61,7 +60,7 @@ bool ServersListManager::reload()
 
 QStringList ServersListManager::queryList(const QStringList &args) const
 {
-    const Action::Ptr &action = m_nordVpn->storate()->createUserAction({});
+    const Action::Ptr &action = m_actionStorage->createUserAction({});
     ActionResultViewer::unregisterAction(action.get());
     action->setTitle(tr("Servers list"));
     action->setForcedShow(false);
@@ -95,7 +94,7 @@ Places ServersListManager::queryGroups() const
     const auto &names = queryList({ JsonConsts::ArgGroups });
     Places groups(names.size());
     std::transform(names.begin(), names.end(), groups.begin(),
-                   [](const auto &name) { return createPlace(utils::groupsTitle(), name); });
+                   [](const auto &name) { return createPlace(geo::groupsTitle(), name); });
 
     return groups;
 }
@@ -113,16 +112,16 @@ Places ServersListManager::queryCountries() const
 Places ServersListManager::queryCities(const QString &country) const
 {
     const auto &names = queryList({ JsonConsts::ArgCountry, country });
-    Places sities(names.size());
-    std::transform(names.begin(), names.end(), sities.begin(),
+    Places cities(names.size());
+    std::transform(names.begin(), names.end(), cities.begin(),
                    [&country](const auto &name) { return createPlace(country, name); });
 
-    return sities;
+    return cities;
 }
 
 void ServersListManager::run()
 {
-    QFuture<void> future = QtConcurrent::run([this]() { this->runSeparated(); });
+    const auto &future = QtConcurrent::run([this]() { this->runSeparated(); });
 
     m_futureWatcher.setFuture(future);
 }
@@ -134,7 +133,6 @@ void ServersListManager::runSeparated()
     emit citiesCount(total);
     notifyPlacesAdded(groups);
 
-    QList<Places> chunks { groups };
     const auto &countries = queryCountries();
     for (const auto &country : countries) {
         const auto &chunk = queryCities(country.country);

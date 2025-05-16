@@ -17,31 +17,35 @@
 
 #pragma once
 
-#include "app/common.h"
+#include <QObject>
+#include <QSystemTrayIcon>
 
-#include <QTextBrowser>
+class NordVpnWrapper;
+class ActionStorage;
+class StateChecker;
 
-class QAction;
-class CLICallResultView : public QTextBrowser
+class AppUiCoordinator : public QObject
 {
     Q_OBJECT
 public:
-    static constexpr int MaxBlocksCountDefault = utils::DefaultLogLinesLimit;
+    AppUiCoordinator(NordVpnWrapper *wrapper, ActionStorage *storage, StateChecker *checker, QObject *parent = {});
 
-    CLICallResultView(int maxBlcockCount = CLICallResultView::MaxBlocksCountDefault, QWidget *parent = nullptr);
+    void saveState() const;
 
-    int blocksLimit() const;
-    void setBlocksLimit(int limit);
+public slots:
+    void showMapView();
+    void showSettingsEditor();
+    void showLog();
+    void showAbout();
 
-protected:
-    virtual void contextMenuEvent(QContextMenuEvent *e) override;
+    void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
-protected slots:
-    void validateTextLength();
+signals:
+    void settingsAccepted();
+    void actionRequested(int nordVpnAction);
 
 private:
-    int m_blocksLimit;
-    QAction *m_actClear;
-
-    int newLinesCount() const;
+    NordVpnWrapper *m_wrapper;
+    ActionStorage *m_storage;
+    StateChecker *m_checker;
 };

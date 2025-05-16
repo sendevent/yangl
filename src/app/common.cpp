@@ -17,6 +17,7 @@
 
 #include "common.h"
 
+#include "geo/placeinfo.h"
 #include "settings/appsettings.h"
 #include "version/appversiondefs.h"
 
@@ -29,8 +30,7 @@ namespace utils {
 
 QString groupsTitle()
 {
-    static const QString &title = QObject::tr("Groups");
-    return title;
+    return geo::groupsTitle();
 }
 
 QString ensureDirExists(const QString &path)
@@ -45,7 +45,7 @@ QString ensureDirExists(const QString &path)
     if (!dir.exists())
         dir.mkpath(dir.absolutePath());
 
-    const QString res = info.absoluteFilePath();
+    const QString &res = info.absoluteFilePath();
     return res;
 }
 
@@ -83,6 +83,43 @@ std::tuple<QGeoCoordinate, bool> parseCoordinates(const QString &latStr, const Q
 
     return { coordinate, parsed };
 };
+
+bool isValidAppPath(const QString &path, QString *reason)
+{
+    if (path.isEmpty()) {
+        const QString &msg = QObject::tr("Target binary path is empty");
+        WRN << msg;
+        if (reason) {
+            *reason = msg;
+        }
+        return false;
+    }
+
+    const QFileInfo info(path);
+    if (!info.exists()) {
+        const QString &msg = QObject::tr("Target binary file not exists: <br><b>`%1`</b>").arg(path);
+        WRN << msg;
+        if (reason) {
+            *reason = msg;
+        }
+        return false;
+    }
+
+    if (!info.isExecutable()) {
+        const QString &msg = QObject::tr("Target binary file file is not executable: `%1`").arg(path);
+        WRN << msg;
+        if (reason) {
+            *reason = msg;
+        }
+        return false;
+    }
+
+    if (reason) {
+        *reason = {};
+    }
+
+    return true;
+}
 
 QString composeTitle(const QString &payload)
 {

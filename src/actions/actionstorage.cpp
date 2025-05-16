@@ -18,7 +18,9 @@
 #include "actionstorage.h"
 
 #include "actionjson.h"
+#include "actionresultviewer.h"
 #include "app/common.h"
+#include "app/nordvpnwrapper.h"
 #include "cli/clicall.h"
 #include "settings/appsettings.h"
 
@@ -151,7 +153,7 @@ void ActionStorage::loadYanglActions()
             jsonYanglActionsById.insert(static_cast<Action::Yangl>(action->type()), action);
 
     const auto &actionTypes = Action::yanglActions();
-    for (auto actionType : actionTypes) {
+    for (const auto actionType : actionTypes) {
         if (const auto &action = jsonYanglActionsById.value(actionType, {})) {
             m_yanglActions[actionType] = action;
             jsonYanglActionsById.remove(actionType);
@@ -183,7 +185,7 @@ void ActionStorage::loadBuiltinActions()
     }
 
     const auto &actions = Action::nvpnActions();
-    for (auto actionType : actions) {
+    for (const auto actionType : actions) {
         if (const auto &action = jsonBuiltinActionsById.value(actionType, {})) {
             m_nvpnActions[actionType] = action;
             jsonBuiltinActionsById.remove(actionType);
@@ -391,7 +393,7 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
         wordsToList(QStringLiteral("set killswitch 1"));
         break;
     }
-    case Action::NordVPN::KillSwithcOff: {
+    case Action::NordVPN::KillSwitchOff: {
         title = QObject::tr("Kill Switch OFF");
         menuPlace = Action::MenuPlace::Own;
         wordsToList(QStringLiteral("set killswitch 0"));
@@ -463,8 +465,11 @@ Action::Ptr ActionStorage::createAction(Action::Flow scope, int type, const Acti
         break;
     }
 
-    if (!action)
+    if (!action) {
         action = Action::Ptr(new Action(scope, type, parent, id));
+        ActionResultViewer::registerAction(action.get());
+        NordVpnWrapper::registerAction(action.get());
+    }
 
     if (!appPath.isEmpty())
         action->setApp(appPath);

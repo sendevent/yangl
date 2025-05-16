@@ -29,7 +29,7 @@ public:
     explicit MenuHolder(QObject *parent = {});
 
     QMenu *createMenu(const QList<Action::Ptr> &actions);
-    QAction *yangleAction(Action::Yangl act) const;
+    QAction *yanglAction(Action::Yangl act) const;
 
 signals:
     void actionTriggered(Action *action);

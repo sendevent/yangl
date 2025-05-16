@@ -17,31 +17,33 @@
 
 #pragma once
 
-#include "app/common.h"
+#include "actions/action.h"
 
-#include <QTextBrowser>
+#include <QObject>
 
-class QAction;
-class CLICallResultView : public QTextBrowser
+class ActionStorage;
+class StateChecker;
+class QTimer;
+
+class PauseController : public QObject
 {
     Q_OBJECT
 public:
-    static constexpr int MaxBlocksCountDefault = utils::DefaultLogLinesLimit;
+    PauseController(ActionStorage *storage, StateChecker *checker, QObject *parent = {});
 
-    CLICallResultView(int maxBlcockCount = CLICallResultView::MaxBlocksCountDefault, QWidget *parent = nullptr);
+    void pause(Action::NordVPN actionType);
+    bool isPaused() const;
 
-    int blocksLimit() const;
-    void setBlocksLimit(int limit);
+signals:
+    void requestAction(Action *action);
 
-protected:
-    virtual void contextMenuEvent(QContextMenuEvent *e) override;
-
-protected slots:
-    void validateTextLength();
+private slots:
+    void onPauseTimer();
+    void onStatusChanged(int status);
 
 private:
-    int m_blocksLimit;
-    QAction *m_actClear;
-
-    int newLinesCount() const;
+    ActionStorage *m_storage;
+    StateChecker *m_checker;
+    QTimer *m_pauseTimer;
+    int m_paused;
 };

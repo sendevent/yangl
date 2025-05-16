@@ -21,25 +21,24 @@
 #include "app/nordvpninfo.h"
 
 #include <QObject>
-#include <QPointer>
-#include <QSystemTrayIcon>
 
+class AppUiCoordinator;
 class CLICaller;
 class ActionStorage;
 class StateChecker;
 class MenuHolder;
-class QTimer;
+class PauseController;
 class TrayIcon;
 
-class NordVpnWraper : public QObject
+class NordVpnWrapper : public QObject
 {
     Q_OBJECT
 public:
-    static NordVpnWraper *instance();
+    static NordVpnWrapper *instance();
     static void init();
 
     CLICaller *bus() const;
-    ActionStorage *storate() const;
+    ActionStorage *storage() const;
     StateChecker *stateChecker() const;
 
     void connectTo(const QString &country, const QString &city);
@@ -49,35 +48,22 @@ public:
 private slots:
     void prepareQuit();
 
-    void showMapView();
-    void showSettingsEditor();
-    void showLog();
-    void showAbout();
-
-    void performStatusCheck();
-
-    void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
-
     void onActionTriggered(Action *action);
     void onStatusChanged(NordVpnInfo::Status status);
-    void onPauseTimer();
 
     void notifyError(const QString &errorMessage);
 
 private:
-    explicit NordVpnWraper(QObject *parent = {});
+    explicit NordVpnWrapper(QObject *parent = {});
 
     CLICaller *m_bus;
     ActionStorage *m_actions;
     StateChecker *m_checker;
     TrayIcon *m_trayIcon;
     MenuHolder *m_menuHolder;
-    QTimer *m_pauseTimer;
-    int m_paused;
-    QPointer<QWidget> m_mapView;
+    PauseController *m_pauseCtrl;
+    AppUiCoordinator *m_uiCoordinator;
     void loadSettings();
-
-    void pause(Action::NordVPN action);
 
     void updateActions(bool connected);
 
@@ -85,9 +71,11 @@ private:
 
     void start();
 
-    void processYangleAction(Action *action);
+    void processYanglAction(Action *action);
     void processNordVpnAction(Action *action);
     void processUserAction(Action *action);
 
     static bool isAcceptableAction(const Action *action, Action::Flow expectedFlow, const QString &callerInfo);
+
+    QString m_lastServer;
 };

@@ -17,8 +17,6 @@
 
 #include "clicaller.h"
 
-#include "actions/action.h"
-
 #include <QPointer>
 #include <QRunnable>
 #include <QThreadPool>
@@ -47,18 +45,7 @@ CLICaller::CLICaller(QObject *parent)
 {
 }
 
-bool CLICaller::performAction(Action *action)
-{
-    if (action) {
-        if (auto call = action->createRequest()) {
-            return runQuery(call);
-        }
-    }
-
-    return false;
-}
-
-bool CLICaller::runQuery(CLICall *call)
+bool CLICaller::runCall(CLICall *call)
 {
     if (call) {
         QThreadPool::globalInstance()->start(new RunCallTask(call));

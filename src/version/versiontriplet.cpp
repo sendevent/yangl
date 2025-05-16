@@ -4,7 +4,7 @@
 #include <QStringList>
 
 /*static*/ const QMap<VersionTriplet, VersionTriplet::KnownVersion> VersionTriplet::KnownVersions {
-    { VersionTriplet::fromString("1.0.0"), VersionTriplet::KnownVersion::V_1_0_0},
+    { VersionTriplet::fromString("1.0.0"), VersionTriplet::KnownVersion::V_1_0_0 },
 };
 
 VersionTriplet::VersionTriplet(int maj, int min, int patch)

@@ -17,12 +17,11 @@
 
 #include "appsettings.h"
 
-#include "actions/clicallresultview.h"
 #include "app/common.h"
 #include "app/statechecker.h"
-#include "geo/mapwidget.h"
 #include "settings/settingsmanager.h"
 
+#include <QGeoServiceProvider>
 #include <QSettings>
 #include <QStandardPaths>
 
@@ -63,8 +62,8 @@ GroupMonitor::GroupMonitor()
                            new AppSetting(QString("%1/Interval").arg(localName()), StateChecker::DefaultIntervalMs),
                            new AppSetting(QString("%1/Active").arg(localName()), false),
                            new AppSetting(QString("%1/EditorGeometry").arg(localName())),
-                           new AppSetting(QString("%1/LogLinesLimit").arg(localName()),
-                                          CLICallResultView::MaxBlocksCountDefault),
+                           new AppSetting(QString("%1/LogLinesLimit").arg(localName()), utils::DefaultLogLinesLimit),
+                           new AppSetting(QString("%1/LastServer").arg(localName()), QString()),
                    },
                    {})
 {
@@ -81,10 +80,10 @@ GroupMap::GroupMap()
                            new AppSetting(QString("%1/Scale").arg(localName()), 2.5),
                            new AppSetting(QString("%1/Plugin").arg(localName()),
                                           []() {
-                                              const auto &plugins = MapWidget::geoServices();
+                                              const auto &plugins = QGeoServiceProvider::availableServiceProviders();
                                               return plugins.size() ? plugins.first() : "osm";
                                           }()),
-                           new AppSetting(QString("%1/Type").arg(localName()), 6),
+                           new AppSetting(QString("%1/Type").arg(localName()), 0),
                    },
                    {})
 {
