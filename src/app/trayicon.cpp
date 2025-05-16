@@ -135,21 +135,23 @@ void TrayIcon::updateIcon(NordVpnInfo::Status status)
 void TrayIcon::setState(const NordVpnInfo &state)
 {
     const auto &stateText = state.toString();
-    bool skeepMessage(false);
+    bool showPopup = false;
+
     if (m_state.status() != state.status() && !qApp->isSavingSession()) {
         updateIcon(state.status());
+        showPopup = true;
 
         if (m_isFirstChange && state.status() == NordVpnInfo::Status::Connected)
             if (AppSettings::Monitor->Active->read().toBool()
                 && AppSettings::Tray->IgnoreFirstConnected->read().toBool()) {
-                skeepMessage = true;
+                showPopup = false;
             }
     }
 
-    if (skeepMessage) {
-        updateTooltip(stateText);
-    } else {
+    if (showPopup) {
         updateStateText(stateText, iconForState(state));
+    } else {
+        updateTooltip(stateText);
     }
 
     m_state = state;
