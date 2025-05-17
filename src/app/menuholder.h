@@ -19,6 +19,7 @@
 
 #include "actions/action.h"
 
+#include <QHash>
 #include <QMenu>
 #include <QObject>
 
@@ -30,6 +31,8 @@ public:
 
     QMenu *createMenu(const QList<Action::Ptr> &actions);
     QAction *yanglAction(Action::Yangl act) const;
+
+    void syncToggleStates(const QString &settingsOutput);
 
 signals:
     void actionTriggered(Action *action);
@@ -46,4 +49,5 @@ private:
     void populateActions(const QList<Action::Ptr> &actions);
 
     QHash<Action::Flow, QList<QAction *>> m_qActions;
+    QHash<QString, QAction *> m_toggleActions; // normalized stem -> QAction*
 };

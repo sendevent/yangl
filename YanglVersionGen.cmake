@@ -2,7 +2,7 @@
 
 set(YANGL_V_MAJOR 2)
 set(YANGL_V_MINOR 0)
-set(YANGL_V_PATCH 0)
+set(YANGL_V_PATCH 1)
 
 # the rest is the automatic acquirement of the necessary fields:
 

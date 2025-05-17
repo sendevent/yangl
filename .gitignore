@@ -77,6 +77,7 @@ qrc_*.cpp
 build
 manbuild/
 scriptbuild/
+debbuild/
 .cache/
 
 #versioning

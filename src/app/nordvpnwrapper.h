@@ -68,6 +68,7 @@ private:
     void updateActions(bool connected);
 
     void initMenu();
+    void syncToggleSettings();
 
     void start();
 
@@ -77,5 +78,6 @@ private:
 
     static bool isAcceptableAction(const Action *action, Action::Flow expectedFlow, const QString &callerInfo);
 
-    QString m_lastServer;
+    QString m_lastCountry;
+    QString m_lastCity;
 };

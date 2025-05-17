@@ -54,3 +54,34 @@ option(DISABLE_TESTS "Disable unit tests" ON)
 if(NOT DISABLE_TESTS)
     add_subdirectory(test)
 endif()
+
+# --- Installation rules ---
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+install(FILES packaging/yangl.desktop DESTINATION share/applications)
+install(FILES packaging/yangl.png DESTINATION share/icons/hicolor/256x256/apps)
+
+# --- Packaging (CPack / .deb) ---
+set(CPACK_GENERATOR "DEB")
+set(CPACK_PACKAGE_NAME "yangl")
+set(CPACK_PACKAGE_VERSION "${YANGL_VERSION}")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
+    "Yet Another NordVPN GUI for Linux")
+set(CPACK_PACKAGE_DESCRIPTION
+    "Lightweight, unofficial system tray application for managing NordVPN connections on Linux. Provides quick connect/disconnect, server selection via geo chart, customizable tray icons, and configurable actions.")
+set(CPACK_PACKAGE_MAINTAINER "Denis <denis@yangl>")
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/sendevent/yangl/")
+set(CPACK_PACKAGE_CONTACT "https://github.com/sendevent/yangl/")
+set(CPACK_DEBIAN_PACKAGE_SECTION "net")
+set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/lgpl-3.0.txt")
+
+# Auto-detect shared library dependencies (Qt6, etc.)
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+
+# Architecture auto-detection
+set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+
+# Debian-style filename: yangl_2.0.0_amd64.deb
+set(CPACK_DEBIAN_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
+
+include(CPack)

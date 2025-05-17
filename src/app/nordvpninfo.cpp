@@ -88,28 +88,28 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
             continue;
         }
 
-        const QString &name = pair.first().simplified();
+        const QString &name = pair.first().simplified().toLower();
         const QString &value = pair.last().simplified();
 
-        if (name == QStringLiteral("Status")) {
+        if (name.contains(QLatin1String("status"))) {
             updatedState.m_status = textToStatus(value);
-        } else if (name == QStringLiteral("Current server")) {
+        } else if (name.contains(QLatin1String("server")) || name.contains(QLatin1String("hostname"))) {
             updatedState.m_server = value;
-        } else if (name == QStringLiteral("Country")) {
+        } else if (name.contains(QLatin1String("country"))) {
             updatedState.m_country = value;
-        } else if (name == QStringLiteral("City")) {
+        } else if (name.contains(QLatin1String("city"))) {
             updatedState.m_city = value;
-        } else if (name == QStringLiteral("Your new IP")) {
+        } else if (name.contains(QLatin1String("ip"))) {
             updatedState.m_ip = value;
-        } else if (name == QStringLiteral("Current technology")) {
+        } else if (name.contains(QLatin1String("technology"))) {
             updatedState.m_technology = value;
-        } else if (name == QStringLiteral("Current protocol")) {
+        } else if (name.contains(QLatin1String("protocol"))) {
             updatedState.m_protocol = value;
-        } else if (name == QStringLiteral("Transfer")) {
+        } else if (name.contains(QLatin1String("transfer"))) {
             updatedState.m_traffic = value;
             updatedState.m_traffic.replace(QStringLiteral("received"), QStringLiteral("↓"));
             updatedState.m_traffic.replace(QStringLiteral("sent"), QStringLiteral("↑"));
-        } else if (name == QStringLiteral("Uptime")) {
+        } else if (name.contains(QLatin1String("uptime"))) {
             updatedState.m_uptime = parseUptime(value.simplified());
         }
     }
@@ -200,9 +200,20 @@ QString NordVpnInfo::toString() const
     text = add(m_server);
     text = add(m_city, QStringLiteral(" — "));
     text = add(m_country, QStringLiteral(", "));
-    text = add(m_ip);
-    text = add(m_technology);
-    text = add(m_protocol, QStringLiteral(", "));
+    {
+        QString ipLine = m_ip;
+        if (!m_technology.isEmpty() || !m_protocol.isEmpty()) {
+            const QString techProto = m_protocol.isEmpty()     ? m_technology
+                                      : m_technology.isEmpty() ? m_protocol
+                                      : QStringLiteral("%1, %2").arg(m_technology, m_protocol);
+            if (!ipLine.isEmpty()) {
+                ipLine += QStringLiteral(" — ") + techProto;
+            } else {
+                ipLine = techProto;
+            }
+        }
+        text = add(ipLine);
+    }
     text = add(m_traffic);
 
     return text;

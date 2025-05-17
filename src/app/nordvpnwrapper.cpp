@@ -104,16 +104,15 @@ StateChecker *NordVpnWrapper::stateChecker() const
 
 void NordVpnWrapper::start()
 {
-    const bool wasActive = m_checker->isActive();
-
     loadSettings();
 
     initMenu();
+    syncToggleSettings();
 
     m_checker->setCheckAction(m_actions->action(Action::NordVPN::CheckStatus));
     if (auto act = m_menuHolder->yanglAction(Action::Yangl::Activated)) {
         act->setCheckable(true);
-        act->setChecked(wasActive || AppSettings::Monitor->Active->read().toBool());
+        act->setChecked(AppSettings::Monitor->Active->read().toBool());
         m_checker->setActive(act->isChecked());
     }
 
@@ -128,7 +127,8 @@ void NordVpnWrapper::loadSettings()
     m_checker->setInterval(AppSettings::Monitor->Interval->read().toInt());
     m_trayIcon->setMessageDuration(AppSettings::Tray->MessageDuration->read().toInt() * utils::oneSecondMs());
 
-    m_lastServer = AppSettings::Monitor->LastServer->read().toString();
+    m_lastCountry = AppSettings::Monitor->LastCountry->read().toString();
+    m_lastCity = AppSettings::Monitor->LastCity->read().toString();
 
     if (AppSettings::Map->Visible->read().toBool()) {
         m_uiCoordinator->showMapView();
@@ -255,12 +255,8 @@ void NordVpnWrapper::processNordVpnAction(Action *action)
         return;
     }
     case Action::NordVPN::Connect: {
-        if (!m_lastServer.isEmpty()) {
-            const Action::Ptr &reconnect = m_actions->createUserAction({});
-            reconnect->setTitle(tr("Reconnect"));
-            reconnect->setForcedShow(false);
-            reconnect->setArgs({ QStringLiteral("c"), m_lastServer });
-            m_bus->runCall(reconnect->createRequest());
+        if (!m_lastCountry.isEmpty()) {
+            connectTo(m_lastCountry, m_lastCity);
             return;
         }
         break;
@@ -276,10 +272,12 @@ void NordVpnWrapper::processNordVpnAction(Action *action)
 void NordVpnWrapper::onStatusChanged(NordVpnInfo::Status status)
 {
     if (status == NordVpnInfo::Status::Connected) {
-        const auto &server = m_checker->state().server();
-        if (!server.isEmpty()) {
-            m_lastServer = server;
-            AppSettings::Monitor->LastServer->write(m_lastServer);
+        const auto &state = m_checker->state();
+        if (!state.country().isEmpty()) {
+            m_lastCountry = state.country();
+            m_lastCity = state.city();
+            AppSettings::Monitor->LastCountry->write(m_lastCountry);
+            AppSettings::Monitor->LastCity->write(m_lastCity);
         }
     }
 
@@ -348,7 +346,12 @@ void NordVpnWrapper::connectTo(const QString &country, const QString &city)
             const Action::Ptr &action = storage()->createUserAction({});
             action->setTitle(tr("Geo Connection"));
             action->setForcedShow(false);
-            action->setArgs({ "c", country == utils::groupsTitle() ? "-g" : country, city });
+            QStringList connArgs = { QStringLiteral("c"),
+                                     country == utils::groupsTitle() ? QStringLiteral("-g") : country };
+            if (!city.isEmpty()) {
+                connArgs.append(city);
+            }
+            action->setArgs(connArgs);
             if (auto call = action->createRequest()) {
                 call->run();
             }
@@ -373,6 +376,22 @@ void NordVpnWrapper::connectTo(const QString &country, const QString &city)
         watcher->deleteLater();
     });
     watcher->setFuture(future);
+}
+
+void NordVpnWrapper::syncToggleSettings()
+{
+    const Action::Ptr &action = m_actions->createUserAction({});
+    if (!action)
+        return;
+    ActionResultViewer::unregisterAction(action.get());
+    action->setForcedShow(false);
+    action->setArgs({ QStringLiteral("settings") });
+    if (auto call = action->createRequest()) {
+        const QString &result = call->run();
+        if (!result.isEmpty()) {
+            m_menuHolder->syncToggleStates(result);
+        }
+    }
 }
 
 void NordVpnWrapper::notifyError(const QString &errorMessage)
