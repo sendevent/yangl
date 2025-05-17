@@ -104,8 +104,6 @@ StateChecker *NordVpnWrapper::stateChecker() const
 
 void NordVpnWrapper::start()
 {
-    const bool wasActive = m_checker->isActive();
-
     loadSettings();
 
     initMenu();
@@ -114,7 +112,7 @@ void NordVpnWrapper::start()
     m_checker->setCheckAction(m_actions->action(Action::NordVPN::CheckStatus));
     if (auto act = m_menuHolder->yanglAction(Action::Yangl::Activated)) {
         act->setCheckable(true);
-        act->setChecked(wasActive || AppSettings::Monitor->Active->read().toBool());
+        act->setChecked(AppSettings::Monitor->Active->read().toBool());
         m_checker->setActive(act->isChecked());
     }
 

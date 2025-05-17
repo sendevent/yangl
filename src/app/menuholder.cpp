@@ -187,7 +187,8 @@ void MenuHolder::onActionTriggered()
     if (qAction->isCheckable()) {
         const char *key = qAction->isChecked() ? ActionOnKey : ActionOffKey;
         action = qAction->property(key).value<Action *>();
-    } else {
+    }
+    if (!action) {
         action = qAction->data().value<Action *>();
     }
 
