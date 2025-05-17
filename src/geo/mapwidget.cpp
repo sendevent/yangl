@@ -134,7 +134,7 @@ void MapWidget::centerOn(const QGeoCoordinate &center)
 {
     if (QQuickItem *map = m_quickView->rootObject()) {
         const QVariant &var = QVariant::fromValue(center);
-        map->setProperty("mapCenter", var);
+        QMetaObject::invokeMethod(map, "navigateTo", Q_ARG(QVariant, var));
     }
 }
 
