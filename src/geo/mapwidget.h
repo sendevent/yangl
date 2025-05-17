@@ -58,6 +58,7 @@ signals:
 
 private:
     QQuickWidget *m_quickView { nullptr };
+    FlatPlaceProxyModel *m_markerModel { nullptr };
 
     void syncMapSize();
 

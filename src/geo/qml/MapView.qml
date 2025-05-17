@@ -13,6 +13,21 @@ Rectangle {
 
     signal markerDoubleclicked(placeInfo anObject)
 
+    function navigateTo(coord) {
+        panAnimation.stop()
+        panAnimation.from = map.center
+        panAnimation.to = coord
+        panAnimation.start()
+    }
+
+    CoordinateAnimation {
+        id: panAnimation
+        target: map
+        property: "center"
+        duration: 600
+        easing.type: Easing.InOutQuad
+    }
+
     function updateValidMapTypes() {
         var result = [];
         for (var i = 0; i < map.supportedMapTypes.length; ++i) {
@@ -115,7 +130,7 @@ Rectangle {
                 {
                     id: markerRect
 
-                    property bool active: marker.place.country === currenCountry && marker.place.town === currenCity;
+                    property bool active: isActiveConnection || false
 
                     clip: true
 
