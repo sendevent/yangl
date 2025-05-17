@@ -52,6 +52,9 @@ QMenu *MenuHolder::createMenu(const QList<Action::Ptr> &actions)
     return m_menuRoot.get();
 }
 
+static constexpr const char *ActionOnKey = "actionOn";
+static constexpr const char *ActionOffKey = "actionOff";
+
 void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
 {
     m_qActions.clear();
@@ -82,11 +85,54 @@ void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
         const ActionsHolder &collection = actionsHolders[flow];
         m_menuRoot->addSection(collection.m_menu->title());
 
-        for (auto act : collection.m_menuActions)
-            makeConnection(act, collection.m_menu, {});
+        // Heuristic toggle pair detection: group actions by title stem
+        // (everything before the last space). Groups of exactly 2 become
+        // checkable toggles; the suffix sorting later alphabetically is
+        // treated as the "checked" (ON) variant.
+        struct StemEntry {
+            Action::Ptr action;
+            QString suffix;
+        };
+        QMap<QString, QList<StemEntry>> stemGroups;
+
+        for (const auto &act : collection.m_menuActions) {
+            const auto &title = act->title();
+            const int lastSpace = title.lastIndexOf(QLatin1Char(' '));
+            if (lastSpace > 0) {
+                stemGroups[title.left(lastSpace)].append({ act, title.mid(lastSpace + 1) });
+            }
+        }
+
+        QSet<Action *> pairedActions;
+        QMap<QString, std::pair<Action::Ptr, Action::Ptr>> togglePairs; // stem -> {on, off}
+        for (auto it = stemGroups.cbegin(); it != stemGroups.cend(); ++it) {
+            if (it->size() == 2) {
+                const auto &a = it->at(0);
+                const auto &b = it->at(1);
+                // Later suffix alphabetically = ON (checked)
+                const bool aIsOn = a.suffix > b.suffix;
+                togglePairs[it.key()] = { aIsOn ? a.action : b.action, aIsOn ? b.action : a.action };
+                pairedActions.insert(a.action.get());
+                pairedActions.insert(b.action.get());
+            }
+        }
+
+        for (const auto &act : collection.m_menuActions) {
+            if (!pairedActions.contains(act.get())) {
+                makeConnection(act, collection.m_menu, {});
+            }
+        }
+
+        for (auto it = togglePairs.cbegin(); it != togglePairs.cend(); ++it) {
+            QAction *qAct = collection.m_menu->addAction(it.key());
+            qAct->setCheckable(true);
+            qAct->setProperty(ActionOnKey, QVariant::fromValue(it->first.get()));
+            qAct->setProperty(ActionOffKey, QVariant::fromValue(it->second.get()));
+            connect(qAct, &QAction::triggered, this, &MenuHolder::onActionTriggered);
+        }
 
         QAction *qAct = nullptr;
-        for (auto act : collection.m_topActions) {
+        for (const auto &act : collection.m_topActions) {
             QAction *added = makeConnection(act, m_menuRoot.get(), {});
             m_qActions[flow].append(added);
             if (!qAct)
@@ -116,7 +162,20 @@ void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
 
 void MenuHolder::onActionTriggered()
 {
-    if (auto qAction = qobject_cast<QAction *>(sender()))
-        if (auto action = qAction->data().value<Action *>())
-            emit actionTriggered(action);
+    auto *qAction = qobject_cast<QAction *>(sender());
+    if (!qAction) {
+        return;
+    }
+
+    Action *action = nullptr;
+    if (qAction->isCheckable()) {
+        const char *key = qAction->isChecked() ? ActionOnKey : ActionOffKey;
+        action = qAction->property(key).value<Action *>();
+    } else {
+        action = qAction->data().value<Action *>();
+    }
+
+    if (action) {
+        emit actionTriggered(action);
+    }
 }
