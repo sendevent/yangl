@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=yangl
+Comment=Yet Another NordVPN GUI for Linux
+Exec=yangl
+Icon=yangl
+Type=Application
+Categories=Network;Utility;
+Keywords=vpn;nordvpn;tray;
