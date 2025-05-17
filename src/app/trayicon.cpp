@@ -28,6 +28,7 @@
 #include <QPixmap>
 #include <QSystemTrayIcon>
 #include <QTextDocumentFragment>
+#include <qlatin1stringview.h>
 
 /*static*/ QMap<NordVpnInfo::Status, TrayIcon::IconInfo> TrayIcon::m_allIcons = {};
 /*static*/ QMap<NordVpnInfo::Status, QIcon> TrayIcon::m_composedIcons = {};
@@ -177,6 +178,22 @@ void TrayIcon::deployDefaults() const
                 const auto &resourceFile = rscPath.arg(info.fileName());
                 QFile::copy(resourceFile, fsFile);
             }
+        }
+    }
+
+    static const QStringList kdeNames {
+        QLatin1String("unknown"),
+        QLatin1String("disconnected"),
+        QLatin1String("connected"),
+    };
+    
+    static const QLatin1String kdeSubdir("kde/%1.png");
+    for (const auto &part : kdeNames) {
+        const auto &fsFile = GroupTray::iconPath(kdeSubdir.arg(part));
+        const QFileInfo info(fsFile);
+        if (!info.exists()) {
+            const auto &resourceFile = rscPath.arg(kdeSubdir.arg(part));
+            QFile::copy(resourceFile, fsFile);
         }
     }
 }
