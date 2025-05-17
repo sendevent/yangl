@@ -53,9 +53,7 @@ MapWidget::MapWidget(const QString &mapPlugin, int mapType, FlatPlaceProxyModel 
     , m_quickView(new QQuickWidget(this))
     , m_markerModel(model)
 {
-    if (model) {
-        setRootContextProperty("markerModel", QVariant::fromValue(model));
-    }
+    setRootContextProperty("markerModel", model ? QVariant::fromValue(model) : QVariant());
     setRootContextProperty("pluginName", mapPlugin);
 
     LOG << mapPlugin << mapType;
