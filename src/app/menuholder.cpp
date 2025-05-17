@@ -58,6 +58,7 @@ static constexpr const char *ActionOffKey = "actionOff";
 void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
 {
     m_qActions.clear();
+    m_toggleActions.clear();
     m_menuYangl->clear();
     m_menuNordVpn->clear();
     m_menuUser->clear();
@@ -129,6 +130,7 @@ void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
             qAct->setProperty(ActionOnKey, QVariant::fromValue(it->first.get()));
             qAct->setProperty(ActionOffKey, QVariant::fromValue(it->second.get()));
             connect(qAct, &QAction::triggered, this, &MenuHolder::onActionTriggered);
+            m_toggleActions[it.key().toLower().remove(' ').remove('-')] = qAct;
         }
 
         QAction *qAct = nullptr;
@@ -158,6 +160,20 @@ void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
 
     for (auto flow : { Action::Flow::NordVPN, Action::Flow::Custom, Action::Flow::Yangl })
         addActions(flow);
+}
+
+void MenuHolder::syncToggleStates(const QString &settingsOutput)
+{
+    for (const auto &line : settingsOutput.split('\n', Qt::SkipEmptyParts)) {
+        const int sep = line.indexOf(':');
+        if (sep <= 0)
+            continue;
+        const QString key = line.left(sep).simplified().toLower().remove(' ').remove('-');
+        const QString value = line.mid(sep + 1).simplified().toLower();
+        if (auto *qAct = m_toggleActions.value(key)) {
+            qAct->setChecked(value == QLatin1String("enabled"));
+        }
+    }
 }
 
 void MenuHolder::onActionTriggered()

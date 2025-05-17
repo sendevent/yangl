@@ -109,6 +109,7 @@ void NordVpnWrapper::start()
     loadSettings();
 
     initMenu();
+    syncToggleSettings();
 
     m_checker->setCheckAction(m_actions->action(Action::NordVPN::CheckStatus));
     if (auto act = m_menuHolder->yanglAction(Action::Yangl::Activated)) {
@@ -373,6 +374,38 @@ void NordVpnWrapper::connectTo(const QString &country, const QString &city)
             WRN << "Async task failed!";
         } else {
             WRN << "Async task completed successfully.";
+        }
+        watcher->deleteLater();
+    });
+    watcher->setFuture(future);
+}
+
+void NordVpnWrapper::syncToggleSettings()
+{
+    const auto &future = QtConcurrent::run([this]() -> QString {
+        try {
+            const Action::Ptr &action = m_actions->createUserAction({});
+            if (!action)
+                return {};
+            ActionResultViewer::unregisterAction(action.get());
+            action->setForcedShow(false);
+            action->setArgs({ QStringLiteral("settings") });
+            if (auto call = action->createRequest()) {
+                return call->run();
+            }
+        } catch (const std::exception &e) {
+            WRN << "Exception querying settings:" << e.what();
+        } catch (...) {
+            WRN << "Unknown error querying settings!";
+        }
+        return {};
+    });
+
+    auto *watcher = new QFutureWatcher<QString>(this);
+    connect(watcher, &QFutureWatcher<QString>::finished, this, [this, watcher]() {
+        const QString &result = watcher->result();
+        if (!result.isEmpty()) {
+            m_menuHolder->syncToggleStates(result);
         }
         watcher->deleteLater();
     });

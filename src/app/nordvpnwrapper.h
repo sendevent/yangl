@@ -68,6 +68,7 @@ private:
     void updateActions(bool connected);
 
     void initMenu();
+    void syncToggleSettings();
 
     void start();
 
