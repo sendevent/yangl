@@ -17,6 +17,12 @@ QString VersionInfo::trio() const
     return v;
 }
 
+QString VersionInfo::full() const
+{
+    static const QString v = QStringLiteral("%1.%2").arg(trio()).arg(BuildNumber);
+    return v;
+}
+
 QString VersionInfo::commit() const
 {
     static const QString v =
