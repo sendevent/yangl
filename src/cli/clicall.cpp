@@ -74,6 +74,11 @@ QString CLICall::run()
 
     proc.waitForFinished(m_timeout);
 
+    // Read any remaining output after the process has finished
+    QString trailing(proc.readAllStandardOutput());
+    result += stripSpinner(trailing);
+    errors += proc.readAllStandardError();
+
     return setResult(result.trimmed(), errors.trimmed());
 }
 
