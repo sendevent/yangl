@@ -50,8 +50,8 @@ void ServerLocationResolver::resolveServerLocation(const PlaceInfo &place)
     LOG << place.country << place.town << place.ok << place.location << place.location.isValid();
     ensureCacheLoaded();
 
-    const auto &countryName = place.country;
-    const auto &cityName = place.town;
+    const auto &countryName = place.country.toLower();
+    const auto &cityName = place.town.toLower();
 
     if (m_placesLoaded.contains(countryName)) {
         const auto &cities = m_placesLoaded[countryName];
@@ -152,7 +152,7 @@ void ServerLocationResolver::loadCache()
             jObj[JsonConsts::Capital].toString().toLower() == "true",
             true, // ok
         };
-        m_placesLoaded[place.country].insert(place.town, place);
+        m_placesLoaded[place.country.toLower()].insert(place.town.toLower(), place);
 
         notifyPlace(place);
     }
