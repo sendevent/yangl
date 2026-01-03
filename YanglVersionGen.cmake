@@ -20,9 +20,28 @@ string(SUBSTRING ${YANGL_V_COMMIT_FULL} 0 7 YANGL_V_COMMIT_SHORT)
 git_local_changes(__HAS_UNCOMMITED_SOURCES)
 string(COMPARE NOTEQUAL ${__HAS_UNCOMMITED_SOURCES} "CLEAN" YANGL_V_HAS_CHANGES)
 
+# monotonic build number from total commit count:
+if(NOT GIT_FOUND)
+    find_package(Git QUIET)
+endif()
+if(GIT_FOUND)
+    execute_process(
+        COMMAND "${GIT_EXECUTABLE}" rev-list --count HEAD
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+        RESULT_VARIABLE _rev_list_res
+        OUTPUT_VARIABLE YANGL_V_BUILD_NUMBER
+        ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(NOT _rev_list_res EQUAL 0)
+        set(YANGL_V_BUILD_NUMBER 0)
+    endif()
+else()
+    set(YANGL_V_BUILD_NUMBER 0)
+endif()
+
 # generate the header:
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/version/appversiondefs.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/version/appversiondefs.h)
 
 set(YANGL_VERSION "${YANGL_V_MAJOR}.${YANGL_V_MINOR}.${YANGL_V_PATCH}")
+set(YANGL_VERSION_FULL "${YANGL_VERSION}.${YANGL_V_BUILD_NUMBER}")
 
 

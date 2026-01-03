@@ -12,6 +12,7 @@ static const struct VersionInfo {
     const int Major { @YANGL_V_MAJOR@ } ;
     const int Minor { @YANGL_V_MINOR@ } ;
     const int Patch { @YANGL_V_PATCH@ } ;
+    const int BuildNumber { @YANGL_V_BUILD_NUMBER@ } ;
 
     const QString Branch { QStringLiteral("@YANGL_V_BRANCH@") } ;
     const QString CommitFull { QStringLiteral("@YANGL_V_COMMIT_FULL@") } ;
@@ -21,6 +22,7 @@ static const struct VersionInfo {
 
     QString majorMinor() const;
     QString trio() const;
+    QString full() const;
     QString commit() const;
     QString buildDate(const QString& format) const;
 
