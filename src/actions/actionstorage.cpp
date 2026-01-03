@@ -169,7 +169,7 @@ void ActionStorage::loadYanglActions()
         }
     }
 
-    for (const auto &action : std::as_const(m_nvpnActions)) {
+    for (const auto &action : std::as_const(m_yanglActions)) {
         m_json->putAction(action.get());
     }
 }
