@@ -40,7 +40,8 @@ void CLICallResultView::contextMenuEvent(QContextMenuEvent *e)
     if (QMenu *menu = createStandardContextMenu(e->pos())) {
         menu->addSeparator();
         menu->addAction(m_actClear);
-        menu->show();
+        menu->setAttribute(Qt::WA_DeleteOnClose);
+        menu->popup(e->globalPos());
     }
 }
 
