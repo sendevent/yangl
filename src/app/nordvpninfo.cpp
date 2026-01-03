@@ -82,14 +82,14 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
 
     const QStringList &pairs = text.split('\n', Qt::SkipEmptyParts);
     for (const QString &line : pairs) {
-        const QStringList &pair = line.split(':', Qt::SkipEmptyParts);
-        if (pair.size() != 2) {
+        const int sep = line.indexOf(':');
+        if (sep <= 0) {
             WRN << "Unexpected format:" << line;
             continue;
         }
 
-        const QString &name = pair.first().simplified().toLower();
-        const QString &value = pair.last().simplified();
+        const QString &name = line.left(sep).simplified().toLower();
+        const QString &value = line.mid(sep + 1).simplified();
 
         if (name.contains(QLatin1String("status"))) {
             updatedState.m_status = textToStatus(value);
