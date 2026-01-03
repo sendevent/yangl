@@ -80,4 +80,6 @@ private:
 
     QString m_lastCountry;
     QString m_lastCity;
+
+    Action::Ptr m_geoAction;
 };
