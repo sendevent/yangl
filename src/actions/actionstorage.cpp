@@ -90,11 +90,6 @@ Action::Ptr ActionStorage::action(Action::Yangl requested) const
 QList<Action::Ptr> ActionStorage::load(const QString &from)
 {
     const auto &usedPath = from.isEmpty() ? ActionJson::jsonFilePath() : from;
-    QFile in(usedPath);
-    if (!in.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        WRN << "failed opening file:" << usedPath << in.errorString();
-    }
-
     const bool jsonLoaded = m_json->load(usedPath);
     loadActions();
     if (!jsonLoaded) {
