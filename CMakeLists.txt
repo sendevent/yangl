@@ -63,7 +63,7 @@ install(FILES packaging/yangl.png DESTINATION share/icons/hicolor/256x256/apps)
 # --- Packaging (CPack / .deb) ---
 set(CPACK_GENERATOR "DEB")
 set(CPACK_PACKAGE_NAME "yangl")
-set(CPACK_PACKAGE_VERSION "${YANGL_VERSION}")
+set(CPACK_PACKAGE_VERSION "${YANGL_VERSION_FULL}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
     "Yet Another NordVPN GUI for Linux")
 set(CPACK_PACKAGE_DESCRIPTION
@@ -81,7 +81,7 @@ set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 # Architecture auto-detection
 set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
 
-# Debian-style filename: yangl_2.0.0_amd64.deb
+# Debian-style filename: yangl_2.0.1.321_amd64.deb
 set(CPACK_DEBIAN_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
 
 include(CPack)
