@@ -140,14 +140,14 @@ QString composeMessage(const Action::RunInfo &actionInfo)
         return QString(usePlainText ? tmplPlainText : tmplHtml).arg(value);
     };
 
-    const QMap<QString, QString> parts {
+    const QList<std::pair<QString, QString>> parts {
         { QObject::tr("Result"), actionInfo.result },
         { QObject::tr("Exit code"), actionInfo.exitCode },
         { QObject::tr("Errors"), actionInfo.errors },
     };
 
     QString message = QString("%1 ").arg(actionInfo.timeStamp);
-    for (const auto [key, value] : parts.asKeyValueRange()) {
+    for (const auto &[key, value] : parts) {
 
         const auto &scopeLines = value.split('\n');
         const auto &line = scopeLines.join(lineSeparator);
