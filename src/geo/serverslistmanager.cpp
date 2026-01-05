@@ -17,10 +17,9 @@
 
 #include "serverslistmanager.h"
 
-#include "actions/actionresultviewer.h"
-#include "actions/actionstorage.h"
 #include "app/common.h"
 #include "cli/clicall.h"
+#include "settings/appsettings.h"
 
 #include <QTimer>
 #include <QtConcurrentRun>
@@ -31,9 +30,8 @@ struct JsonConsts {
     static constexpr QLatin1String ArgCountry = QLatin1String("cities");
 };
 
-ServersListManager::ServersListManager(ActionStorage *actionStorage, QObject *parent)
+ServersListManager::ServersListManager(QObject *parent)
     : QObject(parent)
-    , m_actionStorage(actionStorage)
 {
     connect(&m_futureWatcher, &QFutureWatcher<void>::finished, this, &ServersListManager::ready);
 }
@@ -60,18 +58,12 @@ bool ServersListManager::reload()
 
 QStringList ServersListManager::queryList(const QStringList &args) const
 {
-    const Action::Ptr &action = m_actionStorage->createUserAction({});
-    ActionResultViewer::unregisterAction(action.get());
-    action->setTitle(tr("Servers list"));
-    action->setForcedShow(false);
-    action->setArgs(args);
-
-    if (auto call = action->createRequest()) {
-        call->run();
-        LOG << call->result();
-        if (call->success()) {
-            return stringToServers(call->result());
-        }
+    const QString &appPath = AppSettings::Monitor->NVPNPath->read().toString();
+    CLICall call(appPath, args, CLICall::DefaultTimeoutMSecs);
+    call.run();
+    LOG << call.result();
+    if (call.success()) {
+        return stringToServers(call.result());
     }
 
     return {};

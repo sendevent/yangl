@@ -28,9 +28,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 #include <QJsonObject>
 #include <QJsonParseError>
 
-ServerLocationResolver::ServerLocationResolver(ActionStorage *actionStorage, QObject *parent)
+ServerLocationResolver::ServerLocationResolver(ActionStorage * /*actionStorage*/, QObject *parent)
     : QObject(parent)
-    , m_listManager(new ServersListManager(actionStorage, this))
+    , m_listManager(new ServersListManager(this))
     , m_geoResolver(new CoordinatesResolver(this))
 {
     connect(m_listManager, &ServersListManager::citiesAdded, this, &ServerLocationResolver::resolveServers);
