@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020-2026 Denis Gofman - <sendevent@gmail.com>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -26,17 +26,17 @@
 
 /*static*/ int Action::MetaIdId = -1;
 
-uint qHash(Action::Yangl key, uint seed)
+size_t qHash(Action::Yangl key, size_t seed)
 {
     return qHash(static_cast<int>(key), seed);
 }
 
-uint qHash(Action::NordVPN key, uint seed)
+size_t qHash(Action::NordVPN key, size_t seed)
 {
     return qHash(static_cast<int>(key), seed);
 }
 
-uint qHash(Action::Flow key, uint seed)
+size_t qHash(Action::Flow key, size_t seed)
 {
     return qHash(static_cast<int>(key), seed);
 }

@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020-2026 Denis Gofman - <sendevent@gmail.com>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -130,9 +130,9 @@ GroupTray::GroupTray()
     }
 }
 
-/*static*/ GroupMonitor *AppSettings::Monitor = {};
-/*static*/ GroupMap *AppSettings::Map = {};
-/*static*/ GroupTray *AppSettings::Tray = {};
+/*static*/ std::unique_ptr<GroupMonitor> AppSettings::Monitor = {};
+/*static*/ std::unique_ptr<GroupMap> AppSettings::Map = {};
+/*static*/ std::unique_ptr<GroupTray> AppSettings::Tray = {};
 
 /*static*/ void AppSettings::init()
 {
@@ -140,7 +140,7 @@ GroupTray::GroupTray()
     QStandardPaths::setTestModeEnabled(true);
 #endif
 
-    Monitor = new GroupMonitor;
-    Map = new GroupMap;
-    Tray = new GroupTray;
+    Monitor = std::make_unique<GroupMonitor>();
+    Map = std::make_unique<GroupMap>();
+    Tray = std::make_unique<GroupTray>();
 }

@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020-2026 Denis Gofman - <sendevent@gmail.com>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -40,9 +40,9 @@
 
     QMetaEnum me = QMetaEnum::fromType<NordVpnInfo::Status>();
     for (int i = 0; i < me.keyCount(); ++i) {
+        const NordVpnInfo::Status state = static_cast<NordVpnInfo::Status>(me.value(i));
         IconInfo info;
-        info.m_status = static_cast<NordVpnInfo::Status>(i);
-        const NordVpnInfo::Status &state = static_cast<NordVpnInfo::Status>(me.value(i));
+        info.m_status = state;
 
         switch (state) {
         case NordVpnInfo::Status::Connected:
@@ -101,6 +101,7 @@
 TrayIcon::TrayIcon(QObject *parent)
     : QSystemTrayIcon(parent)
     , m_isFirstChange(true)
+    , m_duration(5 * utils::oneSecondMs())
 {
     deployDefaults();
     reloadIcons();
@@ -186,7 +187,7 @@ void TrayIcon::deployDefaults() const
         QLatin1String("disconnected"),
         QLatin1String("connected"),
     };
-    
+
     static const QLatin1String kdeSubdir("kde/%1.png");
     for (const auto &part : kdeNames) {
         const auto &fsFile = GroupTray::iconPath(kdeSubdir.arg(part));

@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020-2026 Denis Gofman - <sendevent@gmail.com>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -20,6 +20,7 @@
 #include "app/common.h"
 #include "settings/appsettings.h"
 
+#include <QApplication>
 #include <QGridLayout>
 #include <QLatin1StringView>
 #include <QTabWidget>
@@ -41,6 +42,11 @@ ActionResultViewer::ActionResultViewer()
     layout->addWidget(m_tabWidget);
 
     setWindowTitle(utils::composeTitle("CLI Log"));
+
+    connect(qApp, &QApplication::aboutToQuit, this, [this]() {
+        m_instance = nullptr;
+        deleteLater();
+    });
 }
 
 /*static*/ ActionResultViewer *ActionResultViewer::instance()

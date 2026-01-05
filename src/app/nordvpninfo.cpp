@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020-2026 Denis Gofman - <sendevent@gmail.com>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -82,14 +82,14 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
 
     const QStringList &pairs = text.split('\n', Qt::SkipEmptyParts);
     for (const QString &line : pairs) {
-        const QStringList &pair = line.split(':', Qt::SkipEmptyParts);
-        if (pair.size() != 2) {
+        const int sep = line.indexOf(':');
+        if (sep <= 0) {
             WRN << "Unexpected format:" << line;
             continue;
         }
 
-        const QString &name = pair.first().simplified().toLower();
-        const QString &value = pair.last().simplified();
+        const QString &name = line.left(sep).simplified().toLower();
+        const QString &value = line.mid(sep + 1).simplified();
 
         if (name.contains(QLatin1String("status"))) {
             updatedState.m_status = textToStatus(value);
@@ -203,9 +203,9 @@ QString NordVpnInfo::toString() const
     {
         QString ipLine = m_ip;
         if (!m_technology.isEmpty() || !m_protocol.isEmpty()) {
-            const QString techProto = m_protocol.isEmpty()     ? m_technology
-                                      : m_technology.isEmpty() ? m_protocol
-                                      : QStringLiteral("%1, %2").arg(m_technology, m_protocol);
+            const QString techProto = m_protocol.isEmpty() ? m_technology
+                    : m_technology.isEmpty()               ? m_protocol
+                                                           : QStringLiteral("%1, %2").arg(m_technology, m_protocol);
             if (!ipLine.isEmpty()) {
                 ipLine += QStringLiteral(" — ") + techProto;
             } else {

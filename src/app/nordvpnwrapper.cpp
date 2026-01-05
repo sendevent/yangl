@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020-2026 Denis Gofman - <sendevent@gmail.com>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -29,8 +29,6 @@
 #include "settings/appsettings.h"
 
 #include <QApplication>
-#include <QFutureWatcher>
-#include <QtConcurrentRun>
 
 NordVpnWrapper::NordVpnWrapper(QObject *parent)
     : QObject(parent)
@@ -63,7 +61,7 @@ NordVpnWrapper::NordVpnWrapper(QObject *parent)
 {
     static NordVpnWrapper *pInstance { nullptr };
     if (!pInstance) {
-        pInstance = new NordVpnWrapper();
+        pInstance = new NordVpnWrapper(qApp);
     }
     return pInstance;
 }
@@ -341,41 +339,21 @@ void NordVpnWrapper::connectTo(const QString &country, const QString &city)
 {
     LOG << country << city;
 
-    const auto &future = QtConcurrent::run([country, city, this]() -> bool {
-        try {
-            const Action::Ptr &action = storage()->createUserAction({});
-            action->setTitle(tr("Geo Connection"));
-            action->setForcedShow(false);
-            QStringList connArgs = { QStringLiteral("c"),
-                                     country == utils::groupsTitle() ? QStringLiteral("-g") : country };
-            if (!city.isEmpty()) {
-                connArgs.append(city);
-            }
-            action->setArgs(connArgs);
-            if (auto call = action->createRequest()) {
-                call->run();
-            }
-            return true; // Success
-        } catch (const std::exception &e) {
-            WRN << "Exception in async task:" << e.what();
-            return false; // Failure
-        } catch (...) {
-            WRN << "Unknown error in async task!";
-            return false;
-        }
-    });
+    const Action::Ptr &action = storage()->createUserAction({});
+    action->setTitle(tr("Geo Connection"));
+    action->setForcedShow(false);
+    QStringList connArgs = { QStringLiteral("c"), country == utils::groupsTitle() ? QStringLiteral("-g") : country };
+    if (!city.isEmpty()) {
+        connArgs.append(city);
+    }
+    action->setArgs(connArgs);
 
-    // Check result when available
-    auto *watcher = new QFutureWatcher<bool>(this);
-    QObject::connect(watcher, &QFutureWatcher<bool>::finished, this, [future, watcher]() {
-        if (!future.result()) { // If false, an error occurred
-            WRN << "Async task failed!";
-        } else {
-            WRN << "Async task completed successfully.";
-        }
-        watcher->deleteLater();
-    });
-    watcher->setFuture(future);
+    if (auto call = action->createRequest()) {
+        // Store shared pointer to keep action alive until the call completes
+        m_geoAction = action;
+        connect(action.get(), &Action::performed, this, [this]() { m_geoAction.reset(); });
+        m_bus->runCall(call);
+    }
 }
 
 void NordVpnWrapper::syncToggleSettings()

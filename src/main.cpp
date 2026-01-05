@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
+Copyright (C) 2020-2026 Denis Gofman - <sendevent@gmail.com>
 
 This application is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -19,7 +19,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 #include "settings/appsettings.h"
 
 #include <QApplication>
-#include <QProcess>
 
 int main(int argc, char *argv[])
 {

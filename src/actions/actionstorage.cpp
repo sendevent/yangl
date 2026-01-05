@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020-2026 Denis Gofman - <sendevent@gmail.com>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -90,11 +90,6 @@ Action::Ptr ActionStorage::action(Action::Yangl requested) const
 QList<Action::Ptr> ActionStorage::load(const QString &from)
 {
     const auto &usedPath = from.isEmpty() ? ActionJson::jsonFilePath() : from;
-    QFile in(usedPath);
-    if (!in.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        WRN << "failed opening file:" << usedPath << in.errorString();
-    }
-
     const bool jsonLoaded = m_json->load(usedPath);
     loadActions();
     if (!jsonLoaded) {
@@ -169,7 +164,7 @@ void ActionStorage::loadYanglActions()
         }
     }
 
-    for (const auto &action : std::as_const(m_nvpnActions)) {
+    for (const auto &action : std::as_const(m_yanglActions)) {
         m_json->putAction(action.get());
     }
 }
@@ -301,7 +296,7 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
         break;
     }
     case Action::NordVPN::Disconnect: {
-        title = QObject::tr("Disonnect");
+        title = QObject::tr("Disconnect");
         wordsToList(QStringLiteral("disconnect"));
         menuPlace = Action::MenuPlace::Own;
         break;
