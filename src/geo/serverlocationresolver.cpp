@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2025 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2025-2026 Denis Gofman - <sendevent@gmail.com>
 
 This application is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -28,9 +28,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 #include <QJsonObject>
 #include <QJsonParseError>
 
-ServerLocationResolver::ServerLocationResolver(ActionStorage *actionStorage, QObject *parent)
+ServerLocationResolver::ServerLocationResolver(ActionStorage * /*actionStorage*/, QObject *parent)
     : QObject(parent)
-    , m_listManager(new ServersListManager(actionStorage, this))
+    , m_listManager(new ServersListManager(this))
     , m_geoResolver(new CoordinatesResolver(this))
 {
     connect(m_listManager, &ServersListManager::citiesAdded, this, &ServerLocationResolver::resolveServers);
@@ -50,8 +50,8 @@ void ServerLocationResolver::resolveServerLocation(const PlaceInfo &place)
     LOG << place.country << place.town << place.ok << place.location << place.location.isValid();
     ensureCacheLoaded();
 
-    const auto &countryName = place.country;
-    const auto &cityName = place.town;
+    const auto &countryName = place.country.toLower();
+    const auto &cityName = place.town.toLower();
 
     if (m_placesLoaded.contains(countryName)) {
         const auto &cities = m_placesLoaded[countryName];
@@ -152,7 +152,7 @@ void ServerLocationResolver::loadCache()
             jObj[JsonConsts::Capital].toString().toLower() == "true",
             true, // ok
         };
-        m_placesLoaded[place.country].insert(place.town, place);
+        m_placesLoaded[place.country.toLower()].insert(place.town.toLower(), place);
 
         notifyPlace(place);
     }

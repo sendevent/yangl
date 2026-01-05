@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020-2026 Denis Gofman - <sendevent@gmail.com>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -48,7 +48,7 @@ SettingsManager::SettingsManager(QObject *parent)
 SettingsManager *SettingsManager::instance()
 {
     if (!m_instance)
-        m_instance = new SettingsManager();
+        m_instance = new SettingsManager(qApp);
     return m_instance;
 }
 

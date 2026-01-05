@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020-2026 Denis Gofman - <sendevent@gmail.com>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -40,7 +40,8 @@ void CLICallResultView::contextMenuEvent(QContextMenuEvent *e)
     if (QMenu *menu = createStandardContextMenu(e->pos())) {
         menu->addSeparator();
         menu->addAction(m_actClear);
-        menu->show();
+        menu->setAttribute(Qt::WA_DeleteOnClose);
+        menu->popup(e->globalPos());
     }
 }
 

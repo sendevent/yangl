@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020-2026 Denis Gofman - <sendevent@gmail.com>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -106,7 +106,7 @@ void StateChecker::onQueryFinish(const Action::Id &id, const QString &result, bo
     if (ok) {
         updateState(result);
     } else {
-        QString message = tr("Action ivocation `%1` failed:").arg(id.toString());
+        QString message = tr("Action invocation `%1` failed:").arg(id.toString());
         if (!info.errors.isEmpty()) {
             const auto &lineSeparator =
                     QLatin1String(AppSettings::Tray->MessagePlainText->read().toBool() ? "\n" : "<br>");
@@ -135,8 +135,8 @@ NordVpnInfo StateChecker::state() const
 void StateChecker::setState(const NordVpnInfo &state)
 {
     if (this->state() != state) {
-        const bool statusDetailsChanged = m_state.status() != state.status()
-                || m_state.country() != state.country() || m_state.city() != state.city();
+        const bool statusDetailsChanged = m_state.status() != state.status() || m_state.country() != state.country()
+                || m_state.city() != state.city();
 
         m_state = state;
 

@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2025 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2025-2026 Denis Gofman - <sendevent@gmail.com>
 
 This application is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -174,11 +174,8 @@ QVariant FlatPlaceProxyModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> FlatPlaceProxyModel::roleNames() const
 {
     return {
-        { PositionRole, "position" },
-        { CountryNameRole, "country" },
-        { CityNameRole, "city" },
-        { PlaceInfoRole, "placeInfo" },
-        { ActiveRole, "isActiveConnection" },
+        { PositionRole, "position" },   { CountryNameRole, "country" },       { CityNameRole, "city" },
+        { PlaceInfoRole, "placeInfo" }, { ActiveRole, "isActiveConnection" },
     };
 }
 

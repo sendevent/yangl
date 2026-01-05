@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020-2026 Denis Gofman - <sendevent@gmail.com>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -73,6 +73,11 @@ QString CLICall::run()
     }
 
     proc.waitForFinished(m_timeout);
+
+    // Read any remaining output after the process has finished
+    QString trailing(proc.readAllStandardOutput());
+    result += stripSpinner(trailing);
+    errors += proc.readAllStandardError();
 
     return setResult(result.trimmed(), errors.trimmed());
 }

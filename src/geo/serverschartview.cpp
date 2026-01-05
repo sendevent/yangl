@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020-2026 Denis Gofman - <sendevent@gmail.com>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -198,7 +198,9 @@ void ServersChartView::requestServersList()
 
 void ServersChartView::onReloadRequested()
 {
-    handleLocationReadingPorgress(1, 150);
+    m_progressBar->setRange(0, 0); // indeterminate until we know the total
+    m_progressBar->setVisible(true);
+    m_buttonReload->setVisible(false);
     requestServersList();
 }
 
@@ -206,7 +208,7 @@ void ServersChartView::onGotLocation(const PlaceInfo &place, int current, int to
 {
     LOG << place.country << place.town << place.location << current << total;
 
-    handleLocationReadingPorgress(current, total);
+    handleLocationReadingProgress(current, total);
 
     if (!place.ok) {
         WRN << place.country << place.town << place.message;
@@ -260,8 +262,8 @@ void ServersChartView::onStateChanged(const NordVpnInfo &info)
     m_activeState = info;
 
     if (info.status() == NordVpnInfo::Status::Connected && !info.country().isEmpty()) {
-        const auto &label = info.city().isEmpty() ? info.country()
-                                                  : QString("%1 — %2").arg(info.country(), info.city());
+        const auto &label =
+                info.city().isEmpty() ? info.country() : QString("%1 — %2").arg(info.country(), info.city());
         m_connectionLabel->setText(
                 tr("<a href='#' style='text-decoration:none; color:palette(link)'>&#9889; %1</a>").arg(label));
         m_connectionLabel->setToolTip(info.server().isEmpty() ? label : info.server());
@@ -366,8 +368,17 @@ PlaceInfo ServersChartView::findActivePlace(const QString &country, const QStrin
     return m_instance;
 }
 
-void ServersChartView::handleLocationReadingPorgress(int current, int total)
+void ServersChartView::handleLocationReadingProgress(int current, int total)
 {
+    if (!m_progressBar->isVisible()) {
+        m_progressBar->setRange(0, total);
+        m_progressBar->setVisible(true);
+        m_buttonReload->setVisible(false);
+    }
+
+    m_progressBar->setMaximum(total);
+    m_progressBar->setValue(current);
+
     const bool finished = current == total;
     if (finished) {
         m_timer->stop();

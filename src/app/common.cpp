@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020-2026 Denis Gofman - <sendevent@gmail.com>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -106,7 +106,7 @@ bool isValidAppPath(const QString &path, QString *reason)
     }
 
     if (!info.isExecutable()) {
-        const QString &msg = QObject::tr("Target binary file file is not executable: `%1`").arg(path);
+        const QString &msg = QObject::tr("Target binary file is not executable: `%1`").arg(path);
         WRN << msg;
         if (reason) {
             *reason = msg;
@@ -140,14 +140,14 @@ QString composeMessage(const Action::RunInfo &actionInfo)
         return QString(usePlainText ? tmplPlainText : tmplHtml).arg(value);
     };
 
-    const QMap<QString, QString> parts {
+    const QList<std::pair<QString, QString>> parts {
         { QObject::tr("Result"), actionInfo.result },
         { QObject::tr("Exit code"), actionInfo.exitCode },
         { QObject::tr("Errors"), actionInfo.errors },
     };
 
     QString message = QString("%1 ").arg(actionInfo.timeStamp);
-    for (const auto [key, value] : parts.asKeyValueRange()) {
+    for (const auto &[key, value] : parts) {
 
         const auto &scopeLines = value.split('\n');
         const auto &line = scopeLines.join(lineSeparator);

@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2020-2025 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2020-2026 Denis Gofman - <sendevent@gmail.com>
 
    This application is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -88,5 +88,5 @@ private:
     PlaceInfo findActivePlace(const QString &country, const QString &city) const;
     void requestConnection(const PlaceInfo &place);
 
-    void handleLocationReadingPorgress(int current, int total);
+    void handleLocationReadingProgress(int current, int total);
 };
