@@ -18,6 +18,7 @@
 #pragma once
 
 #include <QVariant>
+#include <memory>
 
 class AppSetting
 {
@@ -120,9 +121,9 @@ private:
 class AppSettings
 {
 public:
-    static GroupMonitor *Monitor;
-    static GroupMap *Map;
-    static GroupTray *Tray;
+    static std::unique_ptr<GroupMonitor> Monitor;
+    static std::unique_ptr<GroupMap> Map;
+    static std::unique_ptr<GroupTray> Tray;
 
     static void init();
 

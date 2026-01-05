@@ -61,7 +61,7 @@ NordVpnWrapper::NordVpnWrapper(QObject *parent)
 {
     static NordVpnWrapper *pInstance { nullptr };
     if (!pInstance) {
-        pInstance = new NordVpnWrapper();
+        pInstance = new NordVpnWrapper(qApp);
     }
     return pInstance;
 }

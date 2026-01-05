@@ -130,9 +130,9 @@ GroupTray::GroupTray()
     }
 }
 
-/*static*/ GroupMonitor *AppSettings::Monitor = {};
-/*static*/ GroupMap *AppSettings::Map = {};
-/*static*/ GroupTray *AppSettings::Tray = {};
+/*static*/ std::unique_ptr<GroupMonitor> AppSettings::Monitor = {};
+/*static*/ std::unique_ptr<GroupMap> AppSettings::Map = {};
+/*static*/ std::unique_ptr<GroupTray> AppSettings::Tray = {};
 
 /*static*/ void AppSettings::init()
 {
@@ -140,7 +140,7 @@ GroupTray::GroupTray()
     QStandardPaths::setTestModeEnabled(true);
 #endif
 
-    Monitor = new GroupMonitor;
-    Map = new GroupMap;
-    Tray = new GroupTray;
+    Monitor = std::make_unique<GroupMonitor>();
+    Map = std::make_unique<GroupMap>();
+    Tray = std::make_unique<GroupTray>();
 }
