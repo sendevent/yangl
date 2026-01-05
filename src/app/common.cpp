@@ -106,7 +106,7 @@ bool isValidAppPath(const QString &path, QString *reason)
     }
 
     if (!info.isExecutable()) {
-        const QString &msg = QObject::tr("Target binary file file is not executable: `%1`").arg(path);
+        const QString &msg = QObject::tr("Target binary file is not executable: `%1`").arg(path);
         WRN << msg;
         if (reason) {
             *reason = msg;

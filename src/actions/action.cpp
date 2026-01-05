@@ -26,17 +26,17 @@
 
 /*static*/ int Action::MetaIdId = -1;
 
-uint qHash(Action::Yangl key, uint seed)
+size_t qHash(Action::Yangl key, size_t seed)
 {
     return qHash(static_cast<int>(key), seed);
 }
 
-uint qHash(Action::NordVPN key, uint seed)
+size_t qHash(Action::NordVPN key, size_t seed)
 {
     return qHash(static_cast<int>(key), seed);
 }
 
-uint qHash(Action::Flow key, uint seed)
+size_t qHash(Action::Flow key, size_t seed)
 {
     return qHash(static_cast<int>(key), seed);
 }

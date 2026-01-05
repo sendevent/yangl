@@ -180,6 +180,6 @@ protected:
 
 Q_DECLARE_METATYPE(Action::MenuPlace);
 
-uint qHash(Action::Yangl key, uint seed = 0);
-uint qHash(Action::NordVPN key, uint seed = 0);
-uint qHash(Action::Flow key, uint seed = 0);
+size_t qHash(Action::Yangl key, size_t seed = 0);
+size_t qHash(Action::NordVPN key, size_t seed = 0);
+size_t qHash(Action::Flow key, size_t seed = 0);

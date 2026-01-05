@@ -19,7 +19,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 #include "settings/appsettings.h"
 
 #include <QApplication>
-#include <QProcess>
 
 int main(int argc, char *argv[])
 {

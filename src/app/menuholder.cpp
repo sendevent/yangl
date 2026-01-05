@@ -32,8 +32,8 @@ QAction *MenuHolder::yanglAction(Action::Yangl act) const
 {
     const auto &collection = m_qActions[Action::Flow::Yangl];
     const auto found = std::find_if(collection.cbegin(), collection.cend(), [&act](const QAction *qAction) {
-        Action *action = qAction->data().value<Action *>();
-        return static_cast<Action::Yangl>(action->type()) == act;
+        const Action *action = qAction->data().value<Action *>();
+        return action && static_cast<Action::Yangl>(action->type()) == act;
     });
 
     if (found != collection.end())

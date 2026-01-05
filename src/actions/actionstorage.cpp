@@ -296,7 +296,7 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
         break;
     }
     case Action::NordVPN::Disconnect: {
-        title = QObject::tr("Disonnect");
+        title = QObject::tr("Disconnect");
         wordsToList(QStringLiteral("disconnect"));
         menuPlace = Action::MenuPlace::Own;
         break;
