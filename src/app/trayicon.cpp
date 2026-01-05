@@ -40,9 +40,9 @@
 
     QMetaEnum me = QMetaEnum::fromType<NordVpnInfo::Status>();
     for (int i = 0; i < me.keyCount(); ++i) {
+        const NordVpnInfo::Status state = static_cast<NordVpnInfo::Status>(me.value(i));
         IconInfo info;
-        info.m_status = static_cast<NordVpnInfo::Status>(i);
-        const NordVpnInfo::Status &state = static_cast<NordVpnInfo::Status>(me.value(i));
+        info.m_status = state;
 
         switch (state) {
         case NordVpnInfo::Status::Connected:

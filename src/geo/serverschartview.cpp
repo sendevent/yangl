@@ -208,7 +208,7 @@ void ServersChartView::onGotLocation(const PlaceInfo &place, int current, int to
 {
     LOG << place.country << place.town << place.location << current << total;
 
-    handleLocationReadingPorgress(current, total);
+    handleLocationReadingProgress(current, total);
 
     if (!place.ok) {
         WRN << place.country << place.town << place.message;
@@ -368,7 +368,7 @@ PlaceInfo ServersChartView::findActivePlace(const QString &country, const QStrin
     return m_instance;
 }
 
-void ServersChartView::handleLocationReadingPorgress(int current, int total)
+void ServersChartView::handleLocationReadingProgress(int current, int total)
 {
     if (!m_progressBar->isVisible()) {
         m_progressBar->setRange(0, total);

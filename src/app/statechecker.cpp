@@ -106,7 +106,7 @@ void StateChecker::onQueryFinish(const Action::Id &id, const QString &result, bo
     if (ok) {
         updateState(result);
     } else {
-        QString message = tr("Action ivocation `%1` failed:").arg(id.toString());
+        QString message = tr("Action invocation `%1` failed:").arg(id.toString());
         if (!info.errors.isEmpty()) {
             const auto &lineSeparator =
                     QLatin1String(AppSettings::Tray->MessagePlainText->read().toBool() ? "\n" : "<br>");
