@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2025 Denis Gofman - <sendevent@gmail.com>
+   Copyright (C) 2025-2026 Denis Gofman - <sendevent@gmail.com>
 
 This application is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
