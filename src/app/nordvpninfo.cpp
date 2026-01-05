@@ -203,9 +203,9 @@ QString NordVpnInfo::toString() const
     {
         QString ipLine = m_ip;
         if (!m_technology.isEmpty() || !m_protocol.isEmpty()) {
-            const QString techProto = m_protocol.isEmpty()     ? m_technology
-                                      : m_technology.isEmpty() ? m_protocol
-                                      : QStringLiteral("%1, %2").arg(m_technology, m_protocol);
+            const QString techProto = m_protocol.isEmpty() ? m_technology
+                    : m_technology.isEmpty()               ? m_protocol
+                                                           : QStringLiteral("%1, %2").arg(m_technology, m_protocol);
             if (!ipLine.isEmpty()) {
                 ipLine += QStringLiteral(" — ") + techProto;
             } else {

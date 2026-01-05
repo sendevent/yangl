@@ -342,8 +342,7 @@ void NordVpnWrapper::connectTo(const QString &country, const QString &city)
     const Action::Ptr &action = storage()->createUserAction({});
     action->setTitle(tr("Geo Connection"));
     action->setForcedShow(false);
-    QStringList connArgs = { QStringLiteral("c"),
-                             country == utils::groupsTitle() ? QStringLiteral("-g") : country };
+    QStringList connArgs = { QStringLiteral("c"), country == utils::groupsTitle() ? QStringLiteral("-g") : country };
     if (!city.isEmpty()) {
         connArgs.append(city);
     }

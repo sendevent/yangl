@@ -262,8 +262,8 @@ void ServersChartView::onStateChanged(const NordVpnInfo &info)
     m_activeState = info;
 
     if (info.status() == NordVpnInfo::Status::Connected && !info.country().isEmpty()) {
-        const auto &label = info.city().isEmpty() ? info.country()
-                                                  : QString("%1 — %2").arg(info.country(), info.city());
+        const auto &label =
+                info.city().isEmpty() ? info.country() : QString("%1 — %2").arg(info.country(), info.city());
         m_connectionLabel->setText(
                 tr("<a href='#' style='text-decoration:none; color:palette(link)'>&#9889; %1</a>").arg(label));
         m_connectionLabel->setToolTip(info.server().isEmpty() ? label : info.server());

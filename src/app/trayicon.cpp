@@ -187,7 +187,7 @@ void TrayIcon::deployDefaults() const
         QLatin1String("disconnected"),
         QLatin1String("connected"),
     };
-    
+
     static const QLatin1String kdeSubdir("kde/%1.png");
     for (const auto &part : kdeNames) {
         const auto &fsFile = GroupTray::iconPath(kdeSubdir.arg(part));
