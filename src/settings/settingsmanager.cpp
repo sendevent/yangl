@@ -48,7 +48,7 @@ SettingsManager::SettingsManager(QObject *parent)
 SettingsManager *SettingsManager::instance()
 {
     if (!m_instance)
-        m_instance = new SettingsManager();
+        m_instance = new SettingsManager(qApp);
     return m_instance;
 }
 

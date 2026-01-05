@@ -20,6 +20,7 @@
 #include "app/common.h"
 #include "settings/appsettings.h"
 
+#include <QApplication>
 #include <QGridLayout>
 #include <QLatin1StringView>
 #include <QTabWidget>
@@ -41,6 +42,11 @@ ActionResultViewer::ActionResultViewer()
     layout->addWidget(m_tabWidget);
 
     setWindowTitle(utils::composeTitle("CLI Log"));
+
+    connect(qApp, &QApplication::aboutToQuit, this, [this]() {
+        m_instance = nullptr;
+        deleteLater();
+    });
 }
 
 /*static*/ ActionResultViewer *ActionResultViewer::instance()
