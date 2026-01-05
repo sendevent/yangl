@@ -174,11 +174,8 @@ QVariant FlatPlaceProxyModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> FlatPlaceProxyModel::roleNames() const
 {
     return {
-        { PositionRole, "position" },
-        { CountryNameRole, "country" },
-        { CityNameRole, "city" },
-        { PlaceInfoRole, "placeInfo" },
-        { ActiveRole, "isActiveConnection" },
+        { PositionRole, "position" },   { CountryNameRole, "country" },       { CityNameRole, "city" },
+        { PlaceInfoRole, "placeInfo" }, { ActiveRole, "isActiveConnection" },
     };
 }
 
