@@ -101,6 +101,7 @@
 TrayIcon::TrayIcon(QObject *parent)
     : QSystemTrayIcon(parent)
     , m_isFirstChange(true)
+    , m_duration(5 * utils::oneSecondMs())
 {
     deployDefaults();
     reloadIcons();
