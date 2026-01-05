@@ -22,12 +22,11 @@
 #include <QFutureWatcher>
 #include <QObject>
 
-class ActionStorage;
 class ServersListManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit ServersListManager(ActionStorage *actionStorage, QObject *parent = {});
+    explicit ServersListManager(QObject *parent = {});
     ~ServersListManager() override;
 
     bool reload();
@@ -41,7 +40,6 @@ private slots:
     void run();
 
 private:
-    ActionStorage *m_actionStorage;
     QFutureWatcher<void> m_futureWatcher;
 
     Places queryGroups() const;
