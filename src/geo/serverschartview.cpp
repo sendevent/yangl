@@ -198,7 +198,9 @@ void ServersChartView::requestServersList()
 
 void ServersChartView::onReloadRequested()
 {
-    handleLocationReadingPorgress(1, 150);
+    m_progressBar->setRange(0, 0); // indeterminate until we know the total
+    m_progressBar->setVisible(true);
+    m_buttonReload->setVisible(false);
     requestServersList();
 }
 
@@ -368,6 +370,15 @@ PlaceInfo ServersChartView::findActivePlace(const QString &country, const QStrin
 
 void ServersChartView::handleLocationReadingPorgress(int current, int total)
 {
+    if (!m_progressBar->isVisible()) {
+        m_progressBar->setRange(0, total);
+        m_progressBar->setVisible(true);
+        m_buttonReload->setVisible(false);
+    }
+
+    m_progressBar->setMaximum(total);
+    m_progressBar->setValue(current);
+
     const bool finished = current == total;
     if (finished) {
         m_timer->stop();
