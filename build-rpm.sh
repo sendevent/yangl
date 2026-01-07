@@ -51,28 +51,13 @@ fi
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
-cmake .. "${CMAKE_ARGS[@]}"
-
-if [ $? -ne 0 ]; then
-    echo "Could not execute cmake"
-    exit 1
-fi
+cmake .. "${CMAKE_ARGS[@]}" || { echo "Could not execute cmake"; exit 1; }
 
 # --- Build ---
-make -j"$(nproc)"
-
-if [ $? -ne 0 ]; then
-    echo "Could not execute make"
-    exit 2
-fi
+make -j"$(nproc)" || { echo "Could not execute make"; exit 2; }
 
 # --- Package ---
-cpack -G RPM
-
-if [ $? -ne 0 ]; then
-    echo "Could not create .rpm package"
-    exit 3
-fi
+cpack -G RPM || { echo "Could not create .rpm package"; exit 3; }
 
 FINISHED_AT=$(date +"%I:%M:%S.%N")
 
