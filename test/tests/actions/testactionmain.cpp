@@ -1,5 +1,5 @@
-#include "testaction.h"
+#include "testactiontests.h"
 
 #include <QTest>
 
-QTEST_MAIN(TestAction)
+QTEST_MAIN(TestActionTests)

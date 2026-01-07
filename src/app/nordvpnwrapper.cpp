@@ -57,13 +57,14 @@ NordVpnWrapper::NordVpnWrapper(QObject *parent)
     m_trayIcon->setVisible(true);
 }
 
+/*static*/ NordVpnWrapper *NordVpnWrapper::s_instance = nullptr;
+
 /*static*/ NordVpnWrapper *NordVpnWrapper::instance()
 {
-    static NordVpnWrapper *pInstance { nullptr };
-    if (!pInstance) {
-        pInstance = new NordVpnWrapper(qApp);
+    if (!s_instance) {
+        s_instance = new NordVpnWrapper(qApp);
     }
-    return pInstance;
+    return s_instance;
 }
 
 /*static*/ void NordVpnWrapper::init()
@@ -73,8 +74,8 @@ NordVpnWrapper::NordVpnWrapper(QObject *parent)
 
 /*static*/ void NordVpnWrapper::registerAction(Action *act)
 {
-    if (act) {
-        connect(act, &Action::invocationError, instance(), &NordVpnWrapper::notifyError);
+    if (act && s_instance) {
+        connect(act, &Action::invocationError, s_instance, &NordVpnWrapper::notifyError);
     }
 }
 
