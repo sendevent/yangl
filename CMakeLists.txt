@@ -10,7 +10,7 @@ project(yangl
   LANGUAGES CXX
 )
 
-find_package(Qt6 REQUIRED COMPONENTS
+find_package(Qt6 6.8 REQUIRED COMPONENTS
     Core
     Gui
     Widgets
