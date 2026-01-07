@@ -64,7 +64,7 @@ void TestActionStorage::initTestCase()
 
 void TestActionStorage::cleanupTestCase()
 {
-    static const QString path = SettingsManager::dirPath();
+    const QString path = SettingsManager::dirPath();
     for (const auto &file : { "actions.json", "settings.conf" })
         QFile::remove(QString("%1/%2").arg(path, file));
 }

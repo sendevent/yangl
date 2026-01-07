@@ -27,9 +27,9 @@
 
 void TestActionTests::testCreate_Builtin()
 {
-    static const Action::Flow scope = Action::Flow::NordVPN;
+    const Action::Flow scope = Action::Flow::NordVPN;
     for (auto actionType : Action::nvpnActions()) {
-        static const Action::Id &id = Action::Id::createUuid();
+        const Action::Id id = Action::Id::createUuid();
 
         const Action::Ptr action(new TestAction(scope, actionType, {}, id));
         TestAction().checkAction(action, static_cast<int>(actionType), scope, id);
@@ -41,9 +41,9 @@ void TestActionTests::testCreate_Builtin()
 
 void TestActionTests::testCreate_Custom()
 {
-    static const Action::Flow scope = Action::Flow::Custom;
-    static const Action::Id &id = Action::Id::createUuid();
-    static const Action::NordVPN actionType = Action::NordVPN::Unknown;
+    const Action::Flow scope = Action::Flow::Custom;
+    const Action::Id id = Action::Id::createUuid();
+    const Action::NordVPN actionType = Action::NordVPN::Unknown;
 
     const Action::Ptr action(new TestAction(scope, actionType, {}, id));
     TestAction().checkAction(action, static_cast<int>(actionType), scope, id);
@@ -54,7 +54,7 @@ void TestActionTests::testCreate_Custom()
 
 void TestActionTests::testSetTitle()
 {
-    static const QString testValue("test");
+    const QString testValue("test");
     const Action::Ptr action(new TestAction(Action::Flow::Custom, Action::NordVPN::Unknown));
     QSignalSpy spy(action.get(), &Action::titleChanged);
 
@@ -69,7 +69,7 @@ void TestActionTests::testSetTitle()
 
 void TestActionTests::testSetApp()
 {
-    static const QString testValue("/no/such/app");
+    const QString testValue("/no/such/app");
     const Action::Ptr action(new TestAction(Action::Flow::Custom, Action::NordVPN::Unknown));
     QSignalSpy spy(action.get(), &Action::appChanged);
 
@@ -84,7 +84,7 @@ void TestActionTests::testSetApp()
 
 void TestActionTests::testSetArgs()
 {
-    static const QStringList testValue { "-a", "\"b c d\"", "e" };
+    const QStringList testValue { "-a", "\"b c d\"", "e" };
     const Action::Ptr action(new TestAction(Action::Flow::Custom, Action::NordVPN::Unknown));
     QSignalSpy spy(action.get(), &Action::argsChanged);
 
@@ -99,7 +99,7 @@ void TestActionTests::testSetArgs()
 
 void TestActionTests::testSetTimeout()
 {
-    static const int testValue(1);
+    const int testValue(1);
     const Action::Ptr action(new TestAction(Action::Flow::Custom, Action::NordVPN::Unknown));
     QSignalSpy spy(action.get(), &Action::timeoutChanged);
 
@@ -114,7 +114,7 @@ void TestActionTests::testSetTimeout()
 
 void TestActionTests::testSetForcedShow()
 {
-    static const bool testValue(true);
+    const bool testValue(true);
     const Action::Ptr action(new TestAction(Action::Flow::Custom, Action::NordVPN::Unknown));
     QSignalSpy spy(action.get(), &Action::forcedShowChanged);
 
@@ -129,7 +129,7 @@ void TestActionTests::testSetForcedShow()
 
 void TestActionTests::testSetAnchor()
 {
-    static const Action::MenuPlace testValue(Action::MenuPlace::Own);
+    const Action::MenuPlace testValue(Action::MenuPlace::Own);
     const Action::Ptr action(new TestAction(Action::Flow::Custom, Action::NordVPN::Unknown));
     QSignalSpy spy(action.get(), &Action::anchorChanged);
 

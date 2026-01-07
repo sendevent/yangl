@@ -44,7 +44,6 @@ void TestCLICall::test_call()
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
     const QString &filesList = arguments.at(0).toString();
-    qDebug() << filesList;
     QVERIFY(arguments.at(0).typeId() == QVariant::String);
     QCOMPARE(filesList, receivedResult);
     QVERIFY(filesList.contains("Test_CLICall"));
@@ -52,7 +51,6 @@ void TestCLICall::test_call()
     QCOMPARE(call->result(), filesList);
     QCOMPARE(call->exitCode(), 0);
     QCOMPARE(call->exitStatus(), QProcess::ExitStatus::NormalExit);
-    QCOMPARE(call->result(), filesList);
     QCOMPARE(call->errors(), QString());
 }
 
