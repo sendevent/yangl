@@ -97,12 +97,22 @@ make -j$(nproc)
 On Fedora/RHEL: `sudo dnf install rpm-build`
 On Debian/Ubuntu: `sudo apt install rpm`
 
+### AppImage
+
+[build-appimage.sh](build-appimage.sh) builds the project and creates a self-contained `.AppImage` in `./appimagebuild`. It automatically downloads [linuxdeploy](https://github.com/linuxdeploy/linuxdeploy) and its Qt plugin on first run:
+```
+./build-appimage.sh
+```
+
+The resulting AppImage bundles Qt and all dependencies — users just download, `chmod +x`, and run.
+
 ### Custom Qt path
 
 All build scripts accept the `--qt-dir` option to specify a non-system Qt installation:
 ```
-./build-deb.sh --qt-dir ~/Qt/6.8.3/gcc_64
-./build-rpm.sh --qt-dir ~/Qt/6.8.3/gcc_64
+./build-deb.sh      --qt-dir ~/Qt/6.8.3/gcc_64
+./build-rpm.sh      --qt-dir ~/Qt/6.8.3/gcc_64
+./build-appimage.sh --qt-dir ~/Qt/6.8.3/gcc_64
 ```
 
 When omitted, the scripts use whatever Qt6 is found on the system.
