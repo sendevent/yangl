@@ -59,9 +59,14 @@ Open [CMakeLists.txt](CMakeLists.txt) and build it as a regular project.
 
 #### Build script
 
-[build.sh](build.sh) performs the build process in the sub directory ./scriptbuild (created automatically). On success, the directory would contain yangl executable:
+[build.sh](build.sh) performs the build process in the sub directory `./scriptbuild` (created automatically). On success, the binary is located at `./scriptbuild/src/yangl`:
 ```
-chmod +x ./build.sh && ./build.sh
+./build.sh
+```
+
+If Qt is installed in a custom location (e.g. via Qt Online Installer), pass it explicitly:
+```
+./build.sh --qt-dir ~/Qt/6.8.3/gcc_64
 ```
 
 #### Manual steps
@@ -70,5 +75,34 @@ chmod +x ./build.sh && ./build.sh
 mkdir ./manualbuild
 cd ./manualbuild
 cmake .. -DCMAKE_BUILD_TYPE=Release
-make -j`nproc`
+make -j$(nproc)
 ```
+
+## Packaging
+
+### .deb (Debian/Ubuntu)
+
+[build-deb.sh](build-deb.sh) builds the project and creates a `.deb` package in `./debbuild`. Requires `dpkg-deb`:
+```
+./build-deb.sh
+```
+
+### .rpm (Fedora/RHEL/openSUSE)
+
+[build-rpm.sh](build-rpm.sh) builds the project and creates an `.rpm` package in `./rpmbuild`. Requires `rpmbuild`:
+```
+./build-rpm.sh
+```
+
+On Fedora/RHEL: `sudo dnf install rpm-build`
+On Debian/Ubuntu: `sudo apt install rpm`
+
+### Custom Qt path
+
+All build scripts accept the `--qt-dir` option to specify a non-system Qt installation:
+```
+./build-deb.sh --qt-dir ~/Qt/6.8.3/gcc_64
+./build-rpm.sh --qt-dir ~/Qt/6.8.3/gcc_64
+```
+
+When omitted, the scripts use whatever Qt6 is found on the system.
