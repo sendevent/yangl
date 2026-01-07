@@ -18,7 +18,6 @@
 #include "actions/testaction.h"
 #include "cli/clicaller.h"
 
-#include <QElapsedTimer>
 #include <QSignalSpy>
 #include <QTest>
 #include <memory>
@@ -37,30 +36,30 @@ void TestCLICaller::test_performAction()
     action->setApp("/usr/bin/ls");
     action->setArgs({ "-la" });
 
-    bool actionPerformed(false);
-    connect(action.get(), &Action::performed, this,
-            [&actionPerformed](const Action::Id & /*id*/, const QString & /*result*/, bool /*ok*/,
-                               const Action::RunInfo & /*info*/) { actionPerformed = true; });
-
     QSignalSpy spy(action.get(), &Action::performed);
 
     CLICall *call = action->createRequest();
     QVERIFY(call != nullptr);
 
     std::unique_ptr<CLICaller> caller(new CLICaller);
-    caller->runCall(call);
+    QVERIFY(caller->runCall(call));
 
-    QElapsedTimer timer;
-    timer.start();
-    while (!actionPerformed && timer.elapsed() < CLICall::DefaultTimeoutMSecs)
-        QTest::qWait(10);
+    if (spy.isEmpty())
+        QVERIFY(spy.wait());
 
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
     QVERIFY(arguments.at(0).typeId() == QVariant::Uuid);
     QVERIFY(arguments.at(1).typeId() == QVariant::String);
+    QVERIFY(!arguments.at(1).toString().isEmpty());
     QVERIFY(arguments.at(2).typeId() == QVariant::Bool);
-    QVERIFY(arguments.at(2).toBool() == true);
+    QCOMPARE(arguments.at(2).toBool(), true);
+
+    const auto runInfo = arguments.at(3).value<Action::RunInfo>();
+    QVERIFY(runInfo.exitCode.isEmpty()); // exitCode is empty string on success (0)
+    QVERIFY(!runInfo.result.isEmpty());
+    QVERIFY(runInfo.errors.isEmpty());
+    QVERIFY(!runInfo.timeStamp.isEmpty());
 }
 
 QTEST_MAIN(TestCLICaller)

@@ -140,15 +140,6 @@ void TestCoordinatesResolver::test_location_fake()
 
 const QList<QPair<QString, QString>> generateDataSet(const QString &country, const QString &city)
 {
-    /*{
-        { "Country", "City" },
-        { "country", "city" },
-        { "country", "City" },
-        { "Country", "city" },
-        { "Country", "" },
-        { "country", "" },
-    }*/
-
     auto capitalize = [](const QString &value) {
         auto str(value);
         str[0] = str[0].toUpper();
@@ -258,8 +249,6 @@ void TestCoordinatesResolver::test_requestCoordinates_fake()
         QCOMPARE(city.town, "Emerald City");
         QVERIFY(!city.location.isValid());
     };
-
-    const QList<QPair<QString, QString>> &data = ::generateDataSet("Oz", "Emerald City");
 
     {
         QSignalSpy spy(&resolver, &CoordinatesResolver::coordinatesResolved);

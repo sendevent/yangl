@@ -20,6 +20,7 @@
 #include "cli/clicaller.h"
 #include "settings/appsettings.h"
 
+#include <QElapsedTimer>
 #include <QObject>
 #include <QSharedPointer>
 #include <QSignalSpy>
@@ -36,7 +37,6 @@ private slots:
     void onStatusCheckPerformed(const NordVpnInfo::Status &status);
 
     void initTestCase();
-    void init();
 
     void test_active();
     void test_interval();
@@ -75,22 +75,19 @@ void TestStateChecker::initTestCase()
     connect(m_checker.get(), &StateChecker::statusChanged, this, &TestStateChecker::onStatusCheckPerformed);
 }
 
-void TestStateChecker::init() { }
-
 void TestStateChecker::test_active()
 {
     QSignalSpy spy(m_checker.get(), &StateChecker::statusChanged);
 
     QCOMPARE(m_checker->isActive(), false);
-    m_checker->setActive(true); // tirggers StateChecker::check which triggers StateChecker::statusChanged
+    m_checker->setActive(true); // triggers StateChecker::check which triggers StateChecker::statusChanged
                                 // which may be wrongly caught by upfollowing tests
     QCOMPARE(m_checker->isActive(), true);
     m_checker->setActive(false);
     QCOMPARE(m_checker->isActive(), false);
 
-    while (spy.count() != 1) {
-        QTest::qWait(50);
-    }
+    if (spy.isEmpty())
+        QVERIFY(spy.wait());
 }
 
 void TestStateChecker::test_interval()
@@ -133,12 +130,11 @@ void TestStateChecker::test_check(NordVpnInfo::Status targetStatus)
 
     m_checker->check();
 
-    QElapsedTimer timer;
-    timer.start();
-    while (m_detectedStatus == sourceStatus && timer.elapsed() < CLICall::DefaultTimeoutMSecs)
-        QTest::qWait(10);
+    if (spy.isEmpty())
+        QVERIFY(spy.wait(CLICall::DefaultTimeoutMSecs));
 
     QCOMPARE(m_checker->state().status(), targetStatus);
+    QVERIFY(spy.count() >= 1);
 
     const QList<QVariant> &arguments = spy.takeLast();
     const auto &arg = arguments.at(0);
