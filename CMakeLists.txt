@@ -35,7 +35,7 @@ qt_standard_project_setup()
 
 add_subdirectory(src)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
+target_link_libraries(yangl_lib PUBLIC
     Qt6::Core
     Qt6::Gui
     Qt6::Widgets
@@ -48,7 +48,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Positioning
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/src/)
+target_include_directories(yangl_lib PUBLIC ${CMAKE_SOURCE_DIR}/src/)
 
 option(DISABLE_TESTS "Disable unit tests" ON)
 if(NOT DISABLE_TESTS)

@@ -40,12 +40,15 @@ void TestCLICaller::test_performAction()
     bool actionPerformed(false);
     connect(action.get(), &Action::performed, this,
             [&actionPerformed](const Action::Id & /*id*/, const QString & /*result*/, bool /*ok*/,
-                               const QString & /*info*/) { actionPerformed = true; });
+                               const Action::RunInfo & /*info*/) { actionPerformed = true; });
 
     QSignalSpy spy(action.get(), &Action::performed);
 
+    CLICall *call = action->createRequest();
+    QVERIFY(call != nullptr);
+
     std::unique_ptr<CLICaller> caller(new CLICaller);
-    caller->performAction(action.get());
+    caller->runCall(call);
 
     QElapsedTimer timer;
     timer.start();
@@ -57,7 +60,6 @@ void TestCLICaller::test_performAction()
     QVERIFY(arguments.at(0).typeId() == QVariant::Uuid);
     QVERIFY(arguments.at(1).typeId() == QVariant::String);
     QVERIFY(arguments.at(2).typeId() == QVariant::Bool);
-    QVERIFY(arguments.at(3).typeId() == QVariant::String);
     QVERIFY(arguments.at(2).toBool() == true);
 }
 

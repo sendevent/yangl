@@ -20,6 +20,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 #include "actions/action.h"
 
 class ActionStorage;
+
+// Helper class: a concrete Action subclass for use in tests.
+// Test methods for Action itself live in TestActionTests (testactiontests.h).
 class TestAction : public Action
 {
     Q_OBJECT
@@ -28,19 +31,9 @@ public:
                const Action::Id &id = {});
     ~TestAction() = default;
 
-private:
-    static int MetaIdMenuPlace;
-private slots:
-    void testCreate_Builtin();
-    void testCreate_Custom();
-
     void checkAction(const Action::Ptr &action, int expectedType, Action::Flow expectedScope,
                      const Action::Id &expectedId = {}) const;
 
-    void testSetTitle();
-    void testSetApp();
-    void testSetArgs();
-    void testSetTimeout();
-    void testSetForcedShow();
-    void testSetAnchor();
+private:
+    static int MetaIdMenuPlace;
 };
