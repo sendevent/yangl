@@ -28,6 +28,8 @@ class TestCLICaller : public QObject
 
 private slots:
     void test_performAction();
+    void test_runCall_null();
+    void test_performAction_failure();
 };
 
 void TestCLICaller::test_performAction()
@@ -59,6 +61,37 @@ void TestCLICaller::test_performAction()
     QVERIFY(runInfo.exitCode.isEmpty()); // exitCode is empty string on success (0)
     QVERIFY(!runInfo.result.isEmpty());
     QVERIFY(runInfo.errors.isEmpty());
+    QVERIFY(!runInfo.timeStamp.isEmpty());
+}
+
+void TestCLICaller::test_runCall_null()
+{
+    CLICaller caller;
+    QCOMPARE(caller.runCall(nullptr), false);
+}
+
+void TestCLICaller::test_performAction_failure()
+{
+    Action::Ptr action(new TestAction(Action::Flow::Custom, Action::NordVPN::Unknown));
+    action->setApp("/usr/bin/false");
+
+    QSignalSpy spy(action.get(), &Action::performed);
+
+    CLICall *call = action->createRequest();
+    QVERIFY(call != nullptr);
+
+    CLICaller caller;
+    QVERIFY(caller.runCall(call));
+
+    if (spy.isEmpty())
+        QVERIFY(spy.wait());
+
+    QCOMPARE(spy.count(), 1);
+    const QList<QVariant> &arguments = spy.takeFirst();
+    QCOMPARE(arguments.at(2).toBool(), false);
+
+    const auto runInfo = arguments.at(3).value<Action::RunInfo>();
+    QVERIFY(!runInfo.exitCode.isEmpty());
     QVERIFY(!runInfo.timeStamp.isEmpty());
 }
 
