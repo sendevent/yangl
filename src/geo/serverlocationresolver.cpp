@@ -34,12 +34,14 @@ ServerLocationResolver::ServerLocationResolver(ActionStorage * /*actionStorage*/
     , m_geoResolver(new CoordinatesResolver(this))
 {
     connect(m_listManager, &ServersListManager::citiesAdded, this, &ServerLocationResolver::resolveServers);
-    connect(m_listManager, &ServersListManager::citiesCount, this, [this](int total) { m_serversFound = total; });
+    connect(m_listManager, &ServersListManager::discoveryProgress, this, &ServerLocationResolver::progressChanged);
+    connect(m_listManager, &ServersListManager::ready, this, &ServerLocationResolver::onDiscoveryComplete);
     connect(m_geoResolver, &CoordinatesResolver::coordinatesResolved, this, &ServerLocationResolver::onPlaceResolved);
 }
 
 void ServerLocationResolver::resolveServers(const Places &places)
 {
+    m_serversFound += places.size();
     for (const auto &place : places) {
         resolveServerLocation(place);
     }
@@ -199,8 +201,11 @@ void ServerLocationResolver::refresh()
     if (needActualization) {
         m_serversFound = 0;
         m_serversResolved = 0;
+        m_discoveryComplete = false;
 
         m_listManager->reload();
+    } else if (m_serversFound > 0) {
+        emit allResolved();
     }
 }
 
@@ -210,5 +215,19 @@ void ServerLocationResolver::notifyPlace(const PlaceInfo &place)
 
     LOG << m_serversResolved << m_serversFound;
 
-    emit serverLocationResolved(place, m_serversResolved, m_serversFound);
+    emit serverLocationResolved(place);
+    checkCompletion();
+}
+
+void ServerLocationResolver::onDiscoveryComplete()
+{
+    m_discoveryComplete = true;
+    checkCompletion();
+}
+
+void ServerLocationResolver::checkCompletion()
+{
+    if (m_discoveryComplete && m_serversFound > 0 && m_serversResolved >= m_serversFound) {
+        emit allResolved();
+    }
 }

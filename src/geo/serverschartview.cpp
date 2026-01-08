@@ -137,6 +137,8 @@ void ServersChartView::initUi()
 void ServersChartView::initConnections()
 {
     connect(m_listManager, &ServerLocationResolver::serverLocationResolved, this, &ServersChartView::onGotLocation);
+    connect(m_listManager, &ServerLocationResolver::progressChanged, this, &ServersChartView::onProgressChanged);
+    connect(m_listManager, &ServerLocationResolver::allResolved, this, &ServersChartView::onAllServersResolved);
     connect(m_connectionLabel, &QLabel::linkActivated, this, &ServersChartView::navigateToConnection);
 
     connect(m_treeView->selectionModel(), &QItemSelectionModel::currentChanged, this,
@@ -204,11 +206,9 @@ void ServersChartView::onReloadRequested()
     requestServersList();
 }
 
-void ServersChartView::onGotLocation(const PlaceInfo &place, int current, int total)
+void ServersChartView::onGotLocation(const PlaceInfo &place)
 {
-    LOG << place.country << place.town << place.location << current << total;
-
-    handleLocationReadingProgress(current, total);
+    LOG << place.country << place.town << place.location;
 
     if (!place.ok) {
         WRN << place.country << place.town << place.message;
@@ -368,22 +368,21 @@ PlaceInfo ServersChartView::findActivePlace(const QString &country, const QStrin
     return m_instance;
 }
 
-void ServersChartView::handleLocationReadingProgress(int current, int total)
+void ServersChartView::onProgressChanged(int current, int total)
 {
     if (!m_progressBar->isVisible()) {
-        m_progressBar->setRange(0, total);
         m_progressBar->setVisible(true);
         m_buttonReload->setVisible(false);
     }
 
-    m_progressBar->setMaximum(total);
+    m_progressBar->setRange(0, total);
     m_progressBar->setValue(current);
+}
 
-    const bool finished = current == total;
-    if (finished) {
-        m_timer->stop();
-        m_timer->start();
-    }
+void ServersChartView::onAllServersResolved()
+{
+    m_timer->stop();
+    m_timer->start();
 }
 
 void ServersChartView::saveServerLocationsCache()

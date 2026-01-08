@@ -121,17 +121,16 @@ void ServersListManager::run()
 void ServersListManager::runSeparated()
 {
     const auto &groups = queryGroups();
-    int total = groups.size();
-    emit citiesCount(total);
     notifyPlacesAdded(groups);
 
     const auto &countries = queryCountries();
-    for (const auto &country : countries) {
-        const auto &chunk = queryCities(country.country);
-        total += chunk.size();
-        emit citiesCount(total);
+    const int totalCountries = countries.size();
+    emit discoveryProgress(0, totalCountries);
 
+    for (int i = 0; i < totalCountries; ++i) {
+        const auto &chunk = queryCities(countries[i].country);
         notifyPlacesAdded(chunk);
+        emit discoveryProgress(i + 1, totalCountries);
     }
 }
 
