@@ -29,6 +29,8 @@ class ActionResultViewer : public QWidget
 {
     Q_OBJECT
 public:
+    ~ActionResultViewer() override;
+
     static void makeVisible();
     static void registerAction(Action *action);
     static void unregisterAction(Action *action);

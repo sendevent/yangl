@@ -1,4 +1,6 @@
 add_qt_test(Test_Action
+  testactiontests.cpp
+  testactiontests.h
   testaction.cpp
   testaction.h
   testactionmain.cpp

@@ -78,6 +78,8 @@ private:
 
     static bool isAcceptableAction(const Action *action, Action::Flow expectedFlow, const QString &callerInfo);
 
+    static NordVpnWrapper *s_instance;
+
     QString m_lastCountry;
     QString m_lastCity;
 

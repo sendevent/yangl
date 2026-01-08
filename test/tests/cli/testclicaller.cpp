@@ -18,7 +18,6 @@
 #include "actions/testaction.h"
 #include "cli/clicaller.h"
 
-#include <QElapsedTimer>
 #include <QSignalSpy>
 #include <QTest>
 #include <memory>
@@ -29,6 +28,8 @@ class TestCLICaller : public QObject
 
 private slots:
     void test_performAction();
+    void test_runCall_null();
+    void test_performAction_failure();
 };
 
 void TestCLICaller::test_performAction()
@@ -37,28 +38,61 @@ void TestCLICaller::test_performAction()
     action->setApp("/usr/bin/ls");
     action->setArgs({ "-la" });
 
-    bool actionPerformed(false);
-    connect(action.get(), &Action::performed, this,
-            [&actionPerformed](const Action::Id & /*id*/, const QString & /*result*/, bool /*ok*/,
-                               const QString & /*info*/) { actionPerformed = true; });
-
     QSignalSpy spy(action.get(), &Action::performed);
 
-    std::unique_ptr<CLICaller> caller(new CLICaller);
-    caller->performAction(action.get());
+    CLICall *call = action->createRequest();
+    QVERIFY(call != nullptr);
 
-    QElapsedTimer timer;
-    timer.start();
-    while (!actionPerformed && timer.elapsed() < CLICall::DefaultTimeoutMSecs)
-        QTest::qWait(10);
+    std::unique_ptr<CLICaller> caller(new CLICaller);
+    QVERIFY(caller->runCall(call));
+
+    if (spy.isEmpty())
+        QVERIFY(spy.wait());
 
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
     QVERIFY(arguments.at(0).typeId() == QVariant::Uuid);
     QVERIFY(arguments.at(1).typeId() == QVariant::String);
+    QVERIFY(!arguments.at(1).toString().isEmpty());
     QVERIFY(arguments.at(2).typeId() == QVariant::Bool);
-    QVERIFY(arguments.at(3).typeId() == QVariant::String);
-    QVERIFY(arguments.at(2).toBool() == true);
+    QCOMPARE(arguments.at(2).toBool(), true);
+
+    const auto runInfo = arguments.at(3).value<Action::RunInfo>();
+    QVERIFY(runInfo.exitCode.isEmpty()); // exitCode is empty string on success (0)
+    QVERIFY(!runInfo.result.isEmpty());
+    QVERIFY(runInfo.errors.isEmpty());
+    QVERIFY(!runInfo.timeStamp.isEmpty());
+}
+
+void TestCLICaller::test_runCall_null()
+{
+    CLICaller caller;
+    QCOMPARE(caller.runCall(nullptr), false);
+}
+
+void TestCLICaller::test_performAction_failure()
+{
+    Action::Ptr action(new TestAction(Action::Flow::Custom, Action::NordVPN::Unknown));
+    action->setApp("/usr/bin/false");
+
+    QSignalSpy spy(action.get(), &Action::performed);
+
+    CLICall *call = action->createRequest();
+    QVERIFY(call != nullptr);
+
+    CLICaller caller;
+    QVERIFY(caller.runCall(call));
+
+    if (spy.isEmpty())
+        QVERIFY(spy.wait());
+
+    QCOMPARE(spy.count(), 1);
+    const QList<QVariant> &arguments = spy.takeFirst();
+    QCOMPARE(arguments.at(2).toBool(), false);
+
+    const auto runInfo = arguments.at(3).value<Action::RunInfo>();
+    QVERIFY(!runInfo.exitCode.isEmpty());
+    QVERIFY(!runInfo.timeStamp.isEmpty());
 }
 
 QTEST_MAIN(TestCLICaller)

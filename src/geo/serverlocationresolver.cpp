@@ -34,13 +34,18 @@ ServerLocationResolver::ServerLocationResolver(ActionStorage * /*actionStorage*/
     , m_geoResolver(new CoordinatesResolver(this))
 {
     connect(m_listManager, &ServersListManager::citiesAdded, this, &ServerLocationResolver::resolveServers);
-    connect(m_listManager, &ServersListManager::citiesCount, this, [this](int total) { m_serversFound = total; });
+    connect(m_listManager, &ServersListManager::discoveryProgress, this, &ServerLocationResolver::progressChanged);
+    connect(m_listManager, &ServersListManager::ready, this, &ServerLocationResolver::onDiscoveryComplete);
     connect(m_geoResolver, &CoordinatesResolver::coordinatesResolved, this, &ServerLocationResolver::onPlaceResolved);
 }
 
 void ServerLocationResolver::resolveServers(const Places &places)
 {
+    m_serversFound += places.size();
     for (const auto &place : places) {
+        if (!place.isGroup()) {
+            m_refreshedCountries.insert(utils::geoToNvpn(place.country).toLower());
+        }
         resolveServerLocation(place);
     }
 }
@@ -91,8 +96,6 @@ static QString geoCacheFilePath()
 
 bool ServerLocationResolver::ensureCacheLoaded()
 {
-    bool needsActualization = false;
-
     if (!m_cacheLoaded) {
         m_serversFound = 0;
         m_serversResolved = 0;
@@ -101,19 +104,20 @@ bool ServerLocationResolver::ensureCacheLoaded()
         loadCache();
     }
 
-    if (!m_serversFound || !m_serversResolved || m_serversFound != m_serversResolved) {
-        needsActualization = true;
-    } else {
-        QFileInfo fi(geoCacheFilePath());
-        needsActualization = fi.lastModified().daysTo(QDateTime::currentDateTime()) >= 1;
+    if (!m_serversFound || m_serversFound != m_serversResolved) {
+        return true;
     }
 
-    if (!needsActualization) {
+    QFileInfo fi(geoCacheFilePath());
+    if (fi.lastModified().daysTo(QDateTime::currentDateTime()) < 1) {
         m_placesChecked = m_placesLoaded;
+        return false;
     }
 
-    return needsActualization;
+    return true;
 }
+
+static constexpr qint64 CacheTTLSecs = 7 * 24 * 3600; // 7 days
 
 namespace JsonConsts {
 static const QLatin1String Country { "country" };
@@ -121,6 +125,9 @@ static const QLatin1String City { "city" };
 static const QLatin1String Lat { "lat" };
 static const QLatin1String Lon { "lon" };
 static const QLatin1String Capital { "capital" };
+static const QLatin1String Places { "places" };
+static const QLatin1String Timestamps { "timestamps" };
+static const QLatin1String NordVpnVersion { "nordvpnVersion" };
 };
 
 void ServerLocationResolver::loadCache()
@@ -141,10 +148,23 @@ void ServerLocationResolver::loadCache()
         return;
     }
 
-    const auto &jArr = jDoc.array();
+    QJsonArray jArr;
+    if (jDoc.isArray()) {
+        jArr = jDoc.array();
+    } else if (jDoc.isObject()) {
+        const auto &root = jDoc.object();
+        jArr = root[JsonConsts::Places].toArray();
+        m_cachedNordVpnVersion = root[JsonConsts::NordVpnVersion].toString();
+        const auto &timestamps = root[JsonConsts::Timestamps].toObject();
+        for (auto it = timestamps.begin(); it != timestamps.end(); ++it) {
+            m_countryTimestamps[it.key()] = it.value().toInteger();
+        }
+    }
+
     m_serversFound = jArr.size();
 
-    for (const auto &jObj : jArr) {
+    for (const auto &jVal : jArr) {
+        const auto &jObj = jVal.toObject();
         const PlaceInfo place {
             jObj[JsonConsts::Country].toString(),
             jObj[JsonConsts::City].toString(),
@@ -158,11 +178,17 @@ void ServerLocationResolver::loadCache()
     }
 }
 
-void ServerLocationResolver::saveCache() const
+void ServerLocationResolver::saveCache()
 {
-    if (m_placesLoaded == m_placesChecked) {
+    if (m_placesLoaded == m_placesChecked && m_refreshedCountries.isEmpty()) {
         return;
     }
+
+    const qint64 now = QDateTime::currentSecsSinceEpoch();
+    for (const auto &country : m_refreshedCountries) {
+        m_countryTimestamps[country] = now;
+    }
+    m_refreshedCountries.clear();
 
     static const auto &to = geoCacheFilePath();
     QFile out(to);
@@ -185,7 +211,18 @@ void ServerLocationResolver::saveCache() const
         }
     }
 
-    const QJsonDocument jDoc(jArr);
+    QJsonObject timestamps;
+    for (auto it = m_countryTimestamps.cbegin(); it != m_countryTimestamps.cend(); ++it) {
+        timestamps[it.key()] = it.value();
+    }
+
+    const QJsonObject root {
+        { JsonConsts::Places, jArr },
+        { JsonConsts::Timestamps, timestamps },
+        { JsonConsts::NordVpnVersion, m_cachedNordVpnVersion },
+    };
+
+    const QJsonDocument jDoc(root);
     const QByteArray &data = jDoc.toJson();
     if (-1 == out.write(std::move(data))) {
         WRN << "error during file write:" << out.errorString();
@@ -197,10 +234,34 @@ void ServerLocationResolver::refresh()
     const bool needActualization = ensureCacheLoaded();
 
     if (needActualization) {
+        const QString currentVersion = m_listManager->queryVersion();
+        const bool versionChanged = !currentVersion.isEmpty()
+                                    && !m_cachedNordVpnVersion.isEmpty()
+                                    && currentVersion != m_cachedNordVpnVersion;
+        if (versionChanged) {
+            LOG << "NordVPN version changed:" << m_cachedNordVpnVersion << "->" << currentVersion;
+            m_countryTimestamps.clear();
+        }
+        m_cachedNordVpnVersion = currentVersion;
+
+        const auto fresh = freshCountries();
+
+        // Carry over cached data for countries that are still fresh
+        for (const auto &nvpnKey : fresh) {
+            const QString geoKey = utils::nvpnToGeo(nvpnKey).toLower();
+            if (m_placesLoaded.contains(geoKey)) {
+                m_placesChecked[geoKey] = m_placesLoaded[geoKey];
+            }
+        }
+
         m_serversFound = 0;
         m_serversResolved = 0;
+        m_discoveryComplete = false;
+        m_refreshedCountries.clear();
 
-        m_listManager->reload();
+        m_listManager->reload(fresh);
+    } else if (m_serversFound > 0) {
+        emit allResolved();
     }
 }
 
@@ -210,5 +271,32 @@ void ServerLocationResolver::notifyPlace(const PlaceInfo &place)
 
     LOG << m_serversResolved << m_serversFound;
 
-    emit serverLocationResolved(place, m_serversResolved, m_serversFound);
+    emit serverLocationResolved(place);
+    checkCompletion();
+}
+
+void ServerLocationResolver::onDiscoveryComplete()
+{
+    m_discoveryComplete = true;
+    checkCompletion();
+}
+
+void ServerLocationResolver::checkCompletion()
+{
+    if (m_discoveryComplete && m_serversFound > 0 && m_serversResolved >= m_serversFound) {
+        emit allResolved();
+    }
+}
+
+QSet<QString> ServerLocationResolver::freshCountries() const
+{
+    QSet<QString> fresh;
+    const qint64 now = QDateTime::currentSecsSinceEpoch();
+
+    for (auto it = m_countryTimestamps.cbegin(); it != m_countryTimestamps.cend(); ++it) {
+        if (now - it.value() < CacheTTLSecs) {
+            fresh.insert(it.key());
+        }
+    }
+    return fresh;
 }

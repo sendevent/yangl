@@ -140,15 +140,6 @@ void TestCoordinatesResolver::test_location_fake()
 
 const QList<QPair<QString, QString>> generateDataSet(const QString &country, const QString &city)
 {
-    /*{
-        { "Country", "City" },
-        { "country", "city" },
-        { "country", "City" },
-        { "Country", "city" },
-        { "Country", "" },
-        { "country", "" },
-    }*/
-
     auto capitalize = [](const QString &value) {
         auto str(value);
         str[0] = str[0].toUpper();
@@ -185,7 +176,8 @@ void TestCoordinatesResolver::test_requestCoordinates_real_1()
 
         const auto idRequested = m_resolver->requestCoordinates({ pair.first, pair.second });
 
-        spy.wait();
+        if (spy.isEmpty())
+            QVERIFY(spy.wait());
         QCOMPARE(spy.count(), 1);
         const QList<QVariant> &arguments = spy.takeFirst();
 
@@ -227,7 +219,8 @@ void TestCoordinatesResolver::test_requestCoordinates_real_3()
         const PlaceInfo placeRequested = { pair.first, pair.second };
         const auto idRequested = m_resolver->requestCoordinates(placeRequested);
 
-        spy.wait();
+        if (spy.isEmpty())
+            QVERIFY(spy.wait());
         QCOMPARE(spy.count(), 1);
         const QList<QVariant> &arguments = spy.takeFirst();
 
@@ -257,14 +250,13 @@ void TestCoordinatesResolver::test_requestCoordinates_fake()
         QVERIFY(!city.location.isValid());
     };
 
-    const QList<QPair<QString, QString>> &data = ::generateDataSet("Oz", "Emerald City");
-
     {
         QSignalSpy spy(&resolver, &CoordinatesResolver::coordinatesResolved);
 
         const auto idRequested = resolver.requestCoordinates({ "Oz", "Emerald City" });
 
-        spy.wait();
+        if (spy.isEmpty())
+            QVERIFY(spy.wait());
         QCOMPARE(spy.count(), 1);
         const QList<QVariant> &arguments = spy.takeFirst();
 
@@ -286,7 +278,8 @@ void TestCoordinatesResolver::test_requestCoordinates_fake()
 
         const auto idRequested = resolver.requestCoordinates("Oz", "Emerald City");
 
-        spy.wait();
+        if (spy.isEmpty())
+            QVERIFY(spy.wait());
         QCOMPARE(spy.count(), 1);
         const QList<QVariant> &arguments = spy.takeFirst();
 
