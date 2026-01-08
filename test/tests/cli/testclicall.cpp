@@ -26,6 +26,9 @@ class TestCLICall : public QObject
     Q_OBJECT
 private slots:
     void test_call();
+    void test_call_invalidApp();
+    void test_call_failure();
+    void test_call_success();
 };
 
 void TestCLICall::test_call()
@@ -49,6 +52,57 @@ void TestCLICall::test_call()
     QVERIFY(filesList.contains("Test_CLICall"));
 
     QCOMPARE(call->result(), filesList);
+    QCOMPARE(call->exitCode(), 0);
+    QCOMPARE(call->exitStatus(), QProcess::ExitStatus::NormalExit);
+    QCOMPARE(call->errors(), QString());
+}
+
+void TestCLICall::test_call_invalidApp()
+{
+    const Action::Ptr action(new TestAction());
+    action->setApp("/no/such/binary");
+
+    QSignalSpy errorSpy(action.get(), &Action::invocationError);
+
+    QString errorMsg;
+    CLICall *call = action->createRequest(&errorMsg);
+
+    QVERIFY(call == nullptr);
+    QVERIFY(!errorMsg.isEmpty());
+    QCOMPARE(errorSpy.count(), 1);
+    QVERIFY(!errorSpy.takeFirst().at(0).toString().isEmpty());
+}
+
+void TestCLICall::test_call_failure()
+{
+    const Action::Ptr action(new TestAction());
+    action->setApp("/usr/bin/false");
+
+    CLICall *call = action->createRequest();
+    QVERIFY(call != nullptr);
+
+    QSignalSpy spy(call, &CLICall::ready);
+    call->run();
+
+    QCOMPARE(spy.count(), 1);
+    QVERIFY(!call->success());
+    QVERIFY(call->exitCode() != 0);
+    QCOMPARE(call->exitStatus(), QProcess::ExitStatus::NormalExit);
+}
+
+void TestCLICall::test_call_success()
+{
+    const Action::Ptr action(new TestAction());
+    action->setApp("/usr/bin/true");
+
+    CLICall *call = action->createRequest();
+    QVERIFY(call != nullptr);
+
+    QSignalSpy spy(call, &CLICall::ready);
+    call->run();
+
+    QCOMPARE(spy.count(), 1);
+    QVERIFY(call->success());
     QCOMPARE(call->exitCode(), 0);
     QCOMPARE(call->exitStatus(), QProcess::ExitStatus::NormalExit);
     QCOMPARE(call->errors(), QString());
