@@ -40,9 +40,12 @@ private slots:
     void resolveServers(const Places &places);
 
     void onPlaceResolved(RequestId id, const PlaceInfo &place);
+    void onDiscoveryComplete();
 
 signals:
-    void serverLocationResolved(const PlaceInfo &place, int current, int total);
+    void serverLocationResolved(const PlaceInfo &place);
+    void progressChanged(int current, int total);
+    void allResolved();
 
 private:
     ServersListManager *m_listManager { nullptr };
@@ -52,9 +55,11 @@ private:
     int m_serversFound { 0 };
     int m_serversResolved { 0 };
     bool m_cacheLoaded { false };
+    bool m_discoveryComplete { false };
 
     bool ensureCacheLoaded();
     void loadCache();
 
     void notifyPlace(const PlaceInfo &place);
+    void checkCompletion();
 };

@@ -50,7 +50,9 @@ public slots:
 
 private slots:
     void onReloadRequested();
-    void onGotLocation(const PlaceInfo &place, int current, int total);
+    void onGotLocation(const PlaceInfo &place);
+    void onProgressChanged(int current, int total);
+    void onAllServersResolved();
     void onCurrentTreeItemChanged(const QModelIndex &current);
     void onTreeItemDoubleclicked(const QModelIndex &current);
 
@@ -87,6 +89,4 @@ private:
 
     PlaceInfo findActivePlace(const QString &country, const QString &city) const;
     void requestConnection(const PlaceInfo &place);
-
-    void handleLocationReadingProgress(int current, int total);
 };
