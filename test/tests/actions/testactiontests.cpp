@@ -24,6 +24,7 @@
 
 #include <QSignalSpy>
 #include <QTest>
+#include <memory>
 
 void TestActionTests::testCreate_Builtin()
 {
@@ -140,4 +141,49 @@ void TestActionTests::testSetAnchor()
     const QList<QVariant> &arguments = spy.takeFirst();
     QCOMPARE(arguments.at(0).value<Action::MenuPlace>(), testValue);
     QCOMPARE(arguments.at(0).toInt(), static_cast<int>(testValue));
+}
+
+void TestActionTests::testCreateRequest_invalidApp()
+{
+    const Action::Ptr action(new TestAction(Action::Flow::Custom, Action::NordVPN::Unknown));
+    action->setApp("/no/such/binary");
+
+    QSignalSpy errorSpy(action.get(), &Action::invocationError);
+
+    QString errorMsg;
+    CLICall *call = action->createRequest(&errorMsg);
+
+    QVERIFY(call == nullptr);
+    QVERIFY(!errorMsg.isEmpty());
+    QCOMPARE(errorSpy.count(), 1);
+    QVERIFY(!errorSpy.takeFirst().at(0).toString().isEmpty());
+}
+
+void TestActionTests::testCreateRequest_validApp()
+{
+    const Action::Ptr action(new TestAction(Action::Flow::Custom, Action::NordVPN::Unknown));
+    action->setApp("/usr/bin/true");
+
+    QSignalSpy errorSpy(action.get(), &Action::invocationError);
+
+    QString errorMsg;
+    CLICall *call = action->createRequest(&errorMsg);
+
+    QVERIFY(call != nullptr);
+    QVERIFY(errorMsg.isEmpty());
+    QCOMPARE(errorSpy.count(), 0);
+
+    delete call;
+}
+
+void TestActionTests::testSetTitle_noChangeNoSignal()
+{
+    const Action::Ptr action(new TestAction(Action::Flow::Custom, Action::NordVPN::Unknown));
+    action->setTitle("initial");
+
+    QSignalSpy spy(action.get(), &Action::titleChanged);
+    action->setTitle("initial");
+
+    QCOMPARE(spy.count(), 0);
+    QCOMPARE(action->title(), QStringLiteral("initial"));
 }

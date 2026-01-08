@@ -32,4 +32,8 @@ private slots:
     void testSetTimeout();
     void testSetForcedShow();
     void testSetAnchor();
+
+    void testCreateRequest_invalidApp();
+    void testCreateRequest_validApp();
+    void testSetTitle_noChangeNoSignal();
 };
