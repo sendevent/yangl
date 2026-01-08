@@ -41,9 +41,10 @@ ServersListManager::~ServersListManager()
     m_futureWatcher.waitForFinished();
 }
 
-bool ServersListManager::reload()
+bool ServersListManager::reload(const QSet<QString> &skipCountries)
 {
     if (!m_futureWatcher.isRunning()) {
+        m_skipCountries = skipCountries;
         QTimer::singleShot(0, this, &ServersListManager::run);
         return true;
     }
@@ -54,6 +55,14 @@ bool ServersListManager::reload()
 /*static*/ QStringList ServersListManager::stringToServers(const QString &in)
 {
     return in.split('\n', Qt::SkipEmptyParts).toVector();
+}
+
+QString ServersListManager::queryVersion() const
+{
+    const QString &appPath = AppSettings::Monitor->NVPNPath->read().toString();
+    CLICall call(appPath, { "--version" }, CLICall::DefaultTimeoutMSecs);
+    call.run();
+    return call.success() ? call.result().trimmed() : QString();
 }
 
 QStringList ServersListManager::queryList(const QStringList &args) const
@@ -124,11 +133,21 @@ void ServersListManager::runSeparated()
     notifyPlacesAdded(groups);
 
     const auto &countries = queryCountries();
-    const int totalCountries = countries.size();
-    emit discoveryProgress(0, totalCountries);
+
+    Places staleCountries;
+    for (const auto &country : countries) {
+        if (!m_skipCountries.contains(country.country.toLower())) {
+            staleCountries.append(country);
+        }
+    }
+
+    const int totalCountries = staleCountries.size();
+    if (totalCountries > 0) {
+        emit discoveryProgress(0, totalCountries);
+    }
 
     for (int i = 0; i < totalCountries; ++i) {
-        const auto &chunk = queryCities(countries[i].country);
+        const auto &chunk = queryCities(staleCountries[i].country);
         notifyPlacesAdded(chunk);
         emit discoveryProgress(i + 1, totalCountries);
     }

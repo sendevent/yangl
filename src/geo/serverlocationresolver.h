@@ -20,6 +20,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 #include "geo/placeinfo.h"
 
 #include <QObject>
+#include <QSet>
 
 class ActionStorage;
 class ServersListManager;
@@ -33,7 +34,7 @@ public:
 
 public slots:
     void refresh();
-    void saveCache() const;
+    void saveCache();
 
 private slots:
     void resolveServerLocation(const PlaceInfo &place);
@@ -50,8 +51,11 @@ signals:
 private:
     ServersListManager *m_listManager { nullptr };
     CoordinatesResolver *m_geoResolver { nullptr };
-    QMap<QString, QMultiMap<QString, PlaceInfo>> m_placesLoaded;
-    QMap<QString, QMultiMap<QString, PlaceInfo>> m_placesChecked;
+    CitiesByCountry m_placesLoaded;
+    CitiesByCountry m_placesChecked;
+    QMap<QString, qint64> m_countryTimestamps;
+    QSet<QString> m_refreshedCountries;
+    QString m_cachedNordVpnVersion;
     int m_serversFound { 0 };
     int m_serversResolved { 0 };
     bool m_cacheLoaded { false };
@@ -62,4 +66,5 @@ private:
 
     void notifyPlace(const PlaceInfo &place);
     void checkCompletion();
+    QSet<QString> freshCountries() const;
 };
