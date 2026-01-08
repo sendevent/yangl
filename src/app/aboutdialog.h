@@ -21,6 +21,8 @@
 #include <QMap>
 #include <QPointer>
 
+class QStatusBar;
+
 namespace Ui {
 class AboutDialog;
 }
@@ -51,6 +53,7 @@ private:
     static const QMap<AboutDialog::TabId, QString> m_tabs;
     static Ptr m_instance;
     Ui::AboutDialog *ui;
+    QStatusBar *m_statusBar;
     explicit AboutDialog(QWidget *parent = nullptr);
 
     QString readResourceFile(const QString &path) const;

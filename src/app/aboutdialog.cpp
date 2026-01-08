@@ -25,6 +25,7 @@
 #include <QDateTime>
 #include <QFile>
 #include <QPushButton>
+#include <QStatusBar>
 #include <QTextBrowser>
 #include <QVBoxLayout>
 
@@ -55,6 +56,11 @@ AboutDialog::AboutDialog(QWidget *parent)
     const QString buildDate =
             QDateTime::fromSecsSinceEpoch(yangl::V.BuildDateSeconds).toUTC().toString("dd MMM yyyy hh:mm:ss t");
     ui->labelBuilt->setText(tr("Built %1").arg(buildDate));
+
+    m_statusBar = new QStatusBar(this);
+    m_statusBar->setSizeGripEnabled(true);
+    layout()->addWidget(m_statusBar);
+    m_statusBar->show();
 
     for (int i = TabId::Yangl; i < TabId::Last; ++i)
         createTab(static_cast<AboutDialog::TabId>(i));
@@ -101,6 +107,9 @@ void AboutDialog::createTab(TabId tabId)
     ui->tabWidget->addTab(tab, nameParts.first());
 
     display->setOpenExternalLinks(true);
+    connect(display, &QTextBrowser::highlighted, m_statusBar,
+            [this](const QUrl &url) { m_statusBar->showMessage(url.toString()); });
+
     const QString &content = readResourceFile(QStringLiteral(":/about/resources/about/%1").arg(file));
     if (nameParts.last() == QStringLiteral("txt"))
         display->setPlainText(content);
