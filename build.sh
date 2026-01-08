@@ -1,47 +1,56 @@
 #!/bin/bash
+set -e
 
 BUILD_DIR=./scriptbuild
+QT_DIR=""
 
-STARTED_AT=`date +"%I:%M:%S.%N"`
+STARTED_AT=$(date +"%I:%M:%S.%N")
 
-echo $BUILD_DIR
+# --- Parse arguments ---
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --qt-dir)
+            QT_DIR="$2"
+            shift 2
+            ;;
+        --qt-dir=*)
+            QT_DIR="${1#*=}"
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Usage: $0 [--qt-dir <path>]"
+            exit 1
+            ;;
+    esac
+done
 
-if [ ! -d $BUILD_DIR ]; then
-    mkdir $BUILD_DIR
+# --- Configure ---
+echo "Build directory: $BUILD_DIR"
+
+CMAKE_ARGS=(
+    -DCMAKE_BUILD_TYPE=Release
+)
+
+if [ -n "$QT_DIR" ]; then
+    echo "Qt directory:    $QT_DIR"
+    CMAKE_ARGS+=(-DCMAKE_PREFIX_PATH="$QT_DIR")
+else
+    echo "Qt directory:    (system default)"
 fi
 
-if [ ! -d $BUILD_DIR ]; then
-    echo "Can't create build directory"
-    exit 1
-fi
+mkdir -p "$BUILD_DIR"
+cd "$BUILD_DIR"
 
-cd $BUILD_DIR
+cmake .. "${CMAKE_ARGS[@]}" || { echo "Could not execute cmake"; exit 1; }
 
-cmake .. -DCMAKE_BUILD_TYPE=Release
+# --- Build ---
+make -j"$(nproc)" || { echo "Could not execute make"; exit 2; }
 
-if [ $? -ne 0 ]; then
-    echo "Could not execute cmake"
-    exit 2
-fi
+FINISHED_AT=$(date +"%I:%M:%S.%N")
 
-make -j`nproc`
-
-if [ $? -ne 0 ]; then
-    echo "Could not execute make"
-    exit 3
-fi
-
-FINISHED_AT=`date +"%I:%M:%S.%N"`
-
-mv ./src/yangl yangl
-
-make clean
-
-find . -name Makefile | xargs rm
-rm -rf ./app ./tests ./test_fake_status
-
-echo -e "\nStarted:\t$STARTED_AT"
+echo ""
+echo -e "Started:\t$STARTED_AT"
 echo -e "Finished:\t$FINISHED_AT"
-echo "App binary:" $(realpath yangl)
-
-
+echo ""
+echo "App binary: $(realpath ./src/yangl)"

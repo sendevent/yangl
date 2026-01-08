@@ -1,1 +1,2 @@
 add_subdirectory(statechecker)
+add_subdirectory(nordvpnwrapper)

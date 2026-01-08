@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.31)
+cmake_minimum_required(VERSION 3.22)
 
 include(YanglVersionGen.cmake)
 include(CollectSourceFiles.cmake)
@@ -10,7 +10,7 @@ project(yangl
   LANGUAGES CXX
 )
 
-find_package(Qt6 REQUIRED COMPONENTS
+find_package(Qt6 6.8 REQUIRED COMPONENTS
     Core
     Gui
     Widgets
@@ -35,7 +35,7 @@ qt_standard_project_setup()
 
 add_subdirectory(src)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
+target_link_libraries(yangl_lib PUBLIC
     Qt6::Core
     Qt6::Gui
     Qt6::Widgets
@@ -48,7 +48,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Positioning
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/src/)
+target_include_directories(yangl_lib PUBLIC ${CMAKE_SOURCE_DIR}/src/)
 
 option(DISABLE_TESTS "Disable unit tests" ON)
 if(NOT DISABLE_TESTS)
@@ -60,8 +60,9 @@ install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 install(FILES packaging/yangl.desktop DESTINATION share/applications)
 install(FILES packaging/yangl.png DESTINATION share/icons/hicolor/256x256/apps)
 
-# --- Packaging (CPack / .deb) ---
-set(CPACK_GENERATOR "DEB")
+# --- Packaging (CPack) ---
+# Generator is selected at pack time via: cpack -G DEB|RPM
+
 set(CPACK_PACKAGE_NAME "yangl")
 set(CPACK_PACKAGE_VERSION "${YANGL_VERSION_FULL}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
@@ -71,17 +72,21 @@ set(CPACK_PACKAGE_DESCRIPTION
 set(CPACK_PACKAGE_MAINTAINER "Denis <denis@yangl>")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/sendevent/yangl/")
 set(CPACK_PACKAGE_CONTACT "https://github.com/sendevent/yangl/")
-set(CPACK_DEBIAN_PACKAGE_SECTION "net")
-set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/lgpl-3.0.txt")
 
-# Auto-detect shared library dependencies (Qt6, etc.)
+# --- DEB-specific ---
+set(CPACK_DEBIAN_PACKAGE_SECTION "net")
+set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-
-# Architecture auto-detection
 set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
-
-# Debian-style filename: yangl_2.0.1.321_amd64.deb
 set(CPACK_DEBIAN_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
+
+# --- RPM-specific ---
+set(CPACK_RPM_PACKAGE_LICENSE "LGPLv3")
+set(CPACK_RPM_PACKAGE_GROUP "Applications/Internet")
+set(CPACK_RPM_PACKAGE_URL "${CPACK_PACKAGE_HOMEPAGE_URL}")
+set(CPACK_RPM_PACKAGE_DESCRIPTION "${CPACK_PACKAGE_DESCRIPTION}")
+set(CPACK_RPM_PACKAGE_AUTOREQ ON)
+set(CPACK_RPM_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}.${CMAKE_SYSTEM_PROCESSOR}.rpm")
 
 include(CPack)

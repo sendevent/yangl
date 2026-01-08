@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-BUILD_DIR=./debbuild
+BUILD_DIR=./rpmbuild
 QT_DIR=""
 
 STARTED_AT=$(date +"%I:%M:%S.%N")
@@ -25,10 +25,11 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# --- Check for dpkg-deb ---
-if ! command -v dpkg-deb &> /dev/null; then
-    echo "Error: dpkg-deb is not installed."
-    echo "Install it with: sudo apt install dpkg  (Debian/Ubuntu)"
+# --- Check for rpmbuild ---
+if ! command -v rpmbuild &> /dev/null; then
+    echo "Error: rpmbuild is not installed."
+    echo "Install it with: sudo dnf install rpm-build  (Fedora/RHEL)"
+    echo "             or: sudo apt install rpm         (Debian/Ubuntu)"
     exit 1
 fi
 
@@ -56,7 +57,7 @@ cmake .. "${CMAKE_ARGS[@]}" || { echo "Could not execute cmake"; exit 1; }
 make -j"$(nproc)" || { echo "Could not execute make"; exit 2; }
 
 # --- Package ---
-cpack -G DEB || { echo "Could not create .deb package"; exit 3; }
+cpack -G RPM || { echo "Could not create .rpm package"; exit 3; }
 
 FINISHED_AT=$(date +"%I:%M:%S.%N")
 
@@ -65,4 +66,4 @@ echo -e "Started:\t$STARTED_AT"
 echo -e "Finished:\t$FINISHED_AT"
 echo ""
 echo "Package created:"
-ls -lh *.deb
+ls -lh *.rpm
