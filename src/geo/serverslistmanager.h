@@ -21,6 +21,7 @@
 
 #include <QFutureWatcher>
 #include <QObject>
+#include <QSet>
 
 class ServersListManager : public QObject
 {
@@ -29,7 +30,8 @@ public:
     explicit ServersListManager(QObject *parent = {});
     ~ServersListManager() override;
 
-    bool reload();
+    bool reload(const QSet<QString> &skipCountries = {});
+    QString queryVersion() const;
 
 signals:
     void ready();
@@ -41,6 +43,7 @@ private slots:
 
 private:
     QFutureWatcher<void> m_futureWatcher;
+    QSet<QString> m_skipCountries;
 
     Places queryGroups() const;
     Places queryCountries() const;
