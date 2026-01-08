@@ -49,6 +49,15 @@ ActionResultViewer::ActionResultViewer()
     });
 }
 
+ActionResultViewer::~ActionResultViewer()
+{
+    for (const auto &view : std::as_const(m_browsers)) {
+        if (view) {
+            disconnect(view, &QObject::destroyed, this, nullptr);
+        }
+    }
+}
+
 /*static*/ ActionResultViewer *ActionResultViewer::instance()
 {
     if (!m_instance)
