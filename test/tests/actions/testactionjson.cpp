@@ -34,6 +34,9 @@ private slots:
     void test_filePath();
     void test_load();
     void test_save();
+    void test_load_invalidJson();
+    void test_load_emptyInput();
+    void test_load_nullDevice();
 
 private:
     static const Action::Id TestId;
@@ -109,6 +112,41 @@ void TestActionJson::test_save()
     json.save(&out);
 
     QCOMPARE(outString, TestJson);
+}
+
+void TestActionJson::test_load_invalidJson()
+{
+    QByteArray garbage("{ this is not valid json !@#$ }");
+    QBuffer in(&garbage);
+    in.open(QIODevice::ReadOnly);
+
+    ActionStorage storage;
+    ActionJson json(&storage);
+
+    QCOMPARE(json.load(&in), false);
+    QCOMPARE(json.customActionIds(), {});
+}
+
+void TestActionJson::test_load_emptyInput()
+{
+    QByteArray empty;
+    QBuffer in(&empty);
+    in.open(QIODevice::ReadOnly);
+
+    ActionStorage storage;
+    ActionJson json(&storage);
+
+    QCOMPARE(json.load(&in), false);
+    QCOMPARE(json.customActionIds(), {});
+}
+
+void TestActionJson::test_load_nullDevice()
+{
+    ActionStorage storage;
+    ActionJson json(&storage);
+
+    QCOMPARE(json.load(static_cast<QIODevice *>(nullptr)), false);
+    QCOMPARE(json.customActionIds(), {});
 }
 
 QTEST_MAIN(TestActionJson)
