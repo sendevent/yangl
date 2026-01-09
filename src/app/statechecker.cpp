@@ -23,13 +23,16 @@
 
 #include <QTimer>
 
-/*static*/ const int StateChecker::DefaultIntervalMs = utils::oneSecondMs();
+/*static*/ const int StateChecker::DefaultIntervalMs = 3 * utils::oneSecondMs();
+/*static*/ const int StateChecker::MaxConsecutiveErrors = 3;
 
 StateChecker::StateChecker(CLICaller *bus, int intervalMs)
     : QObject()
     , m_bus(bus)
     , m_actCheck(nullptr)
     , m_timer(new QTimer(this))
+    , m_pollInFlight(false)
+    , m_consecutiveErrors(0)
     , m_state()
 {
     setInterval(intervalMs);
@@ -94,16 +97,24 @@ int StateChecker::interval() const
 
 void StateChecker::check()
 {
+    if (m_pollInFlight)
+        return;
+
     if (!m_actCheck) {
         notifyError(tr("Invalid Status-check Action instance"));
     } else if (!m_bus->runCall(m_actCheck->createRequest())) {
         stopTimer(); // sets Status::Unknown
+    } else {
+        m_pollInFlight = true;
     }
 }
 
 void StateChecker::onQueryFinish(const Action::Id &id, const QString &result, bool ok, const Action::RunInfo &info)
 {
+    m_pollInFlight = false;
+
     if (ok) {
+        m_consecutiveErrors = 0;
         updateState(result);
     } else {
         QString message = tr("Action invocation `%1` failed:").arg(id.toString());
@@ -163,8 +174,13 @@ void StateChecker::setStatus(NordVpnInfo::Status status)
 void StateChecker::notifyError(const QString &errorMessage)
 {
     WRN << errorMessage;
-    stopTimer(); // sets Status::Unknown
     emit error(errorMessage);
+
+    if (++m_consecutiveErrors >= MaxConsecutiveErrors) {
+        WRN << "Stopping monitor after" << m_consecutiveErrors << "consecutive errors";
+        m_consecutiveErrors = 0;
+        stopTimer(); // sets Status::Unknown
+    }
 }
 
 void StateChecker::stopTimer()
