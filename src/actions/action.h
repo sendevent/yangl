@@ -162,8 +162,6 @@ protected:
     static const QString GroupKeyBuiltin;
     static const QString GroupKeyCustom;
 
-    static int MetaIdId;
-
     explicit Action(Action::Flow scope, int type, QObject *parent = {}, const Action::Id &id = {});
 
     const Action::Id m_id;

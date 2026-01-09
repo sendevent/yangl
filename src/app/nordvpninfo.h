@@ -63,9 +63,6 @@ private:
     QString m_protocol;
     QString m_traffic;
     QString m_uptime;
-
-    static int MetaIdClass;
-    static int MetaIdEnum;
 };
 
 Q_DECLARE_METATYPE(NordVpnInfo::Status)
