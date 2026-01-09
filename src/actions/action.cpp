@@ -24,8 +24,6 @@
 /*static*/ const QString Action::GroupKeyBuiltin { QStringLiteral("builtin") };
 /*static*/ const QString Action::GroupKeyCustom { QStringLiteral("custom") };
 
-/*static*/ int Action::MetaIdId = -1;
-
 size_t qHash(Action::Yangl key, size_t seed)
 {
     return qHash(static_cast<int>(key), seed);
@@ -53,10 +51,6 @@ Action::Action(Action::Flow scope, int type, QObject *parent, const Action::Id &
     , m_forceShow(false)
     , m_menuPlace(MenuPlace::NoMenu)
 {
-    if (-1 == MetaIdId) {
-        MetaIdId = qRegisterMetaType<Action::Id>("Action::Id");
-    }
-
     connect(this, &Action::titleChanged, this, &Action::changed);
     connect(this, &Action::appChanged, this, &Action::changed);
     connect(this, &Action::argsChanged, this, &Action::changed);

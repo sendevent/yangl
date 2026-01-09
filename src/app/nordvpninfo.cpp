@@ -21,18 +21,8 @@
 
 #include <QMetaEnum>
 
-/*static*/ int NordVpnInfo::MetaIdClass = -1;
-/*static*/ int NordVpnInfo::MetaIdEnum = -1;
-
 NordVpnInfo::NordVpnInfo()
 {
-    if (-1 == NordVpnInfo::MetaIdClass) {
-        NordVpnInfo::MetaIdClass = qRegisterMetaType<NordVpnInfo>();
-    }
-    if (-1 == NordVpnInfo::MetaIdEnum) {
-        NordVpnInfo::MetaIdEnum = qRegisterMetaType<NordVpnInfo::Status>();
-    }
-
     clear();
 }
 
