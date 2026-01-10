@@ -24,6 +24,7 @@
 #include <QTimer>
 
 /*static*/ const int StateChecker::DefaultIntervalMs = utils::oneSecondMs();
+/*static*/ const int StateChecker::MaxConsecutiveErrors = 3;
 
 StateChecker::StateChecker(CLICaller *bus, int intervalMs)
     : QObject()
@@ -31,6 +32,7 @@ StateChecker::StateChecker(CLICaller *bus, int intervalMs)
     , m_actCheck(nullptr)
     , m_timer(new QTimer(this))
     , m_pollInFlight(false)
+    , m_consecutiveErrors(0)
     , m_state()
 {
     setInterval(intervalMs);
@@ -112,6 +114,7 @@ void StateChecker::onQueryFinish(const Action::Id &id, const QString &result, bo
     m_pollInFlight = false;
 
     if (ok) {
+        m_consecutiveErrors = 0;
         updateState(result);
     } else {
         QString message = tr("Action invocation `%1` failed:").arg(id.toString());
@@ -171,8 +174,13 @@ void StateChecker::setStatus(NordVpnInfo::Status status)
 void StateChecker::notifyError(const QString &errorMessage)
 {
     WRN << errorMessage;
-    stopTimer(); // sets Status::Unknown
     emit error(errorMessage);
+
+    if (++m_consecutiveErrors >= MaxConsecutiveErrors) {
+        WRN << "Stopping monitor after" << m_consecutiveErrors << "consecutive errors";
+        m_consecutiveErrors = 0;
+        stopTimer(); // sets Status::Unknown
+    }
 }
 
 void StateChecker::stopTimer()
