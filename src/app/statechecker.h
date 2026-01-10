@@ -59,6 +59,7 @@ protected:
     CLICaller *m_bus;
     Action::Ptr m_actCheck;
     QTimer *m_timer;
+    bool m_pollInFlight;
 
     NordVpnInfo m_state;
     void setState(const NordVpnInfo &state);
