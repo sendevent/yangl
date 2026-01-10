@@ -30,6 +30,7 @@ StateChecker::StateChecker(CLICaller *bus, int intervalMs)
     , m_bus(bus)
     , m_actCheck(nullptr)
     , m_timer(new QTimer(this))
+    , m_pollInFlight(false)
     , m_state()
 {
     setInterval(intervalMs);
@@ -94,15 +95,22 @@ int StateChecker::interval() const
 
 void StateChecker::check()
 {
+    if (m_pollInFlight)
+        return;
+
     if (!m_actCheck) {
         notifyError(tr("Invalid Status-check Action instance"));
     } else if (!m_bus->runCall(m_actCheck->createRequest())) {
         stopTimer(); // sets Status::Unknown
+    } else {
+        m_pollInFlight = true;
     }
 }
 
 void StateChecker::onQueryFinish(const Action::Id &id, const QString &result, bool ok, const Action::RunInfo &info)
 {
+    m_pollInFlight = false;
+
     if (ok) {
         updateState(result);
     } else {
