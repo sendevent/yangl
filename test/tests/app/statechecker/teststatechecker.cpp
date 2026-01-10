@@ -41,6 +41,7 @@ private slots:
     void test_active();
     void test_interval();
     void test_no_overlapping_polls();
+    void test_error_resilience();
     void test_check_status_change();
 
 private:
@@ -164,6 +165,45 @@ void TestStateChecker::test_check(NordVpnInfo::Status targetStatus)
     const auto &arg = arguments.at(0);
     QVERIFY(arg.metaType() == QMetaType::fromType<NordVpnInfo::Status>());
     QVERIFY(arg.value<NordVpnInfo::Status>() == targetStatus);
+}
+
+void TestStateChecker::test_error_resilience()
+{
+    const Action::Ptr &action = m_storage->action(Action::NordVPN::CheckStatus);
+    const QString savedApp = action->app();
+
+    // Point the action at a non-existent binary to force CLI errors.
+    action->setApp(QStringLiteral("/nonexistent/yangl-test-binary"));
+
+    QSignalSpy errorSpy(m_checker.get(), &StateChecker::error);
+
+    // Trigger errors one at a time; monitor must survive the first N-1 of them.
+    for (int i = 0; i < StateChecker::MaxConsecutiveErrors - 1; ++i) {
+        m_checker->check();
+        if (errorSpy.size() <= i)
+            QVERIFY(errorSpy.wait(CLICall::DefaultTimeoutMSecs));
+        QCOMPARE(errorSpy.count(), i + 1);
+        QCOMPARE(m_checker->m_consecutiveErrors, i + 1); // counter advancing
+    }
+
+    // The Nth error must trip the threshold: counter resets and monitor stops.
+    m_checker->check();
+    if (errorSpy.size() < StateChecker::MaxConsecutiveErrors)
+        QVERIFY(errorSpy.wait(CLICall::DefaultTimeoutMSecs));
+
+    QCOMPARE(errorSpy.count(), StateChecker::MaxConsecutiveErrors);
+    QCOMPARE(m_checker->m_consecutiveErrors, 0); // reset after stop
+
+    // Restore the good binary and verify a successful poll resets the counter.
+    action->setApp(savedApp);
+    action->setArgs({ "--status-disconnected" });
+
+    QSignalSpy stateSpy(m_checker.get(), &StateChecker::stateChanged);
+    m_checker->check();
+    if (stateSpy.isEmpty())
+        QVERIFY(stateSpy.wait(CLICall::DefaultTimeoutMSecs));
+
+    QCOMPARE(m_checker->m_consecutiveErrors, 0);
 }
 
 void TestStateChecker::test_check_status_change()
