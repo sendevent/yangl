@@ -21,6 +21,7 @@
 #include "actions/action.h"
 #include "actions/actionstorage.h"
 #include "app/common.h"
+#include "app/statechecker.h"
 #include "settings/appsettings.h"
 #include "settings/mapsettings.h"
 #include "ui_settingsdialog.h"
@@ -43,6 +44,15 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
     connect(ui->checkBoxAutoActive, &QCheckBox::toggled, ui->cbIgnoreFirstConnected, &QCheckBox::setEnabled);
 
     ui->leNVPNPath->setText(AppSettings::Monitor->NVPNPath->read().toString());
+
+    const bool isDynamic =
+            AppSettings::Monitor->PollingMode->read().toInt() == static_cast<int>(StateChecker::PollingMode::Dynamic);
+    ui->rbPollingDynamic->setChecked(isDynamic);
+    ui->rbPollingCustom->setChecked(!isDynamic);
+    ui->spinBoxInterval->setEnabled(!isDynamic);
+    connect(ui->rbPollingDynamic, &QRadioButton::toggled, this,
+            [this](bool dynamic) { ui->spinBoxInterval->setEnabled(!dynamic); });
+
     ui->spinBoxInterval->setValue(AppSettings::Monitor->Interval->read().toInt() / utils::oneSecondMs());
     ui->spinBoxMsgDuration->setValue(AppSettings::Tray->MessageDuration->read().toInt());
     ui->checkBoxAutoActive->setChecked(AppSettings::Monitor->Active->read().toBool());
@@ -127,6 +137,9 @@ bool SettingsDialog::saveMonitorSettings()
     AppSettings::Monitor->NVPNPath->write(path);
     AppSettings::Tray->MessageDuration->write(ui->spinBoxMsgDuration->value());
     AppSettings::Monitor->Interval->write(ui->spinBoxInterval->value() * utils::oneSecondMs());
+    AppSettings::Monitor->PollingMode->write(static_cast<int>(ui->rbPollingDynamic->isChecked()
+                                                                      ? StateChecker::PollingMode::Dynamic
+                                                                      : StateChecker::PollingMode::Custom));
     AppSettings::Monitor->Active->write(ui->checkBoxAutoActive->isChecked());
     AppSettings::Tray->IgnoreFirstConnected->write(ui->cbIgnoreFirstConnected->isChecked());
     AppSettings::Tray->MessagePlainText->write(ui->checkBoxMessagePlainText->isChecked());

@@ -17,11 +17,14 @@
 
 #include "appsettings.h"
 
+#include "actions/action.h"
 #include "app/common.h"
+#include "app/nordvpninfo.h"
 #include "app/statechecker.h"
 #include "settings/settingsmanager.h"
 
 #include <QGeoServiceProvider>
+#include <QMetaType>
 #include <QSettings>
 #include <QStandardPaths>
 
@@ -65,6 +68,8 @@ GroupMonitor::GroupMonitor()
                            new AppSetting(QString("%1/LogLinesLimit").arg(localName()), utils::DefaultLogLinesLimit),
                            new AppSetting(QString("%1/LastCountry").arg(localName()), QString()),
                            new AppSetting(QString("%1/LastCity").arg(localName()), QString()),
+                           new AppSetting(QString("%1/PollingMode").arg(localName()),
+                                          static_cast<int>(StateChecker::PollingMode::Dynamic)),
                    },
                    {})
 {
@@ -139,6 +144,10 @@ GroupTray::GroupTray()
 #ifdef QT_TESTLIB_LIB
     QStandardPaths::setTestModeEnabled(true);
 #endif
+
+    qRegisterMetaType<NordVpnInfo>();
+    qRegisterMetaType<NordVpnInfo::Status>();
+    qRegisterMetaType<Action::Id>("Action::Id");
 
     Monitor = std::make_unique<GroupMonitor>();
     Map = std::make_unique<GroupMap>();
