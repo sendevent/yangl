@@ -30,6 +30,7 @@ class StateChecker : public QObject
     Q_OBJECT
 public:
     static const int DefaultIntervalMs;
+    static const int MaxConsecutiveErrors;
 
     using Ptr = QSharedPointer<StateChecker>;
     explicit StateChecker(CLICaller *bus, int intervalMs);
@@ -60,6 +61,7 @@ protected:
     Action::Ptr m_actCheck;
     QTimer *m_timer;
     bool m_pollInFlight;
+    int m_consecutiveErrors;
 
     NordVpnInfo m_state;
     void setState(const NordVpnInfo &state);
