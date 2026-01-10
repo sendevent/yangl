@@ -40,6 +40,7 @@ private slots:
 
     void test_active();
     void test_interval();
+    void test_no_overlapping_polls();
     void test_check_status_change();
 
 private:
@@ -88,6 +89,29 @@ void TestStateChecker::test_active()
 
     if (spy.isEmpty())
         QVERIFY(spy.wait());
+}
+
+void TestStateChecker::test_no_overlapping_polls()
+{
+    // m_pollInFlight is accessible because TestStateChecker is a friend.
+    QCOMPARE(m_checker->m_pollInFlight, false);
+
+    QSignalSpy spy(m_checker.get(), &StateChecker::stateChanged);
+
+    // First call dispatches the CLI request and sets the flag synchronously.
+    m_checker->check();
+    QVERIFY(m_checker->m_pollInFlight);
+
+    // Second call while the first is in flight must be a silent no-op.
+    m_checker->check();
+    QVERIFY(m_checker->m_pollInFlight);
+
+    // Wait for the single poll to complete.
+    if (spy.isEmpty())
+        QVERIFY(spy.wait(CLICall::DefaultTimeoutMSecs));
+
+    QCOMPARE(m_checker->m_pollInFlight, false);
+    QCOMPARE(spy.count(), 1); // exactly one result despite two check() calls
 }
 
 void TestStateChecker::test_interval()
