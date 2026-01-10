@@ -29,7 +29,17 @@ class StateChecker : public QObject
 {
     Q_OBJECT
 public:
+    enum class PollingMode
+    {
+        Dynamic,
+        Custom,
+    };
+    Q_ENUM(PollingMode)
+
     static const int DefaultIntervalMs;
+    static const int MaxConsecutiveErrors;
+    static const int DynamicIntervalTransitionalMs;
+    static const int DynamicIntervalStableMs;
 
     using Ptr = QSharedPointer<StateChecker>;
     explicit StateChecker(CLICaller *bus, int intervalMs);
@@ -45,6 +55,7 @@ public:
 public slots:
     void setInterval(int msecs);
     void setActive(bool active);
+    void setPollingMode(PollingMode mode);
 
 signals:
     void stateChanged(const NordVpnInfo &state);
@@ -59,6 +70,10 @@ protected:
     CLICaller *m_bus;
     Action::Ptr m_actCheck;
     QTimer *m_timer;
+    bool m_pollInFlight;
+    int m_consecutiveErrors;
+    PollingMode m_pollingMode;
+    int m_customIntervalMs;
 
     NordVpnInfo m_state;
     void setState(const NordVpnInfo &state);
@@ -69,6 +84,7 @@ protected:
     void notifyError(const QString &errorMessage);
 
     void stopTimer();
+    void adjustDynamicInterval(NordVpnInfo::Status status);
 
     friend class TestStateChecker;
     friend class NordVpnWrapper;
