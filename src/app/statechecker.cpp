@@ -25,6 +25,8 @@
 
 /*static*/ const int StateChecker::DefaultIntervalMs = 3 * utils::oneSecondMs();
 /*static*/ const int StateChecker::MaxConsecutiveErrors = 3;
+/*static*/ const int StateChecker::DynamicIntervalTransitionalMs = 1 * utils::oneSecondMs();
+/*static*/ const int StateChecker::DynamicIntervalStableMs = 5 * utils::oneSecondMs();
 
 StateChecker::StateChecker(CLICaller *bus, int intervalMs)
     : QObject()
@@ -33,10 +35,12 @@ StateChecker::StateChecker(CLICaller *bus, int intervalMs)
     , m_timer(new QTimer(this))
     , m_pollInFlight(false)
     , m_consecutiveErrors(0)
+    , m_pollingMode(PollingMode::Dynamic)
+    , m_customIntervalMs(intervalMs)
     , m_state()
 {
-    setInterval(intervalMs);
     connect(m_timer, &QTimer::timeout, this, &StateChecker::onTimeout);
+    adjustDynamicInterval(m_state.status());
 
     setStatus(NordVpnInfo::Status::Unknown);
 }
@@ -80,19 +84,38 @@ bool StateChecker::isActive() const
 
 void StateChecker::setInterval(int msecs)
 {
-    const bool wasActive(isActive());
+    m_customIntervalMs = msecs;
 
-    m_timer->stop();
-    m_timer->setInterval(msecs);
+    if (m_pollingMode == PollingMode::Custom) {
+        const bool wasActive = isActive();
+        m_timer->stop();
+        m_timer->setInterval(msecs);
+        if (wasActive)
+            m_timer->start();
+    }
+}
 
-    if (wasActive) {
-        m_timer->start();
+void StateChecker::setPollingMode(PollingMode mode)
+{
+    if (m_pollingMode == mode)
+        return;
+
+    m_pollingMode = mode;
+
+    if (m_pollingMode == PollingMode::Dynamic) {
+        adjustDynamicInterval(m_state.status());
+    } else {
+        const bool wasActive = isActive();
+        m_timer->stop();
+        m_timer->setInterval(m_customIntervalMs);
+        if (wasActive)
+            m_timer->start();
     }
 }
 
 int StateChecker::interval() const
 {
-    return m_timer->interval();
+    return m_customIntervalMs;
 }
 
 void StateChecker::check()
@@ -151,6 +174,9 @@ void StateChecker::setState(const NordVpnInfo &state)
 
         m_state = state;
 
+        if (m_pollingMode == PollingMode::Dynamic)
+            adjustDynamicInterval(state.status());
+
         if (statusDetailsChanged) {
             emit statusChanged(state.status());
         }
@@ -187,4 +213,20 @@ void StateChecker::stopTimer()
 {
     m_timer->stop();
     setStatus(NordVpnInfo::Status::Unknown);
+}
+
+void StateChecker::adjustDynamicInterval(NordVpnInfo::Status status)
+{
+    const bool transitional =
+            (status == NordVpnInfo::Status::Connecting || status == NordVpnInfo::Status::Disconnecting);
+    const int newInterval = transitional ? DynamicIntervalTransitionalMs : DynamicIntervalStableMs;
+
+    if (m_timer->interval() == newInterval)
+        return;
+
+    const bool wasActive = isActive();
+    m_timer->stop();
+    m_timer->setInterval(newInterval);
+    if (wasActive)
+        m_timer->start();
 }
