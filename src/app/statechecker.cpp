@@ -35,11 +35,16 @@ StateChecker::StateChecker(CLICaller *bus, int intervalMs)
     , m_timer(new QTimer(this))
     , m_pollInFlight(false)
     , m_consecutiveErrors(0)
+    , m_uptimeTicker(new QTimer(this))
     , m_pollingMode(PollingMode::Dynamic)
     , m_customIntervalMs(intervalMs)
     , m_state()
 {
     connect(m_timer, &QTimer::timeout, this, &StateChecker::onTimeout);
+
+    m_uptimeTicker->setInterval(utils::oneSecondMs());
+    connect(m_uptimeTicker, &QTimer::timeout, this, &StateChecker::onUptimeTick);
+
     adjustDynamicInterval(m_state.status());
 
     setStatus(NordVpnInfo::Status::Unknown);
@@ -177,6 +182,13 @@ void StateChecker::setState(const NordVpnInfo &state)
         if (m_pollingMode == PollingMode::Dynamic)
             adjustDynamicInterval(state.status());
 
+        if (state.status() == NordVpnInfo::Status::Connected) {
+            if (!m_uptimeTicker->isActive())
+                m_uptimeTicker->start();
+        } else {
+            m_uptimeTicker->stop();
+        }
+
         if (statusDetailsChanged) {
             emit statusChanged(state.status());
         }
@@ -212,7 +224,14 @@ void StateChecker::notifyError(const QString &errorMessage)
 void StateChecker::stopTimer()
 {
     m_timer->stop();
+    m_uptimeTicker->stop();
     setStatus(NordVpnInfo::Status::Unknown);
+}
+
+void StateChecker::onUptimeTick()
+{
+    m_state.tickUptime();
+    emit stateChanged(m_state);
 }
 
 void StateChecker::adjustDynamicInterval(NordVpnInfo::Status status)

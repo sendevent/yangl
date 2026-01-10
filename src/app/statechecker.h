@@ -65,6 +65,7 @@ signals:
 private slots:
     void onTimeout();
     void onQueryFinish(const Action::Id &id, const QString &result, bool ok, const Action::RunInfo &info);
+    void onUptimeTick();
 
 protected:
     CLICaller *m_bus;
@@ -72,6 +73,7 @@ protected:
     QTimer *m_timer;
     bool m_pollInFlight;
     int m_consecutiveErrors;
+    QTimer *m_uptimeTicker;
     PollingMode m_pollingMode;
     int m_customIntervalMs;
 

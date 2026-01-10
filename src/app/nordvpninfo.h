@@ -53,6 +53,8 @@ public:
     QString country() const;
     QString city() const;
 
+    void tickUptime();
+
 private:
     Status m_status;
     QString m_server;
