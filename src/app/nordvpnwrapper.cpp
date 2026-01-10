@@ -359,18 +359,28 @@ void NordVpnWrapper::connectTo(const QString &country, const QString &city)
 
 void NordVpnWrapper::syncToggleSettings()
 {
+    if (m_settingsSyncAction)
+        return;
+
     const Action::Ptr &action = m_actions->createUserAction({});
     if (!action)
         return;
     ActionResultViewer::unregisterAction(action.get());
     action->setForcedShow(false);
     action->setArgs({ QStringLiteral("settings") });
-    if (auto call = action->createRequest()) {
-        const QString &result = call->run();
-        if (!result.isEmpty()) {
-            m_menuHolder->syncToggleStates(result);
-        }
-    }
+
+    m_settingsSyncAction = action;
+    connect(
+            action.get(), &Action::performed, this,
+            [this](const Action::Id &, const QString &result, bool ok, const Action::RunInfo &) {
+                if (ok && !result.isEmpty())
+                    m_menuHolder->syncToggleStates(result);
+                m_settingsSyncAction.reset();
+            },
+            Qt::SingleShotConnection);
+
+    if (auto call = action->createRequest())
+        m_bus->runCall(call);
 }
 
 void NordVpnWrapper::notifyError(const QString &errorMessage)
