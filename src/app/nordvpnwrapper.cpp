@@ -124,6 +124,8 @@ void NordVpnWrapper::start()
 void NordVpnWrapper::loadSettings()
 {
     m_checker->setInterval(AppSettings::Monitor->Interval->read().toInt());
+    m_checker->setPollingMode(
+            static_cast<StateChecker::PollingMode>(AppSettings::Monitor->PollingMode->read().toInt()));
     m_trayIcon->setMessageDuration(AppSettings::Tray->MessageDuration->read().toInt() * utils::oneSecondMs());
 
     m_lastCountry = AppSettings::Monitor->LastCountry->read().toString();
@@ -338,6 +340,11 @@ void NordVpnWrapper::updateActions(bool connected)
 
 void NordVpnWrapper::connectTo(const QString &country, const QString &city)
 {
+    if (m_geoAction) {
+        LOG << "connectTo() called while a geo connection is already in flight — ignoring";
+        return;
+    }
+
     LOG << country << city;
 
     const Action::Ptr &action = storage()->createUserAction({});
@@ -352,25 +359,35 @@ void NordVpnWrapper::connectTo(const QString &country, const QString &city)
     if (auto call = action->createRequest()) {
         // Store shared pointer to keep action alive until the call completes
         m_geoAction = action;
-        connect(action.get(), &Action::performed, this, [this]() { m_geoAction.reset(); });
+        connect(action.get(), &Action::performed, this, [this]() { m_geoAction.reset(); }, Qt::SingleShotConnection);
         m_bus->runCall(call);
     }
 }
 
 void NordVpnWrapper::syncToggleSettings()
 {
+    if (m_settingsSyncAction)
+        return;
+
     const Action::Ptr &action = m_actions->createUserAction({});
     if (!action)
         return;
     ActionResultViewer::unregisterAction(action.get());
     action->setForcedShow(false);
     action->setArgs({ QStringLiteral("settings") });
-    if (auto call = action->createRequest()) {
-        const QString &result = call->run();
-        if (!result.isEmpty()) {
-            m_menuHolder->syncToggleStates(result);
-        }
-    }
+
+    m_settingsSyncAction = action;
+    connect(
+            action.get(), &Action::performed, this,
+            [this](const Action::Id &, const QString &result, bool ok, const Action::RunInfo &) {
+                if (ok && !result.isEmpty())
+                    m_menuHolder->syncToggleStates(result);
+                m_settingsSyncAction.reset();
+            },
+            Qt::SingleShotConnection);
+
+    if (auto call = action->createRequest())
+        m_bus->runCall(call);
 }
 
 void NordVpnWrapper::notifyError(const QString &errorMessage)
