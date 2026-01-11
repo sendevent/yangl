@@ -21,6 +21,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 #include <QApplication>
 #include <QDir>
 #include <QLockFile>
+#include <QMessageBox>
 
 int main(int argc, char *argv[])
 {
@@ -29,8 +30,11 @@ int main(int argc, char *argv[])
     a.setQuitOnLastWindowClosed(false);
 
     QLockFile lockFile(QDir::tempPath() + QStringLiteral("/yangl.lock"));
-    if (!lockFile.tryLock(100))
+    if (!lockFile.tryLock(100)) {
+        QMessageBox::information(nullptr, QObject::tr("yangl"),
+                                 QObject::tr("Another instance of yangl is already running."));
         return 0;
+    }
 
     AppSettings::init();
     NordVpnWrapper::init();
