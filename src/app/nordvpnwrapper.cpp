@@ -359,7 +359,7 @@ void NordVpnWrapper::connectTo(const QString &country, const QString &city)
     if (auto call = action->createRequest()) {
         // Store shared pointer to keep action alive until the call completes
         m_geoAction = action;
-        connect(action.get(), &Action::performed, this, [this]() { m_geoAction.reset(); });
+        connect(action.get(), &Action::performed, this, [this]() { m_geoAction.reset(); }, Qt::SingleShotConnection);
         m_bus->runCall(call);
     }
 }
