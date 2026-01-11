@@ -394,16 +394,16 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
         wordsToList(QStringLiteral("set killswitch 0"));
         break;
     }
-    case Action::NordVPN::CyberSecOn: {
-        title = QObject::tr("CyberSec ON");
+    case Action::NordVPN::ThreatProtectionLiteOn: {
+        title = QObject::tr("Threat Protection Lite ON");
         menuPlace = Action::MenuPlace::Own;
-        wordsToList(QStringLiteral("set cybersec 1"));
+        wordsToList(QStringLiteral("set tpl 1"));
         break;
     }
-    case Action::NordVPN::CyberSecOff: {
-        title = QObject::tr("CyberSec OFF");
+    case Action::NordVPN::ThreatProtectionLiteOff: {
+        title = QObject::tr("Threat Protection Lite OFF");
         menuPlace = Action::MenuPlace::Own;
-        wordsToList(QStringLiteral("set cybersec 0"));
+        wordsToList(QStringLiteral("set tpl 0"));
         break;
     }
     case Action::NordVPN::ObfuscateOn: {
