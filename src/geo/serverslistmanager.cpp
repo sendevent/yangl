@@ -21,6 +21,8 @@
 #include "cli/clicall.h"
 #include "settings/appsettings.h"
 
+#include <QAtomicInt>
+#include <QThreadPool>
 #include <QTimer>
 #include <QtConcurrentRun>
 
@@ -29,6 +31,8 @@ struct JsonConsts {
     static constexpr QLatin1String ArgCountries = QLatin1String("countries");
     static constexpr QLatin1String ArgCountry = QLatin1String("cities");
 };
+
+static constexpr int MaxConcurrentCityQueries = 4;
 
 ServersListManager::ServersListManager(QObject *parent)
     : QObject(parent)
@@ -146,11 +150,19 @@ void ServersListManager::runSeparated()
         emit discoveryProgress(0, totalCountries);
     }
 
-    for (int i = 0; i < totalCountries; ++i) {
-        const auto &chunk = queryCities(staleCountries[i].country);
-        notifyPlacesAdded(chunk);
-        emit discoveryProgress(i + 1, totalCountries);
+    QThreadPool cityPool;
+    cityPool.setMaxThreadCount(MaxConcurrentCityQueries);
+    QAtomicInt completed(0);
+
+    for (const auto &country : staleCountries) {
+        cityPool.start([this, country, &completed, totalCountries]() {
+            const auto &chunk = queryCities(country.country);
+            notifyPlacesAdded(chunk);
+            emit discoveryProgress(completed.fetchAndAddRelaxed(1) + 1, totalCountries);
+        });
     }
+
+    cityPool.waitForDone();
 }
 
 void ServersListManager::notifyPlacesAdded(const Places &cities)
