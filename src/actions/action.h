@@ -133,6 +133,10 @@ public:
     void setAnchor(MenuPlace place);
     Action::MenuPlace anchor() const;
 
+    QString toggleGroup() const;
+    bool isToggleOn() const;
+    void setToggleGroup(const QString &group, bool isOn);
+
     static QString groupKey(Action::Flow flow);
     QString groupKey() const;
     QString key() const;
@@ -174,6 +178,8 @@ protected:
     int m_timeout;
     bool m_forceShow;
     MenuPlace m_menuPlace;
+    QString m_toggleGroup;
+    bool m_toggleOn = false;
 };
 
 Q_DECLARE_METATYPE(Action::MenuPlace);

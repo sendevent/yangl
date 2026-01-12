@@ -272,6 +272,8 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
     QStringList args;
     bool forceShow = false;
     Action::MenuPlace menuPlace = Action::MenuPlace::Own;
+    QString toggleGroup;
+    bool toggleOn = false;
     const Action::Id &actId = id.isEmpty() ? Action::Id::createUuid() : Action::Id(id);
     auto wordsToList = [&args](const QString &noQuotes) { args << noQuotes.split(' '); };
 
@@ -374,60 +376,75 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
         title = QObject::tr("Notify OFF");
         menuPlace = Action::MenuPlace::Own;
         wordsToList(QStringLiteral("set notify 0"));
+        toggleGroup = QStringLiteral("Notify");
         break;
     }
     case Action::NordVPN::SetNotifyOn: {
         title = QObject::tr("Notify ON");
         menuPlace = Action::MenuPlace::Own;
         wordsToList(QStringLiteral("set notify 1"));
+        toggleGroup = QStringLiteral("Notify");
+        toggleOn = true;
         break;
     }
     case Action::NordVPN::KillSwitchOn: {
         title = QObject::tr("Kill Switch ON");
         menuPlace = Action::MenuPlace::Own;
         wordsToList(QStringLiteral("set killswitch 1"));
+        toggleGroup = QStringLiteral("Kill Switch");
+        toggleOn = true;
         break;
     }
     case Action::NordVPN::KillSwitchOff: {
         title = QObject::tr("Kill Switch OFF");
         menuPlace = Action::MenuPlace::Own;
         wordsToList(QStringLiteral("set killswitch 0"));
+        toggleGroup = QStringLiteral("Kill Switch");
         break;
     }
     case Action::NordVPN::ThreatProtectionLiteOn: {
         title = QObject::tr("Threat Protection Lite ON");
         menuPlace = Action::MenuPlace::Own;
         wordsToList(QStringLiteral("set tpl 1"));
+        toggleGroup = QStringLiteral("Threat Protection Lite");
+        toggleOn = true;
         break;
     }
     case Action::NordVPN::ThreatProtectionLiteOff: {
         title = QObject::tr("Threat Protection Lite OFF");
         menuPlace = Action::MenuPlace::Own;
         wordsToList(QStringLiteral("set tpl 0"));
+        toggleGroup = QStringLiteral("Threat Protection Lite");
         break;
     }
     case Action::NordVPN::ObfuscateOn: {
         title = QObject::tr("Obfuscate ON");
         menuPlace = Action::MenuPlace::Own;
         wordsToList(QStringLiteral("set obfuscate 1"));
+        toggleGroup = QStringLiteral("Obfuscate");
+        toggleOn = true;
         break;
     }
     case Action::NordVPN::ObfuscateOff: {
         title = QObject::tr("Obfuscate OFF");
         menuPlace = Action::MenuPlace::Own;
         wordsToList(QStringLiteral("set obfuscate 0"));
+        toggleGroup = QStringLiteral("Obfuscate");
         break;
     }
     case Action::NordVPN::NativeTrayOff: {
         title = QObject::tr("Native Icon OFF");
         menuPlace = Action::MenuPlace::Own;
         wordsToList(QStringLiteral("set tray 0"));
+        toggleGroup = QStringLiteral("Native Icon");
         break;
     }
     case Action::NordVPN::NativeTrayOn: {
         title = QObject::tr("Native Icon ON");
         menuPlace = Action::MenuPlace::Own;
         wordsToList(QStringLiteral("set tray 1"));
+        toggleGroup = QStringLiteral("Native Icon");
+        toggleOn = true;
         break;
     }
 
@@ -437,8 +454,11 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
         break;
     }
 
-    return createAction(scope, static_cast<int>(actionType), actId, appPath, title, args, forceShow, menuPlace,
-                        CLICall::DefaultTimeoutMSecs, this);
+    const auto &action = createAction(scope, static_cast<int>(actionType), actId, appPath, title, args, forceShow,
+                                      menuPlace, CLICall::DefaultTimeoutMSecs, this);
+    if (!toggleGroup.isEmpty())
+        action->setToggleGroup(toggleGroup, toggleOn);
+    return action;
 }
 
 Action::Ptr ActionStorage::createAction(Action::Flow scope, int type, const Action::Id &id, const QString &appPath,
