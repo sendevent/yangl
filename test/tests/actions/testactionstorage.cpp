@@ -50,6 +50,7 @@ private slots:
     void test_createUserAction();
     void test_updateActionsBuiltin();
     void test_updateActionsUser();
+    void test_toggleGroups();
 };
 
 TestActionStorage::TestActionStorage(QObject *parent)
@@ -312,6 +313,51 @@ void TestActionStorage::test_updateActionsUser()
         const Action::Ptr &action = storage.action(userActions.at(i)->id());
         QCOMPARE(action->title(), QString("UserAction_%1").arg(action->id().toString()));
     }
+}
+
+void TestActionStorage::test_toggleGroups()
+{
+    // Known toggle pairs: group name -> {ON type, OFF type}
+    const QMap<QString, std::pair<Action::NordVPN, Action::NordVPN>> expected = {
+        { "Notify", { Action::NordVPN::SetNotifyOn, Action::NordVPN::SetNotifyOff } },
+        { "Kill Switch", { Action::NordVPN::KillSwitchOn, Action::NordVPN::KillSwitchOff } },
+        { "CyberSec", { Action::NordVPN::CyberSecOn, Action::NordVPN::CyberSecOff } },
+        { "Obfuscate", { Action::NordVPN::ObfuscateOn, Action::NordVPN::ObfuscateOff } },
+        { "Native Icon", { Action::NordVPN::NativeTrayOn, Action::NordVPN::NativeTrayOff } },
+    };
+
+    ActionStorage storage;
+    storage.load();
+
+    // Verify each expected pair
+    for (auto it = expected.cbegin(); it != expected.cend(); ++it) {
+        const Action::Ptr &onAction = storage.action(it->first);
+        QVERIFY(onAction);
+        QCOMPARE(onAction->toggleGroup(), it.key());
+        QVERIFY(onAction->isToggleOn());
+
+        const Action::Ptr &offAction = storage.action(it->second);
+        QVERIFY(offAction);
+        QCOMPARE(offAction->toggleGroup(), it.key());
+        QVERIFY(!offAction->isToggleOn());
+    }
+
+    // Non-toggle NordVPN actions must have empty toggleGroup
+    const QList<Action::NordVPN> nonToggleTypes = {
+        Action::NordVPN::Connect,     Action::NordVPN::Disconnect, Action::NordVPN::LogIn,
+        Action::NordVPN::CheckStatus, Action::NordVPN::Pause05,    Action::NordVPN::Rate5,
+    };
+    for (auto t : nonToggleTypes) {
+        const Action::Ptr &action = storage.action(t);
+        QVERIFY(action);
+        QVERIFY2(action->toggleGroup().isEmpty(),
+                 qPrintable(QString("Expected empty toggleGroup for %1").arg(action->title())));
+    }
+
+    // Custom actions must always have empty toggleGroup
+    const QVector<Action::Ptr> &custom = populateUserActions(&storage, 2);
+    for (const auto &action : custom)
+        QVERIFY(action->toggleGroup().isEmpty());
 }
 
 QTEST_MAIN(TestActionStorage)
