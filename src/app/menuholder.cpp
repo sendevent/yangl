@@ -86,36 +86,19 @@ void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
         const ActionsHolder &collection = actionsHolders[flow];
         m_menuRoot->addSection(collection.m_menu->title());
 
-        // Heuristic toggle pair detection: group actions by title stem
-        // (everything before the last space). Groups of exactly 2 become
-        // checkable toggles; the suffix sorting later alphabetically is
-        // treated as the "checked" (ON) variant.
-        struct StemEntry {
-            Action::Ptr action;
-            QString suffix;
-        };
-        QMap<QString, QList<StemEntry>> stemGroups;
+        // Explicit toggle pairing via Action::toggleGroup() / isToggleOn().
+        // Only NordVPN built-in actions have a non-empty toggleGroup; custom
+        // actions are never accidentally treated as toggles.
+        QSet<Action *> pairedActions;
+        QMap<QString, std::pair<Action::Ptr, Action::Ptr>> togglePairs; // group -> {on, off}
 
         for (const auto &act : collection.m_menuActions) {
-            const auto &title = act->title();
-            const int lastSpace = title.lastIndexOf(QLatin1Char(' '));
-            if (lastSpace > 0) {
-                stemGroups[title.left(lastSpace)].append({ act, title.mid(lastSpace + 1) });
-            }
-        }
-
-        QSet<Action *> pairedActions;
-        QMap<QString, std::pair<Action::Ptr, Action::Ptr>> togglePairs; // stem -> {on, off}
-        for (auto it = stemGroups.cbegin(); it != stemGroups.cend(); ++it) {
-            if (it->size() == 2) {
-                const auto &a = it->at(0);
-                const auto &b = it->at(1);
-                // Later suffix alphabetically = ON (checked)
-                const bool aIsOn = a.suffix > b.suffix;
-                togglePairs[it.key()] = { aIsOn ? a.action : b.action, aIsOn ? b.action : a.action };
-                pairedActions.insert(a.action.get());
-                pairedActions.insert(b.action.get());
-            }
+            const QString &group = act->toggleGroup();
+            if (group.isEmpty())
+                continue;
+            auto &pair = togglePairs[group];
+            (act->isToggleOn() ? pair.first : pair.second) = act;
+            pairedActions.insert(act.get());
         }
 
         for (const auto &act : collection.m_menuActions) {
