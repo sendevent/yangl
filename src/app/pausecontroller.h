@@ -19,6 +19,7 @@
 
 #include "actions/action.h"
 
+#include <QDeadlineTimer>
 #include <QObject>
 
 class ActionStorage;
@@ -45,5 +46,5 @@ private:
     ActionStorage *m_storage;
     StateChecker *m_checker;
     QTimer *m_pauseTimer;
-    int m_paused;
+    QDeadlineTimer m_deadline;
 };
