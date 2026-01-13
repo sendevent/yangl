@@ -21,18 +21,8 @@
 
 #include <QMetaEnum>
 
-/*static*/ int NordVpnInfo::MetaIdClass = -1;
-/*static*/ int NordVpnInfo::MetaIdEnum = -1;
-
 NordVpnInfo::NordVpnInfo()
 {
-    if (-1 == NordVpnInfo::MetaIdClass) {
-        NordVpnInfo::MetaIdClass = qRegisterMetaType<NordVpnInfo>();
-    }
-    if (-1 == NordVpnInfo::MetaIdEnum) {
-        NordVpnInfo::MetaIdEnum = qRegisterMetaType<NordVpnInfo::Status>();
-    }
-
     clear();
 }
 
@@ -151,14 +141,14 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
     };
 
     const QStringList &parts = from.split(QChar(' '), Qt::SkipEmptyParts);
-    for (int i = 0; i <= parts.size() - 2; ++i) {
+    for (int i = 0; i + 1 < parts.size(); i += 2) {
         bool converted(false);
         const int value = parts.at(i).toInt(&converted);
         if (!converted) {
             continue;
         }
 
-        const QString &units = parts.at(++i);
+        const QString &units = parts.at(i + 1);
 
         if (units.startsWith(QStringLiteral("day"))) {
             add(value, 3);
@@ -217,6 +207,55 @@ QString NordVpnInfo::toString() const
     text = add(m_traffic);
 
     return text;
+}
+
+void NordVpnInfo::tickUptime()
+{
+    if (m_uptime.isEmpty())
+        return;
+
+    const QStringList parts = m_uptime.split(QChar(':'));
+    const int n = parts.size();
+    if (n < 2)
+        return;
+
+    // Convert formatted uptime to total seconds.
+    // Formats produced by parseUptime:
+    //   "00:SS"        — 2 parts (seconds only)
+    //   "00:MM:SS"     — 3 parts (minutes+seconds, leading "00" is a sentinel)
+    //   "00:HH:MM:SS"  — 4 parts (hours+minutes+seconds, leading "00" is zero days)
+    //   "DDD:HH:MM:SS" — 4 parts (days+hours+minutes+seconds)
+    int totalSecs = 0;
+    if (n == 2) {
+        totalSecs = parts[1].toInt();
+    } else if (n == 3) {
+        totalSecs = parts[1].toInt() * 60 + parts[2].toInt();
+    } else {
+        totalSecs = parts[0].toInt() * 86400 + parts[1].toInt() * 3600 + parts[2].toInt() * 60 + parts[3].toInt();
+    }
+
+    ++totalSecs;
+
+    const int ddd = totalSecs / 86400;
+    const int hh = (totalSecs % 86400) / 3600;
+    const int mm = (totalSecs % 3600) / 60;
+    const int ss = totalSecs % 60;
+
+    auto p = [](int v, int w) { return QString("%1").arg(v, w, 10, QChar('0')); };
+
+    if (n >= 4 || ddd > 0) {
+        m_uptime = p(ddd, 3) + ':' + p(hh, 2) + ':' + p(mm, 2) + ':' + p(ss, 2);
+    } else if (hh > 0) {
+        // Promote from 3-part to 4-part as hours rolled over
+        m_uptime = p(0, 3) + ':' + p(hh, 2) + ':' + p(mm, 2) + ':' + p(ss, 2);
+    } else if (n == 3) {
+        m_uptime = p(0, 2) + ':' + p(mm, 2) + ':' + p(ss, 2);
+    } else if (mm > 0) {
+        // Promote from 2-part to 3-part as minutes rolled over
+        m_uptime = p(0, 2) + ':' + p(mm, 2) + ':' + p(ss, 2);
+    } else {
+        m_uptime = p(0, 2) + ':' + p(ss, 2);
+    }
 }
 
 QString NordVpnInfo::server() const
