@@ -54,13 +54,10 @@
             info.m_sub = AppSettings::Tray->IcnDisconnectedSub->read().toString();
             break;
         case NordVpnInfo::Status::Connecting:
+        case NordVpnInfo::Status::Disconnecting:
             info.m_base = AppSettings::Tray->IcnConnecting->read().toString();
             info.m_sub = AppSettings::Tray->IcnConnectingSub->read().toString();
             break;
-            //        case NordVpnInfo::Status::Disconnecting:
-            //            info.m_base = QStringLiteral(":/icn/resources/offline.png");
-            //            info.m_sub = QStringLiteral(":/icn/resources/sub_toffline.png");
-            //            break;
         default:
             info.m_base = AppSettings::Tray->IcnUnknown->read().toString();
             info.m_sub = AppSettings::Tray->IcnUnknownSub->read().toString();
