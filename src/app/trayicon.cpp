@@ -174,7 +174,9 @@ void TrayIcon::deployDefaults() const
             const QFileInfo info(fsFile);
             if (!info.exists()) {
                 const auto &resourceFile = rscPath.arg(info.fileName());
-                QFile::copy(resourceFile, fsFile);
+                if (!QFile::copy(resourceFile, fsFile)) {
+                    WRN << "Failed to deploy default icon:" << resourceFile << "->" << fsFile;
+                }
             }
         }
     }
@@ -191,7 +193,9 @@ void TrayIcon::deployDefaults() const
         const QFileInfo info(fsFile);
         if (!info.exists()) {
             const auto &resourceFile = rscPath.arg(kdeSubdir.arg(part));
-            QFile::copy(resourceFile, fsFile);
+            if (!QFile::copy(resourceFile, fsFile)) {
+                WRN << "Failed to deploy default icon:" << resourceFile << "->" << fsFile;
+            }
         }
     }
 }
