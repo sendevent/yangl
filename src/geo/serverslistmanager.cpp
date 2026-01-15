@@ -32,7 +32,7 @@ struct JsonConsts {
     static constexpr QLatin1String ArgCountry = QLatin1String("cities");
 };
 
-static constexpr int MaxConcurrentCityQueries = 4;
+static constexpr int MaxConcurrentCityQueries = 5;
 
 ServersListManager::ServersListManager(QObject *parent)
     : QObject(parent)
@@ -69,9 +69,8 @@ QString ServersListManager::queryVersion() const
     return call.success() ? call.result().trimmed() : QString();
 }
 
-QStringList ServersListManager::queryList(const QStringList &args) const
+QStringList ServersListManager::queryList(const QString &appPath, const QStringList &args) const
 {
-    const QString &appPath = AppSettings::Monitor->NVPNPath->read().toString();
     CLICall call(appPath, args, CLICall::DefaultTimeoutMSecs);
     call.run();
     LOG << call.result();
@@ -94,9 +93,9 @@ PlaceInfo createPlace(const QString &country, const QString &city)
     return result;
 }
 
-Places ServersListManager::queryGroups() const
+Places ServersListManager::queryGroups(const QString &appPath) const
 {
-    const auto &names = queryList({ JsonConsts::ArgGroups });
+    const auto &names = queryList(appPath, { JsonConsts::ArgGroups });
     Places groups(names.size());
     std::transform(names.begin(), names.end(), groups.begin(),
                    [](const auto &name) { return createPlace(geo::groupsTitle(), name); });
@@ -104,9 +103,9 @@ Places ServersListManager::queryGroups() const
     return groups;
 }
 
-Places ServersListManager::queryCountries() const
+Places ServersListManager::queryCountries(const QString &appPath) const
 {
-    const auto &names = queryList({ JsonConsts::ArgCountries });
+    const auto &names = queryList(appPath, { JsonConsts::ArgCountries });
     Places countries(names.size());
     std::transform(names.begin(), names.end(), countries.begin(),
                    [](const auto &name) { return createPlace(name, {}); });
@@ -114,9 +113,9 @@ Places ServersListManager::queryCountries() const
     return countries;
 }
 
-Places ServersListManager::queryCities(const QString &country) const
+Places ServersListManager::queryCities(const QString &appPath, const QString &country) const
 {
-    const auto &names = queryList({ JsonConsts::ArgCountry, country });
+    const auto &names = queryList(appPath, { JsonConsts::ArgCountry, country });
     Places cities(names.size());
     std::transform(names.begin(), names.end(), cities.begin(),
                    [&country](const auto &name) { return createPlace(country, name); });
@@ -133,10 +132,13 @@ void ServersListManager::run()
 
 void ServersListManager::runSeparated()
 {
-    const auto &groups = queryGroups();
+    // Read the path once here so pool threads never touch AppSettings concurrently.
+    const QString appPath = AppSettings::Monitor->NVPNPath->read().toString();
+
+    const auto &groups = queryGroups(appPath);
     notifyPlacesAdded(groups);
 
-    const auto &countries = queryCountries();
+    const auto &countries = queryCountries(appPath);
 
     Places staleCountries;
     for (const auto &country : countries) {
@@ -155,8 +157,8 @@ void ServersListManager::runSeparated()
     QAtomicInt completed(0);
 
     for (const auto &country : staleCountries) {
-        cityPool.start([this, country, &completed, totalCountries]() {
-            const auto &chunk = queryCities(country.country);
+        cityPool.start([this, appPath, country, &completed, totalCountries]() {
+            const auto &chunk = queryCities(appPath, country.country);
             notifyPlacesAdded(chunk);
             emit discoveryProgress(completed.fetchAndAddRelaxed(1) + 1, totalCountries);
         });

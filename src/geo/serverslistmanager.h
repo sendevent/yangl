@@ -45,11 +45,11 @@ private:
     QFutureWatcher<void> m_futureWatcher;
     QSet<QString> m_skipCountries;
 
-    Places queryGroups() const;
-    Places queryCountries() const;
-    Places queryCities(const QString &country) const;
+    Places queryGroups(const QString &appPath) const;
+    Places queryCountries(const QString &appPath) const;
+    Places queryCities(const QString &appPath, const QString &country) const;
 
-    QStringList queryList(const QStringList &args) const;
+    QStringList queryList(const QString &appPath, const QStringList &args) const;
 
     void runSeparated();
 
