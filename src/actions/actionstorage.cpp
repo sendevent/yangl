@@ -340,34 +340,34 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
     case Action::NordVPN::Rate5: {
         title = QObject::tr("Rate ★★★★★");
         wordsToList(QStringLiteral("rate 5"));
-        menuPlace = Action::MenuPlace::Own;
+        menuPlace = Action::MenuPlace::NoMenu;
         forceShow = true;
         break;
     }
     case Action::NordVPN::Rate4: {
         title = QObject::tr("Rate ★★★★☆");
         wordsToList(QStringLiteral("rate 4"));
-        menuPlace = Action::MenuPlace::Own;
+        menuPlace = Action::MenuPlace::NoMenu;
         forceShow = true;
         break;
     }
     case Action::NordVPN::Rate3: {
         title = QObject::tr("Rate ★★★☆☆");
         wordsToList(QStringLiteral("rate 3"));
-        menuPlace = Action::MenuPlace::Own;
+        menuPlace = Action::MenuPlace::NoMenu;
         forceShow = true;
         break;
     }
     case Action::NordVPN::Rate2: {
         title = QObject::tr("Rate ★★☆☆☆");
-        menuPlace = Action::MenuPlace::Own;
+        menuPlace = Action::MenuPlace::NoMenu;
         wordsToList(QStringLiteral("rate 2"));
         forceShow = true;
         break;
     }
     case Action::NordVPN::Rate1: {
         title = QObject::tr("Rate ★☆☆☆☆");
-        menuPlace = Action::MenuPlace::Own;
+        menuPlace = Action::MenuPlace::NoMenu;
         wordsToList(QStringLiteral("rate 1"));
         forceShow = true;
         break;
