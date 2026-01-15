@@ -36,6 +36,8 @@ struct JsonAction {
     static constexpr QLatin1String Display { QLatin1String("forcedDisplay") };
     static constexpr QLatin1String Anchor { QLatin1String("anchor") };
     static constexpr QLatin1String Timeout { QLatin1String("timeout") };
+    static constexpr QLatin1String ToggleGroup { QLatin1String("toggleGroup") };
+    static constexpr QLatin1String ToggleOn { QLatin1String("toggleOn") };
 };
 
 ActionJson::ActionJson(ActionStorage *storage)
@@ -146,6 +148,8 @@ bool ActionJson::updateAction(Action *action)
                 action->setForcedShow(loadedAction->forcedShow());
                 action->setAnchor(loadedAction->anchor());
                 action->setTimeout(loadedAction->timeout());
+                if (!loadedAction->toggleGroup().isEmpty())
+                    action->setToggleGroup(loadedAction->toggleGroup(), loadedAction->isToggleOn());
 
                 return true;
             }
@@ -178,7 +182,12 @@ Action::Ptr ActionJson::actionFromJson(const QJsonObject &json) const
     const auto anchor = static_cast<Action::MenuPlace>(json[JsonAction::Anchor].toInt());
     const auto timeout = json[JsonAction::Timeout].toInt() * utils::oneSecondMs();
 
-    return m_storage->createAction(scope, type, id, app, title, args, alwaysShowResult, anchor, timeout, m_storage);
+    const auto &result =
+            m_storage->createAction(scope, type, id, app, title, args, alwaysShowResult, anchor, timeout, m_storage);
+    const auto &toggleGroup = json[JsonAction::ToggleGroup].toString();
+    if (!toggleGroup.isEmpty())
+        result->setToggleGroup(toggleGroup, json[JsonAction::ToggleOn].toBool());
+    return result;
 }
 
 QJsonObject ActionJson::actionToJson(const Action *action) const
@@ -196,6 +205,8 @@ QJsonObject ActionJson::actionToJson(const Action *action) const
         { JsonAction::Display, action->forcedShow() },
         { JsonAction::Anchor, static_cast<int>(action->anchor()) },
         { JsonAction::Timeout, action->timeout() / utils::oneSecondMs() },
+        { JsonAction::ToggleGroup, action->toggleGroup() },
+        { JsonAction::ToggleOn, action->isToggleOn() },
     };
 }
 
