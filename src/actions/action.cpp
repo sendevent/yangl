@@ -20,6 +20,8 @@
 #include "app/common.h"
 #include "cli/clicall.h"
 
+#include <qnamespace.h>
+
 /*static*/ const QString Action::GroupKeyYangl { QStringLiteral("yangl") };
 /*static*/ const QString Action::GroupKeyBuiltin { QStringLiteral("builtin") };
 /*static*/ const QString Action::GroupKeyCustom { QStringLiteral("custom") };
@@ -148,8 +150,12 @@ CLICall *Action::createRequest(QString *errorMessageHandler)
 
     if (utils::isValidAppPath(app(), &errorMessage)) {
         call = new CLICall(app(), args(), timeout(), this);
-        this->QObject::connect(call, &CLICall::ready, this, &Action::onResult);
-        this->QObject::connect(call, &CLICall::starting, this, &Action::onStart);
+        // CLICall::run() executes on a QThreadPool thread (via CLICaller::runCall).
+        // QueuedConnection is explicitly used for cross-thread signal delivery,
+        // so onResult/onStart always run in the main thread's event loop —
+        // no explicit synchronization needed.
+        connect(call, &CLICall::ready, this, &Action::onResult, Qt::QueuedConnection);
+        connect(call, &CLICall::starting, this, &Action::onStart, Qt::QueuedConnection);
     }
 
     if (!errorMessage.isEmpty()) {

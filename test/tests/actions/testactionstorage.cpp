@@ -321,7 +321,7 @@ void TestActionStorage::test_toggleGroups()
     const QMap<QString, std::pair<Action::NordVPN, Action::NordVPN>> expected = {
         { "Notify", { Action::NordVPN::SetNotifyOn, Action::NordVPN::SetNotifyOff } },
         { "Kill Switch", { Action::NordVPN::KillSwitchOn, Action::NordVPN::KillSwitchOff } },
-        { "CyberSec", { Action::NordVPN::CyberSecOn, Action::NordVPN::CyberSecOff } },
+        { "Threat Protection Lite", { Action::NordVPN::ThreatProtectionLiteOn, Action::NordVPN::ThreatProtectionLiteOff } },
         { "Obfuscate", { Action::NordVPN::ObfuscateOn, Action::NordVPN::ObfuscateOff } },
         { "Native Icon", { Action::NordVPN::NativeTrayOn, Action::NordVPN::NativeTrayOff } },
     };
