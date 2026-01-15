@@ -28,11 +28,6 @@
 
 namespace utils {
 
-QString groupsTitle()
-{
-    return geo::groupsTitle();
-}
-
 QString ensureDirExists(const QString &path)
 {
     if (path.isEmpty()) {
