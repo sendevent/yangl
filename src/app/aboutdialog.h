@@ -34,14 +34,12 @@ class AboutDialog : public QDialog
 public:
     enum TabId
     {
-        First = 0,
-        Yangl = First,
+        Yangl = 0,
         License,
         NordVPN,
         Qt,
-
-        Last
     };
+    Q_ENUM(TabId)
 
     using Ptr = QPointer<AboutDialog>;
 
