@@ -62,8 +62,9 @@ AboutDialog::AboutDialog(QWidget *parent)
     layout()->addWidget(m_statusBar);
     m_statusBar->show();
 
-    for (int i = TabId::Yangl; i < TabId::Last; ++i)
-        createTab(static_cast<AboutDialog::TabId>(i));
+    static const QMetaEnum me = QMetaEnum::fromType<TabId>();
+    for (int i = 0; i < me.keyCount(); ++i)
+        createTab(static_cast<TabId>(me.value(i)));
 }
 
 AboutDialog::~AboutDialog()
