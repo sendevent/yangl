@@ -72,6 +72,26 @@ public:
 
         NativeTrayOff,
         NativeTrayOn,
+
+        LogOut,
+
+        AutoconnectOn,
+        AutoconnectOff,
+
+        FirewallOn,
+        FirewallOff,
+
+        LanDiscoveryOn,
+        LanDiscoveryOff,
+
+        VirtualLocationOn,
+        VirtualLocationOff,
+
+        PostQuantumOn,
+        PostQuantumOff,
+
+        TechnologyOpenVPN,
+        TechnologyNordlynx,
     };
 
     Q_ENUM(NordVPN);

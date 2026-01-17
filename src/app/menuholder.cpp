@@ -147,16 +147,32 @@ void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
 
 void MenuHolder::syncToggleStates(const QString &settingsOutput)
 {
+    static const QString kTechnology = QStringLiteral("technology");
+    static const QString kObfuscate = QStringLiteral("obfuscate");
+
     for (const auto &line : settingsOutput.split('\n', Qt::SkipEmptyParts)) {
         const int sep = line.indexOf(':');
         if (sep <= 0)
             continue;
         const QString key = line.left(sep).simplified().toLower().remove(' ').remove('-');
         const QString value = line.mid(sep + 1).simplified().toLower();
-        if (auto *qAct = m_toggleActions.value(key)) {
+        if (key == kTechnology) {
+            const bool isOpenVPN = (value == QLatin1String("openvpn"));
+            if (auto *qAct = m_toggleActions.value(kTechnology))
+                qAct->setChecked(isOpenVPN);
+            if (auto *qAct = m_toggleActions.value(kObfuscate))
+                qAct->setEnabled(isOpenVPN);
+        } else if (auto *qAct = m_toggleActions.value(key)) {
             qAct->setChecked(value == QLatin1String("enabled"));
         }
     }
+}
+
+void MenuHolder::setToggleEnabled(const QString &groupName, bool enabled)
+{
+    const QString key = groupName.toLower().remove(' ').remove('-');
+    if (auto *qAct = m_toggleActions.value(key))
+        qAct->setEnabled(enabled);
 }
 
 void MenuHolder::onActionTriggered()

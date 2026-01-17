@@ -33,6 +33,7 @@ public:
     QAction *yanglAction(Action::Yangl act) const;
 
     void syncToggleStates(const QString &settingsOutput);
+    void setToggleEnabled(const QString &groupName, bool enabled);
 
 signals:
     void actionTriggered(Action *action);
