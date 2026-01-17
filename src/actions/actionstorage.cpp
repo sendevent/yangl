@@ -514,6 +514,21 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
         toggleGroup = QStringLiteral("Virtual Location");
         break;
     }
+    case Action::NordVPN::PostQuantumOn: {
+        title = QObject::tr("Post-Quantum VPN ON");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set post-quantum 1"));
+        toggleGroup = QStringLiteral("Post-quantum VPN");
+        toggleOn = true;
+        break;
+    }
+    case Action::NordVPN::PostQuantumOff: {
+        title = QObject::tr("Post-Quantum VPN OFF");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set post-quantum 0"));
+        toggleGroup = QStringLiteral("Post-quantum VPN");
+        break;
+    }
 
     default:
         scope = Action::Flow::Custom;
