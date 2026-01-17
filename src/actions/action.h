@@ -80,6 +80,9 @@ public:
 
         FirewallOn,
         FirewallOff,
+
+        LanDiscoveryOn,
+        LanDiscoveryOff,
     };
 
     Q_ENUM(NordVPN);
