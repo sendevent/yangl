@@ -86,6 +86,9 @@ public:
 
         VirtualLocationOn,
         VirtualLocationOff,
+
+        PostQuantumOn,
+        PostQuantumOff,
     };
 
     Q_ENUM(NordVPN);

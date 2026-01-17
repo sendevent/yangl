@@ -331,6 +331,7 @@ void TestActionStorage::test_toggleGroups()
         { "Firewall", { Action::NordVPN::FirewallOn, Action::NordVPN::FirewallOff } },
         { "LAN Discovery", { Action::NordVPN::LanDiscoveryOn, Action::NordVPN::LanDiscoveryOff } },
         { "Virtual Location", { Action::NordVPN::VirtualLocationOn, Action::NordVPN::VirtualLocationOff } },
+        { "Post-quantum VPN", { Action::NordVPN::PostQuantumOn, Action::NordVPN::PostQuantumOff } },
     };
 
     ActionStorage storage;
@@ -382,6 +383,7 @@ void TestActionStorage::test_toggleGroups_survive_save_load()
         { "Firewall", { Action::NordVPN::FirewallOn, Action::NordVPN::FirewallOff } },
         { "LAN Discovery", { Action::NordVPN::LanDiscoveryOn, Action::NordVPN::LanDiscoveryOff } },
         { "Virtual Location", { Action::NordVPN::VirtualLocationOn, Action::NordVPN::VirtualLocationOff } },
+        { "Post-quantum VPN", { Action::NordVPN::PostQuantumOn, Action::NordVPN::PostQuantumOff } },
     };
 
     QTemporaryFile tmp;
