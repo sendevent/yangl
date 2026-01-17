@@ -89,6 +89,9 @@ public:
 
         PostQuantumOn,
         PostQuantumOff,
+
+        TechnologyOpenVPN,
+        TechnologyNordlynx,
     };
 
     Q_ENUM(NordVPN);

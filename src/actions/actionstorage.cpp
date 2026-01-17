@@ -529,6 +529,21 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
         toggleGroup = QStringLiteral("Post-quantum VPN");
         break;
     }
+    case Action::NordVPN::TechnologyOpenVPN: {
+        title = QObject::tr("Technology: OpenVPN");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set technology openvpn"));
+        toggleGroup = QStringLiteral("Technology");
+        toggleOn = true;
+        break;
+    }
+    case Action::NordVPN::TechnologyNordlynx: {
+        title = QObject::tr("Technology: NordLynx");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set technology nordlynx"));
+        toggleGroup = QStringLiteral("Technology");
+        break;
+    }
 
     default:
         scope = Action::Flow::Custom;
