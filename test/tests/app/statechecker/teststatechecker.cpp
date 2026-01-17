@@ -26,6 +26,8 @@
 #include <QSignalSpy>
 #include <QStandardPaths>
 #include <QTest>
+#include <QTimer>
+#include <qtcoreexports.h>
 
 class TestStateChecker : public QObject
 {
@@ -40,6 +42,11 @@ private slots:
 
     void test_active();
     void test_interval();
+    void test_no_overlapping_polls();
+    void test_error_resilience();
+    void test_polling_mode_switch();
+    void test_transition_polling();
+    void test_tick_uptime();
     void test_check_status_change();
 
 private:
@@ -90,6 +97,33 @@ void TestStateChecker::test_active()
         QVERIFY(spy.wait());
 }
 
+void TestStateChecker::test_no_overlapping_polls()
+{
+    // m_pollInFlight is accessible because TestStateChecker is a friend.
+    QCOMPARE(m_checker->m_pollInFlight, false);
+
+    // Spy on Action::performed — fires unconditionally on every completed poll,
+    // regardless of whether the state changed. This avoids a false timeout when
+    // the CLI returns the same status that is already stored.
+    const Action::Ptr &action = m_storage->action(Action::NordVPN::CheckStatus);
+    QSignalSpy spy(action.get(), &Action::performed);
+
+    // First call dispatches the CLI request and sets the flag synchronously.
+    m_checker->check();
+    QVERIFY(m_checker->m_pollInFlight);
+
+    // Second call while the first is in flight must be a silent no-op.
+    m_checker->check();
+    QVERIFY(m_checker->m_pollInFlight);
+
+    // Wait for the single poll to complete.
+    if (spy.isEmpty())
+        QVERIFY(spy.wait(CLICall::DefaultTimeoutMSecs));
+
+    QCOMPARE(m_checker->m_pollInFlight, false);
+    QCOMPARE(spy.count(), 1); // exactly one result despite two check() calls
+}
+
 void TestStateChecker::test_interval()
 {
     QCOMPARE(m_checker->interval(), StateChecker::DefaultIntervalMs);
@@ -98,6 +132,95 @@ void TestStateChecker::test_interval()
     QCOMPARE(m_checker->interval(), customInterval);
     m_checker->setInterval(StateChecker::DefaultIntervalMs);
     QCOMPARE(m_checker->interval(), StateChecker::DefaultIntervalMs);
+}
+
+void TestStateChecker::test_polling_mode_switch()
+{
+    // Previous tests may have left a transition in progress; reset to stable.
+    m_checker->endTransition();
+
+    // Default mode is Dynamic — timer runs at the stable dynamic interval.
+    QCOMPARE(m_checker->m_pollingMode, StateChecker::PollingMode::Dynamic);
+    QCOMPARE(m_checker->m_timer->interval(), StateChecker::DynamicIntervalStableMs);
+
+    // Switch to Custom — timer must use the stored custom interval.
+    m_checker->setPollingMode(StateChecker::PollingMode::Custom);
+    QCOMPARE(m_checker->m_pollingMode, StateChecker::PollingMode::Custom);
+    QCOMPARE(m_checker->m_timer->interval(), m_checker->m_customIntervalMs);
+
+    // setInterval in Custom mode must update the timer immediately.
+    static constexpr int newInterval = 7000;
+    m_checker->setInterval(newInterval);
+    QCOMPARE(m_checker->interval(), newInterval);
+    QCOMPARE(m_checker->m_timer->interval(), newInterval);
+
+    // setInterval in Dynamic mode must store the value but not touch the timer.
+    m_checker->setPollingMode(StateChecker::PollingMode::Dynamic);
+    static constexpr int anotherInterval = 9000;
+    m_checker->setInterval(anotherInterval);
+    QCOMPARE(m_checker->interval(), anotherInterval); // stored
+    QVERIFY(m_checker->m_timer->interval() != anotherInterval); // timer unchanged
+
+    // Restore defaults for subsequent tests.
+    m_checker->setInterval(StateChecker::DefaultIntervalMs);
+}
+
+void TestStateChecker::test_transition_polling()
+{
+    // Ensure we start in Dynamic mode with no active transition.
+    m_checker->setPollingMode(StateChecker::PollingMode::Dynamic);
+    m_checker->endTransition();
+    QVERIFY(!m_checker->m_transitionTimer->isActive());
+    QCOMPARE(m_checker->m_timer->interval(), StateChecker::DynamicIntervalStableMs);
+
+    // A status change must trigger fast (transitional) polling.
+    m_checker->setStatus(NordVpnInfo::Status::Connecting);
+    QVERIFY(m_checker->m_transitionTimer->isActive());
+    QCOMPARE(m_checker->m_timer->interval(), StateChecker::DynamicIntervalTransitionalMs);
+
+    // A further status change must reset the timeout and keep fast polling.
+    m_checker->setStatus(NordVpnInfo::Status::Connected);
+    QVERIFY(m_checker->m_transitionTimer->isActive());
+    QCOMPARE(m_checker->m_timer->interval(), StateChecker::DynamicIntervalTransitionalMs);
+
+    // Ending the transition explicitly must revert to stable polling.
+    m_checker->endTransition();
+    QVERIFY(!m_checker->m_transitionTimer->isActive());
+    QCOMPARE(m_checker->m_timer->interval(), StateChecker::DynamicIntervalStableMs);
+
+    // In Custom mode a status change must not affect the polling interval.
+    m_checker->setPollingMode(StateChecker::PollingMode::Custom);
+    const int savedCustom = m_checker->m_customIntervalMs;
+    m_checker->setInterval(7000);
+    m_checker->setStatus(NordVpnInfo::Status::Disconnected);
+    QCOMPARE(m_checker->m_timer->interval(), 7000);
+    QVERIFY(!m_checker->m_transitionTimer->isActive());
+
+    // Restore.
+    m_checker->setPollingMode(StateChecker::PollingMode::Dynamic);
+    m_checker->setInterval(savedCustom);
+}
+
+void TestStateChecker::test_tick_uptime()
+{
+    // Build a Connected NordVpnInfo with known uptime "3 hours 24 minutes 5 seconds"
+    // → parseUptime → "00:03:24:05"
+    const QString connectedBase = QStringLiteral("Status: Connected\nCurrent server: fi88.nordvpn.com\n"
+                                                 "Country: Finland\nCity: Helsinki\nYour new IP: 196.196.203.67\n"
+                                                 "Current technology: OpenVPN\nCurrent protocol: UDP\n"
+                                                 "Transfer: 0.97 MiB received, 452.22 KiB sent\nUptime: %1");
+
+    NordVpnInfo info = NordVpnInfo::fromString(connectedBase.arg("3 hours 24 minutes 5 seconds"));
+    const NordVpnInfo expected = NordVpnInfo::fromString(connectedBase.arg("3 hours 24 minutes 6 seconds"));
+
+    info.tickUptime();
+    QCOMPARE(info, expected);
+
+    // Verify rollover: 59 seconds → 1 minute 0 seconds
+    NordVpnInfo atRollover = NordVpnInfo::fromString(connectedBase.arg("59 seconds"));
+    const NordVpnInfo afterRollover = NordVpnInfo::fromString(connectedBase.arg("1 minutes 0 seconds"));
+    atRollover.tickUptime();
+    QCOMPARE(atRollover, afterRollover);
 }
 
 void TestStateChecker::onStatusCheckPerformed(const NordVpnInfo::Status &status)
@@ -140,6 +263,45 @@ void TestStateChecker::test_check(NordVpnInfo::Status targetStatus)
     const auto &arg = arguments.at(0);
     QVERIFY(arg.metaType() == QMetaType::fromType<NordVpnInfo::Status>());
     QVERIFY(arg.value<NordVpnInfo::Status>() == targetStatus);
+}
+
+void TestStateChecker::test_error_resilience()
+{
+    const Action::Ptr &action = m_storage->action(Action::NordVPN::CheckStatus);
+    const QString savedApp = action->app();
+
+    // Point the action at a non-existent binary to force CLI errors.
+    action->setApp(QStringLiteral("/nonexistent/yangl-test-binary"));
+
+    QSignalSpy errorSpy(m_checker.get(), &StateChecker::error);
+
+    // Trigger errors one at a time; monitor must survive the first N-1 of them.
+    for (int i = 0; i < StateChecker::MaxConsecutiveErrors - 1; ++i) {
+        m_checker->check();
+        if (errorSpy.size() <= i)
+            QVERIFY(errorSpy.wait(CLICall::DefaultTimeoutMSecs));
+        QCOMPARE(errorSpy.count(), i + 1);
+        QCOMPARE(m_checker->m_consecutiveErrors, i + 1); // counter advancing
+    }
+
+    // The Nth error must trip the threshold: counter resets and monitor stops.
+    m_checker->check();
+    if (errorSpy.size() < StateChecker::MaxConsecutiveErrors)
+        QVERIFY(errorSpy.wait(CLICall::DefaultTimeoutMSecs));
+
+    QCOMPARE(errorSpy.count(), StateChecker::MaxConsecutiveErrors);
+    QCOMPARE(m_checker->m_consecutiveErrors, 0); // reset after stop
+
+    // Restore the good binary and verify a successful poll resets the counter.
+    action->setApp(savedApp);
+    action->setArgs({ "--status-disconnected" });
+
+    QSignalSpy stateSpy(m_checker.get(), &StateChecker::stateChanged);
+    m_checker->check();
+    if (stateSpy.isEmpty())
+        QVERIFY(stateSpy.wait(CLICall::DefaultTimeoutMSecs));
+
+    QCOMPARE(m_checker->m_consecutiveErrors, 0);
 }
 
 void TestStateChecker::test_check_status_change()
