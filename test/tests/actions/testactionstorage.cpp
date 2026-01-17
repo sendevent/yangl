@@ -329,6 +329,7 @@ void TestActionStorage::test_toggleGroups()
         { "Native Icon", { Action::NordVPN::NativeTrayOn, Action::NordVPN::NativeTrayOff } },
         { "Auto-connect", { Action::NordVPN::AutoconnectOn, Action::NordVPN::AutoconnectOff } },
         { "Firewall", { Action::NordVPN::FirewallOn, Action::NordVPN::FirewallOff } },
+        { "LAN Discovery", { Action::NordVPN::LanDiscoveryOn, Action::NordVPN::LanDiscoveryOff } },
     };
 
     ActionStorage storage;
@@ -378,6 +379,7 @@ void TestActionStorage::test_toggleGroups_survive_save_load()
         { "Native Icon", { Action::NordVPN::NativeTrayOn, Action::NordVPN::NativeTrayOff } },
         { "Auto-connect", { Action::NordVPN::AutoconnectOn, Action::NordVPN::AutoconnectOff } },
         { "Firewall", { Action::NordVPN::FirewallOn, Action::NordVPN::FirewallOff } },
+        { "LAN Discovery", { Action::NordVPN::LanDiscoveryOn, Action::NordVPN::LanDiscoveryOff } },
     };
 
     QTemporaryFile tmp;

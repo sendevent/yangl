@@ -484,6 +484,21 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
         toggleGroup = QStringLiteral("Firewall");
         break;
     }
+    case Action::NordVPN::LanDiscoveryOn: {
+        title = QObject::tr("LAN Discovery ON");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set lan-discovery 1"));
+        toggleGroup = QStringLiteral("LAN Discovery");
+        toggleOn = true;
+        break;
+    }
+    case Action::NordVPN::LanDiscoveryOff: {
+        title = QObject::tr("LAN Discovery OFF");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set lan-discovery 0"));
+        toggleGroup = QStringLiteral("LAN Discovery");
+        break;
+    }
 
     default:
         scope = Action::Flow::Custom;
