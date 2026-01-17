@@ -83,6 +83,9 @@ public:
 
         LanDiscoveryOn,
         LanDiscoveryOff,
+
+        VirtualLocationOn,
+        VirtualLocationOff,
     };
 
     Q_ENUM(NordVPN);
