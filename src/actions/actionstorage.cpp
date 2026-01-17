@@ -499,6 +499,21 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
         toggleGroup = QStringLiteral("LAN Discovery");
         break;
     }
+    case Action::NordVPN::VirtualLocationOn: {
+        title = QObject::tr("Virtual Location ON");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set virtual-location 1"));
+        toggleGroup = QStringLiteral("Virtual Location");
+        toggleOn = true;
+        break;
+    }
+    case Action::NordVPN::VirtualLocationOff: {
+        title = QObject::tr("Virtual Location OFF");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set virtual-location 0"));
+        toggleGroup = QStringLiteral("Virtual Location");
+        break;
+    }
 
     default:
         scope = Action::Flow::Custom;
