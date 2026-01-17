@@ -340,34 +340,34 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
     case Action::NordVPN::Rate5: {
         title = QObject::tr("Rate ★★★★★");
         wordsToList(QStringLiteral("rate 5"));
-        menuPlace = Action::MenuPlace::Own;
+        menuPlace = Action::MenuPlace::NoMenu;
         forceShow = true;
         break;
     }
     case Action::NordVPN::Rate4: {
         title = QObject::tr("Rate ★★★★☆");
         wordsToList(QStringLiteral("rate 4"));
-        menuPlace = Action::MenuPlace::Own;
+        menuPlace = Action::MenuPlace::NoMenu;
         forceShow = true;
         break;
     }
     case Action::NordVPN::Rate3: {
         title = QObject::tr("Rate ★★★☆☆");
         wordsToList(QStringLiteral("rate 3"));
-        menuPlace = Action::MenuPlace::Own;
+        menuPlace = Action::MenuPlace::NoMenu;
         forceShow = true;
         break;
     }
     case Action::NordVPN::Rate2: {
         title = QObject::tr("Rate ★★☆☆☆");
-        menuPlace = Action::MenuPlace::Own;
+        menuPlace = Action::MenuPlace::NoMenu;
         wordsToList(QStringLiteral("rate 2"));
         forceShow = true;
         break;
     }
     case Action::NordVPN::Rate1: {
         title = QObject::tr("Rate ★☆☆☆☆");
-        menuPlace = Action::MenuPlace::Own;
+        menuPlace = Action::MenuPlace::NoMenu;
         wordsToList(QStringLiteral("rate 1"));
         forceShow = true;
         break;
@@ -445,6 +445,43 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
         wordsToList(QStringLiteral("set tray 1"));
         toggleGroup = QStringLiteral("Native Icon");
         toggleOn = true;
+        break;
+    }
+    case Action::NordVPN::LogOut: {
+        title = QObject::tr("Logout");
+        wordsToList(QStringLiteral("logout"));
+        menuPlace = Action::MenuPlace::Own;
+        forceShow = true;
+        break;
+    }
+    case Action::NordVPN::AutoconnectOn: {
+        title = QObject::tr("Autoconnect ON");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set autoconnect 1"));
+        toggleGroup = QStringLiteral("Auto-connect");
+        toggleOn = true;
+        break;
+    }
+    case Action::NordVPN::AutoconnectOff: {
+        title = QObject::tr("Autoconnect OFF");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set autoconnect 0"));
+        toggleGroup = QStringLiteral("Auto-connect");
+        break;
+    }
+    case Action::NordVPN::FirewallOn: {
+        title = QObject::tr("Firewall ON");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set firewall 1"));
+        toggleGroup = QStringLiteral("Firewall");
+        toggleOn = true;
+        break;
+    }
+    case Action::NordVPN::FirewallOff: {
+        title = QObject::tr("Firewall OFF");
+        menuPlace = Action::MenuPlace::Own;
+        wordsToList(QStringLiteral("set firewall 0"));
+        toggleGroup = QStringLiteral("Firewall");
         break;
     }
 
