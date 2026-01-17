@@ -21,6 +21,7 @@
 #include "settings/settingsmanager.h"
 
 #include <QFile>
+#include <QTemporaryFile>
 #include <QTest>
 
 class ActionStorage;
@@ -51,6 +52,7 @@ private slots:
     void test_updateActionsBuiltin();
     void test_updateActionsUser();
     void test_toggleGroups();
+    void test_toggleGroups_survive_save_load();
 };
 
 TestActionStorage::TestActionStorage(QObject *parent)
@@ -321,9 +323,12 @@ void TestActionStorage::test_toggleGroups()
     const QMap<QString, std::pair<Action::NordVPN, Action::NordVPN>> expected = {
         { "Notify", { Action::NordVPN::SetNotifyOn, Action::NordVPN::SetNotifyOff } },
         { "Kill Switch", { Action::NordVPN::KillSwitchOn, Action::NordVPN::KillSwitchOff } },
-        { "CyberSec", { Action::NordVPN::CyberSecOn, Action::NordVPN::CyberSecOff } },
+        { "Threat Protection Lite",
+          { Action::NordVPN::ThreatProtectionLiteOn, Action::NordVPN::ThreatProtectionLiteOff } },
         { "Obfuscate", { Action::NordVPN::ObfuscateOn, Action::NordVPN::ObfuscateOff } },
         { "Native Icon", { Action::NordVPN::NativeTrayOn, Action::NordVPN::NativeTrayOff } },
+        { "Auto-connect", { Action::NordVPN::AutoconnectOn, Action::NordVPN::AutoconnectOff } },
+        { "Firewall", { Action::NordVPN::FirewallOn, Action::NordVPN::FirewallOff } },
     };
 
     ActionStorage storage;
@@ -346,6 +351,7 @@ void TestActionStorage::test_toggleGroups()
     const QList<Action::NordVPN> nonToggleTypes = {
         Action::NordVPN::Connect,     Action::NordVPN::Disconnect, Action::NordVPN::LogIn,
         Action::NordVPN::CheckStatus, Action::NordVPN::Pause05,    Action::NordVPN::Rate5,
+        Action::NordVPN::LogOut,
     };
     for (auto t : nonToggleTypes) {
         const Action::Ptr &action = storage.action(t);
@@ -358,6 +364,61 @@ void TestActionStorage::test_toggleGroups()
     const QVector<Action::Ptr> &custom = populateUserActions(&storage, 2);
     for (const auto &action : custom)
         QVERIFY(action->toggleGroup().isEmpty());
+}
+
+void TestActionStorage::test_toggleGroups_survive_save_load()
+{
+    // Known toggle pairs that must survive a save/load round-trip.
+    const QMap<QString, std::pair<Action::NordVPN, Action::NordVPN>> expected = {
+        { "Notify", { Action::NordVPN::SetNotifyOn, Action::NordVPN::SetNotifyOff } },
+        { "Kill Switch", { Action::NordVPN::KillSwitchOn, Action::NordVPN::KillSwitchOff } },
+        { "Threat Protection Lite",
+          { Action::NordVPN::ThreatProtectionLiteOn, Action::NordVPN::ThreatProtectionLiteOff } },
+        { "Obfuscate", { Action::NordVPN::ObfuscateOn, Action::NordVPN::ObfuscateOff } },
+        { "Native Icon", { Action::NordVPN::NativeTrayOn, Action::NordVPN::NativeTrayOff } },
+        { "Auto-connect", { Action::NordVPN::AutoconnectOn, Action::NordVPN::AutoconnectOff } },
+        { "Firewall", { Action::NordVPN::FirewallOn, Action::NordVPN::FirewallOff } },
+    };
+
+    QTemporaryFile tmp;
+    QVERIFY(tmp.open());
+    const QString tmpPath = tmp.fileName();
+    tmp.close();
+    {
+        ActionStorage storage;
+        storage.load();
+        storage.save(tmpPath);
+    }
+
+    {
+        ActionStorage storage;
+        storage.load(tmpPath);
+
+        for (auto it = expected.cbegin(); it != expected.cend(); ++it) {
+            const Action::Ptr &onAction = storage.action(it->first);
+            QVERIFY2(onAction, qPrintable(QString("ON action missing for group: %1").arg(it.key())));
+            QCOMPARE(onAction->toggleGroup(), it.key());
+            QVERIFY2(onAction->isToggleOn(), qPrintable(QString("isToggleOn wrong for group: %1").arg(it.key())));
+
+            const Action::Ptr &offAction = storage.action(it->second);
+            QVERIFY2(offAction, qPrintable(QString("OFF action missing for group: %1").arg(it.key())));
+            QCOMPARE(offAction->toggleGroup(), it.key());
+            QVERIFY2(!offAction->isToggleOn(),
+                     qPrintable(QString("isToggleOn wrong for OFF in group: %1").arg(it.key())));
+        }
+
+        const QList<Action::NordVPN> nonToggleTypes = {
+            Action::NordVPN::Connect,     Action::NordVPN::Disconnect, Action::NordVPN::LogIn,
+            Action::NordVPN::CheckStatus, Action::NordVPN::Pause05,    Action::NordVPN::Rate5,
+            Action::NordVPN::LogOut,
+        };
+        for (auto t : nonToggleTypes) {
+            const Action::Ptr &action = storage.action(t);
+            QVERIFY(action);
+            QVERIFY2(action->toggleGroup().isEmpty(),
+                     qPrintable(QString("Unexpected toggleGroup on non-toggle action %1").arg(static_cast<int>(t))));
+        }
+    }
 }
 
 QTEST_MAIN(TestActionStorage)
