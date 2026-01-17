@@ -23,10 +23,11 @@
 
 #include <QTimer>
 
-/*static*/ const int StateChecker::DefaultIntervalMs = 3 * utils::oneSecondMs();
+/*static*/ const int StateChecker::DefaultIntervalMs = 10 * utils::oneSecondMs();
 /*static*/ const int StateChecker::MaxConsecutiveErrors = 3;
 /*static*/ const int StateChecker::DynamicIntervalTransitionalMs = 1 * utils::oneSecondMs();
-/*static*/ const int StateChecker::DynamicIntervalStableMs = 5 * utils::oneSecondMs();
+/*static*/ const int StateChecker::DynamicIntervalStableMs = 10 * utils::oneSecondMs();
+/*static*/ const int StateChecker::DynamicTransitionTimeoutMs = 30 * utils::oneSecondMs();
 
 StateChecker::StateChecker(CLICaller *bus, int intervalMs)
     : QObject()
@@ -36,6 +37,7 @@ StateChecker::StateChecker(CLICaller *bus, int intervalMs)
     , m_pollInFlight(false)
     , m_consecutiveErrors(0)
     , m_uptimeTicker(new QTimer(this))
+    , m_transitionTimer(new QTimer(this))
     , m_pollingMode(PollingMode::Dynamic)
     , m_customIntervalMs(intervalMs)
     , m_state()
@@ -45,7 +47,11 @@ StateChecker::StateChecker(CLICaller *bus, int intervalMs)
     m_uptimeTicker->setInterval(utils::oneSecondMs());
     connect(m_uptimeTicker, &QTimer::timeout, this, &StateChecker::onUptimeTick);
 
-    adjustDynamicInterval(m_state.status());
+    m_transitionTimer->setSingleShot(true);
+    m_transitionTimer->setInterval(DynamicTransitionTimeoutMs);
+    connect(m_transitionTimer, &QTimer::timeout, this, &StateChecker::endTransition);
+
+    adjustDynamicInterval();
 
     setStatus(NordVpnInfo::Status::Unknown);
 }
@@ -106,9 +112,10 @@ void StateChecker::setPollingMode(PollingMode mode)
         return;
 
     m_pollingMode = mode;
+    m_transitionTimer->stop();
 
     if (m_pollingMode == PollingMode::Dynamic) {
-        adjustDynamicInterval(m_state.status());
+        adjustDynamicInterval();
     } else {
         const bool wasActive = isActive();
         m_timer->stop();
@@ -179,8 +186,10 @@ void StateChecker::setState(const NordVpnInfo &state)
 
         m_state = state;
 
-        if (m_pollingMode == PollingMode::Dynamic)
-            adjustDynamicInterval(state.status());
+        if (m_pollingMode == PollingMode::Dynamic && statusDetailsChanged) {
+            m_transitionTimer->start();
+            adjustDynamicInterval();
+        }
 
         if (state.status() == NordVpnInfo::Status::Connected) {
             if (!m_uptimeTicker->isActive())
@@ -234,11 +243,15 @@ void StateChecker::onUptimeTick()
     emit stateChanged(m_state);
 }
 
-void StateChecker::adjustDynamicInterval(NordVpnInfo::Status status)
+void StateChecker::endTransition()
 {
-    const bool transitional =
-            (status == NordVpnInfo::Status::Connecting || status == NordVpnInfo::Status::Disconnecting);
-    const int newInterval = transitional ? DynamicIntervalTransitionalMs : DynamicIntervalStableMs;
+    m_transitionTimer->stop();
+    adjustDynamicInterval();
+}
+
+void StateChecker::adjustDynamicInterval()
+{
+    const int newInterval = m_transitionTimer->isActive() ? DynamicIntervalTransitionalMs : DynamicIntervalStableMs;
 
     if (m_timer->interval() == newInterval)
         return;
