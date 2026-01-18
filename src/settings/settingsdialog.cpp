@@ -21,14 +21,56 @@
 #include "actions/action.h"
 #include "actions/actionstorage.h"
 #include "app/common.h"
+#include "app/statechecker.h"
 #include "settings/appsettings.h"
 #include "settings/mapsettings.h"
 #include "ui_settingsdialog.h"
 
+#include <QCoreApplication>
+#include <QFile>
 #include <QIcon>
 #include <QMessageBox>
+#include <QStandardPaths>
+#include <QTextStream>
 
 /*static*/ QPointer<SettingsDialog> SettingsDialog::m_instance = {};
+
+static QString autostartFilePath()
+{
+    const QString configDir = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation);
+    return configDir + QStringLiteral("/autostart/yangl.desktop");
+}
+
+static bool autostartEnabled()
+{
+    return QFile::exists(autostartFilePath());
+}
+
+static void setAutostartEnabled(bool enable)
+{
+    const QString filePath = autostartFilePath();
+    if (enable) {
+        QFile f(filePath);
+        if (f.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+            static const QString desktopTemplate = QStringLiteral("[Desktop Entry]\n"
+                                                                  "Type=Application\n"
+                                                                  "Name=%1\n"
+                                                                  "Comment=NordVPN tray GUI\n"
+                                                                  "Exec=%2\n"
+                                                                  "Icon=yangl\n"
+                                                                  "Terminal=false\n"
+                                                                  "X-GNOME-Autostart-enabled=true\n");
+            QTextStream out(&f);
+            out << desktopTemplate.arg(QCoreApplication::applicationName(), QCoreApplication::applicationFilePath());
+        } else {
+            WRN << "Failed to write autostart file:" << filePath;
+        }
+    } else {
+        if (QFile::exists(filePath) && !QFile::remove(filePath)) {
+            WRN << "Failed to remove autostart file:" << filePath;
+        }
+    }
+}
 
 SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
     : QDialog(parent)
@@ -42,10 +84,21 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
 
     connect(ui->checkBoxAutoActive, &QCheckBox::toggled, ui->cbIgnoreFirstConnected, &QCheckBox::setEnabled);
 
+    ui->leNVPNPath->setPlaceholderText(QStringLiteral("/usr/bin/nordvpn"));
     ui->leNVPNPath->setText(AppSettings::Monitor->NVPNPath->read().toString());
+
+    const bool isDynamic =
+            AppSettings::Monitor->PollingMode->read().toInt() == static_cast<int>(StateChecker::PollingMode::Dynamic);
+    ui->rbPollingDynamic->setChecked(isDynamic);
+    ui->rbPollingCustom->setChecked(!isDynamic);
+    ui->spinBoxInterval->setEnabled(!isDynamic);
+    connect(ui->rbPollingDynamic, &QRadioButton::toggled, this,
+            [this](bool dynamic) { ui->spinBoxInterval->setEnabled(!dynamic); });
+
     ui->spinBoxInterval->setValue(AppSettings::Monitor->Interval->read().toInt() / utils::oneSecondMs());
     ui->spinBoxMsgDuration->setValue(AppSettings::Tray->MessageDuration->read().toInt());
     ui->checkBoxAutoActive->setChecked(AppSettings::Monitor->Active->read().toBool());
+    ui->checkBoxAutoStart->setChecked(autostartEnabled());
     ui->cbIgnoreFirstConnected->setChecked(AppSettings::Tray->IgnoreFirstConnected->read().toBool());
     ui->checkBoxMessagePlainText->setChecked(AppSettings::Tray->MessagePlainText->read().toBool());
 
@@ -127,10 +180,14 @@ bool SettingsDialog::saveMonitorSettings()
     AppSettings::Monitor->NVPNPath->write(path);
     AppSettings::Tray->MessageDuration->write(ui->spinBoxMsgDuration->value());
     AppSettings::Monitor->Interval->write(ui->spinBoxInterval->value() * utils::oneSecondMs());
+    AppSettings::Monitor->PollingMode->write(static_cast<int>(ui->rbPollingDynamic->isChecked()
+                                                                      ? StateChecker::PollingMode::Dynamic
+                                                                      : StateChecker::PollingMode::Custom));
     AppSettings::Monitor->Active->write(ui->checkBoxAutoActive->isChecked());
     AppSettings::Tray->IgnoreFirstConnected->write(ui->cbIgnoreFirstConnected->isChecked());
     AppSettings::Tray->MessagePlainText->write(ui->checkBoxMessagePlainText->isChecked());
     AppSettings::Monitor->LogLinesLimit->write(ui->spinBoxLogLines->value());
+    setAutostartEnabled(ui->checkBoxAutoStart->isChecked());
 
     return true;
 }

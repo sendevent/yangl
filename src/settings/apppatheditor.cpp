@@ -52,6 +52,11 @@ void AppPathEditor::setText(const QString &text)
     m_pathEdit->setText(text);
 }
 
+void AppPathEditor::setPlaceholderText(const QString &text)
+{
+    m_pathEdit->setPlaceholderText(text);
+}
+
 void AppPathEditor::onAppPathChanged(const QString &text)
 {
     m_pathEdit->setToolTip(text);
