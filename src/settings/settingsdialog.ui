@@ -166,7 +166,7 @@
            <item row="0" column="0">
             <widget class="QLabel" name="label">
              <property name="text">
-              <string>NordVPN:</string>
+              <string>NordVPN app path:</string>
              </property>
             </widget>
            </item>
