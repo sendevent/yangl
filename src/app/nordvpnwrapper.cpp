@@ -292,6 +292,7 @@ void NordVpnWrapper::onStatusChanged(NordVpnInfo::Status status)
     }
 
     updateActions(status == NordVpnInfo::Status::Connected);
+    syncToggleSettings();
 }
 
 void NordVpnWrapper::updateActions(bool connected)
