@@ -66,7 +66,8 @@ void AppPathEditor::onAppPathChanged(const QString &text)
 {
     m_pathEdit->setToolTip(text);
     QPalette p = m_pathEdit->palette();
-    const QColor clr = !isValid() ? Qt::red : m_pathEdit->style()->standardPalette().color(QPalette::Base);
+    const QColor clr =
+            (!text.isEmpty() && !isValid()) ? Qt::red : m_pathEdit->style()->standardPalette().color(QPalette::Base);
     if (p.color(QPalette::Base) != clr) {
         p.setColor(QPalette::Base, clr);
         m_pathEdit->setPalette(p);
