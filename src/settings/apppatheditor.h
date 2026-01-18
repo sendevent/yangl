@@ -30,6 +30,7 @@ public:
     QString text() const;
     void setText(const QString &text);
     void setPlaceholderText(const QString &text);
+    bool isValid() const;
 signals:
 
 private slots:
