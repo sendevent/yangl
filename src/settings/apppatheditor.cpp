@@ -57,12 +57,16 @@ void AppPathEditor::setPlaceholderText(const QString &text)
     m_pathEdit->setPlaceholderText(text);
 }
 
+bool AppPathEditor::isValid() const
+{
+    return utils::isValidAppPath(m_pathEdit->text());
+}
+
 void AppPathEditor::onAppPathChanged(const QString &text)
 {
     m_pathEdit->setToolTip(text);
     QPalette p = m_pathEdit->palette();
-    const QColor clr =
-            utils::isValidAppPath(text) ? m_pathEdit->style()->standardPalette().color(QPalette::Base) : Qt::red;
+    const QColor clr = !isValid() ? Qt::red : m_pathEdit->style()->standardPalette().color(QPalette::Base);
     if (p.color(QPalette::Base) != clr) {
         p.setColor(QPalette::Base, clr);
         m_pathEdit->setPalette(p);
