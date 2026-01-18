@@ -29,6 +29,7 @@ class MapServersModel;
 class ServersFilterModel;
 class QLabel;
 class QLineEdit;
+class QPushButton;
 class QTreeView;
 class QToolButton;
 class QProgressBar;
@@ -44,6 +45,9 @@ public:
     static ServersChartView *instance();
 
     void saveSettings();
+
+signals:
+    void requestSettings();
 
 public slots:
     void onStateChanged(const NordVpnInfo &info);
@@ -72,6 +76,7 @@ private:
     QTreeView *m_treeView { nullptr };
     QToolButton *m_buttonReload { nullptr };
     QProgressBar *m_progressBar { nullptr };
+    QPushButton *m_buttonSettings { nullptr };
     MapWidget *m_chartWidget { nullptr };
 
     NordVpnWrapper *m_nordVpnWraper { nullptr };

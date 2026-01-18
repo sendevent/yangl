@@ -46,6 +46,10 @@ void AppUiCoordinator::saveState() const
 void AppUiCoordinator::showMapView()
 {
     ServersChartView::makeVisible(m_wrapper);
+    if (auto *inst = ServersChartView::instance()) {
+        connect(inst, &ServersChartView::requestSettings, this, &AppUiCoordinator::showSettingsEditor,
+                Qt::UniqueConnection);
+    }
 }
 
 void AppUiCoordinator::showSettingsEditor()
@@ -56,6 +60,8 @@ void AppUiCoordinator::showSettingsEditor()
                 emit settingsAccepted();
             }
         });
+        connect(dlg, &SettingsDialog::showMapRequested, this, &AppUiCoordinator::showMapView,
+                Qt::UniqueConnection);
         dlg->open();
     }
 }

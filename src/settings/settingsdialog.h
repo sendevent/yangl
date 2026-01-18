@@ -35,6 +35,9 @@ public:
 
     ~SettingsDialog() override;
 
+signals:
+    void showMapRequested();
+
 public slots:
     void accept() override;
 
