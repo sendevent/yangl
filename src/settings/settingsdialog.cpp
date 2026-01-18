@@ -104,6 +104,7 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
 
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::accept);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &SettingsDialog::reject);
+    connect(ui->buttonMap, &QPushButton::clicked, this, &SettingsDialog::showMapRequested);
 
     ui->tabActionsYangl->setActions(m_actStorage, Action::Flow::Yangl);
     ui->tabActionsNordVPN->setActions(m_actStorage, Action::Flow::NordVPN);

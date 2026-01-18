@@ -28,11 +28,13 @@
 
 #include <QBoxLayout>
 #include <QCompleter>
+#include <QFrame>
 #include <QHideEvent>
 #include <QItemSelectionModel>
 #include <QLabel>
 #include <QLineEdit>
 #include <QProgressBar>
+#include <QPushButton>
 #include <QSplitter>
 #include <QTimer>
 #include <QToolButton>
@@ -124,6 +126,15 @@ void ServersChartView::initUi()
     leftVBox->addWidget(m_searchBox);
     leftVBox->addWidget(m_treeView);
     leftVBox->addItem(hBox);
+
+    auto *separator = new QFrame(leftView);
+    separator->setFrameShape(QFrame::HLine);
+    separator->setFrameShadow(QFrame::Sunken);
+    leftVBox->addWidget(separator);
+
+    m_buttonSettings = new QPushButton(tr("Settings"), leftView);
+    m_buttonSettings->setToolTip(tr("Open settings"));
+    leftVBox->addWidget(m_buttonSettings);
     QSplitter *splitter = new QSplitter(this);
     splitter->addWidget(leftView);
     splitter->addWidget(m_chartWidget);
@@ -149,6 +160,7 @@ void ServersChartView::initConnections()
             [this](const QString &text) { m_serversFilterModel->setFilterRegularExpression(text); });
     connect(m_chartWidget, &MapWidget::markerDoubleclicked, this, &ServersChartView::onMarkerDoubleclicked);
     connect(m_buttonReload, &QToolButton::clicked, this, &ServersChartView::onReloadRequested);
+    connect(m_buttonSettings, &QPushButton::clicked, this, &ServersChartView::requestSettings);
 
     m_timer->setInterval(3 * utils::oneSecondMs());
     m_timer->setSingleShot(true);
