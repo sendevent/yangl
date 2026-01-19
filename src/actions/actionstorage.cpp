@@ -448,7 +448,7 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
         break;
     }
     case Action::NordVPN::LogOut: {
-        title = QObject::tr("Logout");
+        title = QObject::tr("Logout from NordVPN");
         wordsToList(QStringLiteral("logout"));
         menuPlace = Action::MenuPlace::Own;
         forceShow = true;
