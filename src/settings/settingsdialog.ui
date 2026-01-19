@@ -79,7 +79,7 @@
              <item>
               <widget class="QCheckBox" name="checkBoxAutoActive">
                <property name="text">
-                <string>Activate on app start</string>
+                <string>Enable monitoring on app start</string>
                </property>
               </widget>
              </item>
