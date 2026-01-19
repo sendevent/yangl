@@ -240,7 +240,7 @@ Action::Ptr ActionStorage::createYanglAction(Action::Yangl actionType, const QSt
         title = tr("Log");
         break;
     case Action::Yangl::Activated:
-        title = tr("Active");
+        title = tr("Monitor");
         anchor = Action::MenuPlace::Common;
         break;
     case Action::Yangl::ShowAbout:
