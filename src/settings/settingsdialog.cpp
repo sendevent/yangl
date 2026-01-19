@@ -92,8 +92,13 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
     ui->rbPollingDynamic->setChecked(isDynamic);
     ui->rbPollingCustom->setChecked(!isDynamic);
     ui->spinBoxInterval->setEnabled(!isDynamic);
-    connect(ui->rbPollingDynamic, &QRadioButton::toggled, this,
-            [this](bool dynamic) { ui->spinBoxInterval->setEnabled(!dynamic); });
+    auto updatePollingDesc = [this](bool dynamic) {
+        ui->spinBoxInterval->setEnabled(!dynamic);
+        ui->labelPollingModeDesc->setText(dynamic ? tr("Fast polling on state changes, relaxed when stable.")
+                                                  : tr("Fixed polling interval regardless of VPN state."));
+    };
+    connect(ui->rbPollingDynamic, &QRadioButton::toggled, this, updatePollingDesc);
+    updatePollingDesc(isDynamic);
 
     ui->spinBoxInterval->setValue(AppSettings::Monitor->Interval->read().toInt() / utils::oneSecondMs());
     ui->spinBoxMsgDuration->setValue(AppSettings::Tray->MessageDuration->read().toInt());
