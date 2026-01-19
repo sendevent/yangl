@@ -57,6 +57,7 @@ public slots:
     void setInterval(int msecs);
     void setActive(bool active);
     void setPollingMode(PollingMode mode);
+    void startTransition();
 
 signals:
     void stateChanged(const NordVpnInfo &state);
