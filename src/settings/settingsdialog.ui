@@ -327,7 +327,7 @@
                  <bool>false</bool>
                 </property>
                 <property name="text">
-                 <string>Ommit first &quot;Connected&quot;</string>
+                 <string>Omit first &quot;Connected&quot;</string>
                 </property>
                </widget>
               </item>
