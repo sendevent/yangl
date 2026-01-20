@@ -243,6 +243,15 @@ void StateChecker::onUptimeTick()
     emit stateChanged(m_state);
 }
 
+void StateChecker::startTransition()
+{
+    if (m_pollingMode != PollingMode::Dynamic)
+        return;
+
+    m_transitionTimer->start();
+    adjustDynamicInterval();
+}
+
 void StateChecker::endTransition()
 {
     m_transitionTimer->stop();
