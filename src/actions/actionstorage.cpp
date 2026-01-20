@@ -149,12 +149,14 @@ void ActionStorage::loadYanglActions()
 
     const auto &actionTypes = Action::yanglActions();
     for (const auto actionType : actionTypes) {
-        if (const auto &action = jsonYanglActionsById.value(actionType, {})) {
-            m_yanglActions[actionType] = action;
+        Action::Ptr action = createYanglAction(actionType);
+        if (const auto &jsonAction = jsonYanglActionsById.value(actionType, {})) {
+            // Only forcedShow is user-editable for Yangl actions; everything
+            // else (title, args, anchor, toggleGroup) is code-controlled.
+            action->setForcedShow(jsonAction->forcedShow());
             jsonYanglActionsById.remove(actionType);
-        } else {
-            m_yanglActions[actionType] = createYanglAction(actionType);
         }
+        m_yanglActions[actionType] = action;
     }
 
     while (!jsonYanglActionsById.isEmpty()) {
@@ -181,12 +183,18 @@ void ActionStorage::loadBuiltinActions()
 
     const auto &actions = Action::nvpnActions();
     for (const auto actionType : actions) {
-        if (const auto &action = jsonBuiltinActionsById.value(actionType, {})) {
-            m_nvpnActions[actionType] = action;
+        Action::Ptr action = createNVPNAction(actionType);
+        if (const auto &jsonAction = jsonBuiltinActionsById.value(actionType, {})) {
+            // Restore user-editable fields from JSON. Code-controlled fields
+            // (app, toggleGroup, toggleOn) always come from createNVPNAction.
+            action->setTitle(jsonAction->title());
+            action->setArgs(jsonAction->args());
+            action->setTimeout(jsonAction->timeout());
+            action->setForcedShow(jsonAction->forcedShow());
+            action->setAnchor(jsonAction->anchor());
             jsonBuiltinActionsById.remove(actionType);
-        } else {
-            m_nvpnActions[actionType] = createNVPNAction(actionType);
         }
+        m_nvpnActions[actionType] = action;
     }
 
     while (!jsonBuiltinActionsById.isEmpty()) {
