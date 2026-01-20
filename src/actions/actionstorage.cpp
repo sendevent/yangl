@@ -240,7 +240,7 @@ Action::Ptr ActionStorage::createYanglAction(Action::Yangl actionType, const QSt
         title = tr("Log");
         break;
     case Action::Yangl::Activated:
-        title = tr("Active");
+        title = tr("Monitor");
         anchor = Action::MenuPlace::Common;
         break;
     case Action::Yangl::ShowAbout:
@@ -448,7 +448,7 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
         break;
     }
     case Action::NordVPN::LogOut: {
-        title = QObject::tr("Logout");
+        title = QObject::tr("Logout from NordVPN");
         wordsToList(QStringLiteral("logout"));
         menuPlace = Action::MenuPlace::Own;
         forceShow = true;

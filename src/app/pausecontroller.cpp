@@ -31,7 +31,6 @@ PauseController::PauseController(ActionStorage *storage, StateChecker *checker, 
     , m_storage(storage)
     , m_checker(checker)
     , m_pauseTimer(new QTimer(this))
-    , m_paused(0)
 {
     connect(m_pauseTimer, &QTimer::timeout, this, &PauseController::onPauseTimer);
     connect(m_checker, &StateChecker::statusChanged, this,
@@ -45,7 +44,7 @@ bool PauseController::isPaused() const
 
 void PauseController::pause(Action::NordVPN action)
 {
-    if (m_paused) {
+    if (isPaused()) {
         return;
     }
 
@@ -71,19 +70,21 @@ void PauseController::pause(Action::NordVPN action)
         }
     }
 
-    m_paused = duration * 60 * utils::oneSecondMs();
+    m_deadline = QDeadlineTimer(qint64(duration) * 60 * utils::oneSecondMs());
 
     if (auto disconnect = m_storage->action(Action::NordVPN::Disconnect)) {
         emit requestAction(disconnect.get());
+        m_checker->startTransition();
         m_pauseTimer->start(utils::oneSecondMs());
     }
 }
 
 void PauseController::onPauseTimer()
 {
-    m_paused -= utils::oneSecondMs();
-
-    if (m_paused > 0) {
+    if (!m_deadline.hasExpired()) {
+        static const qint64 preReconnectMs = 15 * 1000;
+        if (m_deadline.remainingTime() <= preReconnectMs)
+            m_checker->startTransition();
         return;
     }
 
@@ -95,7 +96,6 @@ void PauseController::onPauseTimer()
             emit requestAction(connect.get());
         }
     }
-    m_paused = 0;
 }
 
 void PauseController::onStatusChanged(int status)
@@ -103,7 +103,6 @@ void PauseController::onStatusChanged(int status)
     if (static_cast<NordVpnInfo::Status>(status) == NordVpnInfo::Status::Connected) {
         if (m_pauseTimer->isActive()) {
             m_pauseTimer->stop();
-            m_paused = 0;
         }
     }
 }

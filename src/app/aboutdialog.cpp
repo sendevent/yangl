@@ -23,6 +23,7 @@
 #include "version/appversiondefs.h"
 
 #include <QDateTime>
+#include <QDesktopServices>
 #include <QFile>
 #include <QPushButton>
 #include <QStatusBar>
@@ -107,7 +108,9 @@ void AboutDialog::createTab(TabId tabId)
     vBox->addWidget(display);
     ui->tabWidget->addTab(tab, nameParts.first());
 
-    display->setOpenExternalLinks(true);
+    display->setOpenLinks(false);
+    connect(display, &QTextBrowser::anchorClicked, this,
+            [](const QUrl &url) { QDesktopServices::openUrl(url); });
     connect(display, &QTextBrowser::highlighted, m_statusBar,
             [this](const QUrl &url) { m_statusBar->showMessage(url.toString()); });
 
