@@ -63,7 +63,8 @@ NordVpnWrapper::NordVpnWrapper(QObject *parent)
     connect(m_updateChecker, &UpdateChecker::updateAvailable, this, [this](const QString &version) {
         m_trayIcon->updateStateText(tr("Update available: %1").arg(version), QSystemTrayIcon::Information);
     });
-    QTimer::singleShot(5 * utils::oneSecondMs(), m_updateChecker, &UpdateChecker::check);
+    if (AppSettings::Monitor->CheckForUpdates->read().toBool())
+        QTimer::singleShot(5 * utils::oneSecondMs(), m_updateChecker, &UpdateChecker::check);
 }
 
 /*static*/ NordVpnWrapper *NordVpnWrapper::s_instance = nullptr;
