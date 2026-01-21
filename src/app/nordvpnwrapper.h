@@ -29,6 +29,7 @@ class StateChecker;
 class MenuHolder;
 class PauseController;
 class TrayIcon;
+class UpdateChecker;
 
 class NordVpnWrapper : public QObject
 {
@@ -84,4 +85,6 @@ private:
     QString m_lastCity;
 
     Action::Ptr m_geoAction;
+    Action::Ptr m_settingsSyncAction;
+    UpdateChecker *m_updateChecker;
 };
