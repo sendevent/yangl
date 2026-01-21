@@ -75,6 +75,7 @@ GroupMonitor::GroupMonitor()
                            new AppSetting(QString("%1/LastCity").arg(localName()), QString()),
                            new AppSetting(QString("%1/PollingMode").arg(localName()),
                                           static_cast<int>(StateChecker::PollingMode::Dynamic)),
+                           new AppSetting(QString("%1/CheckForUpdates").arg(localName()), true),
                    },
                    {})
 {

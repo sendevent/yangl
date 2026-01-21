@@ -104,6 +104,7 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
     ui->spinBoxMsgDuration->setValue(AppSettings::Tray->MessageDuration->read().toInt());
     ui->checkBoxAutoActive->setChecked(AppSettings::Monitor->Active->read().toBool());
     ui->checkBoxAutoStart->setChecked(autostartEnabled());
+    ui->checkBoxCheckForUpdates->setChecked(AppSettings::Monitor->CheckForUpdates->read().toBool());
     ui->cbIgnoreFirstConnected->setChecked(AppSettings::Tray->IgnoreFirstConnected->read().toBool());
     ui->checkBoxMessagePlainText->setChecked(AppSettings::Tray->MessagePlainText->read().toBool());
 
@@ -193,6 +194,7 @@ bool SettingsDialog::saveMonitorSettings()
     AppSettings::Tray->IgnoreFirstConnected->write(ui->cbIgnoreFirstConnected->isChecked());
     AppSettings::Tray->MessagePlainText->write(ui->checkBoxMessagePlainText->isChecked());
     AppSettings::Monitor->LogLinesLimit->write(ui->spinBoxLogLines->value());
+    AppSettings::Monitor->CheckForUpdates->write(ui->checkBoxCheckForUpdates->isChecked());
     setAutostartEnabled(ui->checkBoxAutoStart->isChecked());
 
     return true;

@@ -66,6 +66,7 @@ public:
     const AppSetting *LastCountry = Options[5];
     const AppSetting *LastCity = Options[6];
     const AppSetting *PollingMode = Options[7];
+    const AppSetting *CheckForUpdates = Options[8];
 
 private:
     GroupMonitor(const GroupMonitor &) = delete;
