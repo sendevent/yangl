@@ -220,6 +220,7 @@ void TestActionStorage::test_actionUser()
 void TestActionStorage::test_saveAndLoad()
 {
     static constexpr int UserActionCount = 3;
+    QMap<int, QString> yanglDefaultTitles;
 
     {
         ActionStorage storage;
@@ -229,6 +230,10 @@ void TestActionStorage::test_saveAndLoad()
 
         populateUserActions(&storage, UserActionCount);
         QCOMPARE(storage.userActions().size(), UserActionCount);
+
+        // Record code-controlled Yangl titles before overwriting them.
+        for (const Action::Ptr &action : storage.yanglActions())
+            yanglDefaultTitles[action->type()] = action->title();
 
         for (const Action::Ptr &action : storage.allActions()) {
             const QString suffix = (action->scope() == Action::Flow::Custom) ? action->id().toString()
@@ -250,10 +255,15 @@ void TestActionStorage::test_saveAndLoad()
                          + storage.yanglActions().size());
 
         for (const Action::Ptr &action : allActions) {
-            const QString suffix = (action->scope() == Action::Flow::Custom) ? action->id().toString()
-                                                                             : QString::number(action->type());
-            const QString title = QString("%1_Action_%2").arg(action->groupKey(), suffix);
-            QCOMPARE(action->title(), title);
+            if (action->scope() == Action::Flow::Yangl) {
+                // Yangl titles are code-controlled: custom titles must not survive reload.
+                QCOMPARE(action->title(), yanglDefaultTitles.value(action->type()));
+            } else {
+                const QString suffix = (action->scope() == Action::Flow::Custom) ? action->id().toString()
+                                                                                 : QString::number(action->type());
+                const QString title = QString("%1_Action_%2").arg(action->groupKey(), suffix);
+                QCOMPARE(action->title(), title);
+            }
         }
     }
 }
