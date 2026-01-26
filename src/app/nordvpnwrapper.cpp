@@ -25,11 +25,13 @@
 #include "app/pausecontroller.h"
 #include "app/statechecker.h"
 #include "app/trayicon.h"
+#include "app/updatechecker.h"
 #include "cli/clicaller.h"
 #include "geo/placeinfo.h"
 #include "settings/appsettings.h"
 
 #include <QApplication>
+#include <QTimer>
 
 NordVpnWrapper::NordVpnWrapper(QObject *parent)
     : QObject(parent)
@@ -40,6 +42,7 @@ NordVpnWrapper::NordVpnWrapper(QObject *parent)
     , m_menuHolder(new MenuHolder(this))
     , m_pauseCtrl(new PauseController(m_actions, m_checker, this))
     , m_uiCoordinator(new AppUiCoordinator(this, m_actions, m_checker, this))
+    , m_updateChecker(new UpdateChecker(this))
 {
     connect(qApp, &QApplication::aboutToQuit, this, &NordVpnWrapper::prepareQuit);
     connect(m_pauseCtrl, &PauseController::requestAction, this, &NordVpnWrapper::onActionTriggered);
@@ -56,6 +59,12 @@ NordVpnWrapper::NordVpnWrapper(QObject *parent)
     });
 
     m_trayIcon->setVisible(true);
+
+    connect(m_updateChecker, &UpdateChecker::updateAvailable, this, [this](const QString &version) {
+        m_trayIcon->updateStateText(tr("Update available: %1").arg(version), QSystemTrayIcon::Information);
+    });
+    if (AppSettings::Monitor->CheckForUpdates->read().toBool())
+        QTimer::singleShot(5 * utils::oneSecondMs(), m_updateChecker, &UpdateChecker::check);
 }
 
 /*static*/ NordVpnWrapper *NordVpnWrapper::s_instance = nullptr;
