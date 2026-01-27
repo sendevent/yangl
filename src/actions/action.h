@@ -195,11 +195,11 @@ protected:
     QString m_title;
     QString m_app;
     QStringList m_args;
-    int m_timeout;
-    bool m_forceShow;
-    MenuPlace m_menuPlace;
+    int m_timeout { 0 };
+    bool m_forceShow { false };
+    MenuPlace m_menuPlace { MenuPlace::NoMenu };
     QString m_toggleGroup;
-    bool m_toggleOn = false;
+    bool m_toggleOn { false };
 };
 
 Q_DECLARE_METATYPE(Action::MenuPlace);

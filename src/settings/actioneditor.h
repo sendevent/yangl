@@ -48,9 +48,9 @@ public:
         QString m_title;
         QString m_app;
         QStringList m_args;
-        int m_timeout;
-        bool m_forceShow;
-        Action::MenuPlace m_menuPlace;
+        int m_timeout { 0 };
+        bool m_forceShow { false };
+        Action::MenuPlace m_menuPlace { Action::MenuPlace::NoMenu };
 
         bool apply();
     };

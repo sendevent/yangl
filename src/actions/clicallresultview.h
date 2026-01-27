@@ -40,8 +40,8 @@ protected slots:
     void validateTextLength();
 
 private:
-    int m_blocksLimit;
-    QAction *m_actClear;
+    int m_blocksLimit { 0 };
+    QAction *m_actClear { nullptr };
 
     int newLinesCount() const;
 };
