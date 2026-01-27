@@ -70,15 +70,15 @@ private slots:
     void onUptimeTick();
 
 protected:
-    CLICaller *m_bus;
+    CLICaller *m_bus { nullptr };
     Action::Ptr m_actCheck;
-    QTimer *m_timer;
-    bool m_pollInFlight;
-    int m_consecutiveErrors;
-    QTimer *m_uptimeTicker;
-    QTimer *m_transitionTimer;
-    PollingMode m_pollingMode;
-    int m_customIntervalMs;
+    QTimer *m_timer { nullptr };
+    bool m_pollInFlight { false };
+    int m_consecutiveErrors { 0 };
+    QTimer *m_uptimeTicker { nullptr };
+    QTimer *m_transitionTimer { nullptr };
+    PollingMode m_pollingMode { PollingMode::Dynamic };
+    int m_customIntervalMs { 0 };
 
     NordVpnInfo m_state;
     void setState(const NordVpnInfo &state);
