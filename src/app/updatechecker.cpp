@@ -35,6 +35,10 @@ UpdateChecker::UpdateChecker(QObject *parent)
 
 void UpdateChecker::check()
 {
+    if (m_inFlight) {
+        return;
+    }
+    m_inFlight = true;
     static const QUrl kReleasesApiUrl(QStringLiteral("https://api.github.com/repos/sendevent/yangl/releases/latest"));
     QNetworkRequest req(kReleasesApiUrl);
     req.setRawHeader("Accept", "application/vnd.github+json");
@@ -42,8 +46,17 @@ void UpdateChecker::check()
     connect(reply, &QNetworkReply::finished, this, [this, reply]() { onReplyFinished(reply); });
 }
 
+void UpdateChecker::applyEnabled(bool enabled)
+{
+    if (enabled && !m_enabled) {
+        check();
+    }
+    m_enabled = enabled;
+}
+
 void UpdateChecker::onReplyFinished(QNetworkReply *reply)
 {
+    m_inFlight = false;
     reply->deleteLater();
 
     if (reply->error() != QNetworkReply::NoError) {
