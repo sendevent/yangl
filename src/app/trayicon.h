@@ -45,14 +45,14 @@ private:
     struct IconInfo {
         QString m_base;
         QString m_sub;
-        NordVpnInfo::Status m_status;
+        NordVpnInfo::Status m_status { NordVpnInfo::Status::Unknown };
     };
     static QMap<NordVpnInfo::Status, IconInfo> m_allIcons;
     static QMap<NordVpnInfo::Status, QIcon> m_composedIcons;
 
     NordVpnInfo m_state;
-    bool m_isFirstChange;
-    int m_duration;
+    bool m_isFirstChange { true };
+    int m_duration { 0 };
 
     static QIcon iconForState(const NordVpnInfo &state);
     static QIcon iconForStatus(const NordVpnInfo::Status &status);

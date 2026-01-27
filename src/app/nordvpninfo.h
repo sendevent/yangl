@@ -53,8 +53,10 @@ public:
     QString country() const;
     QString city() const;
 
+    void tickUptime();
+
 private:
-    Status m_status;
+    Status m_status { Status::Unknown };
     QString m_server;
     QString m_country;
     QString m_city;
@@ -63,9 +65,6 @@ private:
     QString m_protocol;
     QString m_traffic;
     QString m_uptime;
-
-    static int MetaIdClass;
-    static int MetaIdEnum;
 };
 
 Q_DECLARE_METATYPE(NordVpnInfo::Status)

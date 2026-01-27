@@ -48,8 +48,8 @@ protected:
     const QStringList m_params;
     const int m_timeout;
     QString m_result, m_errors;
-    int m_exitCode;
-    QProcess::ExitStatus m_exitStatus;
+    int m_exitCode { 0 };
+    QProcess::ExitStatus m_exitStatus { QProcess::NormalExit };
 
     QString setResult(const QString &result, const QString &errors);
 

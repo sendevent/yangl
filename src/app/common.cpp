@@ -28,11 +28,6 @@
 
 namespace utils {
 
-QString groupsTitle()
-{
-    return geo::groupsTitle();
-}
-
 QString ensureDirExists(const QString &path)
 {
     if (path.isEmpty()) {
@@ -42,8 +37,9 @@ QString ensureDirExists(const QString &path)
 
     const QFileInfo info(path);
     const QDir &dir = info.absoluteDir();
-    if (!dir.exists())
+    if (!dir.exists()) {
         dir.mkpath(dir.absolutePath());
+    }
 
     const QString &res = info.absoluteFilePath();
     return res;
@@ -51,16 +47,18 @@ QString ensureDirExists(const QString &path)
 
 QString geoToNvpn(const QString &name)
 {
-    if (name == "default")
+    if (name == "default") {
         return {};
+    }
 
     return QString(name).replace(' ', '_');
 }
 
 QString nvpnToGeo(const QString &name)
 {
-    if (name.isEmpty())
+    if (name.isEmpty()) {
         return "default";
+    }
 
     return QString(name).replace('_', ' ');
 }

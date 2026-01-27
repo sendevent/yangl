@@ -101,15 +101,17 @@ void StateChecker::setInterval(int msecs)
         const bool wasActive = isActive();
         m_timer->stop();
         m_timer->setInterval(msecs);
-        if (wasActive)
+        if (wasActive) {
             m_timer->start();
+        }
     }
 }
 
 void StateChecker::setPollingMode(PollingMode mode)
 {
-    if (m_pollingMode == mode)
+    if (m_pollingMode == mode) {
         return;
+    }
 
     m_pollingMode = mode;
     m_transitionTimer->stop();
@@ -120,8 +122,9 @@ void StateChecker::setPollingMode(PollingMode mode)
         const bool wasActive = isActive();
         m_timer->stop();
         m_timer->setInterval(m_customIntervalMs);
-        if (wasActive)
+        if (wasActive) {
             m_timer->start();
+        }
     }
 }
 
@@ -132,8 +135,9 @@ int StateChecker::interval() const
 
 void StateChecker::check()
 {
-    if (m_pollInFlight)
+    if (m_pollInFlight) {
         return;
+    }
 
     if (!m_actCheck) {
         notifyError(tr("Invalid Status-check Action instance"));
@@ -192,8 +196,9 @@ void StateChecker::setState(const NordVpnInfo &state)
         }
 
         if (state.status() == NordVpnInfo::Status::Connected) {
-            if (!m_uptimeTicker->isActive())
+            if (!m_uptimeTicker->isActive()) {
                 m_uptimeTicker->start();
+            }
         } else {
             m_uptimeTicker->stop();
         }
@@ -245,8 +250,9 @@ void StateChecker::onUptimeTick()
 
 void StateChecker::startTransition()
 {
-    if (m_pollingMode != PollingMode::Dynamic)
+    if (m_pollingMode != PollingMode::Dynamic) {
         return;
+    }
 
     m_transitionTimer->start();
     adjustDynamicInterval();
@@ -262,12 +268,14 @@ void StateChecker::adjustDynamicInterval()
 {
     const int newInterval = m_transitionTimer->isActive() ? DynamicIntervalTransitionalMs : DynamicIntervalStableMs;
 
-    if (m_timer->interval() == newInterval)
+    if (m_timer->interval() == newInterval) {
         return;
+    }
 
     const bool wasActive = isActive();
     m_timer->stop();
     m_timer->setInterval(newInterval);
-    if (wasActive)
+    if (wasActive) {
         m_timer->start();
+    }
 }

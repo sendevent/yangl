@@ -59,8 +59,9 @@ void IconLineEdit::onOpenRequested()
 {
     const QString &currPath = path();
     const QString newPath = QFileDialog::getOpenFileName(this, tr("Select image"), currPath);
-    if (isValidImage(newPath))
+    if (isValidImage(newPath)) {
         setPath(newPath);
+    }
 }
 
 void IconLineEdit::onPathChanged()
@@ -71,8 +72,9 @@ void IconLineEdit::onPathChanged()
 bool IconLineEdit::isValidImage(const QString &path) const
 {
     QPixmap pm(path);
-    if (pm.isNull())
+    if (pm.isNull()) {
         return false;
+    }
 
     return true;
 }
@@ -87,11 +89,13 @@ void IconLineEdit::updatePreview(const QString &to)
     if (pm.isNull()) {
         pm = QPixmap(":/icn/resources/noimage.png");
         previewTooltip = tr("No image used");
-    } else
+    } else {
         m_edit->setToolTip(to);
+    }
 
-    if (pm.width() > imgTooltipSide || pm.height() > imgTooltipSide)
+    if (pm.width() > imgTooltipSide || pm.height() > imgTooltipSide) {
         pm = pm.scaled(imgTooltipSide, imgTooltipSide, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    }
 
     if (previewTooltip.isEmpty()) {
         QByteArray ba;

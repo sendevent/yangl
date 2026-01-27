@@ -78,6 +78,7 @@ void AppPathEditor::onOpenFileClicked()
 {
     const QString path =
             QFileDialog::getOpenFileName(this, tr("Select NordVPN binary"), m_pathEdit->text(), tr("Applications (*)"));
-    if (!path.isEmpty())
+    if (!path.isEmpty()) {
         m_pathEdit->setText(path);
+    }
 }

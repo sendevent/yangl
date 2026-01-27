@@ -36,6 +36,8 @@ struct JsonAction {
     static constexpr QLatin1String Display { QLatin1String("forcedDisplay") };
     static constexpr QLatin1String Anchor { QLatin1String("anchor") };
     static constexpr QLatin1String Timeout { QLatin1String("timeout") };
+    static constexpr QLatin1String ToggleGroup { QLatin1String("toggleGroup") };
+    static constexpr QLatin1String ToggleOn { QLatin1String("toggleOn") };
 };
 
 ActionJson::ActionJson(ActionStorage *storage)
@@ -101,8 +103,9 @@ void ActionJson::save(const QString &to)
 
 void ActionJson::save(QIODevice *out)
 {
-    if (!out || !out->isWritable())
+    if (!out || !out->isWritable()) {
         return;
+    }
 
     const QJsonDocument jDoc(m_json);
     const QByteArray &data = jDoc.toJson();
@@ -113,8 +116,9 @@ void ActionJson::save(QIODevice *out)
 
 void ActionJson::putAction(const Action *action)
 {
-    if (!action)
+    if (!action) {
         return;
+    }
 
     const QString &collectionKey = action->groupKey();
     QJsonObject collection = m_json[collectionKey].toObject();
@@ -124,8 +128,9 @@ void ActionJson::putAction(const Action *action)
 
 void ActionJson::popAction(const Action *action)
 {
-    if (!action)
+    if (!action) {
         return;
+    }
 
     const QString &collectionKey = action->groupKey();
     QJsonObject collection = m_json[collectionKey].toObject();
@@ -146,6 +151,9 @@ bool ActionJson::updateAction(Action *action)
                 action->setForcedShow(loadedAction->forcedShow());
                 action->setAnchor(loadedAction->anchor());
                 action->setTimeout(loadedAction->timeout());
+                if (!loadedAction->toggleGroup().isEmpty()) {
+                    action->setToggleGroup(loadedAction->toggleGroup(), loadedAction->isToggleOn());
+                }
 
                 return true;
             }
@@ -157,8 +165,9 @@ bool ActionJson::updateAction(Action *action)
 
 Action::Ptr ActionJson::actionFromJson(const QJsonObject &json) const
 {
-    if (json.isEmpty())
+    if (json.isEmpty()) {
         return {};
+    }
 
     const auto scope = static_cast<Action::Flow>(json[JsonAction::Scope].toInt());
     const auto type = json[JsonAction::Type].toInt();
@@ -178,13 +187,20 @@ Action::Ptr ActionJson::actionFromJson(const QJsonObject &json) const
     const auto anchor = static_cast<Action::MenuPlace>(json[JsonAction::Anchor].toInt());
     const auto timeout = json[JsonAction::Timeout].toInt() * utils::oneSecondMs();
 
-    return m_storage->createAction(scope, type, id, app, title, args, alwaysShowResult, anchor, timeout, m_storage);
+    const auto &result =
+            m_storage->createAction(scope, type, id, app, title, args, alwaysShowResult, anchor, timeout, m_storage);
+    const auto &toggleGroup = json[JsonAction::ToggleGroup].toString();
+    if (!toggleGroup.isEmpty()) {
+        result->setToggleGroup(toggleGroup, json[JsonAction::ToggleOn].toBool());
+    }
+    return result;
 }
 
 QJsonObject ActionJson::actionToJson(const Action *action) const
 {
-    if (!action)
+    if (!action) {
         return {};
+    }
 
     return {
         { JsonAction::Scope, static_cast<int>(action->scope()) },
@@ -196,6 +212,8 @@ QJsonObject ActionJson::actionToJson(const Action *action) const
         { JsonAction::Display, action->forcedShow() },
         { JsonAction::Anchor, static_cast<int>(action->anchor()) },
         { JsonAction::Timeout, action->timeout() / utils::oneSecondMs() },
+        { JsonAction::ToggleGroup, action->toggleGroup() },
+        { JsonAction::ToggleOn, action->isToggleOn() },
     };
 }
 
@@ -216,8 +234,9 @@ QList<QString> ActionJson::customActionIds() const
 
 QList<QString> ActionJson::actionsGroup(const QString &group) const
 {
-    if (group.isEmpty() || !m_json.contains(group))
+    if (group.isEmpty() || !m_json.contains(group)) {
         return {};
+    }
 
     QList<QString> keys;
     const auto &oldkeys = m_json[group].toObject().keys();
@@ -228,8 +247,9 @@ QList<QString> ActionJson::actionsGroup(const QString &group) const
 /*static*/ QString ActionJson::jsonFilePath()
 {
     static QString jsonPath;
-    if (jsonPath.isEmpty())
+    if (jsonPath.isEmpty()) {
         jsonPath = utils::ensureDirExists(QString("%1/actions.json").arg(SettingsManager::dirPath()));
+    }
 
     return jsonPath;
 }
@@ -240,8 +260,9 @@ Action::Ptr ActionJson::action(Action::Flow scope, const QString &id)
     const QJsonObject &collection = m_json[groupKey].toObject();
     for (const auto &item : collection) {
         const QJsonObject &jsonAction = item.toObject();
-        if (jsonAction[JsonAction::Id] == id)
+        if (jsonAction[JsonAction::Id] == id) {
             return actionFromJson(jsonAction);
+        }
     }
 
     return {};

@@ -28,7 +28,7 @@ public:
     static const QMap<VersionTriplet, KnownVersion> KnownVersions;
 
 private:
-    int m_major;
-    int m_minor;
-    int m_patch;
+    int m_major { 0 };
+    int m_minor { 0 };
+    int m_patch { 0 };
 };

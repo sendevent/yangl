@@ -27,9 +27,6 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 
-static const QUrl kReleasesApiUrl =
-        QUrl(QStringLiteral("https://api.github.com/repos/sendevent/yangl/releases/latest"));
-
 UpdateChecker::UpdateChecker(QObject *parent)
     : QObject(parent)
     , m_nam(new QNetworkAccessManager(this))
@@ -38,27 +35,43 @@ UpdateChecker::UpdateChecker(QObject *parent)
 
 void UpdateChecker::check()
 {
+    if (m_inFlight) {
+        return;
+    }
+    m_inFlight = true;
+    static const QUrl kReleasesApiUrl(QStringLiteral("https://api.github.com/repos/sendevent/yangl/releases/latest"));
     QNetworkRequest req(kReleasesApiUrl);
     req.setRawHeader("Accept", "application/vnd.github+json");
     auto *reply = m_nam->get(req);
     connect(reply, &QNetworkReply::finished, this, [this, reply]() { onReplyFinished(reply); });
 }
 
+void UpdateChecker::applyEnabled(bool enabled)
+{
+    if (enabled && !m_enabled) {
+        check();
+    }
+    m_enabled = enabled;
+}
+
 void UpdateChecker::onReplyFinished(QNetworkReply *reply)
 {
+    m_inFlight = false;
     reply->deleteLater();
 
     if (reply->error() != QNetworkReply::NoError) {
         // 404 = no releases published yet; not worth logging as a warning
-        if (reply->error() != QNetworkReply::ContentNotFoundError)
+        if (reply->error() != QNetworkReply::ContentNotFoundError) {
             WRN << "Update check failed:" << reply->errorString() << reply->error();
+        }
         return;
     }
 
     const QJsonObject json = QJsonDocument::fromJson(reply->readAll()).object();
     QString tag = json[QStringLiteral("tag_name")].toString().trimmed();
-    if (tag.startsWith('v', Qt::CaseInsensitive))
+    if (tag.startsWith('v', Qt::CaseInsensitive)) {
         tag.remove(0, 1);
+    }
 
     if (tag.isEmpty()) {
         WRN << "Update check: empty tag_name in response";
@@ -70,6 +83,7 @@ void UpdateChecker::onReplyFinished(QNetworkReply *reply)
 
     LOG << "Update check: current" << current.toString() << "latest" << latest.toString();
 
-    if (current < latest)
-        emit updateAvailable(tag);
+    if (current < latest) {
+        emit updateAvailable(latest.toString());
+    }
 }

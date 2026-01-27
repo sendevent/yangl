@@ -262,8 +262,9 @@ void ServersChartView::requestConnection(const PlaceInfo &place)
     const auto &country = utils::geoToNvpn(place.country);
     const auto &city = utils::geoToNvpn(place.town);
 
-    if (place.isGroup() && city.isEmpty())
+    if (place.isGroup() && city.isEmpty()) {
         return;
+    }
 
     m_nordVpnWraper->connectTo(country, city);
 }

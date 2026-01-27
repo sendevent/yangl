@@ -60,8 +60,7 @@ void AppUiCoordinator::showSettingsEditor()
                 emit settingsAccepted();
             }
         });
-        connect(dlg, &SettingsDialog::showMapRequested, this, &AppUiCoordinator::showMapView,
-                Qt::UniqueConnection);
+        connect(dlg, &SettingsDialog::showMapRequested, this, &AppUiCoordinator::showMapView, Qt::UniqueConnection);
         dlg->open();
     }
 }
