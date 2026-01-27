@@ -176,8 +176,9 @@ void TestCoordinatesResolver::test_requestCoordinates_real_1()
 
         const auto idRequested = m_resolver->requestCoordinates({ pair.first, pair.second });
 
-        if (spy.isEmpty())
+        if (spy.isEmpty()) {
             QVERIFY(spy.wait());
+        }
         QCOMPARE(spy.count(), 1);
         const QList<QVariant> &arguments = spy.takeFirst();
 
@@ -219,8 +220,9 @@ void TestCoordinatesResolver::test_requestCoordinates_real_3()
         const PlaceInfo placeRequested = { pair.first, pair.second };
         const auto idRequested = m_resolver->requestCoordinates(placeRequested);
 
-        if (spy.isEmpty())
+        if (spy.isEmpty()) {
             QVERIFY(spy.wait());
+        }
         QCOMPARE(spy.count(), 1);
         const QList<QVariant> &arguments = spy.takeFirst();
 
@@ -255,8 +257,9 @@ void TestCoordinatesResolver::test_requestCoordinates_fake()
 
         const auto idRequested = resolver.requestCoordinates({ "Oz", "Emerald City" });
 
-        if (spy.isEmpty())
+        if (spy.isEmpty()) {
             QVERIFY(spy.wait());
+        }
         QCOMPARE(spy.count(), 1);
         const QList<QVariant> &arguments = spy.takeFirst();
 
@@ -278,8 +281,9 @@ void TestCoordinatesResolver::test_requestCoordinates_fake()
 
         const auto idRequested = resolver.requestCoordinates("Oz", "Emerald City");
 
-        if (spy.isEmpty())
+        if (spy.isEmpty()) {
             QVERIFY(spy.wait());
+        }
         QCOMPARE(spy.count(), 1);
         const QList<QVariant> &arguments = spy.takeFirst();
 

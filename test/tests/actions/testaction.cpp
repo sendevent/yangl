@@ -29,8 +29,9 @@
 TestAction::TestAction(Action::Flow scope, NordVPN action, ActionStorage *parent, const Action::Id &id)
     : Action(scope, static_cast<int>(action), parent, id)
 {
-    if (-1 == TestAction::MetaIdMenuPlace)
+    if (-1 == TestAction::MetaIdMenuPlace) {
         TestAction::MetaIdMenuPlace = qRegisterMetaType<Action::MenuPlace>();
+    }
 }
 
 void TestAction::checkAction(const Action::Ptr &action, int expectedType, Action::Flow expectedScope,
@@ -39,10 +40,11 @@ void TestAction::checkAction(const Action::Ptr &action, int expectedType, Action
     QCOMPARE(action->type(), expectedType);
     QCOMPARE(action->scope(), expectedScope);
 
-    if (expectedId.isNull())
+    if (expectedId.isNull()) {
         QVERIFY(!action->id().isNull());
-    else
+    } else {
         QCOMPARE(action->id(), expectedId);
+    }
 
     QVERIFY(action->title().isEmpty());
     QVERIFY(action->app().isEmpty());

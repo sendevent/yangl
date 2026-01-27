@@ -36,8 +36,9 @@ QAction *MenuHolder::yanglAction(Action::Yangl act) const
         return action && static_cast<Action::Yangl>(action->type()) == act;
     });
 
-    if (found != collection.end())
+    if (found != collection.end()) {
         return *found;
+    }
     return {};
 }
 
@@ -65,8 +66,9 @@ void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
 
     auto makeConnection = [this](const Action::Ptr &action, QMenu *menu, QAction *before) {
         QAction *qAct = menu->addAction(action->title());
-        if (action)
+        if (action) {
             qAct->setData(QVariant::fromValue(action.get()));
+        }
         menu->insertAction(before, qAct);
         connect(qAct, &QAction::triggered, this, &MenuHolder::onActionTriggered);
         return qAct;
@@ -94,8 +96,9 @@ void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
 
         for (const auto &act : collection.m_menuActions) {
             const QString &group = act->toggleGroup();
-            if (group.isEmpty())
+            if (group.isEmpty()) {
                 continue;
+            }
             auto &pair = togglePairs[group];
             (act->isToggleOn() ? pair.first : pair.second) = act;
             pairedActions.insert(act.get());
@@ -120,8 +123,9 @@ void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
         for (const auto &act : collection.m_topActions) {
             QAction *added = makeConnection(act, m_menuRoot.get(), {});
             m_qActions[flow].append(added);
-            if (!qAct)
+            if (!qAct) {
                 qAct = added;
+            }
         }
 
         collection.m_menu->setDisabled(collection.m_menuActions.isEmpty());
@@ -141,8 +145,9 @@ void MenuHolder::populateActions(const QList<Action::Ptr> &actions)
         }
     }
 
-    for (auto flow : { Action::Flow::NordVPN, Action::Flow::Custom, Action::Flow::Yangl })
+    for (auto flow : { Action::Flow::NordVPN, Action::Flow::Custom, Action::Flow::Yangl }) {
         addActions(flow);
+    }
 }
 
 void MenuHolder::syncToggleStates(const QString &settingsOutput)
@@ -152,16 +157,19 @@ void MenuHolder::syncToggleStates(const QString &settingsOutput)
 
     for (const auto &line : settingsOutput.split('\n', Qt::SkipEmptyParts)) {
         const int sep = line.indexOf(':');
-        if (sep <= 0)
+        if (sep <= 0) {
             continue;
+        }
         const QString key = line.left(sep).simplified().toLower().remove(' ').remove('-');
         const QString value = line.mid(sep + 1).simplified().toLower();
         if (key == kTechnology) {
             const bool isOpenVPN = (value == QLatin1String("openvpn"));
-            if (auto *qAct = m_toggleActions.value(kTechnology))
+            if (auto *qAct = m_toggleActions.value(kTechnology)) {
                 qAct->setChecked(isOpenVPN);
-            if (auto *qAct = m_toggleActions.value(kObfuscate))
+            }
+            if (auto *qAct = m_toggleActions.value(kObfuscate)) {
                 qAct->setEnabled(isOpenVPN);
+            }
         } else if (auto *qAct = m_toggleActions.value(key)) {
             qAct->setChecked(value == QLatin1String("enabled"));
         }
@@ -171,8 +179,9 @@ void MenuHolder::syncToggleStates(const QString &settingsOutput)
 void MenuHolder::setToggleEnabled(const QString &groupName, bool enabled)
 {
     const QString key = groupName.toLower().remove(' ').remove('-');
-    if (auto *qAct = m_toggleActions.value(key))
+    if (auto *qAct = m_toggleActions.value(key)) {
         qAct->setEnabled(enabled);
+    }
 }
 
 void MenuHolder::onActionTriggered()

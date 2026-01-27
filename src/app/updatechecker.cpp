@@ -48,15 +48,17 @@ void UpdateChecker::onReplyFinished(QNetworkReply *reply)
 
     if (reply->error() != QNetworkReply::NoError) {
         // 404 = no releases published yet; not worth logging as a warning
-        if (reply->error() != QNetworkReply::ContentNotFoundError)
+        if (reply->error() != QNetworkReply::ContentNotFoundError) {
             WRN << "Update check failed:" << reply->errorString() << reply->error();
+        }
         return;
     }
 
     const QJsonObject json = QJsonDocument::fromJson(reply->readAll()).object();
     QString tag = json[QStringLiteral("tag_name")].toString().trimmed();
-    if (tag.startsWith('v', Qt::CaseInsensitive))
+    if (tag.startsWith('v', Qt::CaseInsensitive)) {
         tag.remove(0, 1);
+    }
 
     if (tag.isEmpty()) {
         WRN << "Update check: empty tag_name in response";
@@ -68,6 +70,7 @@ void UpdateChecker::onReplyFinished(QNetworkReply *reply)
 
     LOG << "Update check: current" << current.toString() << "latest" << latest.toString();
 
-    if (current < latest)
+    if (current < latest) {
         emit updateAvailable(tag);
+    }
 }

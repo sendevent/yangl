@@ -44,8 +44,9 @@ static QAction *findToggleAction(QMenu *menu, const QString &group)
 {
     for (auto *act : menu->actions()) {
         if (auto *sub = act->menu()) {
-            if (auto *found = findToggleAction(sub, group))
+            if (auto *found = findToggleAction(sub, group)) {
                 return found;
+            }
         } else if (act->isCheckable() && act->text() == group) {
             return act;
         }
@@ -67,8 +68,7 @@ void TestMenuHolder::test_syncToggleStates_boolean()
     QMenu *menu = holder.createMenu(actions);
 
     // These groups use "enabled"/"disabled" values in `nordvpn settings` output.
-    const QStringList boolGroups = { "Firewall", "Kill Switch", "Auto-connect",
-                                     "LAN Discovery", "Notify" };
+    const QStringList boolGroups = { "Firewall", "Kill Switch", "Auto-connect", "LAN Discovery", "Notify" };
 
     for (const QString &group : boolGroups) {
         QAction *act = findToggleAction(menu, group);
@@ -150,21 +150,20 @@ void TestMenuHolder::test_syncToggleStates_multiline()
 
     // Simulate a realistic `nordvpn settings` output block.
     // All boolean groups use "enabled"/"disabled" as produced by nordvpn.
-    const QString settingsOn =
-            "Technology: OPENVPN\n"
-            "Firewall: enabled\n"
-            "Kill Switch: enabled\n"
-            "Threat Protection Lite: enabled\n"
-            "Notify: enabled\n"
-            "Auto-connect: enabled\n"
-            "LAN Discovery: enabled\n"
-            "Native Icon: enabled\n"
-            "Obfuscate: enabled\n";
+    const QString settingsOn = "Technology: OPENVPN\n"
+                               "Firewall: enabled\n"
+                               "Kill Switch: enabled\n"
+                               "Threat Protection Lite: enabled\n"
+                               "Notify: enabled\n"
+                               "Auto-connect: enabled\n"
+                               "LAN Discovery: enabled\n"
+                               "Native Icon: enabled\n"
+                               "Obfuscate: enabled\n";
 
     holder.syncToggleStates(settingsOn);
 
-    const QStringList allBoolGroups = { "Firewall", "Kill Switch", "Threat Protection Lite",
-                                        "Notify",   "Auto-connect", "LAN Discovery",
+    const QStringList allBoolGroups = { "Firewall",    "Kill Switch",  "Threat Protection Lite",
+                                        "Notify",      "Auto-connect", "LAN Discovery",
                                         "Native Icon", "Obfuscate" };
     for (const QString &group : allBoolGroups) {
         QAction *act = findToggleAction(menu, group);
@@ -177,16 +176,15 @@ void TestMenuHolder::test_syncToggleStates_multiline()
     QVERIFY(techAct->isChecked()); // OPENVPN → checked
 
     // Now flip everything off in one call
-    const QString settingsOff =
-            "Technology: NORDLYNX\n"
-            "Firewall: disabled\n"
-            "Kill Switch: disabled\n"
-            "Threat Protection Lite: disabled\n"
-            "Notify: disabled\n"
-            "Auto-connect: disabled\n"
-            "LAN Discovery: disabled\n"
-            "Native Icon: disabled\n"
-            "Obfuscate: disabled\n";
+    const QString settingsOff = "Technology: NORDLYNX\n"
+                                "Firewall: disabled\n"
+                                "Kill Switch: disabled\n"
+                                "Threat Protection Lite: disabled\n"
+                                "Notify: disabled\n"
+                                "Auto-connect: disabled\n"
+                                "LAN Discovery: disabled\n"
+                                "Native Icon: disabled\n"
+                                "Obfuscate: disabled\n";
 
     holder.syncToggleStates(settingsOff);
 
@@ -246,12 +244,10 @@ void TestMenuHolder::test_syncToggleStates_remaining_groups()
         QVERIFY(act->isCheckable());
 
         holder.syncToggleStates(group + QLatin1String(": enabled"));
-        QVERIFY2(act->isChecked(),
-                 qPrintable(QString("%1 should be checked after 'enabled'").arg(group)));
+        QVERIFY2(act->isChecked(), qPrintable(QString("%1 should be checked after 'enabled'").arg(group)));
 
         holder.syncToggleStates(group + QLatin1String(": disabled"));
-        QVERIFY2(!act->isChecked(),
-                 qPrintable(QString("%1 should be unchecked after 'disabled'").arg(group)));
+        QVERIFY2(!act->isChecked(), qPrintable(QString("%1 should be unchecked after 'disabled'").arg(group)));
     }
 }
 

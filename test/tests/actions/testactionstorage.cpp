@@ -68,8 +68,9 @@ void TestActionStorage::initTestCase()
 void TestActionStorage::cleanupTestCase()
 {
     const QString path = SettingsManager::dirPath();
-    for (const auto &file : { "actions.json", "settings.conf" })
+    for (const auto &file : { "actions.json", "settings.conf" }) {
         QFile::remove(QString("%1/%2").arg(path, file));
+    }
 }
 
 void TestActionStorage::init()
@@ -87,8 +88,9 @@ void TestActionStorage::cleanup()
 QVector<Action::Ptr> TestActionStorage::populateUserActions(ActionStorage *storage, int count)
 {
     QVector<Action::Ptr> userActions;
-    for (int i = 0; i < count; ++i)
+    for (int i = 0; i < count; ++i) {
         userActions.append(storage->createUserAction());
+    }
     storage->updateActions(userActions, Action::Flow::Custom);
     return userActions;
 }
@@ -96,8 +98,9 @@ QVector<Action::Ptr> TestActionStorage::populateUserActions(ActionStorage *stora
 void TestActionStorage::test_yanglActions()
 {
     QVector<Action::Action::Yangl> knownActions;
-    for (auto i : Action::yanglActions())
+    for (auto i : Action::yanglActions()) {
         knownActions.append(i);
+    }
 
     ActionStorage storage;
     storage.load();
@@ -105,8 +108,9 @@ void TestActionStorage::test_yanglActions()
     const QVector<Action::Ptr> &actions = storage.yanglActions();
 
     QCOMPARE(actions.size(), knownActions.size());
-    for (const auto &action : actions)
+    for (const auto &action : actions) {
         knownActions.removeAll(static_cast<Action::Yangl>(action->type()));
+    }
 
     QVERIFY(knownActions.isEmpty());
 }
@@ -114,8 +118,9 @@ void TestActionStorage::test_yanglActions()
 void TestActionStorage::test_builtinActions()
 {
     QVector<Action::Action::NordVPN> knownActions;
-    for (auto i : Action::nvpnActions())
+    for (auto i : Action::nvpnActions()) {
         knownActions.append(i);
+    }
 
     ActionStorage storage;
     storage.load();
@@ -123,8 +128,9 @@ void TestActionStorage::test_builtinActions()
     const QVector<Action::Ptr> &actions = storage.nvpnActions();
 
     QCOMPARE(actions.size(), knownActions.size());
-    for (const auto &action : actions)
+    for (const auto &action : actions) {
         knownActions.removeAll(static_cast<Action::NordVPN>(action->type()));
+    }
 
     QVERIFY(knownActions.isEmpty());
 }
@@ -147,8 +153,9 @@ void TestActionStorage::test_userActions()
     const QVector<Action::Ptr> &userActionsHandled = storage.userActions();
     QVERIFY(userActionsHandled.size() == UserActionCount);
 
-    for (const auto &userActionHandled : userActionsHandled)
+    for (const auto &userActionHandled : userActionsHandled) {
         QVERIFY(userActions.indexOf(userActionHandled) >= 0);
+    }
 }
 
 void TestActionStorage::test_allActions()
@@ -232,8 +239,9 @@ void TestActionStorage::test_saveAndLoad()
         QCOMPARE(storage.userActions().size(), UserActionCount);
 
         // Record code-controlled Yangl titles before overwriting them.
-        for (const Action::Ptr &action : storage.yanglActions())
+        for (const Action::Ptr &action : storage.yanglActions()) {
             yanglDefaultTitles[action->type()] = action->title();
+        }
 
         for (const Action::Ptr &action : storage.allActions()) {
             const QString suffix = (action->scope() == Action::Flow::Custom) ? action->id().toString()
@@ -375,8 +383,9 @@ void TestActionStorage::test_toggleGroups()
 
     // Custom actions must always have empty toggleGroup
     const QVector<Action::Ptr> &custom = populateUserActions(&storage, 2);
-    for (const auto &action : custom)
+    for (const auto &action : custom) {
         QVERIFY(action->toggleGroup().isEmpty());
+    }
 }
 
 void TestActionStorage::test_toggleGroups_survive_save_load()
