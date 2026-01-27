@@ -119,8 +119,9 @@ void FlatPlaceProxyModel::onRowsRemoved(const QModelIndex &parent, int first, in
             QModelIndex current = stack.takeLast();
             toRemove.append(current);
             const int childCount = sourceModel()->rowCount(current);
-            for (int i = 0; i < childCount; ++i)
+            for (int i = 0; i < childCount; ++i) {
                 stack.append(sourceModel()->index(i, 0, current));
+            }
         }
     }
 

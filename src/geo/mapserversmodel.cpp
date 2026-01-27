@@ -37,26 +37,30 @@ TreeItem *MapServersModel::rootItem() const
 
 QModelIndex MapServersModel::index(int row, int column, const QModelIndex &parent) const
 {
-    if (!hasIndex(row, column, parent))
+    if (!hasIndex(row, column, parent)) {
         return QModelIndex();
+    }
 
     TreeItem *parentItem = parent.isValid() ? static_cast<TreeItem *>(parent.internalPointer()) : m_root;
     TreeItem *childItem = parentItem->child(row);
-    if (childItem)
+    if (childItem) {
         return createIndex(row, column, childItem);
+    }
     return QModelIndex();
 }
 
 QModelIndex MapServersModel::parent(const QModelIndex &index) const
 {
-    if (!index.isValid())
+    if (!index.isValid()) {
         return QModelIndex();
+    }
 
     TreeItem *childItem = static_cast<TreeItem *>(index.internalPointer());
     TreeItem *parentItem = childItem->parent;
 
-    if (parentItem == m_root || !parentItem)
+    if (parentItem == m_root || !parentItem) {
         return QModelIndex();
+    }
     return createIndex(parentItem->row(), 0, parentItem);
 }
 
@@ -68,8 +72,9 @@ int MapServersModel::rowCount(const QModelIndex &parent) const
 
 QVariant MapServersModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid())
+    if (!index.isValid()) {
         return {};
+    }
 
     if (auto item = static_cast<TreeItem *>(index.internalPointer())) {
 

@@ -235,9 +235,8 @@ void ServerLocationResolver::refresh()
 
     if (needActualization) {
         const QString currentVersion = m_listManager->queryVersion();
-        const bool versionChanged = !currentVersion.isEmpty()
-                                    && !m_cachedNordVpnVersion.isEmpty()
-                                    && currentVersion != m_cachedNordVpnVersion;
+        const bool versionChanged = !currentVersion.isEmpty() && !m_cachedNordVpnVersion.isEmpty()
+                && currentVersion != m_cachedNordVpnVersion;
         if (versionChanged) {
             LOG << "NordVPN version changed:" << m_cachedNordVpnVersion << "->" << currentVersion;
             m_countryTimestamps.clear();

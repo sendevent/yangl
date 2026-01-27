@@ -176,8 +176,9 @@ void MapWidget::setMapType(const QString &mapTypeName)
 {
     const int id = supportedMapTypes().indexOf(mapTypeName);
     LOG << mapTypeName << id;
-    if (id >= 0)
+    if (id >= 0) {
         setMapType(id);
+    }
 }
 
 QSize MapWidget::sizeHint() const

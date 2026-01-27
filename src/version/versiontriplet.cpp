@@ -37,8 +37,9 @@ QString VersionTriplet::toString() const
     const auto partsCount = parts.size();
 
     for (int i = 0; i < 3; ++i) {
-        if (partsCount >= i + 1)
+        if (partsCount >= i + 1) {
             versionParts[i] = doConvert(parts[i]);
+        }
     }
 
     return VersionTriplet(versionParts[0], versionParts[1], versionParts[2]);

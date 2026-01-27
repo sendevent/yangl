@@ -60,16 +60,18 @@ ActionResultViewer::~ActionResultViewer()
 
 /*static*/ ActionResultViewer *ActionResultViewer::instance()
 {
-    if (!m_instance)
+    if (!m_instance) {
         m_instance = new ActionResultViewer();
+    }
 
     return m_instance;
 }
 
 /*static*/ void ActionResultViewer::registerAction(Action *action)
 {
-    if (!action)
+    if (!action) {
         return;
+    }
 
     const Action::Id &id = action->id();
     if (auto inst = instance()) {
@@ -84,8 +86,9 @@ ActionResultViewer::~ActionResultViewer()
 
 /*static*/ void ActionResultViewer::unregisterAction(Action *action)
 {
-    if (!action)
+    if (!action) {
         return;
+    }
 
     disconnect(action, &Action::performed, instance(), &ActionResultViewer::onActionPerformed);
     instance()->m_actions.remove(action->id());
@@ -93,9 +96,11 @@ ActionResultViewer::~ActionResultViewer()
 
 void ActionResultViewer::onActionStarted(const Action::Id &id, const QString & /*app*/, const QStringList & /*args*/)
 {
-    if (auto action = m_actions.value(id))
-        if (auto display = displayForAction(action))
+    if (auto action = m_actions.value(id)) {
+        if (auto display = displayForAction(action)) {
             display->append(tr("%1 <b>Calling</b>…").arg(YANGL_TIMESTAMP));
+        }
+    }
 }
 
 void ActionResultViewer::onActionPerformed(const Action::Id &id, const QString & /*result*/, bool ok,
@@ -120,8 +125,9 @@ void ActionResultViewer::onActionPerformed(const Action::Id &id, const QString &
 
 CLICallResultView *ActionResultViewer::displayForAction(Action *action)
 {
-    if (!action)
+    if (!action) {
         return {};
+    }
 
     const Action::Id &id = action->id();
 
@@ -145,8 +151,9 @@ CLICallResultView *ActionResultViewer::displayForAction(Action *action)
 
     if (newLimit != m_linesLimit) {
         m_linesLimit = newLimit;
-        for (auto view : std::as_const(instance()->m_browsers))
+        for (auto view : std::as_const(instance()->m_browsers)) {
             view->setBlocksLimit(m_linesLimit);
+        }
     }
 }
 

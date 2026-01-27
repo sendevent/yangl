@@ -83,8 +83,9 @@ void PauseController::onPauseTimer()
 {
     if (!m_deadline.hasExpired()) {
         static const qint64 preReconnectMs = 15 * 1000;
-        if (m_deadline.remainingTime() <= preReconnectMs)
+        if (m_deadline.remainingTime() <= preReconnectMs) {
             m_checker->startTransition();
+        }
         return;
     }
 

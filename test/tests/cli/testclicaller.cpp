@@ -46,8 +46,9 @@ void TestCLICaller::test_performAction()
     std::unique_ptr<CLICaller> caller(new CLICaller);
     QVERIFY(caller->runCall(call));
 
-    if (spy.isEmpty())
+    if (spy.isEmpty()) {
         QVERIFY(spy.wait());
+    }
 
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
@@ -83,8 +84,9 @@ void TestCLICaller::test_performAction_failure()
     CLICaller caller;
     QVERIFY(caller.runCall(call));
 
-    if (spy.isEmpty())
+    if (spy.isEmpty()) {
         QVERIFY(spy.wait());
+    }
 
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();

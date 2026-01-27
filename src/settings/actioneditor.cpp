@@ -68,8 +68,9 @@ void ActionEditor::prepareUi(Action::Flow scope)
 
 bool ActionEditor::ActionInfoHandler::apply()
 {
-    if (!m_action)
+    if (!m_action) {
         return false;
+    }
 
     m_action->setTitle(m_title.trimmed());
     m_action->setApp(m_app);
@@ -83,8 +84,9 @@ bool ActionEditor::ActionInfoHandler::apply()
 
 /*static*/ ActionEditor::ActionInfoPtr ActionEditor::wrapAction(const Action::Ptr &action)
 {
-    if (!action)
+    if (!action) {
         return {};
+    }
 
     ActionEditor::ActionInfoPtr info(new ActionEditor::ActionInfoHandler);
 
@@ -101,30 +103,39 @@ bool ActionEditor::ActionInfoHandler::apply()
 
 void ActionEditor::setAction(const ActionInfoPtr &actionInfo)
 {
-    if (m_actionInfo)
+    if (m_actionInfo) {
         commitInfoHandler();
+    }
 
     m_actionInfo = actionInfo;
 
-    for (int i = 0; i < ui->formLayout->count(); ++i)
+    for (int i = 0; i < ui->formLayout->count(); ++i) {
         ui->formLayout->itemAt(i)->widget()->setVisible(m_actionInfo.get());
+    }
 
-    if (!m_actionInfo || !m_actionInfo->m_action)
+    if (!m_actionInfo || !m_actionInfo->m_action) {
         return;
+    }
 
-    if (m_leTitle)
+    if (m_leTitle) {
         m_leTitle->setText(m_actionInfo->m_title);
-    if (m_leApplication)
+    }
+    if (m_leApplication) {
         m_leApplication->setText(m_actionInfo->m_app);
-    if (m_leArguments)
+    }
+    if (m_leArguments) {
         m_leArguments->setText(m_actionInfo->m_args.join(" "));
-    if (m_spinBoxTimeout)
+    }
+    if (m_spinBoxTimeout) {
         m_spinBoxTimeout->setValue(m_actionInfo->m_timeout / utils::oneSecondMs());
-    if (m_checkBoxForceShow)
+    }
+    if (m_checkBoxForceShow) {
         m_checkBoxForceShow->setChecked(m_actionInfo->m_forceShow);
+    }
 
-    if (!m_comboBoxMenu)
+    if (!m_comboBoxMenu) {
         return;
+    }
 
     QMap<Action::MenuPlace, QString> anchors { { Action::MenuPlace::NoMenu, tr("Hide") },
                                                { Action::MenuPlace::Common, tr("Common") } };
@@ -171,24 +182,31 @@ ActionEditor::ActionInfoPtr ActionEditor::getAction() const
 
 void ActionEditor::commitInfoHandler()
 {
-    if (!m_actionInfo)
+    if (!m_actionInfo) {
         return;
+    }
 
-    if (m_leTitle)
+    if (m_leTitle) {
         m_actionInfo->m_title = m_leTitle->text().trimmed();
+    }
 
-    if (m_leApplication)
+    if (m_leApplication) {
         m_actionInfo->m_app = m_leApplication->text().trimmed();
+    }
 
-    if (m_leArguments)
+    if (m_leArguments) {
         m_actionInfo->m_args = m_leArguments->text().trimmed().split(' ');
+    }
 
-    if (m_spinBoxTimeout)
+    if (m_spinBoxTimeout) {
         m_actionInfo->m_timeout = m_spinBoxTimeout->value() * utils::oneSecondMs();
+    }
 
-    if (m_checkBoxForceShow)
+    if (m_checkBoxForceShow) {
         m_actionInfo->m_forceShow = m_checkBoxForceShow->isChecked();
+    }
 
-    if (m_comboBoxMenu)
+    if (m_comboBoxMenu) {
         m_actionInfo->m_menuPlace = m_comboBoxMenu->currentData().value<Action::MenuPlace>();
+    }
 }

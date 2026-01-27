@@ -143,9 +143,11 @@ void ActionStorage::loadYanglActions()
 {
     QMap<Action::Yangl, Action::Ptr> jsonYanglActionsById;
     const QList<QString> &jsonBuiltinActionIds = m_json->yanglActionIds();
-    for (const auto &id : jsonBuiltinActionIds)
-        if (const auto &action = m_json->action(Action::Flow::Yangl, id))
+    for (const auto &id : jsonBuiltinActionIds) {
+        if (const auto &action = m_json->action(Action::Flow::Yangl, id)) {
             jsonYanglActionsById.insert(static_cast<Action::Yangl>(action->type()), action);
+        }
+    }
 
     const auto &actionTypes = Action::yanglActions();
     for (const auto actionType : actionTypes) {
@@ -561,8 +563,9 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
 
     const auto &action = createAction(scope, static_cast<int>(actionType), actId, appPath, title, args, forceShow,
                                       menuPlace, CLICall::DefaultTimeoutMSecs, this);
-    if (!toggleGroup.isEmpty())
+    if (!toggleGroup.isEmpty()) {
         action->setToggleGroup(toggleGroup, toggleOn);
+    }
     return action;
 }
 
@@ -580,8 +583,9 @@ Action::Ptr ActionStorage::createAction(Action::Flow scope, int type, const Acti
         action = m_nvpnActions.value(static_cast<Action::NordVPN>(type), {});
         break;
     default:
-        if (!id.isNull())
+        if (!id.isNull()) {
             action = m_userActions.value(id, {});
+        }
         break;
     }
 
@@ -591,16 +595,20 @@ Action::Ptr ActionStorage::createAction(Action::Flow scope, int type, const Acti
         NordVpnWrapper::registerAction(action.get());
     }
 
-    if (!appPath.isEmpty())
+    if (!appPath.isEmpty()) {
         action->setApp(appPath);
-    if (!title.isEmpty())
+    }
+    if (!title.isEmpty()) {
         action->setTitle(title);
-    if (!args.isEmpty())
+    }
+    if (!args.isEmpty()) {
         action->setArgs(args);
+    }
     action->setForcedShow(alwaysShowResult);
     action->setAnchor(anchor);
-    if (0 != timeout)
+    if (0 != timeout) {
         action->setTimeout(timeout);
+    }
 
     return action;
 }
@@ -616,10 +624,11 @@ bool ActionStorage::updateBuiltinActions(const QList<Action::Ptr> &actions)
     QSet<Action::NordVPN> savedActions;
     for (const auto &action : actions) {
         const Action::NordVPN actType = static_cast<Action::NordVPN>(action->type());
-        if (m_nvpnActions.contains(actType))
+        if (m_nvpnActions.contains(actType)) {
             m_nvpnActions[actType] = action;
-        else
+        } else {
             m_nvpnActions.insert(actType, action);
+        }
         savedActions.insert(actType);
     }
 

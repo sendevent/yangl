@@ -38,8 +38,9 @@ QVariant AppSetting::read() const
 {
     if (!m_cachedValid) {
         QSettings *settings = SettingsManager::instance()->storage();
-        if (!settings)
+        if (!settings) {
             return QVariant();
+        }
         m_cached = settings->value(Name, DefaultValue);
         m_cachedValid = true;
     }
