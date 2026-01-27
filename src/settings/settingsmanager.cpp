@@ -31,8 +31,9 @@ SettingsManager *SettingsManager::m_instance = {};
 
     if (path.isEmpty()) {
         path = utils::ensureDirExists(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation));
-        if (!path.endsWith(qAppName()))
+        if (!path.endsWith(qAppName())) {
             path = QStringLiteral("%1/%2").arg(path, qAppName());
+        }
     }
 
     return path;
@@ -47,8 +48,9 @@ SettingsManager::SettingsManager(QObject *parent)
 
 SettingsManager *SettingsManager::instance()
 {
-    if (!m_instance)
+    if (!m_instance) {
         m_instance = new SettingsManager(qApp);
+    }
     return m_instance;
 }
 

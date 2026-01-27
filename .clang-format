@@ -82,4 +82,5 @@ BreakConstructorInitializers: BeforeComma
 ColumnLimit: 120
 SortIncludes: true
 IncludeBlocks: Regroup
+InsertBraces: true
 

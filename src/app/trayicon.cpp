@@ -54,13 +54,10 @@
             info.m_sub = AppSettings::Tray->IcnDisconnectedSub->read().toString();
             break;
         case NordVpnInfo::Status::Connecting:
+        case NordVpnInfo::Status::Disconnecting:
             info.m_base = AppSettings::Tray->IcnConnecting->read().toString();
             info.m_sub = AppSettings::Tray->IcnConnectingSub->read().toString();
             break;
-            //        case NordVpnInfo::Status::Disconnecting:
-            //            info.m_base = QStringLiteral(":/icn/resources/offline.png");
-            //            info.m_sub = QStringLiteral(":/icn/resources/sub_toffline.png");
-            //            break;
         default:
             info.m_base = AppSettings::Tray->IcnUnknown->read().toString();
             info.m_sub = AppSettings::Tray->IcnUnknownSub->read().toString();
@@ -143,11 +140,12 @@ void TrayIcon::setState(const NordVpnInfo &state)
         updateIcon(state.status());
         showPopup = true;
 
-        if (m_isFirstChange && state.status() == NordVpnInfo::Status::Connected)
+        if (m_isFirstChange && state.status() == NordVpnInfo::Status::Connected) {
             if (AppSettings::Monitor->Active->read().toBool()
                 && AppSettings::Tray->IgnoreFirstConnected->read().toBool()) {
                 showPopup = false;
             }
+        }
     }
 
     if (showPopup) {
@@ -177,7 +175,9 @@ void TrayIcon::deployDefaults() const
             const QFileInfo info(fsFile);
             if (!info.exists()) {
                 const auto &resourceFile = rscPath.arg(info.fileName());
-                QFile::copy(resourceFile, fsFile);
+                if (!QFile::copy(resourceFile, fsFile)) {
+                    WRN << "Failed to deploy default icon:" << resourceFile << "->" << fsFile;
+                }
             }
         }
     }
@@ -194,7 +194,9 @@ void TrayIcon::deployDefaults() const
         const QFileInfo info(fsFile);
         if (!info.exists()) {
             const auto &resourceFile = rscPath.arg(kdeSubdir.arg(part));
-            QFile::copy(resourceFile, fsFile);
+            if (!QFile::copy(resourceFile, fsFile)) {
+                WRN << "Failed to deploy default icon:" << resourceFile << "->" << fsFile;
+            }
         }
     }
 }

@@ -96,8 +96,9 @@ void ActionsTab::setActions(ActionStorage *actStorage, Action::Flow scope)
 
 void ActionsTab::addAction(const Action::Ptr &action)
 {
-    if (!action)
+    if (!action) {
         return;
+    }
 
     m_actionInfos.append(ui->editorWidget->wrapAction(action));
 
@@ -121,8 +122,9 @@ void ActionsTab::onAddRequested()
 void ActionsTab::onRemoveRequested()
 {
     const QModelIndex &currId = ui->listView->currentIndex();
-    if (!currId.isValid())
+    if (!currId.isValid()) {
         return;
+    }
 
     const int row = currId.row();
     if (const auto &info = currId.data(ActionPointerDataRole).value<ActionEditor::ActionInfoPtr>()) {
@@ -154,8 +156,9 @@ bool ActionsTab::save()
 void ActionsTab::onCurrentRowChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
 {
     ActionEditor::ActionInfoPtr action;
-    if (current.isValid())
+    if (current.isValid()) {
         action = current.data(ActionPointerDataRole).value<ActionEditor::ActionInfoPtr>();
+    }
 
     ui->editorWidget->setAction(action);
 }
@@ -163,8 +166,9 @@ void ActionsTab::onCurrentRowChanged(const QModelIndex &current, const QModelInd
 void ActionsTab::onCurrentTitleChanged(const QString &title)
 {
     const QModelIndex &currRow = ui->listView->selectionModel()->currentIndex();
-    if (!currRow.isValid())
+    if (!currRow.isValid()) {
         return;
+    }
 
     if (auto info = currRow.data(ActionPointerDataRole).value<ActionEditor::ActionInfoPtr>()) {
         info->m_title = title;

@@ -54,9 +54,6 @@ inline int oneSecondMs()
 
 constexpr int DefaultLogLinesLimit = 1000;
 
-// Deprecated: use geo::groupsTitle() from geo/placeinfo.h instead
-QString groupsTitle();
-
 template<typename SomeQEnum>
 QList<SomeQEnum> allEnum(const QList<SomeQEnum> &excluded = {})
 {
@@ -64,8 +61,9 @@ QList<SomeQEnum> allEnum(const QList<SomeQEnum> &excluded = {})
     const QMetaEnum &me = QMetaEnum::fromType<SomeQEnum>();
     for (int i = 0; i < me.keyCount(); ++i) {
         const SomeQEnum value = static_cast<SomeQEnum>(me.value(i));
-        if (!excluded.contains(value))
+        if (!excluded.contains(value)) {
             values << value;
+        }
     }
 
     return values;

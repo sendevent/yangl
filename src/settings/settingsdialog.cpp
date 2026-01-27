@@ -139,19 +139,22 @@ SettingsDialog::~SettingsDialog()
 
 void SettingsDialog::accept()
 {
-    if (saveSettings())
+    if (saveSettings()) {
         QDialog::accept();
+    }
 }
 
 bool SettingsDialog::saveSettings()
 {
     const bool settingsOk = saveMonitorSettings();
-    if (!settingsOk)
+    if (!settingsOk) {
         WRN << "failed to save settings";
+    }
 
     const bool actionsOk = saveActions();
-    if (!actionsOk)
+    if (!actionsOk) {
         WRN << "failed to save actions";
+    }
 
     AppSettings::Map->MapType->write(m_mapSettings->selectedType());
     AppSettings::Map->MapPlugin->write(m_mapSettings->selectedPlugin());
@@ -203,8 +206,9 @@ bool SettingsDialog::saveMonitorSettings()
 bool SettingsDialog::saveActions()
 {
     const bool saved = ui->tabActionsYangl->save() && ui->tabActionsNordVPN->save() && ui->tabActionsUser->save();
-    if (saved)
+    if (saved) {
         m_actStorage->save();
+    }
     return saved;
 }
 

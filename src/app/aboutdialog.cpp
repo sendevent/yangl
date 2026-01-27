@@ -64,8 +64,9 @@ AboutDialog::AboutDialog(QWidget *parent)
     m_statusBar->show();
 
     static const QMetaEnum me = QMetaEnum::fromType<TabId>();
-    for (int i = 0; i < me.keyCount(); ++i)
+    for (int i = 0; i < me.keyCount(); ++i) {
         createTab(static_cast<TabId>(me.value(i)));
+    }
 }
 
 AboutDialog::~AboutDialog()
@@ -109,16 +110,16 @@ void AboutDialog::createTab(TabId tabId)
     ui->tabWidget->addTab(tab, nameParts.first());
 
     display->setOpenLinks(false);
-    connect(display, &QTextBrowser::anchorClicked, this,
-            [](const QUrl &url) { QDesktopServices::openUrl(url); });
+    connect(display, &QTextBrowser::anchorClicked, this, [](const QUrl &url) { QDesktopServices::openUrl(url); });
     connect(display, &QTextBrowser::highlighted, m_statusBar,
             [this](const QUrl &url) { m_statusBar->showMessage(url.toString()); });
 
     const QString &content = readResourceFile(QStringLiteral(":/about/resources/about/%1").arg(file));
-    if (nameParts.last() == QStringLiteral("txt"))
+    if (nameParts.last() == QStringLiteral("txt")) {
         display->setPlainText(content);
-    else
+    } else {
         display->setHtml(content);
+    }
 
     switch (tabId) {
     case TabId::Qt: {
