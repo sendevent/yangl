@@ -28,11 +28,14 @@ class UpdateChecker : public QObject
 public:
     explicit UpdateChecker(QObject *parent = {});
     void check();
+    void applyEnabled(bool enabled);
 
 signals:
     void updateAvailable(const QString &version);
 
 private:
     void onReplyFinished(QNetworkReply *reply);
-    QNetworkAccessManager *m_nam;
+    QNetworkAccessManager *m_nam { nullptr };
+    bool m_inFlight { false };
+    bool m_enabled { false };
 };

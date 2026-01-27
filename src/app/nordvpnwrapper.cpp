@@ -51,7 +51,10 @@ NordVpnWrapper::NordVpnWrapper(QObject *parent)
     connect(m_checker, &StateChecker::error, this, &NordVpnWrapper::notifyError);
     connect(m_trayIcon, &QSystemTrayIcon::activated, m_uiCoordinator, &AppUiCoordinator::onTrayIconActivated);
     connect(m_menuHolder, &MenuHolder::actionTriggered, this, &NordVpnWrapper::onActionTriggered);
-    connect(m_uiCoordinator, &AppUiCoordinator::settingsAccepted, this, [this]() { start(); });
+    connect(m_uiCoordinator, &AppUiCoordinator::settingsAccepted, this, [this]() {
+        start();
+        m_updateChecker->applyEnabled(AppSettings::Monitor->CheckForUpdates->read().toBool());
+    });
     connect(m_uiCoordinator, &AppUiCoordinator::actionRequested, this, [this](int actionType) {
         if (const Action::Ptr &action = m_actions->action(static_cast<Action::NordVPN>(actionType))) {
             onActionTriggered(action.get());
@@ -63,9 +66,9 @@ NordVpnWrapper::NordVpnWrapper(QObject *parent)
     connect(m_updateChecker, &UpdateChecker::updateAvailable, this, [this](const QString &version) {
         m_trayIcon->updateStateText(tr("Update available: %1").arg(version), QSystemTrayIcon::Information);
     });
-    if (AppSettings::Monitor->CheckForUpdates->read().toBool()) {
-        QTimer::singleShot(5 * utils::oneSecondMs(), m_updateChecker, &UpdateChecker::check);
-    }
+    QTimer::singleShot(5 * utils::oneSecondMs(), this, [this]() {
+        m_updateChecker->applyEnabled(AppSettings::Monitor->CheckForUpdates->read().toBool());
+    });
 }
 
 /*static*/ NordVpnWrapper *NordVpnWrapper::s_instance = nullptr;
