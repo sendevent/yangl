@@ -1,6 +1,7 @@
 #include "versiontriplet.h"
 
-#include <QString>
+#include "app/common.h"
+
 #include <QStringList>
 
 /*static*/ const QMap<VersionTriplet, VersionTriplet::KnownVersion> VersionTriplet::KnownVersions {
@@ -24,21 +25,20 @@ QString VersionTriplet::toString() const
     const auto doConvert = [](const QString &str) {
         bool ok(false);
         const int res = str.toInt(&ok);
+        if (!ok) {
+            WRN << "conversion failed:" << str << res;
+        }
         return res;
     };
 
     QList<int> versionParts(3, 0);
 
     const auto &parts = s.split('.');
-    if (parts.size()) {
-        versionParts[0] = doConvert(parts.first());
-    }
-    if (parts.size() >= 2) {
-        versionParts[1] = doConvert(parts[1]);
-    }
+    const auto partsCount = parts.size();
 
-    if (parts.size() >= 3) {
-        versionParts[2] = doConvert(parts[2]);
+    for (int i = 0; i < 3; ++i) {
+        if (partsCount >= i + 1)
+            versionParts[i] = doConvert(parts[i]);
     }
 
     return VersionTriplet(versionParts[0], versionParts[1], versionParts[2]);
@@ -69,5 +69,5 @@ bool VersionTriplet::operator<(const VersionTriplet &other) const
             return bool(checked);
         }
     }
-    return false; // equlas
+    return false; // equal
 }
