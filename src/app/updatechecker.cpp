@@ -27,9 +27,6 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 
-static const QUrl kReleasesApiUrl =
-        QUrl(QStringLiteral("https://api.github.com/repos/sendevent/yangl/releases/latest"));
-
 UpdateChecker::UpdateChecker(QObject *parent)
     : QObject(parent)
     , m_nam(new QNetworkAccessManager(this))
@@ -38,6 +35,7 @@ UpdateChecker::UpdateChecker(QObject *parent)
 
 void UpdateChecker::check()
 {
+    static const QUrl kReleasesApiUrl(QStringLiteral("https://api.github.com/repos/sendevent/yangl/releases/latest"));
     QNetworkRequest req(kReleasesApiUrl);
     req.setRawHeader("Accept", "application/vnd.github+json");
     auto *reply = m_nam->get(req);

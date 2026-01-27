@@ -362,11 +362,10 @@ void TestActionStorage::test_toggleGroups()
     }
 
     // Non-toggle NordVPN actions must have empty toggleGroup
-    const QList<Action::NordVPN> nonToggleTypes = {
-        Action::NordVPN::Connect,     Action::NordVPN::Disconnect, Action::NordVPN::LogIn,
-        Action::NordVPN::CheckStatus, Action::NordVPN::Pause05,    Action::NordVPN::Rate5,
-        Action::NordVPN::LogOut,
-    };
+    const QList<Action::NordVPN> nonToggleTypes = { Action::NordVPN::Connect, Action::NordVPN::Disconnect,
+                                                    Action::NordVPN::LogIn,   Action::NordVPN::CheckStatus,
+                                                    Action::NordVPN::Pause05, Action::NordVPN::Rate5,
+                                                    Action::NordVPN::LogOut };
     for (auto t : nonToggleTypes) {
         const Action::Ptr &action = storage.action(t);
         QVERIFY(action);
