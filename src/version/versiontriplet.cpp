@@ -5,8 +5,26 @@
 #include <QStringList>
 
 /*static*/ const QMap<VersionTriplet, VersionTriplet::KnownVersion> VersionTriplet::KnownVersions {
+    { VersionTriplet::fromString("0.99.1"), VersionTriplet::KnownVersion::V_0_99_1 },
     { VersionTriplet::fromString("1.0.0"), VersionTriplet::KnownVersion::V_1_0_0 },
+    { VersionTriplet::fromString("2.0.0"), VersionTriplet::KnownVersion::V_2_0_0 },
+    { VersionTriplet::fromString("2.0.1"), VersionTriplet::KnownVersion::V_2_0_1 },
 };
+
+/*static*/ VersionTriplet VersionTriplet::fromKnown(KnownVersion v)
+{
+    switch (v) {
+    case KnownVersion::V_0_99_1:
+        return { 0, 99, 1 };
+    case KnownVersion::V_1_0_0:
+        return { 1, 0, 0 };
+    case KnownVersion::V_2_0_0:
+        return { 2, 0, 0 };
+    case KnownVersion::V_2_0_1:
+        return { 2, 0, 1 };
+    }
+    return { 0, 0, 0 };
+}
 
 VersionTriplet::VersionTriplet(int maj, int min, int patch)
     : m_major(maj)
