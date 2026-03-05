@@ -116,3 +116,25 @@ All build scripts accept the `--qt-dir` option to specify a non-system Qt instal
 ```
 
 When omitted, the scripts use whatever Qt6 is found on the system.
+
+## For developers
+
+### Running tests
+
+Unit tests are off by default to keep user builds lean. Enable them with:
+
+```
+cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTS=ON
+```
+
+Then run them:
+```
+ctest --test-dir build --output-on-failure
+```
+
+### Code style
+
+The project enforces formatting via [clang-format](https://clang.llvm.org/docs/ClangFormat.html). CI will reject un-formatted code. To format locally:
+```
+clang-format -i $(git diff --name-only HEAD | grep -E '\.(cpp|h)$')
+```
