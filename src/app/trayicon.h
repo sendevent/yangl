@@ -20,7 +20,6 @@
 #include "app/nordvpninfo.h"
 
 #include <QSystemTrayIcon>
-#include <QUrl>
 
 class TrayIcon : public QSystemTrayIcon
 {
@@ -55,7 +54,6 @@ private:
     NordVpnInfo m_state;
     bool m_isFirstChange { true };
     int m_duration { 0 };
-    QUrl m_pendingUrl;
 
     static QIcon iconForState(const NordVpnInfo &state);
     static QIcon iconForStatus(const NordVpnInfo::Status &status);

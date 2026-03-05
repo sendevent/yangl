@@ -21,12 +21,15 @@
 #include <QUrl>
 
 class QLabel;
+class UpdateChecker;
 
 class UpdateBanner : public QFrame
 {
     Q_OBJECT
 public:
     explicit UpdateBanner(bool dismissible, QWidget *parent = {});
+
+    static UpdateBanner *create(bool dismissible, UpdateChecker *checker, QWidget *parent);
 
     void setUpdate(const QString &version, const QUrl &url);
 

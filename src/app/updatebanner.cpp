@@ -17,6 +17,8 @@
 
 #include "updatebanner.h"
 
+#include "app/updatechecker.h"
+
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
@@ -47,6 +49,16 @@ UpdateBanner::UpdateBanner(bool dismissible, QWidget *parent)
     }
 
     hide();
+}
+
+/*static*/ UpdateBanner *UpdateBanner::create(bool dismissible, UpdateChecker *checker, QWidget *parent)
+{
+    auto *banner = new UpdateBanner(dismissible, parent);
+    connect(checker, &UpdateChecker::updateAvailable, banner, &UpdateBanner::setUpdate);
+    if (checker->hasPendingUpdate()) {
+        banner->setUpdate(checker->pendingVersion(), checker->pendingUrl());
+    }
+    return banner;
 }
 
 void UpdateBanner::setUpdate(const QString &version, const QUrl &url)

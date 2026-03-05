@@ -87,6 +87,8 @@ void UpdateChecker::onReplyFinished(QNetworkReply *reply)
     LOG << "Update check: current" << current.toString() << "latest" << latest.toString();
 
     if (current < latest) {
-        emit updateAvailable(latest.toString(), RepoUrl);
+        m_pendingVersion = latest.toString();
+        m_pendingUrl = RepoUrl;
+        emit updateAvailable(m_pendingVersion, m_pendingUrl);
     }
 }

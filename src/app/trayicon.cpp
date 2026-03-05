@@ -104,13 +104,6 @@ TrayIcon::TrayIcon(QObject *parent)
     deployDefaults();
     reloadIcons();
 
-    connect(this, &QSystemTrayIcon::messageClicked, this, [this]() {
-        if (m_pendingUrl.isValid()) {
-            QDesktopServices::openUrl(m_pendingUrl);
-            m_pendingUrl.clear();
-        }
-    });
-
     const auto &icon = iconForStatus(NordVpnInfo::Status::Unknown);
     updateStateText(tr("State: Unknown"), icon);
     setIcon(icon);
@@ -217,7 +210,11 @@ void TrayIcon::updateTooltip(const QString &text)
 
 void TrayIcon::showUpdateNotification(const QString &version, const QUrl &repoUrl)
 {
-    m_pendingUrl = repoUrl;
+    disconnect(this, &QSystemTrayIcon::messageClicked, nullptr, nullptr);
+    connect(
+            this, &QSystemTrayIcon::messageClicked, this, [repoUrl]() { QDesktopServices::openUrl(repoUrl); },
+            Qt::SingleShotConnection);
+
     const QString text = tr("New version %1 is available\n%2").arg(version, repoUrl.toString());
     const QString &tooltip = QTextDocumentFragment::fromHtml(text).toPlainText();
     setToolTip(tooltip);
@@ -226,7 +223,6 @@ void TrayIcon::showUpdateNotification(const QString &version, const QUrl &repoUr
 
 void TrayIcon::updateStateText(const QString &message, QSystemTrayIcon::MessageIcon messageType)
 {
-    m_pendingUrl.clear();
     const QString &tooltip = QTextDocumentFragment::fromHtml(message).toPlainText();
     setToolTip(tooltip);
 
@@ -239,7 +235,6 @@ void TrayIcon::updateStateText(const QString &message, QSystemTrayIcon::MessageI
 
 void TrayIcon::updateStateText(const QString &message, const QIcon &icon)
 {
-    m_pendingUrl.clear();
     const QString &tooltip = QTextDocumentFragment::fromHtml(message).toPlainText();
     setToolTip(tooltip);
 

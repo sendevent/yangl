@@ -21,7 +21,6 @@
 #include "app/nordvpninfo.h"
 
 #include <QObject>
-#include <QUrl>
 
 class AppUiCoordinator;
 class CLICaller;
@@ -47,11 +46,7 @@ public:
 
     static void registerAction(Action *act);
 
-    QString pendingUpdateVersion() const { return m_updateVersion; }
-    QUrl pendingUpdateUrl() const { return m_updateUrl; }
-
-signals:
-    void updateDetected(const QString &version, const QUrl &url);
+    UpdateChecker *updateChecker() const;
 
 private slots:
     void prepareQuit();
@@ -91,8 +86,6 @@ private:
 
     QString m_lastCountry;
     QString m_lastCity;
-    QString m_updateVersion;
-    QUrl m_updateUrl;
 
     Action::Ptr m_geoAction;
     Action::Ptr m_settingsSyncAction;

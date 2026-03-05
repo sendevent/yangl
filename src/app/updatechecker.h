@@ -33,6 +33,10 @@ public:
 
     static const QUrl RepoUrl;
 
+    bool hasPendingUpdate() const { return !m_pendingVersion.isEmpty(); }
+    QString pendingVersion() const { return m_pendingVersion; }
+    QUrl pendingUrl() const { return m_pendingUrl; }
+
 signals:
     void updateAvailable(const QString &version, const QUrl &repoUrl);
 
@@ -41,4 +45,6 @@ private:
     QNetworkAccessManager *m_nam { nullptr };
     bool m_inFlight { false };
     bool m_enabled { false };
+    QString m_pendingVersion;
+    QUrl m_pendingUrl;
 };

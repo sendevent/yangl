@@ -67,13 +67,7 @@ MapWidget::MapWidget(const QString &mapPlugin, int mapType, FlatPlaceProxyModel 
     vBox->addWidget(m_quickView);
     vBox->setContentsMargins(0, 0, 0, 0);
 
-    m_updateBanner = new UpdateBanner(true, this);
-
-    auto *nw = NordVpnWrapper::instance();
-    connect(nw, &NordVpnWrapper::updateDetected, m_updateBanner, &UpdateBanner::setUpdate);
-    if (!nw->pendingUpdateVersion().isEmpty()) {
-        m_updateBanner->setUpdate(nw->pendingUpdateVersion(), nw->pendingUpdateUrl());
-    }
+    m_updateBanner = UpdateBanner::create(true, NordVpnWrapper::instance()->updateChecker(), this);
 }
 
 MapWidget::~MapWidget() { }
