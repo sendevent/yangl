@@ -80,7 +80,7 @@ jobs:
         run: |
           apt-get update
           apt-get install -y --no-install-recommends \
-            git ca-certificates build-essential cmake \
+            git ca-certificates build-essential cmake file \
             qt6-base-dev \
             qt6-base-dev-tools \
             qt6-base-private-dev \
@@ -160,7 +160,7 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: '6.8.3'
-          modules: 'qtlocation qtpositioning'
+          modules: 'qtlocation qtpositioning qtserialport'
           cache: true
 
       - name: Build AppImage
