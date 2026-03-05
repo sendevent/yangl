@@ -25,6 +25,22 @@
 class CLICaller;
 class QTimer;
 
+/*!
+ * \brief Periodic VPN state monitor.
+ *
+ * Fires a \c CLICaller request on a configurable timer and parses the result
+ * into a \c NordVpnInfo. Two polling modes are supported:
+ *
+ * \li \b Dynamic — polls every \c DynamicIntervalTransitionalMs (1 s) while
+ *     the connection is transitioning and backs off to \c DynamicIntervalStableMs
+ *     (5 s) once the state has been stable for \c DynamicTransitionTimeoutMs.
+ *     Between real polls the uptime counter is ticked locally at 1 s.
+ * \li \b Custom — polls at a fixed user-defined interval regardless of state.
+ *
+ * An in-flight guard (\c m_pollInFlight) prevents overlapping requests.
+ * After \c MaxConsecutiveErrors successive failures the monitor stops and
+ * emits \c error; a successful poll resets the counter.
+ */
 class StateChecker : public QObject
 {
     Q_OBJECT

@@ -50,8 +50,8 @@ target_link_libraries(yangl_lib PUBLIC
 
 target_include_directories(yangl_lib PUBLIC ${CMAKE_SOURCE_DIR}/src/)
 
-option(DISABLE_TESTS "Disable unit tests" ON)
-if(NOT DISABLE_TESTS)
+option(ENABLE_TESTS "Enable unit tests" OFF)
+if(ENABLE_TESTS)
     add_subdirectory(test)
 endif()
 
@@ -69,7 +69,7 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
     "Yet Another NordVPN GUI for Linux")
 set(CPACK_PACKAGE_DESCRIPTION
     "Lightweight, unofficial system tray application for managing NordVPN connections on Linux. Provides quick connect/disconnect, server selection via geo chart, customizable tray icons, and configurable actions.")
-set(CPACK_PACKAGE_MAINTAINER "Denis <denis@yangl>")
+set(CPACK_PACKAGE_MAINTAINER "Denis Gofman <sendevent@gmail.com>")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/sendevent/yangl/")
 set(CPACK_PACKAGE_CONTACT "https://github.com/sendevent/yangl/")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/lgpl-3.0.txt")
