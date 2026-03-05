@@ -218,7 +218,7 @@ void TrayIcon::updateTooltip(const QString &text)
 void TrayIcon::showUpdateNotification(const QString &version, const QUrl &repoUrl)
 {
     m_pendingUrl = repoUrl;
-    const QString text = tr("Update available: %1\n%2").arg(version, repoUrl.toString());
+    const QString text = tr("New version %1 is available\n%2").arg(version, repoUrl.toString());
     const QString &tooltip = QTextDocumentFragment::fromHtml(text).toPlainText();
     setToolTip(tooltip);
     showMessage(qApp->applicationDisplayName(), tooltip, QSystemTrayIcon::Information, m_duration);

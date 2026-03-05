@@ -21,7 +21,9 @@
 #include "actions/action.h"
 #include "actions/actionstorage.h"
 #include "app/common.h"
+#include "app/nordvpnwrapper.h"
 #include "app/statechecker.h"
+#include "app/updatebanner.h"
 #include "settings/appsettings.h"
 #include "settings/mapsettings.h"
 #include "ui_settingsdialog.h"
@@ -129,6 +131,14 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
     ui->mapVerticalLayout->insertWidget(0, m_mapSettings);
 
     restoreGeometry(AppSettings::Monitor->SettingsDialog->read().toByteArray());
+
+    m_updateBanner = new UpdateBanner(true, this);
+    auto *nw = NordVpnWrapper::instance();
+    connect(nw, &NordVpnWrapper::updateDetected, m_updateBanner, &UpdateBanner::setUpdate);
+    if (!nw->pendingUpdateVersion().isEmpty()) {
+        m_updateBanner->setUpdate(nw->pendingUpdateVersion(), nw->pendingUpdateUrl());
+    }
+    qobject_cast<QVBoxLayout *>(layout())->insertWidget(0, m_updateBanner);
 }
 
 SettingsDialog::~SettingsDialog()

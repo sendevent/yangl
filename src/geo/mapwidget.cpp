@@ -18,6 +18,8 @@
 #include "mapwidget.h"
 
 #include "app/common.h"
+#include "app/nordvpnwrapper.h"
+#include "app/updatebanner.h"
 #include "geo/flatplaceproxymodel.h"
 #include "settings/appsettings.h"
 
@@ -64,6 +66,14 @@ MapWidget::MapWidget(const QString &mapPlugin, int mapType, FlatPlaceProxyModel 
     QVBoxLayout *vBox = new QVBoxLayout(this);
     vBox->addWidget(m_quickView);
     vBox->setContentsMargins(0, 0, 0, 0);
+
+    m_updateBanner = new UpdateBanner(true, this);
+
+    auto *nw = NordVpnWrapper::instance();
+    connect(nw, &NordVpnWrapper::updateDetected, m_updateBanner, &UpdateBanner::setUpdate);
+    if (!nw->pendingUpdateVersion().isEmpty()) {
+        m_updateBanner->setUpdate(nw->pendingUpdateVersion(), nw->pendingUpdateUrl());
+    }
 }
 
 MapWidget::~MapWidget() { }
@@ -116,16 +126,27 @@ void MapWidget::syncMapSize()
     }
 }
 
+void MapWidget::repositionBanner()
+{
+    if (m_updateBanner) {
+        const int margin = 8;
+        m_updateBanner->setGeometry(margin, margin, width() - 2 * margin, m_updateBanner->sizeHint().height());
+        m_updateBanner->raise();
+    }
+}
+
 void MapWidget::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
     syncMapSize();
+    repositionBanner();
 }
 
 void MapWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
     syncMapSize();
+    repositionBanner();
 }
 
 void MapWidget::centerOn(const QGeoCoordinate &center)

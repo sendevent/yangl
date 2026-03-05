@@ -47,6 +47,12 @@ public:
 
     static void registerAction(Action *act);
 
+    QString pendingUpdateVersion() const { return m_updateVersion; }
+    QUrl pendingUpdateUrl() const { return m_updateUrl; }
+
+signals:
+    void updateDetected(const QString &version, const QUrl &url);
+
 private slots:
     void prepareQuit();
 

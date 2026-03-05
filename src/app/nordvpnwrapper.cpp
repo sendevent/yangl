@@ -71,6 +71,7 @@ NordVpnWrapper::NordVpnWrapper(QObject *parent)
                 m_updateUrl = repoUrl;
                 m_trayIcon->showUpdateNotification(version, repoUrl);
                 prependUpdateAction();
+                emit updateDetected(version, repoUrl);
             });
     QTimer::singleShot(5 * utils::oneSecondMs(), this, [this]() {
         m_updateChecker->applyEnabled(AppSettings::Monitor->CheckForUpdates->read().toBool());
@@ -116,7 +117,7 @@ void NordVpnWrapper::prependUpdateAction()
     if (!menu) {
         return;
     }
-    auto *act = new QAction(tr("Update available: %1").arg(m_updateVersion), menu);
+    auto *act = new QAction(tr("New version %1 available").arg(m_updateVersion), menu);
     const QUrl url = m_updateUrl;
     connect(act, &QAction::triggered, this, [url]() { QDesktopServices::openUrl(url); });
     auto *sep = new QAction(menu);

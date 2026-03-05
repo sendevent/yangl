@@ -17,40 +17,19 @@
 
 #pragma once
 
-#include <QDialog>
-#include <QPointer>
+#include <QFrame>
+#include <QUrl>
 
-namespace Ui {
-class SettingsDialog;
-}
+class QLabel;
 
-class MapSettings;
-class ActionStorage;
-class UpdateBanner;
-class SettingsDialog : public QDialog
+class UpdateBanner : public QFrame
 {
     Q_OBJECT
-
 public:
-    static SettingsDialog *makeVisible(ActionStorage *actionStorage);
+    explicit UpdateBanner(bool dismissible, QWidget *parent = {});
 
-    ~SettingsDialog() override;
-
-signals:
-    void showMapRequested();
-
-public slots:
-    void accept() override;
+    void setUpdate(const QString &version, const QUrl &url);
 
 private:
-    static QPointer<SettingsDialog> m_instance;
-    SettingsDialog(ActionStorage *actionStorage, QWidget *parent = {});
-    Ui::SettingsDialog *ui;
-    ActionStorage *m_actStorage;
-    MapSettings *m_mapSettings;
-    UpdateBanner *m_updateBanner;
-
-    bool saveSettings();
-    bool saveMonitorSettings();
-    bool saveActions();
+    QLabel *m_label { nullptr };
 };
