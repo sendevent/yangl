@@ -59,7 +59,7 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DDISABLE_TESTS=OFF
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTS=ON
 
       - name: Build
         run: cmake --build build -j"$(nproc)"

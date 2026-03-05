@@ -50,8 +50,8 @@ target_link_libraries(yangl_lib PUBLIC
 
 target_include_directories(yangl_lib PUBLIC ${CMAKE_SOURCE_DIR}/src/)
 
-option(DISABLE_TESTS "Disable unit tests" ON)
-if(NOT DISABLE_TESTS)
+option(ENABLE_TESTS "Enable unit tests" OFF)
+if(ENABLE_TESTS)
     add_subdirectory(test)
 endif()
 
