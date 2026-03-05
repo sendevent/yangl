@@ -23,6 +23,19 @@
 #include <QHash>
 #include <QObject>
 
+/*!
+ * \brief Registry and persistence layer for all application actions.
+ *
+ * Actions are split into three flows:
+ * \li \b Yangl — internal application controls (Show Settings, Quit, …).
+ * \li \b NordVPN — predefined wrappers around \c nordvpn CLI subcommands.
+ * \li \b Custom — user-defined executable/script invocations.
+ *
+ * The storage is the single source of truth for all \c Action instances.
+ * It loads from and saves to a JSON file, and provides typed lookup by
+ * \c Action::Yangl / \c Action::NordVPN enum value or by UUID for custom
+ * actions.
+ */
 class ActionStorage : public QObject
 {
     Q_OBJECT

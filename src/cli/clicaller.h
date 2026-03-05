@@ -21,6 +21,17 @@
 
 #include <QObject>
 
+/*!
+ * \brief Asynchronous subprocess dispatcher.
+ *
+ * Accepts a \c CLICall and runs it on a Qt thread-pool worker so the GUI
+ * thread is never blocked. Results are delivered back to the main thread
+ * via the signals on the originating \c Action.
+ *
+ * All NordVPN CLI interactions and user-defined script invocations flow
+ * through this single choke point, making it straightforward to add
+ * logging, throttling, or request queuing in one place.
+ */
 class CLICaller : public QObject
 {
     Q_OBJECT

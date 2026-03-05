@@ -25,6 +25,21 @@
 class QNetworkAccessManager;
 class QNetworkReply;
 
+/*!
+ * \brief Asynchronous GitHub release checker.
+ *
+ * Queries the GitHub Releases API for the latest published tag and compares
+ * it against the running build version via \c currentAppVersion(). If a newer
+ * version is found, \c updateAvailable is emitted and the result is cached so
+ * that widgets created after the check can still call \c hasPendingUpdate(),
+ * \c pendingVersion(), and \c pendingUrl() without waiting for another round.
+ *
+ * An in-flight guard prevents overlapping requests. Network errors and
+ * 404 responses (no release published yet) are silently swallowed.
+ *
+ * \c currentAppVersion() is virtual to allow test subclasses to inject an
+ * arbitrary baseline version.
+ */
 class UpdateChecker : public QObject
 {
     Q_OBJECT
