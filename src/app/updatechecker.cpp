@@ -35,6 +35,17 @@ UpdateChecker::UpdateChecker(QObject *parent)
 {
 }
 
+UpdateChecker::UpdateChecker(QNetworkAccessManager *nam, QObject *parent)
+    : QObject(parent)
+    , m_nam(nam)
+{
+}
+
+VersionTriplet UpdateChecker::currentAppVersion() const
+{
+    return { yangl::V.Major, yangl::V.Minor, yangl::V.Patch };
+}
+
 void UpdateChecker::check()
 {
     if (m_inFlight) {
@@ -82,7 +93,7 @@ void UpdateChecker::onReplyFinished(QNetworkReply *reply)
     }
 
     const VersionTriplet latest = VersionTriplet::fromString(tag);
-    const VersionTriplet current(yangl::V.Major, yangl::V.Minor, yangl::V.Patch);
+    const VersionTriplet current = currentAppVersion();
 
     LOG << "Update check: current" << current.toString() << "latest" << latest.toString();
 

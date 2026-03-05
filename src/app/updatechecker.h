@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "version/versiontriplet.h"
+
 #include <QObject>
 #include <QUrl>
 
@@ -39,6 +41,10 @@ public:
 
 signals:
     void updateAvailable(const QString &version, const QUrl &repoUrl);
+
+protected:
+    explicit UpdateChecker(QNetworkAccessManager *nam, QObject *parent = {});
+    virtual VersionTriplet currentAppVersion() const;
 
 private:
     void onReplyFinished(QNetworkReply *reply);
