@@ -69,7 +69,7 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
     "Yet Another NordVPN GUI for Linux")
 set(CPACK_PACKAGE_DESCRIPTION
     "Lightweight, unofficial system tray application for managing NordVPN connections on Linux. Provides quick connect/disconnect, server selection via geo chart, customizable tray icons, and configurable actions.")
-set(CPACK_PACKAGE_MAINTAINER "Denis <denis@yangl>")
+set(CPACK_PACKAGE_MAINTAINER "Denis Gofman <sendevent@gmail.com>")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/sendevent/yangl/")
 set(CPACK_PACKAGE_CONTACT "https://github.com/sendevent/yangl/")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/lgpl-3.0.txt")
