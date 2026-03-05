@@ -2,8 +2,6 @@
 
 #include "app/common.h"
 
-#include <QStringList>
-
 /*static*/ const QMap<VersionTriplet, VersionTriplet::KnownVersion> VersionTriplet::KnownVersions {
     { VersionTriplet::fromString("0.99.1"), VersionTriplet::KnownVersion::V_0_99_1 },
     { VersionTriplet::fromString("1.0.0"), VersionTriplet::KnownVersion::V_1_0_0 },
@@ -35,7 +33,7 @@ VersionTriplet::VersionTriplet(int maj, int min, int patch)
 
 QString VersionTriplet::toString() const
 {
-    return QString("%1.%2.%3").arg(m_major).arg(m_minor).arg(m_patch);
+    return QStringLiteral("%1.%2.%3").arg(m_major).arg(m_minor).arg(m_patch);
 }
 
 /*static*/ VersionTriplet VersionTriplet::fromString(const QString &s)
@@ -70,23 +68,11 @@ bool VersionTriplet::operator==(const VersionTriplet &other) const
 
 bool VersionTriplet::operator<(const VersionTriplet &other) const
 {
-    auto compare_part = [](const auto &our, const auto &their) {
-        if (our < their) {
-            return 1;
-        } else if (our > their) {
-            return 0;
-        }
-
-        return -1;
-    };
-
-    const QList<QPair<int, int>> &pairs { qMakePair(major(), other.major()), qMakePair(minor(), other.minor()),
-                                          qMakePair(patch(), other.patch()) };
-    for (const auto &pair : pairs) {
-        const int checked = compare_part(pair.first, pair.second);
-        if (checked != -1) {
-            return bool(checked);
-        }
+    if (m_major != other.m_major) {
+        return m_major < other.m_major;
     }
-    return false; // equal
+    if (m_minor != other.m_minor) {
+        return m_minor < other.m_minor;
+    }
+    return m_patch < other.m_patch;
 }
