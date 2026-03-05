@@ -21,6 +21,7 @@
 #include "app/nordvpninfo.h"
 
 #include <QObject>
+#include <QUrl>
 
 class AppUiCoordinator;
 class CLICaller;
@@ -69,6 +70,7 @@ private:
     void updateActions(bool connected);
 
     void initMenu();
+    void prependUpdateAction();
     void syncToggleSettings();
 
     void start();
@@ -83,6 +85,8 @@ private:
 
     QString m_lastCountry;
     QString m_lastCity;
+    QString m_updateVersion;
+    QUrl m_updateUrl;
 
     Action::Ptr m_geoAction;
     Action::Ptr m_settingsSyncAction;

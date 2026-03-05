@@ -30,7 +30,9 @@
 #include "geo/placeinfo.h"
 #include "settings/appsettings.h"
 
+#include <QAction>
 #include <QApplication>
+#include <QDesktopServices>
 #include <QTimer>
 
 NordVpnWrapper::NordVpnWrapper(QObject *parent)
@@ -65,7 +67,10 @@ NordVpnWrapper::NordVpnWrapper(QObject *parent)
 
     connect(m_updateChecker, &UpdateChecker::updateAvailable, this,
             [this](const QString &version, const QUrl &repoUrl) {
+                m_updateVersion = version;
+                m_updateUrl = repoUrl;
                 m_trayIcon->showUpdateNotification(version, repoUrl);
+                prependUpdateAction();
             });
     QTimer::singleShot(5 * utils::oneSecondMs(), this, [this]() {
         m_updateChecker->applyEnabled(AppSettings::Monitor->CheckForUpdates->read().toBool());
@@ -99,6 +104,26 @@ void NordVpnWrapper::initMenu()
     const auto &actions = m_actions->load();
     auto *const menu = m_menuHolder->createMenu(actions);
     m_trayIcon->setContextMenu(menu);
+    prependUpdateAction();
+}
+
+void NordVpnWrapper::prependUpdateAction()
+{
+    if (m_updateVersion.isEmpty()) {
+        return;
+    }
+    auto *menu = m_trayIcon->contextMenu();
+    if (!menu) {
+        return;
+    }
+    auto *act = new QAction(tr("Update available: %1").arg(m_updateVersion), menu);
+    const QUrl url = m_updateUrl;
+    connect(act, &QAction::triggered, this, [url]() { QDesktopServices::openUrl(url); });
+    auto *sep = new QAction(menu);
+    sep->setSeparator(true);
+    const auto &existing = menu->actions();
+    menu->insertAction(existing.isEmpty() ? nullptr : existing.first(), sep);
+    menu->insertAction(sep, act);
 }
 
 CLICaller *NordVpnWrapper::bus() const

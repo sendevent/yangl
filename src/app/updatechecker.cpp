@@ -46,6 +46,7 @@ void UpdateChecker::check()
     req.setRawHeader("Accept", "application/vnd.github+json");
     auto *reply = m_nam->get(req);
     connect(reply, &QNetworkReply::finished, this, [this, reply]() { onReplyFinished(reply); });
+    LOG << "Checking for updates...";
 }
 
 void UpdateChecker::applyEnabled(bool enabled)
