@@ -21,6 +21,7 @@
 #include "settings/appsettings.h"
 
 #include <QApplication>
+#include <QDesktopServices>
 #include <QFileInfo>
 #include <QLatin1StringView>
 #include <QMetaEnum>
@@ -102,6 +103,13 @@ TrayIcon::TrayIcon(QObject *parent)
 {
     deployDefaults();
     reloadIcons();
+
+    connect(this, &QSystemTrayIcon::messageClicked, this, [this]() {
+        if (m_pendingUrl.isValid()) {
+            QDesktopServices::openUrl(m_pendingUrl);
+            m_pendingUrl.clear();
+        }
+    });
 
     const auto &icon = iconForStatus(NordVpnInfo::Status::Unknown);
     updateStateText(tr("State: Unknown"), icon);
@@ -207,8 +215,18 @@ void TrayIcon::updateTooltip(const QString &text)
     setToolTip(sanitized);
 }
 
+void TrayIcon::showUpdateNotification(const QString &version, const QUrl &repoUrl)
+{
+    m_pendingUrl = repoUrl;
+    const QString text = tr("Update available: %1\n%2").arg(version, repoUrl.toString());
+    const QString &tooltip = QTextDocumentFragment::fromHtml(text).toPlainText();
+    setToolTip(tooltip);
+    showMessage(qApp->applicationDisplayName(), tooltip, QSystemTrayIcon::Information, m_duration);
+}
+
 void TrayIcon::updateStateText(const QString &message, QSystemTrayIcon::MessageIcon messageType)
 {
+    m_pendingUrl.clear();
     const QString &tooltip = QTextDocumentFragment::fromHtml(message).toPlainText();
     setToolTip(tooltip);
 
@@ -221,6 +239,7 @@ void TrayIcon::updateStateText(const QString &message, QSystemTrayIcon::MessageI
 
 void TrayIcon::updateStateText(const QString &message, const QIcon &icon)
 {
+    m_pendingUrl.clear();
     const QString &tooltip = QTextDocumentFragment::fromHtml(message).toPlainText();
     setToolTip(tooltip);
 
