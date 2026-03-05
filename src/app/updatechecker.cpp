@@ -27,10 +27,23 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 
+/*static*/ const QUrl UpdateChecker::RepoUrl(QStringLiteral("https://github.com/sendevent/yangl"));
+
 UpdateChecker::UpdateChecker(QObject *parent)
     : QObject(parent)
     , m_nam(new QNetworkAccessManager(this))
 {
+}
+
+UpdateChecker::UpdateChecker(QNetworkAccessManager *nam, QObject *parent)
+    : QObject(parent)
+    , m_nam(nam)
+{
+}
+
+VersionTriplet UpdateChecker::currentAppVersion() const
+{
+    return { yangl::V.Major, yangl::V.Minor, yangl::V.Patch };
 }
 
 void UpdateChecker::check()
@@ -44,6 +57,7 @@ void UpdateChecker::check()
     req.setRawHeader("Accept", "application/vnd.github+json");
     auto *reply = m_nam->get(req);
     connect(reply, &QNetworkReply::finished, this, [this, reply]() { onReplyFinished(reply); });
+    LOG << "Checking for updates...";
 }
 
 void UpdateChecker::applyEnabled(bool enabled)
@@ -79,11 +93,13 @@ void UpdateChecker::onReplyFinished(QNetworkReply *reply)
     }
 
     const VersionTriplet latest = VersionTriplet::fromString(tag);
-    const VersionTriplet current(yangl::V.Major, yangl::V.Minor, yangl::V.Patch);
+    const VersionTriplet current = currentAppVersion();
 
     LOG << "Update check: current" << current.toString() << "latest" << latest.toString();
 
     if (current < latest) {
-        emit updateAvailable(latest.toString());
+        m_pendingVersion = latest.toString();
+        m_pendingUrl = RepoUrl;
+        emit updateAvailable(m_pendingVersion, m_pendingUrl);
     }
 }

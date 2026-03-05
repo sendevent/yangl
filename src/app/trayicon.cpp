@@ -21,6 +21,7 @@
 #include "settings/appsettings.h"
 
 #include <QApplication>
+#include <QDesktopServices>
 #include <QFileInfo>
 #include <QLatin1StringView>
 #include <QMetaEnum>
@@ -205,6 +206,19 @@ void TrayIcon::updateTooltip(const QString &text)
 {
     const QString &sanitized = QTextDocumentFragment::fromHtml(text).toPlainText();
     setToolTip(sanitized);
+}
+
+void TrayIcon::showUpdateNotification(const QString &version, const QUrl &repoUrl)
+{
+    disconnect(this, &QSystemTrayIcon::messageClicked, nullptr, nullptr);
+    connect(
+            this, &QSystemTrayIcon::messageClicked, this, [repoUrl]() { QDesktopServices::openUrl(repoUrl); },
+            Qt::SingleShotConnection);
+
+    const QString text = tr("New version %1 is available\n%2").arg(version, repoUrl.toString());
+    const QString &tooltip = QTextDocumentFragment::fromHtml(text).toPlainText();
+    setToolTip(tooltip);
+    showMessage(qApp->applicationDisplayName(), tooltip, QSystemTrayIcon::Information, m_duration);
 }
 
 void TrayIcon::updateStateText(const QString &message, QSystemTrayIcon::MessageIcon messageType)

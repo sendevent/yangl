@@ -17,7 +17,10 @@
 
 #pragma once
 
+#include "version/versiontriplet.h"
+
 #include <QObject>
+#include <QUrl>
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -30,12 +33,24 @@ public:
     void check();
     void applyEnabled(bool enabled);
 
+    static const QUrl RepoUrl;
+
+    bool hasPendingUpdate() const { return !m_pendingVersion.isEmpty(); }
+    QString pendingVersion() const { return m_pendingVersion; }
+    QUrl pendingUrl() const { return m_pendingUrl; }
+
 signals:
-    void updateAvailable(const QString &version);
+    void updateAvailable(const QString &version, const QUrl &repoUrl);
+
+protected:
+    explicit UpdateChecker(QNetworkAccessManager *nam, QObject *parent = {});
+    virtual VersionTriplet currentAppVersion() const;
 
 private:
     void onReplyFinished(QNetworkReply *reply);
     QNetworkAccessManager *m_nam { nullptr };
     bool m_inFlight { false };
     bool m_enabled { false };
+    QString m_pendingVersion;
+    QUrl m_pendingUrl;
 };

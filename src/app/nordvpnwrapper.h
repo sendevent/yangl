@@ -46,6 +46,8 @@ public:
 
     static void registerAction(Action *act);
 
+    UpdateChecker *updateChecker() const;
+
 private slots:
     void prepareQuit();
 
@@ -69,6 +71,7 @@ private:
     void updateActions(bool connected);
 
     void initMenu();
+    void prependUpdateAction();
     void syncToggleSettings();
 
     void start();

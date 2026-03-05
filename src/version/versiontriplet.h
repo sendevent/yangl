@@ -21,11 +21,15 @@ public:
 
     enum class KnownVersion
     {
+        V_0_99_1,
         V_1_0_0,
+        V_2_0_0,
+        V_2_0_1,
     };
     Q_ENUM(KnownVersion)
 
     static const QMap<VersionTriplet, KnownVersion> KnownVersions;
+    static VersionTriplet fromKnown(KnownVersion v);
 
 private:
     int m_major { 0 };

@@ -25,6 +25,7 @@
 class FlatPlaceProxyModel;
 class QQuickWidget;
 class QQuickItem;
+class UpdateBanner;
 
 class MapWidget : public QWidget
 {
@@ -59,8 +60,10 @@ signals:
 private:
     QQuickWidget *m_quickView { nullptr };
     FlatPlaceProxyModel *m_markerModel { nullptr };
+    UpdateBanner *m_updateBanner { nullptr };
 
     void syncMapSize();
+    void repositionBanner();
 
     void showEvent(QShowEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
