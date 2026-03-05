@@ -18,6 +18,7 @@
 #pragma once
 
 #include <QObject>
+#include <QUrl>
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -30,8 +31,10 @@ public:
     void check();
     void applyEnabled(bool enabled);
 
+    static const QUrl RepoUrl;
+
 signals:
-    void updateAvailable(const QString &version);
+    void updateAvailable(const QString &version, const QUrl &repoUrl);
 
 private:
     void onReplyFinished(QNetworkReply *reply);

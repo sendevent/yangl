@@ -27,6 +27,8 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 
+/*static*/ const QUrl UpdateChecker::RepoUrl(QStringLiteral("https://github.com/sendevent/yangl"));
+
 UpdateChecker::UpdateChecker(QObject *parent)
     : QObject(parent)
     , m_nam(new QNetworkAccessManager(this))
@@ -84,6 +86,6 @@ void UpdateChecker::onReplyFinished(QNetworkReply *reply)
     LOG << "Update check: current" << current.toString() << "latest" << latest.toString();
 
     if (current < latest) {
-        emit updateAvailable(latest.toString());
+        emit updateAvailable(latest.toString(), RepoUrl);
     }
 }
