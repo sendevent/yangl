@@ -126,6 +126,7 @@ private slots:
     void test_invalid_json_ignored();
     void test_missing_tag_name_ignored();
     void test_invalid_version_format_ignored();
+    void test_non_numeric_version_ignored();
     void test_no_overlapping();
     void test_apply_enabled_triggers();
     void test_apply_enabled_no_double_check();
@@ -266,6 +267,20 @@ void TestUpdateChecker::test_invalid_version_format_ignored()
 {
     auto *nam = new MockNAM;
     nam->setNextResponse(makeTagJson(QStringLiteral("1.0")));
+
+    TestableUpdateChecker checker(nam);
+    QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
+
+    checker.check();
+    QTest::qWait(500);
+    QCOMPARE(spy.count(), 0);
+    QVERIFY(!checker.hasPendingUpdate());
+}
+
+void TestUpdateChecker::test_non_numeric_version_ignored()
+{
+    auto *nam = new MockNAM;
+    nam->setNextResponse(makeTagJson(QStringLiteral("1.x.0")));
 
     TestableUpdateChecker checker(nam);
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
