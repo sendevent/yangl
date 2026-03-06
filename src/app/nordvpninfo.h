@@ -18,6 +18,7 @@
 #pragma once
 
 #include <QObject>
+#include <expected>
 
 class NordVpnInfo
 {
@@ -55,6 +56,13 @@ public:
 
     void tickUptime();
 
+    enum class UptimeParseError
+    {
+        EmptyInput,
+        InvalidToken,
+    };
+    Q_ENUM(UptimeParseError)
+
 private:
     Status m_status { Status::Unknown };
     QString m_server;
@@ -65,6 +73,9 @@ private:
     QString m_protocol;
     QString m_traffic;
     QString m_uptime;
+
+    using UptimeResult = std::expected<QString, UptimeParseError>;
+    static UptimeResult tryParseUptime(const QString &from);
 };
 
 Q_DECLARE_METATYPE(NordVpnInfo::Status)

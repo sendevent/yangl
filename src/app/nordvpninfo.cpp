@@ -127,11 +127,24 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
 
 /*static*/ QString NordVpnInfo::parseUptime(const QString &from)
 {
-    QString result;
-
-    if (from.isEmpty()) {
-        return result;
+    const auto &parsed = tryParseUptime(from);
+    if (!parsed) {
+        auto err = parsed.error();
+        static const QMetaEnum &me = QMetaEnum::fromType<NordVpnInfo::UptimeParseError>();
+        WRN << me.key(static_cast<int>(err));
+        return {};
     }
+    return parsed.value();
+}
+
+/*static*/ NordVpnInfo::UptimeResult NordVpnInfo::tryParseUptime(const QString &from)
+{
+    if (from.isEmpty()) {
+        return std::unexpected(UptimeParseError::EmptyInput);
+    }
+
+    QString result;
+    bool hasParsedTokens { false };
 
     auto add = [&result](int value, int width = 2) {
         if (!result.isEmpty()) {
@@ -155,6 +168,11 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
         } else {
             add(value, 2);
         }
+        hasParsedTokens = true;
+    }
+
+    if (!hasParsedTokens) {
+        return std::unexpected(UptimeParseError::InvalidToken);
     }
 
     if (result.count(QChar(':')) <= 2) {
