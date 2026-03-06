@@ -3,10 +3,10 @@
 #include "app/common.h"
 
 /*static*/ const QMap<VersionTriplet, VersionTriplet::KnownVersion> VersionTriplet::KnownVersions {
-    { VersionTriplet::fromString("0.99.1"), VersionTriplet::KnownVersion::V_0_99_1 },
-    { VersionTriplet::fromString("1.0.0"), VersionTriplet::KnownVersion::V_1_0_0 },
-    { VersionTriplet::fromString("2.0.0"), VersionTriplet::KnownVersion::V_2_0_0 },
-    { VersionTriplet::fromString("2.0.1"), VersionTriplet::KnownVersion::V_2_0_1 },
+    { VersionTriplet(0, 99, 1), VersionTriplet::KnownVersion::V_0_99_1 },
+    { VersionTriplet(1, 0, 0), VersionTriplet::KnownVersion::V_1_0_0 },
+    { VersionTriplet(2, 0, 0), VersionTriplet::KnownVersion::V_2_0_0 },
+    { VersionTriplet(2, 0, 1), VersionTriplet::KnownVersion::V_2_0_1 },
 };
 
 /*static*/ VersionTriplet VersionTriplet::fromKnown(KnownVersion v)
