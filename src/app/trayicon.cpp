@@ -24,7 +24,6 @@
 #include <QDesktopServices>
 #include <QFileInfo>
 #include <QLatin1StringView>
-#include <QMetaEnum>
 #include <QPainter>
 #include <QPixmap>
 #include <QSystemTrayIcon>
@@ -39,9 +38,7 @@
     m_allIcons.clear();
     m_composedIcons.clear();
 
-    QMetaEnum me = QMetaEnum::fromType<NordVpnInfo::Status>();
-    for (int i = 0; i < me.keyCount(); ++i) {
-        const NordVpnInfo::Status state = static_cast<NordVpnInfo::Status>(me.value(i));
+    for (const auto state : utils::allEnum<NordVpnInfo::Status>()) {
         IconInfo info;
         info.m_status = state;
 
