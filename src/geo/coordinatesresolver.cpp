@@ -115,14 +115,15 @@ CitiesByCountry CoordinatesResolver::loadData(const QString &path)
                 continue;
             }
 
-            const auto [coord, parsed] = utils::parseCoordinates(parts[3], parts[4]);
-            if (!parsed) {
-                WRN << "Failed parsing lat/lon value:" << parts[3] << parts[4];
+            const auto parsedCoords = utils::parseCoordinatesExpected(parts[3], parts[4]);
+            if (!parsedCoords) {
+                WRN << "Failed parsing lat/lon value:" << parts[3] << parts[4]
+                    << utils::enumToString(parsedCoords.error(), QStringLiteral("UnknownError"));
                 continue;
             }
 
             const PlaceInfo place {
-                parts[0], parts[1], coord, parts[2] == "True", true, QString(),
+                parts[0], parts[1], *parsedCoords, parts[2] == "True", true, QString(),
             };
 
             auto &country = loaded[place.country.toLower()];

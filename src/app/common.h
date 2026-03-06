@@ -23,6 +23,7 @@
 #include <QDebug>
 #include <QGeoCoordinate>
 #include <QMetaEnum>
+#include <expected>
 
 #ifndef YANGL_TIMESTAMP
 #define YANGL_TIMESTAMP QDateTime::currentDateTime().toString("t hh:mm:ss.zzz:")
@@ -53,6 +54,18 @@ inline int oneSecondMs()
 }
 
 constexpr int DefaultLogLinesLimit = 1000;
+
+enum class CoordinateParseError
+{
+    MissingLatitude,
+    MissingLongitude,
+    InvalidLatitude,
+    InvalidLongitude,
+    OutOfRange,
+};
+Q_ENUM_NS(CoordinateParseError)
+
+using CoordinateParseResult = std::expected<QGeoCoordinate, CoordinateParseError>;
 
 template<typename SomeQEnum>
 QList<SomeQEnum> allEnum(const QList<SomeQEnum> &excluded = {})
@@ -103,7 +116,7 @@ QString ensureDirExists(const QString &path);
 QString geoToNvpn(const QString &name);
 QString nvpnToGeo(const QString &name);
 
-std::tuple<QGeoCoordinate, bool> parseCoordinates(const QString &latStr, const QString &lonStr);
+CoordinateParseResult parseCoordinatesExpected(const QString &latStr, const QString &lonStr);
 
 bool isValidAppPath(const QString &path, QString *reason = nullptr);
 
