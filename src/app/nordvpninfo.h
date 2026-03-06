@@ -63,6 +63,16 @@ public:
     };
     Q_ENUM(UptimeParseError)
 
+    enum class StatusParseErrorCode
+    {
+        EmptyInput,
+        MalformedLine,
+        MissingStatus,
+        InvalidStatus,
+        InvalidUptime,
+    };
+    Q_ENUM(StatusParseErrorCode)
+
 private:
     Status m_status { Status::Unknown };
     QString m_server;
@@ -76,6 +86,13 @@ private:
 
     using UptimeResult = std::expected<QString, UptimeParseError>;
     static UptimeResult tryParseUptime(const QString &from);
+
+    struct ParseError {
+        StatusParseErrorCode code;
+        QString detail;
+    };
+    using StatusParseResult = std::expected<NordVpnInfo, ParseError>;
+    static StatusParseResult tryFromString(const QString &text);
 };
 
 Q_DECLARE_METATYPE(NordVpnInfo::Status)

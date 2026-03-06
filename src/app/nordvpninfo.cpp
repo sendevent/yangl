@@ -65,24 +65,45 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
 
 /*static*/ NordVpnInfo NordVpnInfo::fromString(const QString &text)
 {
-    NordVpnInfo updatedState;
-    if (text.isEmpty()) {
-        return updatedState;
+    const auto &parsed = tryFromString(text);
+    if (!parsed) {
+        const auto &error = parsed.error();
+        static const QMetaEnum &me = QMetaEnum::fromType<NordVpnInfo::StatusParseErrorCode>();
+        WRN << me.key(static_cast<int>(error.code)) << error.detail;
+        return {};
     }
+    return parsed.value();
+}
+
+/*static*/ NordVpnInfo::StatusParseResult NordVpnInfo::tryFromString(const QString &text)
+{
+    if (text.isEmpty()) {
+        return std::unexpected(ParseError { StatusParseErrorCode::EmptyInput, QStringLiteral("Input is empty") });
+    }
+
+    NordVpnInfo updatedState;
+    bool hasStatus { false };
 
     const QStringList &pairs = text.split('\n', Qt::SkipEmptyParts);
     for (const QString &line : pairs) {
         const int sep = line.indexOf(':');
         if (sep <= 0) {
-            WRN << "Unexpected format:" << line;
-            continue;
+            return std::unexpected(ParseError { StatusParseErrorCode::MalformedLine,
+                                                QStringLiteral("No ':' separator in line: '%1'").arg(line) });
         }
 
         const QString &name = line.left(sep).simplified().toLower();
         const QString &value = line.mid(sep + 1).simplified();
 
         if (name.contains(QLatin1String("status"))) {
-            updatedState.m_status = textToStatus(value);
+            hasStatus = true;
+            const NordVpnInfo::Status parsedStatus = textToStatus(value);
+            if (parsedStatus == NordVpnInfo::Status::Unknown
+                && value.compare(QStringLiteral("Unknown"), Qt::CaseInsensitive) != 0) {
+                return std::unexpected(ParseError { StatusParseErrorCode::InvalidStatus,
+                                                    QStringLiteral("Unrecognized status value: '%1'").arg(value) });
+            }
+            updatedState.m_status = parsedStatus;
         } else if (name.contains(QLatin1String("server")) || name.contains(QLatin1String("hostname"))) {
             updatedState.m_server = value;
         } else if (name.contains(QLatin1String("country"))) {
@@ -100,8 +121,22 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
             updatedState.m_traffic.replace(QStringLiteral("received"), QStringLiteral("↓"));
             updatedState.m_traffic.replace(QStringLiteral("sent"), QStringLiteral("↑"));
         } else if (name.contains(QLatin1String("uptime"))) {
-            updatedState.m_uptime = parseUptime(value.simplified());
+            const UptimeResult parsedUptime = tryParseUptime(value.simplified());
+            if (!parsedUptime) {
+                static const QMetaEnum me = QMetaEnum::fromType<NordVpnInfo::UptimeParseError>();
+                return std::unexpected(ParseError {
+                        StatusParseErrorCode::InvalidUptime,
+                        QStringLiteral("Failed parsing uptime '%1': %2")
+                                .arg(value,
+                                     QString::fromLatin1(me.valueToKey(static_cast<int>(parsedUptime.error())))) });
+            }
+            updatedState.m_uptime = parsedUptime.value();
         }
+    }
+
+    if (!hasStatus) {
+        return std::unexpected(
+                ParseError { StatusParseErrorCode::MissingStatus, QStringLiteral("No status field found in input") });
     }
 
     return updatedState;
