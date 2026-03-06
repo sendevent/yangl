@@ -73,26 +73,16 @@ void UpdateChecker::onReplyFinished(QNetworkReply *reply)
     m_inFlight = false;
     reply->deleteLater();
 
-    if (reply->error() != QNetworkReply::NoError) {
-        // 404 = no releases published yet; not worth logging as a warning
-        if (reply->error() != QNetworkReply::ContentNotFoundError) {
-            WRN << "Update check failed:" << reply->errorString() << reply->error();
+    const auto parsed = parseResponse(reply);
+    if (!parsed) {
+        const auto &error = parsed.error();
+        if (!error.details.isEmpty()) {
+            WRN << utils::enumToString(error.code) << error.details;
         }
         return;
     }
 
-    const QJsonObject json = QJsonDocument::fromJson(reply->readAll()).object();
-    QString tag = json[QStringLiteral("tag_name")].toString().trimmed();
-    if (tag.startsWith('v', Qt::CaseInsensitive)) {
-        tag.remove(0, 1);
-    }
-
-    if (tag.isEmpty()) {
-        WRN << "Update check: empty tag_name in response";
-        return;
-    }
-
-    const VersionTriplet latest = VersionTriplet::fromString(tag);
+    const auto latest = parsed.value();
     const VersionTriplet current = currentAppVersion();
 
     LOG << "Update check: current" << current.toString() << "latest" << latest.toString();
@@ -102,4 +92,62 @@ void UpdateChecker::onReplyFinished(QNetworkReply *reply)
         m_pendingUrl = RepoUrl;
         emit updateAvailable(m_pendingVersion, m_pendingUrl);
     }
+}
+
+UpdateChecker::ParseResult UpdateChecker::parseResponse(QNetworkReply *reply)
+{
+    if (!reply) {
+        const ResponseParseResult res { UpdateChecker::ResponseParsingError::NetworkError,
+                                        QStringLiteral("Update check: Invalid reply instance") };
+        return std::unexpected(res);
+    }
+
+    if (reply->error() != QNetworkReply::NoError) {
+        const QString message =
+                QStringLiteral("Update check failed: '%1' '%2'").arg(reply->errorString()).arg(reply->error());
+        const ResponseParseResult res { UpdateChecker::ResponseParsingError::NetworkError, message };
+        return std::unexpected(res);
+    }
+
+    static const QString tagName = QStringLiteral("tag_name");
+    QJsonParseError jpe;
+    const QByteArray data = reply->readAll();
+    const QJsonDocument jsonDoc = QJsonDocument::fromJson(data, &jpe);
+    if (jpe.error != QJsonParseError::NoError) {
+        const QString message = QStringLiteral("Update check: JSON parsing error: '%1' %2 '%3'")
+                                        .arg(jpe.errorString(), QString::number(jpe.offset), QString::fromUtf8(data));
+        const ResponseParseResult res { UpdateChecker::ResponseParsingError::InvalidJson, message };
+        return std::unexpected(res);
+    }
+
+    const QJsonObject json = jsonDoc.object();
+    if (json.isEmpty()) {
+        const QString message = QStringLiteral("Update check: Received JSON is empty");
+        const ResponseParseResult res { UpdateChecker::ResponseParsingError::InvalidJson, message };
+        return std::unexpected(res);
+    }
+    if (!json.contains(tagName)) {
+        const QString message = QStringLiteral("Update check: JSON tag not found: '%1' '%2'")
+                                        .arg(tagName, QString::fromUtf8(jsonDoc.toJson(QJsonDocument::Compact)));
+        const ResponseParseResult res { UpdateChecker::ResponseParsingError::MissingTagName, message };
+        return std::unexpected(res);
+    }
+    QString tag = json[tagName].toString().trimmed();
+    if (tag.startsWith('v', Qt::CaseInsensitive)) {
+        tag.remove(0, 1);
+    }
+
+    if (tag.isEmpty()) {
+        const QString message = QStringLiteral("Update check: empty %1 in response").arg(tagName);
+        const ResponseParseResult res { UpdateChecker::ResponseParsingError::EmptyTagName, message };
+        return std::unexpected(res);
+    }
+
+    if (tag.count(QStringLiteral(".")) < 2) {
+        const QString message = QStringLiteral("Update check: invalid version format: '%1'").arg(tag);
+        const ResponseParseResult res { UpdateChecker::ResponseParsingError::InvalidVersionTag, message };
+        return std::unexpected(res);
+    }
+
+    return VersionTriplet::fromString(tag);
 }

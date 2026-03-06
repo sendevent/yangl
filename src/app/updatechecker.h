@@ -21,6 +21,7 @@
 
 #include <QObject>
 #include <QUrl>
+#include <expected>
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -44,6 +45,21 @@ class UpdateChecker : public QObject
 {
     Q_OBJECT
 public:
+    enum ResponseParsingError
+    {
+        NetworkError,
+        InvalidJson,
+        MissingTagName,
+        EmptyTagName,
+        InvalidVersionTag
+    };
+    Q_ENUM(ResponseParsingError);
+
+    struct ResponseParseResult {
+        ResponseParsingError code;
+        QString details;
+    };
+
     explicit UpdateChecker(QObject *parent = {});
     void check();
     void applyEnabled(bool enabled);
@@ -68,4 +84,7 @@ private:
     bool m_enabled { false };
     QString m_pendingVersion;
     QUrl m_pendingUrl;
+
+    using ParseResult = std::expected<VersionTriplet, ResponseParseResult>;
+    ParseResult parseResponse(QNetworkReply *reply);
 };
