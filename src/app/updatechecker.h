@@ -35,8 +35,8 @@ class QNetworkReply;
  * that widgets created after the check can still call \c hasPendingUpdate(),
  * \c pendingVersion(), and \c pendingUrl() without waiting for another round.
  *
- * An in-flight guard prevents overlapping requests. Network errors and
- * 404 responses (no release published yet) are silently swallowed.
+ * An in-flight guard prevents overlapping requests. Network/parse errors are
+ * ignored for control flow (no update signal is emitted) and logged as warnings.
  *
  * \c currentAppVersion() is virtual to allow test subclasses to inject an
  * arbitrary baseline version.

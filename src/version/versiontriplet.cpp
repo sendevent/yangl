@@ -38,24 +38,44 @@ QString VersionTriplet::toString() const
 
 /*static*/ VersionTriplet VersionTriplet::fromString(const QString &s)
 {
-    const auto doConvert = [](const QString &str) {
-        bool ok(false);
-        const int res = str.toInt(&ok);
+    const auto parsed = tryFromString(s);
+    if (!parsed) {
+        WRN << "VersionTriplet parse error:" << s
+            << utils::enumToString(parsed.error(), QStringLiteral("UnknownError"));
+        return { 0, 0, 0 };
+    }
+
+    return parsed.value();
+}
+
+/*static*/ VersionTriplet::ParseResult VersionTriplet::tryFromString(const QString &s)
+{
+    const QString normalized = s.trimmed();
+    if (normalized.isEmpty()) {
+        return std::unexpected(ParseError::EmptyInput);
+    }
+
+    const QStringList parts = normalized.split('.');
+    if (parts.size() != 3) {
+        return std::unexpected(ParseError::WrongPartsCount);
+    }
+
+    QList<int> versionParts;
+    versionParts.reserve(3);
+
+    for (const QString &part : parts) {
+        const QString trimmedPart = part.trimmed();
+        if (trimmedPart.isEmpty()) {
+            return std::unexpected(ParseError::EmptyComponent);
+        }
+
+        bool ok = false;
+        const int value = trimmedPart.toInt(&ok);
         if (!ok) {
-            WRN << "conversion failed:" << str << res;
+            return std::unexpected(ParseError::InvalidComponent);
         }
-        return res;
-    };
 
-    QList<int> versionParts(3, 0);
-
-    const auto &parts = s.split('.');
-    const auto partsCount = parts.size();
-
-    for (int i = 0; i < 3; ++i) {
-        if (partsCount >= i + 1) {
-            versionParts[i] = doConvert(parts[i]);
-        }
+        versionParts.push_back(value);
     }
 
     return VersionTriplet(versionParts[0], versionParts[1], versionParts[2]);
