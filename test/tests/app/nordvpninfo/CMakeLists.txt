@@ -1,0 +1,1 @@
+add_qt_test(Test_NordVpnInfo testnordvpninfo.cpp)
