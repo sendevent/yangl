@@ -143,10 +143,11 @@ UpdateChecker::ParseResult UpdateChecker::parseResponse(QNetworkReply *reply)
         return std::unexpected(res);
     }
 
-    const auto parsedVersion = VersionTriplet::tryFromString(tag);
+    const auto parsedVersion = VersionTriplet::fromString(tag);
     if (!parsedVersion) {
-        const QString message = QStringLiteral("Update check: invalid version format: '%1' (%2)")
-                                        .arg(tag, utils::enumToString(parsedVersion.error(), QStringLiteral("UnknownError")));
+        const QString message =
+                QStringLiteral("Update check: invalid version format: '%1' (%2)")
+                        .arg(tag, utils::enumToString(parsedVersion.error(), QStringLiteral("UnknownError")));
         const ResponseParseResult res { UpdateChecker::ResponseParsingError::InvalidVersionTag, message };
         return std::unexpected(res);
     }

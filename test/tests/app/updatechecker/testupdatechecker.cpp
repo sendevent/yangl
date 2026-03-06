@@ -149,7 +149,9 @@ void TestUpdateChecker::test_update_detected()
     QVERIFY(spy.wait(3000));
     QCOMPARE(spy.count(), 1);
 
-    const VersionTriplet emitted = VersionTriplet::fromString(spy.first().at(0).toString());
+    const auto emittedParsed = VersionTriplet::fromString(spy.first().at(0).toString());
+    QVERIFY(emittedParsed.has_value());
+    const VersionTriplet emitted = emittedParsed.value();
     QVERIFY(base < emitted);
 }
 
@@ -370,7 +372,10 @@ void TestUpdateChecker::test_live_network()
     }
 
     const QString emittedVersion = spy.first().at(0).toString();
-    const VersionTriplet emitted = VersionTriplet::fromString(emittedVersion);
+    const auto emittedParsed = VersionTriplet::fromString(emittedVersion);
+    QVERIFY2(emittedParsed.has_value(),
+             qPrintable(QStringLiteral("Failed parsing emitted version: %1").arg(emittedVersion)));
+    const VersionTriplet emitted = emittedParsed.value();
     const VersionTriplet base = VersionTriplet::fromKnown(VersionTriplet::KnownVersion::V_0_99_1);
     QVERIFY2(base < emitted,
              qPrintable(

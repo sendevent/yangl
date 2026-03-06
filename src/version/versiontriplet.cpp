@@ -36,19 +36,7 @@ QString VersionTriplet::toString() const
     return QStringLiteral("%1.%2.%3").arg(m_major).arg(m_minor).arg(m_patch);
 }
 
-/*static*/ VersionTriplet VersionTriplet::fromString(const QString &s)
-{
-    const auto parsed = tryFromString(s);
-    if (!parsed) {
-        WRN << "VersionTriplet parse error:" << s
-            << utils::enumToString(parsed.error(), QStringLiteral("UnknownError"));
-        return { 0, 0, 0 };
-    }
-
-    return parsed.value();
-}
-
-/*static*/ VersionTriplet::ParseResult VersionTriplet::tryFromString(const QString &s)
+/*static*/ VersionTriplet::ParseResult VersionTriplet::fromString(const QString &s)
 {
     const QString normalized = s.trimmed();
     if (normalized.isEmpty()) {

@@ -22,8 +22,7 @@ public:
     Q_ENUM(ParseError)
 
     using ParseResult = std::expected<VersionTriplet, ParseError>;
-    static ParseResult tryFromString(const QString &s);
-    static VersionTriplet fromString(const QString &s);
+    static ParseResult fromString(const QString &s);
     bool operator==(const VersionTriplet &other) const;
     bool operator<(const VersionTriplet &other) const;
 
