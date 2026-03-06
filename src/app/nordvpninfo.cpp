@@ -19,8 +19,6 @@
 
 #include "common.h"
 
-#include <QMetaEnum>
-
 NordVpnInfo::NordVpnInfo()
 {
     clear();
@@ -68,8 +66,7 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
     const auto &parsed = tryFromString(text);
     if (!parsed) {
         const auto &error = parsed.error();
-        static const QMetaEnum &me = QMetaEnum::fromType<NordVpnInfo::StatusParseErrorCode>();
-        WRN << me.key(static_cast<int>(error.code)) << error.detail;
+        WRN << utils::enumToString(error.code, QStringLiteral("UnknownError")) << error.detail;
         return {};
     }
     return parsed.value();
@@ -123,12 +120,11 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
         } else if (name.contains(QLatin1String("uptime"))) {
             const UptimeResult parsedUptime = tryParseUptime(value.simplified());
             if (!parsedUptime) {
-                static const QMetaEnum me = QMetaEnum::fromType<NordVpnInfo::UptimeParseError>();
                 return std::unexpected(ParseError {
                         StatusParseErrorCode::InvalidUptime,
                         QStringLiteral("Failed parsing uptime '%1': %2")
                                 .arg(value,
-                                     QString::fromLatin1(me.valueToKey(static_cast<int>(parsedUptime.error())))) });
+                                     utils::enumToString(parsedUptime.error(), QStringLiteral("UnknownError"))) });
             }
             updatedState.m_uptime = parsedUptime.value();
         }
@@ -144,20 +140,12 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
 
 /*static*/ NordVpnInfo::Status NordVpnInfo::textToStatus(const QString &from)
 {
-    if (from.isEmpty()) {
-        return NordVpnInfo::Status::Unknown;
-    }
-
-    const QMetaEnum me = QMetaEnum::fromType<NordVpnInfo::Status>();
-    bool found(false);
-    const int enumVal = me.keyToValue(qPrintable(from), &found);
-    return (found ? static_cast<NordVpnInfo::Status>(enumVal) : NordVpnInfo::Status::Unknown);
+    return utils::enumFromString(from, NordVpnInfo::Status::Unknown);
 }
 
 /*static*/ QString NordVpnInfo::statusToText(NordVpnInfo::Status from)
 {
-    const QMetaEnum me = QMetaEnum::fromType<NordVpnInfo::Status>();
-    return me.valueToKey(static_cast<int>(from));
+    return utils::enumToString(from);
 }
 
 /*static*/ QString NordVpnInfo::parseUptime(const QString &from)
@@ -165,8 +153,7 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
     const auto &parsed = tryParseUptime(from);
     if (!parsed) {
         auto err = parsed.error();
-        static const QMetaEnum &me = QMetaEnum::fromType<NordVpnInfo::UptimeParseError>();
-        WRN << me.key(static_cast<int>(err));
+        WRN << utils::enumToString(err, QStringLiteral("UnknownError"));
         return {};
     }
     return parsed.value();

@@ -69,6 +69,35 @@ QList<SomeQEnum> allEnum(const QList<SomeQEnum> &excluded = {})
     return values;
 }
 
+template<typename SomeQEnum>
+QString enumToString(SomeQEnum value, const QString &fallback = {})
+{
+    const QMetaEnum me = QMetaEnum::fromType<SomeQEnum>();
+    const char *key = me.valueToKey(static_cast<int>(value));
+    return key ? QString::fromLatin1(key) : fallback;
+}
+
+template<typename SomeQEnum>
+QString enumToString(int value, const QString &fallback = {})
+{
+    const QMetaEnum me = QMetaEnum::fromType<SomeQEnum>();
+    const char *key = me.valueToKey(value);
+    return key ? QString::fromLatin1(key) : fallback;
+}
+
+template<typename SomeQEnum>
+SomeQEnum enumFromString(const QString &from, SomeQEnum fallback)
+{
+    if (from.isEmpty()) {
+        return fallback;
+    }
+
+    const QMetaEnum me = QMetaEnum::fromType<SomeQEnum>();
+    bool found = false;
+    const int value = me.keyToValue(from.toLatin1().constData(), &found);
+    return found ? static_cast<SomeQEnum>(value) : fallback;
+}
+
 QString ensureDirExists(const QString &path);
 
 QString geoToNvpn(const QString &name);
