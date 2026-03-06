@@ -105,7 +105,8 @@ TrayIcon::TrayIcon(QObject *parent)
     reloadIcons();
 
     const auto &icon = iconForStatus(NordVpnInfo::Status::Unknown);
-    updateStateText(tr("State: Unknown"), icon);
+    const QString unknownStateText = utils::enumToString(NordVpnInfo::Status::Unknown, QStringLiteral("Unknown"));
+    updateStateText(tr("State: %1").arg(unknownStateText), icon);
     setIcon(icon);
 }
 

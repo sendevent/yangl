@@ -102,12 +102,13 @@ void AboutDialog::createTab(TabId tabId)
 {
     const QString &file = AboutDialog::m_tabs[tabId];
     const QStringList nameParts = file.split('.');
+    const QString tabTitle = utils::enumToString(tabId, nameParts.first());
 
     QWidget *tab = new QWidget(ui->tabWidget);
     QVBoxLayout *vBox = new QVBoxLayout(tab);
     QTextBrowser *display = new QTextBrowser(tab);
     vBox->addWidget(display);
-    ui->tabWidget->addTab(tab, nameParts.first());
+    ui->tabWidget->addTab(tab, tabTitle);
 
     display->setOpenLinks(false);
     connect(display, &QTextBrowser::anchorClicked, this, [](const QUrl &url) { QDesktopServices::openUrl(url); });
