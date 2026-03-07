@@ -44,6 +44,8 @@ private slots:
     void test_trySave_unwritableDevice_errorCode();
     void test_trySave_invalidPath_errorCode();
     void test_trySave_writeFailed_errorCode();
+    void test_loadErrorCodeToString();
+    void test_saveErrorCodeToString();
 
 private:
     static const Action::Id TestId;
@@ -256,6 +258,22 @@ void TestActionJson::test_trySave_writeFailed_errorCode()
     const auto saved = json.trySave(&out);
     QVERIFY(!saved.has_value());
     QCOMPARE(saved.error().code, ActionJson::SaveErrorCode::WriteFailed);
+}
+
+void TestActionJson::test_loadErrorCodeToString()
+{
+    QCOMPARE(ActionJson::errorCodeToString(ActionJson::LoadErrorCode::InvalidPath), QStringLiteral("InvalidPath"));
+    QCOMPARE(ActionJson::errorCodeToString(ActionJson::LoadErrorCode::InvalidDevice), QStringLiteral("InvalidDevice"));
+    QCOMPARE(ActionJson::errorCodeToString(ActionJson::LoadErrorCode::EmptyInput), QStringLiteral("EmptyInput"));
+    QCOMPARE(ActionJson::errorCodeToString(ActionJson::LoadErrorCode::InvalidJson), QStringLiteral("InvalidJson"));
+    QCOMPARE(ActionJson::errorCodeToString(ActionJson::LoadErrorCode::InvalidRoot), QStringLiteral("InvalidRoot"));
+}
+
+void TestActionJson::test_saveErrorCodeToString()
+{
+    QCOMPARE(ActionJson::errorCodeToString(ActionJson::SaveErrorCode::InvalidPath), QStringLiteral("InvalidPath"));
+    QCOMPARE(ActionJson::errorCodeToString(ActionJson::SaveErrorCode::InvalidDevice), QStringLiteral("InvalidDevice"));
+    QCOMPARE(ActionJson::errorCodeToString(ActionJson::SaveErrorCode::WriteFailed), QStringLiteral("WriteFailed"));
 }
 
 QTEST_MAIN(TestActionJson)
