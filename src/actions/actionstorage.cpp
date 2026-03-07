@@ -90,9 +90,14 @@ Action::Ptr ActionStorage::action(Action::Yangl requested) const
 QList<Action::Ptr> ActionStorage::load(const QString &from)
 {
     const auto &usedPath = from.isEmpty() ? ActionJson::jsonFilePath() : from;
-    const bool jsonLoaded = m_json->load(usedPath);
-    loadActions();
+    const auto jsonLoaded = m_json->tryLoad(usedPath);
     if (!jsonLoaded) {
+        const auto code = jsonLoaded.error().code;
+        WRN << static_cast<int>(code) << jsonLoaded.error().details;
+    }
+
+    loadActions();
+    if (!jsonLoaded.has_value()) {
         m_json->save(usedPath);
     }
 
