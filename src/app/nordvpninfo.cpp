@@ -171,19 +171,20 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
         return QStringLiteral("Connected");
     case Status::Disconnecting:
         return QStringLiteral("Disconnecting");
+    case Status::StatusCount:
+        return QStringLiteral("StatusCount");
     }
     return QStringLiteral("Unknown");
 }
 
 /*static*/ QList<NordVpnInfo::Status> NordVpnInfo::allStatuses()
 {
-    return {
-        Status::Unknown,
-        Status::Disconnected,
-        Status::Connecting,
-        Status::Connected,
-        Status::Disconnecting,
-    };
+    QList<Status> statuses;
+    statuses.reserve(static_cast<int>(Status::StatusCount));
+    for (int i = 0; i < static_cast<int>(Status::StatusCount); ++i) {
+        statuses << static_cast<Status>(i);
+    }
+    return statuses;
 }
 
 /*static*/ QString NordVpnInfo::errorCodeToString(UptimeParseError code)

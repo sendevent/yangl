@@ -32,6 +32,8 @@ private slots:
     void test_fromString_invalidStatus();
     void test_fromString_invalidUptime();
     void test_fromString_valid();
+    void test_statusToText_loopCoverage();
+    void test_allStatuses_coversEnumRangeWithoutSentinel();
     void test_uptimeParseErrorCodeToString();
     void test_statusParseErrorCodeToString();
 };
@@ -83,6 +85,43 @@ void TestNordVpnInfo::test_fromString_valid()
     QCOMPARE(parsed.server(), QString("test.server"));
     QCOMPARE(parsed.country(), QString("Neverland"));
     QCOMPARE(parsed.city(), QString("TestCity"));
+}
+
+void TestNordVpnInfo::test_statusToText_loopCoverage()
+{
+    const auto expectedText = [](NordVpnInfo::Status status) -> QString {
+        switch (status) {
+        case NordVpnInfo::Status::Unknown:
+            return QStringLiteral("Unknown");
+        case NordVpnInfo::Status::Disconnected:
+            return QStringLiteral("Disconnected");
+        case NordVpnInfo::Status::Connecting:
+            return QStringLiteral("Connecting");
+        case NordVpnInfo::Status::Connected:
+            return QStringLiteral("Connected");
+        case NordVpnInfo::Status::Disconnecting:
+            return QStringLiteral("Disconnecting");
+        case NordVpnInfo::Status::StatusCount:
+            return QStringLiteral("StatusCount");
+        }
+        return QStringLiteral("UnexpectedStatus");
+    };
+
+    for (int i = 0; i <= static_cast<int>(NordVpnInfo::Status::StatusCount); ++i) {
+        const auto status = static_cast<NordVpnInfo::Status>(i);
+        QCOMPARE(NordVpnInfo::statusToText(status), expectedText(status));
+    }
+}
+
+void TestNordVpnInfo::test_allStatuses_coversEnumRangeWithoutSentinel()
+{
+    const auto all = NordVpnInfo::allStatuses();
+    QCOMPARE(all.size(), static_cast<int>(NordVpnInfo::Status::StatusCount));
+    QVERIFY(!all.contains(NordVpnInfo::Status::StatusCount));
+
+    for (int i = 0; i < static_cast<int>(NordVpnInfo::Status::StatusCount); ++i) {
+        QVERIFY(all.contains(static_cast<NordVpnInfo::Status>(i)));
+    }
 }
 
 void TestNordVpnInfo::test_uptimeParseErrorCodeToString()

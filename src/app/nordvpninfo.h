@@ -30,6 +30,7 @@ public:
         Connecting,
         Connected,
         Disconnecting,
+        StatusCount,
     };
 
     NordVpnInfo();
