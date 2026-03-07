@@ -18,7 +18,6 @@
 #include "actions/actionjson.h"
 #include "actions/actionstorage.h"
 #include "testaction.h"
-#include "testutils.h"
 
 #include <QBuffer>
 #include <QTest>
@@ -33,14 +32,14 @@ signals:
 
 private slots:
     void test_filePath();
-    void test_load();
+    void test_tryLoad();
     void test_save();
-    void test_load_invalidJson();
-    void test_load_emptyInput();
-    void test_load_nullDevice();
     void test_tryLoad_invalidJson_errorCode();
     void test_tryLoad_emptyInput_errorCode();
     void test_tryLoad_nullDevice_errorCode();
+    void test_tryLoad_unreadableDevice_errorCode();
+    void test_tryLoad_nonObjectRoot_errorCode();
+    void test_tryLoad_invalidPath_errorCode();
 
 private:
     static const Action::Id TestId;
@@ -64,7 +63,7 @@ void TestActionJson::test_filePath()
     QVERIFY(jsonFilePath.endsWith(QString("%1/actions.json").arg(qAppName())));
 }
 
-void TestActionJson::test_load()
+void TestActionJson::test_tryLoad()
 {
     const Action::Ptr action(new TestAction(Action::Flow::Custom, Action::NordVPN::Unknown, {}, TestId));
 
@@ -76,7 +75,8 @@ void TestActionJson::test_load()
     ActionJson json(&storage);
     QCOMPARE(json.customActionIds(), {});
 
-    json.load(&in);
+    const auto loaded = json.tryLoad(&in);
+    QVERIFY(loaded.has_value());
     QCOMPARE(json.customActionIds(), { TestId.toString() });
 
     json.updateAction(action.get());
@@ -118,45 +118,6 @@ void TestActionJson::test_save()
     QCOMPARE(outString, TestJson);
 }
 
-void TestActionJson::test_load_invalidJson()
-{
-    testutils::ignoreWarning(QStringLiteral("error parsing document: unterminated object"));
-    QByteArray garbage("{ this is not valid json !@#$ }");
-    QBuffer in(&garbage);
-    in.open(QIODevice::ReadOnly);
-
-    ActionStorage storage;
-    ActionJson json(&storage);
-
-    QCOMPARE(json.load(&in), false);
-    QCOMPARE(json.customActionIds(), {});
-}
-
-void TestActionJson::test_load_emptyInput()
-{
-    testutils::ignoreWarning(QStringLiteral("No JSON to load"));
-
-    QByteArray empty;
-    QBuffer in(&empty);
-    in.open(QIODevice::ReadOnly);
-
-    ActionStorage storage;
-    ActionJson json(&storage);
-
-    QCOMPARE(json.load(&in), false);
-    QCOMPARE(json.customActionIds(), {});
-}
-
-void TestActionJson::test_load_nullDevice()
-{
-    testutils::ignoreWarning(QStringLiteral("Input device is null or not readable"));
-    ActionStorage storage;
-    ActionJson json(&storage);
-
-    QCOMPARE(json.load(static_cast<QIODevice *>(nullptr)), false);
-    QCOMPARE(json.customActionIds(), {});
-}
-
 void TestActionJson::test_tryLoad_invalidJson_errorCode()
 {
     QByteArray garbage("{ this is not valid json !@#$ }");
@@ -195,6 +156,44 @@ void TestActionJson::test_tryLoad_nullDevice_errorCode()
     const auto parsed = json.tryLoad(static_cast<QIODevice *>(nullptr));
     QVERIFY(!parsed.has_value());
     QCOMPARE(parsed.error().code, ActionJson::LoadErrorCode::InvalidDevice);
+}
+
+void TestActionJson::test_tryLoad_unreadableDevice_errorCode()
+{
+    QByteArray data(TestJson);
+    QBuffer in(&data);
+    // Deliberately not opening the device to hit the "not readable" path.
+
+    ActionStorage storage;
+    ActionJson json(&storage);
+
+    const auto parsed = json.tryLoad(&in);
+    QVERIFY(!parsed.has_value());
+    QCOMPARE(parsed.error().code, ActionJson::LoadErrorCode::InvalidDevice);
+}
+
+void TestActionJson::test_tryLoad_nonObjectRoot_errorCode()
+{
+    QByteArray arrayRoot("[1,2,3]");
+    QBuffer in(&arrayRoot);
+    in.open(QIODevice::ReadOnly);
+
+    ActionStorage storage;
+    ActionJson json(&storage);
+
+    const auto parsed = json.tryLoad(&in);
+    QVERIFY(!parsed.has_value());
+    QCOMPARE(parsed.error().code, ActionJson::LoadErrorCode::InvalidRoot);
+}
+
+void TestActionJson::test_tryLoad_invalidPath_errorCode()
+{
+    ActionStorage storage;
+    ActionJson json(&storage);
+
+    const auto parsed = json.tryLoad(QStringLiteral("/path/that/does/not/exist/actions.json"));
+    QVERIFY(!parsed.has_value());
+    QCOMPARE(parsed.error().code, ActionJson::LoadErrorCode::InvalidPath);
 }
 
 QTEST_MAIN(TestActionJson)
