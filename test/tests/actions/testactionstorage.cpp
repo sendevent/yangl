@@ -21,6 +21,8 @@
 #include "settings/settingsmanager.h"
 
 #include <QFile>
+#include <QJsonDocument>
+#include <QJsonParseError>
 #include <QTemporaryFile>
 #include <QTest>
 
@@ -53,6 +55,7 @@ private slots:
     void test_updateActionsUser();
     void test_toggleGroups();
     void test_toggleGroups_survive_save_load();
+    void test_load_invalidJson_recovers_defaults();
 };
 
 TestActionStorage::TestActionStorage(QObject *parent)
@@ -445,6 +448,25 @@ void TestActionStorage::test_toggleGroups_survive_save_load()
                      qPrintable(QString("Unexpected toggleGroup on non-toggle action %1").arg(static_cast<int>(t))));
         }
     }
+}
+
+void TestActionStorage::test_load_invalidJson_recovers_defaults()
+{
+    QTemporaryFile tmp;
+    QVERIFY(tmp.open());
+    tmp.write("{ invalid json");
+    tmp.close();
+
+    ActionStorage storage;
+    const QList<Action::Ptr> loaded = storage.load(tmp.fileName());
+    QVERIFY(!loaded.isEmpty());
+
+    QFile in(tmp.fileName());
+    QVERIFY(in.open(QIODevice::ReadOnly | QIODevice::Text));
+    QJsonParseError err;
+    const QJsonDocument doc = QJsonDocument::fromJson(in.readAll(), &err);
+    QCOMPARE(err.error, QJsonParseError::NoError);
+    QVERIFY(doc.isObject());
 }
 
 QTEST_MAIN(TestActionStorage)
