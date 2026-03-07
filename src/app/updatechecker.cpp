@@ -32,17 +32,17 @@
 /*static*/ QString UpdateChecker::errorCodeToString(ResponseParsingError code)
 {
     switch (code) {
-    case NetworkError:
+    case ResponseParsingError::NetworkError:
         return QStringLiteral("NetworkError");
-    case InvalidJson:
+    case ResponseParsingError::InvalidJson:
         return QStringLiteral("InvalidJson");
-    case MissingTagName:
+    case ResponseParsingError::MissingTagName:
         return QStringLiteral("MissingTagName");
-    case EmptyTagName:
+    case ResponseParsingError::EmptyTagName:
         return QStringLiteral("EmptyTagName");
-    case InvalidVersionTag:
+    case ResponseParsingError::InvalidVersionTag:
         return QStringLiteral("InvalidVersionTag");
-    case ResponseParsingErrorCount:
+    case ResponseParsingError::ResponseParsingErrorCount:
         return QStringLiteral("ResponseParsingErrorCount");
     }
     return QStringLiteral("UnknownResponseParsingError");
@@ -116,7 +116,7 @@ void UpdateChecker::onReplyFinished(QNetworkReply *reply)
 UpdateChecker::ParseResult UpdateChecker::parseResponse(QNetworkReply *reply)
 {
     if (!reply) {
-        const ResponseParseResult res { UpdateChecker::ResponseParsingError::NetworkError,
+        const ResponseParseResult res { ResponseParsingError::NetworkError,
                                         QStringLiteral("Update check: Invalid reply instance") };
         return std::unexpected(res);
     }
@@ -124,7 +124,7 @@ UpdateChecker::ParseResult UpdateChecker::parseResponse(QNetworkReply *reply)
     if (reply->error() != QNetworkReply::NoError) {
         const QString message =
                 QStringLiteral("Update check failed: '%1' '%2'").arg(reply->errorString()).arg(reply->error());
-        const ResponseParseResult res { UpdateChecker::ResponseParsingError::NetworkError, message };
+        const ResponseParseResult res { ResponseParsingError::NetworkError, message };
         return std::unexpected(res);
     }
 
@@ -135,20 +135,20 @@ UpdateChecker::ParseResult UpdateChecker::parseResponse(QNetworkReply *reply)
     if (jpe.error != QJsonParseError::NoError) {
         const QString message = QStringLiteral("Update check: JSON parsing error: '%1' %2 '%3'")
                                         .arg(jpe.errorString(), QString::number(jpe.offset), QString::fromUtf8(data));
-        const ResponseParseResult res { UpdateChecker::ResponseParsingError::InvalidJson, message };
+        const ResponseParseResult res { ResponseParsingError::InvalidJson, message };
         return std::unexpected(res);
     }
 
     const QJsonObject json = jsonDoc.object();
     if (json.isEmpty()) {
         const QString message = QStringLiteral("Update check: Received JSON is empty");
-        const ResponseParseResult res { UpdateChecker::ResponseParsingError::InvalidJson, message };
+        const ResponseParseResult res { ResponseParsingError::InvalidJson, message };
         return std::unexpected(res);
     }
     if (!json.contains(tagName)) {
         const QString message = QStringLiteral("Update check: JSON tag not found: '%1' '%2'")
                                         .arg(tagName, QString::fromUtf8(jsonDoc.toJson(QJsonDocument::Compact)));
-        const ResponseParseResult res { UpdateChecker::ResponseParsingError::MissingTagName, message };
+        const ResponseParseResult res { ResponseParsingError::MissingTagName, message };
         return std::unexpected(res);
     }
     QString tag = json[tagName].toString().trimmed();
@@ -158,7 +158,7 @@ UpdateChecker::ParseResult UpdateChecker::parseResponse(QNetworkReply *reply)
 
     if (tag.isEmpty()) {
         const QString message = QStringLiteral("Update check: empty %1 in response").arg(tagName);
-        const ResponseParseResult res { UpdateChecker::ResponseParsingError::EmptyTagName, message };
+        const ResponseParseResult res { ResponseParsingError::EmptyTagName, message };
         return std::unexpected(res);
     }
 
@@ -167,7 +167,7 @@ UpdateChecker::ParseResult UpdateChecker::parseResponse(QNetworkReply *reply)
         const QString message =
                 QStringLiteral("Update check: invalid version format: '%1' (%2)")
                         .arg(tag, VersionTriplet::errorCodeToString(parsedVersion.error()));
-        const ResponseParseResult res { UpdateChecker::ResponseParsingError::InvalidVersionTag, message };
+        const ResponseParseResult res { ResponseParsingError::InvalidVersionTag, message };
         return std::unexpected(res);
     }
 

@@ -45,7 +45,7 @@ class UpdateChecker : public QObject
 {
     Q_OBJECT
 public:
-    enum ResponseParsingError
+    enum class ResponseParsingError
     {
         NetworkError,
         InvalidJson,

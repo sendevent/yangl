@@ -391,23 +391,24 @@ void TestUpdateChecker::test_errorCodeToString()
 {
     const auto expectedText = [](UpdateChecker::ResponseParsingError code) -> QString {
         switch (code) {
-        case UpdateChecker::NetworkError:
+        case UpdateChecker::ResponseParsingError::NetworkError:
             return QStringLiteral("NetworkError");
-        case UpdateChecker::InvalidJson:
+        case UpdateChecker::ResponseParsingError::InvalidJson:
             return QStringLiteral("InvalidJson");
-        case UpdateChecker::MissingTagName:
+        case UpdateChecker::ResponseParsingError::MissingTagName:
             return QStringLiteral("MissingTagName");
-        case UpdateChecker::EmptyTagName:
+        case UpdateChecker::ResponseParsingError::EmptyTagName:
             return QStringLiteral("EmptyTagName");
-        case UpdateChecker::InvalidVersionTag:
+        case UpdateChecker::ResponseParsingError::InvalidVersionTag:
             return QStringLiteral("InvalidVersionTag");
-        case UpdateChecker::ResponseParsingErrorCount:
+        case UpdateChecker::ResponseParsingError::ResponseParsingErrorCount:
             return QStringLiteral("ResponseParsingErrorCount");
         }
         return QStringLiteral("UnexpectedResponseParsingError");
     };
 
-    for (int i = 0; i <= UpdateChecker::ResponseParsingErrorCount; ++i) {
+    for (int i = 0;
+         i <= static_cast<int>(UpdateChecker::ResponseParsingError::ResponseParsingErrorCount); ++i) {
         const auto code = static_cast<UpdateChecker::ResponseParsingError>(i);
         QCOMPARE(UpdateChecker::errorCodeToString(code), expectedText(code));
     }
