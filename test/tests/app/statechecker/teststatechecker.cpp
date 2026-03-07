@@ -19,23 +19,15 @@
 #include "app/statechecker.h"
 #include "cli/clicaller.h"
 #include "settings/appsettings.h"
+#include "testutils.h"
 
 #include <QElapsedTimer>
 #include <QObject>
-#include <QRegularExpression>
 #include <QSharedPointer>
 #include <QSignalSpy>
 #include <QStandardPaths>
 #include <QTest>
 #include <QTimer>
-
-using namespace Qt::Literals::StringLiterals;
-
-static void ignoreWarning(const QString &body)
-{
-    const QString rx = QStringLiteral(".*") + QRegularExpression::escape(body) + QStringLiteral(".*");
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression(rx));
-}
 
 class TestStateChecker : public QObject
 {
@@ -281,8 +273,8 @@ void TestStateChecker::test_error_resilience()
     const Action::Ptr &action = m_storage->action(Action::NordVPN::CheckStatus);
     const QString savedApp = action->app();
 
-    ignoreWarning("Target binary file not exists:"_L1);
-    ignoreWarning("Failed to dispatch status check"_L1);
+    testutils::ignoreWarning(QStringLiteral("Target binary file not exists:"));
+    testutils::ignoreWarning(QStringLiteral("Failed to dispatch status check"));
 
     // Point the action at a non-existent binary to force CLI errors.
     action->setApp(QStringLiteral("/nonexistent/yangl-test-binary"));
@@ -291,8 +283,8 @@ void TestStateChecker::test_error_resilience()
 
     // Trigger errors one at a time; monitor must survive the first N-1 of them.
     for (int i = 0; i < StateChecker::MaxConsecutiveErrors - 1; ++i) {
-        ignoreWarning("Target binary file not exists:"_L1);
-        ignoreWarning("Failed to dispatch status check"_L1);
+        testutils::ignoreWarning(QStringLiteral("Target binary file not exists:"));
+        testutils::ignoreWarning(QStringLiteral("Failed to dispatch status check"));
 
         m_checker->check();
         if (errorSpy.size() <= i) {
@@ -302,7 +294,7 @@ void TestStateChecker::test_error_resilience()
         QCOMPARE(m_checker->m_consecutiveErrors, i + 1); // counter advancing
     }
 
-    ignoreWarning("Stopping monitor after 3 consecutive errors"_L1);
+    testutils::ignoreWarning(QStringLiteral("Stopping monitor after 3 consecutive errors"));
 
     // The Nth error must trip the threshold: counter resets and monitor stops.
     m_checker->check();

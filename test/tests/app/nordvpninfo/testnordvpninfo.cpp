@@ -16,17 +16,10 @@
 */
 
 #include "app/nordvpninfo.h"
+#include "testutils.h"
 
 #include <QObject>
 #include <QTest>
-
-using namespace Qt::Literals::StringLiterals;
-
-static void ignoreWarning(const QString &body)
-{
-    const QString rx = QStringLiteral(".*") + QRegularExpression::escape(body) + QStringLiteral(".*");
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression(rx));
-}
 
 class TestNordVpnInfo : public QObject
 {
@@ -43,7 +36,7 @@ private slots:
 
 void TestNordVpnInfo::test_fromString_emptyInput()
 {
-    ignoreWarning("Input is empty"_L1);
+    testutils::ignoreWarning(QStringLiteral("Input is empty"));
 
     const NordVpnInfo parsed = NordVpnInfo::fromString({});
     QCOMPARE(parsed, NordVpnInfo {});
@@ -51,28 +44,28 @@ void TestNordVpnInfo::test_fromString_emptyInput()
 
 void TestNordVpnInfo::test_fromString_malformedLine()
 {
-    ignoreWarning("MalformedLine No ':' separator in line: 'Status Connected'"_L1);
+    testutils::ignoreWarning(QStringLiteral("MalformedLine No ':' separator in line: 'Status Connected'"));
     const NordVpnInfo parsed = NordVpnInfo::fromString("Status Connected\nServer: srv");
     QCOMPARE(parsed, NordVpnInfo {});
 }
 
 void TestNordVpnInfo::test_fromString_missingStatus()
 {
-    ignoreWarning("No status field found in input"_L1);
+    testutils::ignoreWarning(QStringLiteral("No status field found in input"));
     const NordVpnInfo parsed = NordVpnInfo::fromString("Server: srv\nCountry: Country");
     QCOMPARE(parsed, NordVpnInfo {});
 }
 
 void TestNordVpnInfo::test_fromString_invalidStatus()
 {
-    ignoreWarning("Unrecognized status value: 'TotallyInvalid'"_L1);
+    testutils::ignoreWarning(QStringLiteral("Unrecognized status value: 'TotallyInvalid'"));
     const NordVpnInfo parsed = NordVpnInfo::fromString("Status: TotallyInvalid\nServer: srv");
     QCOMPARE(parsed, NordVpnInfo {});
 }
 
 void TestNordVpnInfo::test_fromString_invalidUptime()
 {
-    ignoreWarning("Failed parsing uptime 'nope tokens': InvalidToken"_L1);
+    testutils::ignoreWarning(QStringLiteral("Failed parsing uptime 'nope tokens': InvalidToken"));
     const QString input = "Status: Connected\nServer: srv\nUptime: nope tokens";
     const NordVpnInfo parsed = NordVpnInfo::fromString(input);
     QCOMPARE(parsed, NordVpnInfo {});

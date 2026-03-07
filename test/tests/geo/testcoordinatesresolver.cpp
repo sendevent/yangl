@@ -16,17 +16,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 */
 
 #include "geo/coordinatesresolver.h"
+#include "testutils.h"
 
 #include <QSignalSpy>
 #include <QTest>
-
-using namespace Qt::Literals::StringLiterals;
-
-static void ignoreWarning(const QString &body)
-{
-    const QString rx = QStringLiteral(".*") + QRegularExpression::escape(body) + QStringLiteral(".*");
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression(rx));
-}
 
 class TestCoordinatesResolver : public QObject
 {
@@ -260,7 +253,7 @@ void TestCoordinatesResolver::test_requestCoordinates_fake()
     };
 
     {
-        ignoreWarning("No locations found for: `Oz` `Emerald City`"_L1);
+        testutils::ignoreWarning(QStringLiteral("No locations found for: `Oz` `Emerald City`"));
 
         QSignalSpy spy(&resolver, &CoordinatesResolver::coordinatesResolved);
 
@@ -286,7 +279,7 @@ void TestCoordinatesResolver::test_requestCoordinates_fake()
     }
 
     {
-        ignoreWarning("No locations found for: `Oz` `Emerald City`"_L1);
+        testutils::ignoreWarning(QStringLiteral("No locations found for: `Oz` `Emerald City`"));
 
         QSignalSpy spy(&resolver, &CoordinatesResolver::coordinatesResolved);
 

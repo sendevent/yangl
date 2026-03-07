@@ -17,17 +17,10 @@
 
 #include "actions/testaction.h"
 #include "cli/clicall.h"
+#include "testutils.h"
 
 #include <QSignalSpy>
 #include <QTest>
-
-using namespace Qt::Literals::StringLiterals;
-
-static void ignoreWarning(const QString &body)
-{
-    const QString rx = QStringLiteral(".*") + QRegularExpression::escape(body) + QStringLiteral(".*");
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression(rx));
-}
 
 class TestCLICall : public QObject
 {
@@ -67,7 +60,7 @@ void TestCLICall::test_call()
 
 void TestCLICall::test_call_invalidApp()
 {
-    ignoreWarning("Target binary file not exists: <br><b>`/no/such/binary`</b>"_L1);
+    testutils::ignoreWarning(QStringLiteral("Target binary file not exists: <br><b>`/no/such/binary`</b>"));
     const Action::Ptr action(new TestAction());
     action->setApp("/no/such/binary");
 
