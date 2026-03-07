@@ -29,6 +29,7 @@ private slots:
     void test_tryFromString_emptyComponent();
     void test_tryFromString_invalidComponent();
     void test_tryFromString_validWithSpaces();
+    void test_parseErrorCodeToString();
 };
 
 void TestVersionTriplet::test_tryFromString_emptyInput()
@@ -66,6 +67,30 @@ void TestVersionTriplet::test_tryFromString_validWithSpaces()
     QCOMPARE(parsed->major(), 1);
     QCOMPARE(parsed->minor(), 2);
     QCOMPARE(parsed->patch(), 3);
+}
+
+void TestVersionTriplet::test_parseErrorCodeToString()
+{
+    const auto expectedText = [](VersionTriplet::ParseError code) -> QString {
+        switch (code) {
+        case VersionTriplet::ParseError::EmptyInput:
+            return QStringLiteral("EmptyInput");
+        case VersionTriplet::ParseError::WrongPartsCount:
+            return QStringLiteral("WrongPartsCount");
+        case VersionTriplet::ParseError::EmptyComponent:
+            return QStringLiteral("EmptyComponent");
+        case VersionTriplet::ParseError::InvalidComponent:
+            return QStringLiteral("InvalidComponent");
+        case VersionTriplet::ParseError::ParseErrorCount:
+            return QStringLiteral("ParseErrorCount");
+        }
+        return QStringLiteral("UnexpectedParseError");
+    };
+
+    for (int i = 0; i <= static_cast<int>(VersionTriplet::ParseError::ParseErrorCount); ++i) {
+        const auto code = static_cast<VersionTriplet::ParseError>(i);
+        QCOMPARE(VersionTriplet::errorCodeToString(code), expectedText(code));
+    }
 }
 
 QTEST_MAIN(TestVersionTriplet)

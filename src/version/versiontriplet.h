@@ -16,6 +16,7 @@ public:
         WrongPartsCount,
         EmptyComponent,
         InvalidComponent,
+        ParseErrorCount,
     };
 
     using ParseResult = std::expected<VersionTriplet, ParseError>;

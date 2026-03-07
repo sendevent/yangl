@@ -45,6 +45,8 @@ QString VersionTriplet::toString() const
         return QStringLiteral("EmptyComponent");
     case ParseError::InvalidComponent:
         return QStringLiteral("InvalidComponent");
+    case ParseError::ParseErrorCount:
+        return QStringLiteral("ParseErrorCount");
     }
     return QStringLiteral("UnknownParseError");
 }
