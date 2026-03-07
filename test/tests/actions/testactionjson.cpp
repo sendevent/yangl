@@ -20,7 +20,16 @@
 #include "testaction.h"
 
 #include <QBuffer>
+#include <QRegularExpression>
 #include <QTest>
+
+using namespace Qt::Literals::StringLiterals;
+
+static void ignoreWarning(const QString &body)
+{
+    const QString rx = QStringLiteral(".*") + QRegularExpression::escape(body) + QStringLiteral(".*");
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression(rx));
+}
 
 class TestActionJson : public QObject
 {
@@ -116,6 +125,7 @@ void TestActionJson::test_save()
 
 void TestActionJson::test_load_invalidJson()
 {
+    ignoreWarning("error parsing document: unterminated object"_L1);
     QByteArray garbage("{ this is not valid json !@#$ }");
     QBuffer in(&garbage);
     in.open(QIODevice::ReadOnly);
@@ -129,6 +139,8 @@ void TestActionJson::test_load_invalidJson()
 
 void TestActionJson::test_load_emptyInput()
 {
+    ignoreWarning("No JSON to load"_L1);
+
     QByteArray empty;
     QBuffer in(&empty);
     in.open(QIODevice::ReadOnly);

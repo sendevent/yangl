@@ -25,8 +25,17 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QObject>
+#include <QRegularExpression>
 #include <QSignalSpy>
 #include <QTest>
+
+using namespace Qt::Literals::StringLiterals;
+
+static void ignoreWarning(const QString &body)
+{
+    const QString rx = QStringLiteral(".*") + QRegularExpression::escape(body) + QStringLiteral(".*");
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression(rx));
+}
 
 class MockReply : public QNetworkReply
 {
@@ -211,6 +220,8 @@ void TestUpdateChecker::test_V_prefix_case_insensitive()
 
 void TestUpdateChecker::test_empty_tag_ignored()
 {
+    ignoreWarning("EmptyTagName Update check: empty tag_name in response"_L1);
+
     auto *nam = new MockNAM;
     nam->setNextResponse(makeTagJson(QString()));
 
@@ -224,6 +235,8 @@ void TestUpdateChecker::test_empty_tag_ignored()
 
 void TestUpdateChecker::test_network_error_suppressed()
 {
+    ignoreWarning("NetworkError Update check failed:"_L1);
+
     auto *nam = new MockNAM;
     nam->setNextResponse(QByteArray(), QNetworkReply::ConnectionRefusedError);
 
@@ -238,6 +251,8 @@ void TestUpdateChecker::test_network_error_suppressed()
 
 void TestUpdateChecker::test_invalid_json_ignored()
 {
+    ignoreWarning("InvalidJson Update check: JSON parsing error:"_L1);
+
     auto *nam = new MockNAM;
     nam->setNextResponse(QByteArrayLiteral("{invalid json"));
 
@@ -252,6 +267,8 @@ void TestUpdateChecker::test_invalid_json_ignored()
 
 void TestUpdateChecker::test_missing_tag_name_ignored()
 {
+    ignoreWarning("MissingTagName Update check: JSON tag not found:"_L1);
+
     auto *nam = new MockNAM;
     const QJsonObject obj { { QStringLiteral("name"), QStringLiteral("release-1") } };
     nam->setNextResponse(QJsonDocument(obj).toJson(QJsonDocument::Compact));
@@ -267,6 +284,8 @@ void TestUpdateChecker::test_missing_tag_name_ignored()
 
 void TestUpdateChecker::test_invalid_version_format_ignored()
 {
+    ignoreWarning("InvalidVersionTag Update check: invalid version format:"_L1);
+
     auto *nam = new MockNAM;
     nam->setNextResponse(makeTagJson(QStringLiteral("1.0")));
 
@@ -281,6 +300,7 @@ void TestUpdateChecker::test_invalid_version_format_ignored()
 
 void TestUpdateChecker::test_non_numeric_version_ignored()
 {
+    ignoreWarning("InvalidVersionTag Update check: invalid version format:"_L1);
     auto *nam = new MockNAM;
     nam->setNextResponse(makeTagJson(QStringLiteral("1.x.0")));
 

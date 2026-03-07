@@ -21,6 +21,14 @@
 #include <QSignalSpy>
 #include <QTest>
 
+using namespace Qt::Literals::StringLiterals;
+
+static void ignoreWarning(const QString &body)
+{
+    const QString rx = QStringLiteral(".*") + QRegularExpression::escape(body) + QStringLiteral(".*");
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression(rx));
+}
+
 class TestCLICall : public QObject
 {
     Q_OBJECT
@@ -47,7 +55,7 @@ void TestCLICall::test_call()
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
     const QString &filesList = arguments.at(0).toString();
-    QVERIFY(arguments.at(0).typeId() == QVariant::String);
+    QVERIFY(arguments.at(0).typeId() == QMetaType::QString);
     QCOMPARE(filesList, receivedResult);
     QVERIFY(filesList.contains("Test_CLICall"));
 
@@ -59,6 +67,7 @@ void TestCLICall::test_call()
 
 void TestCLICall::test_call_invalidApp()
 {
+    ignoreWarning("Target binary file not exists: <br><b>`/no/such/binary`</b>"_L1);
     const Action::Ptr action(new TestAction());
     action->setApp("/no/such/binary");
 

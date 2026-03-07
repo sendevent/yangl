@@ -19,7 +19,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 
 #include <QSignalSpy>
 #include <QTest>
-#include <qtestcase.h>
+
+using namespace Qt::Literals::StringLiterals;
+
+static void ignoreWarning(const QString &body)
+{
+    const QString rx = QStringLiteral(".*") + QRegularExpression::escape(body) + QStringLiteral(".*");
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression(rx));
+}
 
 class TestCoordinatesResolver : public QObject
 {
@@ -253,6 +260,8 @@ void TestCoordinatesResolver::test_requestCoordinates_fake()
     };
 
     {
+        ignoreWarning("No locations found for: `Oz` `Emerald City`"_L1);
+
         QSignalSpy spy(&resolver, &CoordinatesResolver::coordinatesResolved);
 
         const auto idRequested = resolver.requestCoordinates({ "Oz", "Emerald City" });
@@ -277,6 +286,8 @@ void TestCoordinatesResolver::test_requestCoordinates_fake()
     }
 
     {
+        ignoreWarning("No locations found for: `Oz` `Emerald City`"_L1);
+
         QSignalSpy spy(&resolver, &CoordinatesResolver::coordinatesResolved);
 
         const auto idRequested = resolver.requestCoordinates("Oz", "Emerald City");

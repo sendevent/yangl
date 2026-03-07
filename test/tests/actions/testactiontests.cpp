@@ -18,13 +18,20 @@
 #include "testactiontests.h"
 
 #include "actions/action.h"
-#include "actions/actionstorage.h"
 #include "cli/clicall.h"
 #include "testaction.h"
 
+#include <QRegularExpression>
 #include <QSignalSpy>
 #include <QTest>
-#include <memory>
+
+using namespace Qt::Literals::StringLiterals;
+
+static void ignoreWarning(const QString &body)
+{
+    const QString rx = QStringLiteral(".*") + QRegularExpression::escape(body) + QStringLiteral(".*");
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression(rx));
+}
 
 void TestActionTests::testCreate_Builtin()
 {
@@ -145,6 +152,8 @@ void TestActionTests::testSetAnchor()
 
 void TestActionTests::testCreateRequest_invalidApp()
 {
+    ignoreWarning("Target binary file not exists: <br><b>`/no/such/binary`</b>"_L1);
+
     const Action::Ptr action(new TestAction(Action::Flow::Custom, Action::NordVPN::Unknown));
     action->setApp("/no/such/binary");
 

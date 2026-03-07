@@ -20,6 +20,14 @@
 #include <QObject>
 #include <QTest>
 
+using namespace Qt::Literals::StringLiterals;
+
+static void ignoreWarning(const QString &body)
+{
+    const QString rx = QStringLiteral(".*") + QRegularExpression::escape(body) + QStringLiteral(".*");
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression(rx));
+}
+
 class TestNordVpnInfo : public QObject
 {
     Q_OBJECT
@@ -35,30 +43,36 @@ private slots:
 
 void TestNordVpnInfo::test_fromString_emptyInput()
 {
+    ignoreWarning("Input is empty"_L1);
+
     const NordVpnInfo parsed = NordVpnInfo::fromString({});
     QCOMPARE(parsed, NordVpnInfo {});
 }
 
 void TestNordVpnInfo::test_fromString_malformedLine()
 {
+    ignoreWarning("MalformedLine No ':' separator in line: 'Status Connected'"_L1);
     const NordVpnInfo parsed = NordVpnInfo::fromString("Status Connected\nServer: srv");
     QCOMPARE(parsed, NordVpnInfo {});
 }
 
 void TestNordVpnInfo::test_fromString_missingStatus()
 {
+    ignoreWarning("No status field found in input"_L1);
     const NordVpnInfo parsed = NordVpnInfo::fromString("Server: srv\nCountry: Country");
     QCOMPARE(parsed, NordVpnInfo {});
 }
 
 void TestNordVpnInfo::test_fromString_invalidStatus()
 {
+    ignoreWarning("Unrecognized status value: 'TotallyInvalid'"_L1);
     const NordVpnInfo parsed = NordVpnInfo::fromString("Status: TotallyInvalid\nServer: srv");
     QCOMPARE(parsed, NordVpnInfo {});
 }
 
 void TestNordVpnInfo::test_fromString_invalidUptime()
 {
+    ignoreWarning("Failed parsing uptime 'nope tokens': InvalidToken"_L1);
     const QString input = "Status: Connected\nServer: srv\nUptime: nope tokens";
     const NordVpnInfo parsed = NordVpnInfo::fromString(input);
     QCOMPARE(parsed, NordVpnInfo {});
@@ -66,7 +80,8 @@ void TestNordVpnInfo::test_fromString_invalidUptime()
 
 void TestNordVpnInfo::test_fromString_valid()
 {
-    const QString input = "Status: Connected\nServer: test.server\nCountry: Neverland\nCity: TestCity\nUptime: 1 day 2 hours";
+    const QString input =
+            "Status: Connected\nServer: test.server\nCountry: Neverland\nCity: TestCity\nUptime: 1 day 2 hours";
     const NordVpnInfo parsed = NordVpnInfo::fromString(input);
 
     QCOMPARE(parsed.status(), NordVpnInfo::Status::Connected);

@@ -34,11 +34,11 @@
 #endif // YANGL_LOG_PREFIX
 
 #ifndef LOG
-#define LOG qDebug() << YANGL_LOG_PREFIX
+#define LOG qDebug().noquote() << YANGL_LOG_PREFIX
 #endif // LOG
 
 #ifndef WRN
-#define WRN qWarning() << YANGL_LOG_PREFIX
+#define WRN qWarning().noquote() << YANGL_LOG_PREFIX
 #endif // WRN
 
 #ifndef NIY
