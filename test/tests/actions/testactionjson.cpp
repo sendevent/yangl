@@ -262,18 +262,50 @@ void TestActionJson::test_trySave_writeFailed_errorCode()
 
 void TestActionJson::test_loadErrorCodeToString()
 {
-    QCOMPARE(ActionJson::errorCodeToString(ActionJson::LoadErrorCode::InvalidPath), QStringLiteral("InvalidPath"));
-    QCOMPARE(ActionJson::errorCodeToString(ActionJson::LoadErrorCode::InvalidDevice), QStringLiteral("InvalidDevice"));
-    QCOMPARE(ActionJson::errorCodeToString(ActionJson::LoadErrorCode::EmptyInput), QStringLiteral("EmptyInput"));
-    QCOMPARE(ActionJson::errorCodeToString(ActionJson::LoadErrorCode::InvalidJson), QStringLiteral("InvalidJson"));
-    QCOMPARE(ActionJson::errorCodeToString(ActionJson::LoadErrorCode::InvalidRoot), QStringLiteral("InvalidRoot"));
+    const auto expectedText = [](ActionJson::LoadErrorCode code) -> QString {
+        switch (code) {
+        case ActionJson::LoadErrorCode::InvalidPath:
+            return QStringLiteral("InvalidPath");
+        case ActionJson::LoadErrorCode::InvalidDevice:
+            return QStringLiteral("InvalidDevice");
+        case ActionJson::LoadErrorCode::EmptyInput:
+            return QStringLiteral("EmptyInput");
+        case ActionJson::LoadErrorCode::InvalidJson:
+            return QStringLiteral("InvalidJson");
+        case ActionJson::LoadErrorCode::InvalidRoot:
+            return QStringLiteral("InvalidRoot");
+        case ActionJson::LoadErrorCode::LoadErrorCodeCount:
+            return QStringLiteral("LoadErrorCodeCount");
+        }
+        return QStringLiteral("UnexpectedLoadErrorCode");
+    };
+
+    for (int i = 0; i <= static_cast<int>(ActionJson::LoadErrorCode::LoadErrorCodeCount); ++i) {
+        const auto code = static_cast<ActionJson::LoadErrorCode>(i);
+        QCOMPARE(ActionJson::errorCodeToString(code), expectedText(code));
+    }
 }
 
 void TestActionJson::test_saveErrorCodeToString()
 {
-    QCOMPARE(ActionJson::errorCodeToString(ActionJson::SaveErrorCode::InvalidPath), QStringLiteral("InvalidPath"));
-    QCOMPARE(ActionJson::errorCodeToString(ActionJson::SaveErrorCode::InvalidDevice), QStringLiteral("InvalidDevice"));
-    QCOMPARE(ActionJson::errorCodeToString(ActionJson::SaveErrorCode::WriteFailed), QStringLiteral("WriteFailed"));
+    const auto expectedText = [](ActionJson::SaveErrorCode code) -> QString {
+        switch (code) {
+        case ActionJson::SaveErrorCode::InvalidPath:
+            return QStringLiteral("InvalidPath");
+        case ActionJson::SaveErrorCode::InvalidDevice:
+            return QStringLiteral("InvalidDevice");
+        case ActionJson::SaveErrorCode::WriteFailed:
+            return QStringLiteral("WriteFailed");
+        case ActionJson::SaveErrorCode::SaveErrorCodeCount:
+            return QStringLiteral("SaveErrorCodeCount");
+        }
+        return QStringLiteral("UnexpectedSaveErrorCode");
+    };
+
+    for (int i = 0; i <= static_cast<int>(ActionJson::SaveErrorCode::SaveErrorCodeCount); ++i) {
+        const auto code = static_cast<ActionJson::SaveErrorCode>(i);
+        QCOMPARE(ActionJson::errorCodeToString(code), expectedText(code));
+    }
 }
 
 QTEST_MAIN(TestActionJson)

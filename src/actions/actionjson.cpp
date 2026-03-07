@@ -58,6 +58,8 @@ QString ActionJson::errorCodeToString(LoadErrorCode code)
         return QStringLiteral("InvalidJson");
     case LoadErrorCode::InvalidRoot:
         return QStringLiteral("InvalidRoot");
+    case LoadErrorCode::LoadErrorCodeCount:
+        return QStringLiteral("LoadErrorCodeCount");
     }
 
     return QStringLiteral("UnknownLoadError");
@@ -72,6 +74,8 @@ QString ActionJson::errorCodeToString(SaveErrorCode code)
         return QStringLiteral("InvalidDevice");
     case SaveErrorCode::WriteFailed:
         return QStringLiteral("WriteFailed");
+    case SaveErrorCode::SaveErrorCodeCount:
+        return QStringLiteral("SaveErrorCodeCount");
     }
 
     return QStringLiteral("UnknownSaveError");

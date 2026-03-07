@@ -1,7 +1,5 @@
 #include "versiontriplet.h"
 
-#include "app/common.h"
-
 /*static*/ const QMap<VersionTriplet, VersionTriplet::KnownVersion> VersionTriplet::KnownVersions {
     { VersionTriplet(0, 99, 1), VersionTriplet::KnownVersion::V_0_99_1 },
     { VersionTriplet(1, 0, 0), VersionTriplet::KnownVersion::V_1_0_0 },
@@ -34,6 +32,21 @@ VersionTriplet::VersionTriplet(int maj, int min, int patch)
 QString VersionTriplet::toString() const
 {
     return QStringLiteral("%1.%2.%3").arg(m_major).arg(m_minor).arg(m_patch);
+}
+
+/*static*/ QString VersionTriplet::errorCodeToString(ParseError code)
+{
+    switch (code) {
+    case ParseError::EmptyInput:
+        return QStringLiteral("EmptyInput");
+    case ParseError::WrongPartsCount:
+        return QStringLiteral("WrongPartsCount");
+    case ParseError::EmptyComponent:
+        return QStringLiteral("EmptyComponent");
+    case ParseError::InvalidComponent:
+        return QStringLiteral("InvalidComponent");
+    }
+    return QStringLiteral("UnknownParseError");
 }
 
 /*static*/ VersionTriplet::ParseResult VersionTriplet::fromString(const QString &s)

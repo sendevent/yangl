@@ -35,6 +35,7 @@ public:
         EmptyInput,
         InvalidJson,
         InvalidRoot,
+        LoadErrorCodeCount,
     };
 
     struct LoadError {
@@ -49,6 +50,7 @@ public:
         InvalidPath,
         InvalidDevice,
         WriteFailed,
+        SaveErrorCodeCount,
     };
 
     struct SaveError {

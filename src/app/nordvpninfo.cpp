@@ -66,7 +66,7 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
     const auto &parsed = tryFromString(text);
     if (!parsed) {
         const auto &error = parsed.error();
-        WRN << utils::enumToString(error.code, QStringLiteral("UnknownError")) << error.detail;
+        WRN << errorCodeToString(error.code) << error.detail;
         return {};
     }
     return parsed.value();
@@ -123,8 +123,7 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
                 return std::unexpected(ParseError {
                         StatusParseErrorCode::InvalidUptime,
                         QStringLiteral("Failed parsing uptime '%1': %2")
-                                .arg(value,
-                                     utils::enumToString(parsedUptime.error(), QStringLiteral("UnknownError"))) });
+                                .arg(value, errorCodeToString(parsedUptime.error())) });
             }
             updatedState.m_uptime = parsedUptime.value();
         }
@@ -140,12 +139,79 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
 
 /*static*/ NordVpnInfo::Status NordVpnInfo::textToStatus(const QString &from)
 {
-    return utils::enumFromString(from, NordVpnInfo::Status::Unknown);
+    const QString normalized = from.trimmed();
+    if (normalized.compare(QStringLiteral("Disconnected"), Qt::CaseInsensitive) == 0) {
+        return Status::Disconnected;
+    }
+    if (normalized.compare(QStringLiteral("Connecting"), Qt::CaseInsensitive) == 0) {
+        return Status::Connecting;
+    }
+    if (normalized.compare(QStringLiteral("Connected"), Qt::CaseInsensitive) == 0) {
+        return Status::Connected;
+    }
+    if (normalized.compare(QStringLiteral("Disconnecting"), Qt::CaseInsensitive) == 0) {
+        return Status::Disconnecting;
+    }
+    if (normalized.compare(QStringLiteral("Unknown"), Qt::CaseInsensitive) == 0) {
+        return Status::Unknown;
+    }
+    return Status::Unknown;
 }
 
 /*static*/ QString NordVpnInfo::statusToText(NordVpnInfo::Status from)
 {
-    return utils::enumToString(from);
+    switch (from) {
+    case Status::Unknown:
+        return QStringLiteral("Unknown");
+    case Status::Disconnected:
+        return QStringLiteral("Disconnected");
+    case Status::Connecting:
+        return QStringLiteral("Connecting");
+    case Status::Connected:
+        return QStringLiteral("Connected");
+    case Status::Disconnecting:
+        return QStringLiteral("Disconnecting");
+    }
+    return QStringLiteral("Unknown");
+}
+
+/*static*/ QList<NordVpnInfo::Status> NordVpnInfo::allStatuses()
+{
+    return {
+        Status::Unknown,
+        Status::Disconnected,
+        Status::Connecting,
+        Status::Connected,
+        Status::Disconnecting,
+    };
+}
+
+/*static*/ QString NordVpnInfo::errorCodeToString(UptimeParseError code)
+{
+    switch (code) {
+    case UptimeParseError::EmptyInput:
+        return QStringLiteral("EmptyInput");
+    case UptimeParseError::InvalidToken:
+        return QStringLiteral("InvalidToken");
+    }
+    return QStringLiteral("UnknownUptimeParseError");
+}
+
+/*static*/ QString NordVpnInfo::errorCodeToString(StatusParseErrorCode code)
+{
+    switch (code) {
+    case StatusParseErrorCode::EmptyInput:
+        return QStringLiteral("EmptyInput");
+    case StatusParseErrorCode::MalformedLine:
+        return QStringLiteral("MalformedLine");
+    case StatusParseErrorCode::MissingStatus:
+        return QStringLiteral("MissingStatus");
+    case StatusParseErrorCode::InvalidStatus:
+        return QStringLiteral("InvalidStatus");
+    case StatusParseErrorCode::InvalidUptime:
+        return QStringLiteral("InvalidUptime");
+    }
+    return QStringLiteral("UnknownStatusParseError");
 }
 
 /*static*/ QString NordVpnInfo::parseUptime(const QString &from)
@@ -153,7 +219,7 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
     const auto &parsed = tryParseUptime(from);
     if (!parsed) {
         auto err = parsed.error();
-        WRN << utils::enumToString(err, QStringLiteral("UnknownError"));
+        WRN << errorCodeToString(err);
         return {};
     }
     return parsed.value();

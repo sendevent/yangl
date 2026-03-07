@@ -22,8 +22,6 @@
 
 class NordVpnInfo
 {
-    Q_GADGET
-
 public:
     enum class Status
     {
@@ -33,7 +31,6 @@ public:
         Connected,
         Disconnecting,
     };
-    Q_ENUM(Status);
 
     NordVpnInfo();
 
@@ -45,6 +42,7 @@ public:
     static NordVpnInfo fromString(const QString &text);
     static NordVpnInfo::Status textToStatus(const QString &from);
     static QString statusToText(NordVpnInfo::Status from);
+    static QList<NordVpnInfo::Status> allStatuses();
     static QString parseUptime(const QString &from);
 
     NordVpnInfo::Status status() const;
@@ -61,7 +59,6 @@ public:
         EmptyInput,
         InvalidToken,
     };
-    Q_ENUM(UptimeParseError)
 
     enum class StatusParseErrorCode
     {
@@ -71,7 +68,8 @@ public:
         InvalidStatus,
         InvalidUptime,
     };
-    Q_ENUM(StatusParseErrorCode)
+    static QString errorCodeToString(UptimeParseError code);
+    static QString errorCodeToString(StatusParseErrorCode code);
 
 private:
     Status m_status { Status::Unknown };

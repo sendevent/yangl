@@ -147,7 +147,7 @@ UpdateChecker::ParseResult UpdateChecker::parseResponse(QNetworkReply *reply)
     if (!parsedVersion) {
         const QString message =
                 QStringLiteral("Update check: invalid version format: '%1' (%2)")
-                        .arg(tag, utils::enumToString(parsedVersion.error(), QStringLiteral("UnknownError")));
+                        .arg(tag, VersionTriplet::errorCodeToString(parsedVersion.error()));
         const ResponseParseResult res { UpdateChecker::ResponseParsingError::InvalidVersionTag, message };
         return std::unexpected(res);
     }

@@ -38,7 +38,7 @@
     m_allIcons.clear();
     m_composedIcons.clear();
 
-    for (const auto state : utils::allEnum<NordVpnInfo::Status>()) {
+    for (const auto state : NordVpnInfo::allStatuses()) {
         IconInfo info;
         info.m_status = state;
 
@@ -102,7 +102,7 @@ TrayIcon::TrayIcon(QObject *parent)
     reloadIcons();
 
     const auto &icon = iconForStatus(NordVpnInfo::Status::Unknown);
-    const QString unknownStateText = utils::enumToString(NordVpnInfo::Status::Unknown, QStringLiteral("Unknown"));
+    const QString unknownStateText = NordVpnInfo::statusToText(NordVpnInfo::Status::Unknown);
     updateStateText(tr("State: %1").arg(unknownStateText), icon);
     setIcon(icon);
 }
