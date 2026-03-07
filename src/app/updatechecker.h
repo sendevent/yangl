@@ -53,12 +53,12 @@ public:
         EmptyTagName,
         InvalidVersionTag
     };
-    Q_ENUM(ResponseParsingError);
 
     struct ResponseParseResult {
         ResponseParsingError code;
         QString details;
     };
+    static QString errorCodeToString(ResponseParsingError code);
 
     explicit UpdateChecker(QObject *parent = {});
     void check();

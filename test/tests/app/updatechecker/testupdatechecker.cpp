@@ -133,6 +133,7 @@ private slots:
     void test_apply_enabled_no_double_check();
     void test_pending_state_after_detection();
     void test_live_network();
+    void test_errorCodeToString();
 };
 
 void TestUpdateChecker::test_update_detected()
@@ -384,6 +385,15 @@ void TestUpdateChecker::test_live_network()
     QVERIFY2(base < emitted,
              qPrintable(
                      QStringLiteral("Expected a version newer than %1, got: %2").arg(base.toString(), emittedVersion)));
+}
+
+void TestUpdateChecker::test_errorCodeToString()
+{
+    QCOMPARE(UpdateChecker::errorCodeToString(UpdateChecker::NetworkError), QStringLiteral("NetworkError"));
+    QCOMPARE(UpdateChecker::errorCodeToString(UpdateChecker::InvalidJson), QStringLiteral("InvalidJson"));
+    QCOMPARE(UpdateChecker::errorCodeToString(UpdateChecker::MissingTagName), QStringLiteral("MissingTagName"));
+    QCOMPARE(UpdateChecker::errorCodeToString(UpdateChecker::EmptyTagName), QStringLiteral("EmptyTagName"));
+    QCOMPARE(UpdateChecker::errorCodeToString(UpdateChecker::InvalidVersionTag), QStringLiteral("InvalidVersionTag"));
 }
 
 QTEST_MAIN(TestUpdateChecker)

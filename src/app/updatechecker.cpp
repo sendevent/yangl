@@ -29,6 +29,23 @@
 
 /*static*/ const QUrl UpdateChecker::RepoUrl(QStringLiteral("https://github.com/sendevent/yangl"));
 
+/*static*/ QString UpdateChecker::errorCodeToString(ResponseParsingError code)
+{
+    switch (code) {
+    case NetworkError:
+        return QStringLiteral("NetworkError");
+    case InvalidJson:
+        return QStringLiteral("InvalidJson");
+    case MissingTagName:
+        return QStringLiteral("MissingTagName");
+    case EmptyTagName:
+        return QStringLiteral("EmptyTagName");
+    case InvalidVersionTag:
+        return QStringLiteral("InvalidVersionTag");
+    }
+    return QStringLiteral("UnknownResponseParsingError");
+}
+
 UpdateChecker::UpdateChecker(QObject *parent)
     : QObject(parent)
     , m_nam(new QNetworkAccessManager(this))
@@ -77,7 +94,7 @@ void UpdateChecker::onReplyFinished(QNetworkReply *reply)
     if (!parsed) {
         const auto &error = parsed.error();
         if (!error.details.isEmpty()) {
-            WRN << utils::enumToString(error.code) << error.details;
+            WRN << errorCodeToString(error.code) << error.details;
         }
         return;
     }
