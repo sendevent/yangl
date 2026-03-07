@@ -33,13 +33,17 @@ signals:
 private slots:
     void test_filePath();
     void test_tryLoad();
-    void test_save();
+    void test_trySave();
     void test_tryLoad_invalidJson_errorCode();
     void test_tryLoad_emptyInput_errorCode();
     void test_tryLoad_nullDevice_errorCode();
     void test_tryLoad_unreadableDevice_errorCode();
     void test_tryLoad_nonObjectRoot_errorCode();
     void test_tryLoad_invalidPath_errorCode();
+    void test_trySave_nullDevice_errorCode();
+    void test_trySave_unwritableDevice_errorCode();
+    void test_trySave_invalidPath_errorCode();
+    void test_trySave_writeFailed_errorCode();
 
 private:
     static const Action::Id TestId;
@@ -90,7 +94,7 @@ void TestActionJson::test_tryLoad()
     QCOMPARE(json.customActionIds(), { TestId.toString() });
 }
 
-void TestActionJson::test_save()
+void TestActionJson::test_trySave()
 {
     const Action::Ptr action(new TestAction(Action::Flow::Custom, Action::NordVPN::Unknown, {}, TestId));
     action->setApp("/usr/bin/ls");
@@ -113,7 +117,8 @@ void TestActionJson::test_save()
     json.putAction(action.get());
     QCOMPARE(json.customActionIds(), { TestId.toString() });
 
-    json.save(&out);
+    const auto saved = json.trySave(&out);
+    QVERIFY(saved.has_value());
 
     QCOMPARE(outString, TestJson);
 }
@@ -194,6 +199,63 @@ void TestActionJson::test_tryLoad_invalidPath_errorCode()
     const auto parsed = json.tryLoad(QStringLiteral("/path/that/does/not/exist/actions.json"));
     QVERIFY(!parsed.has_value());
     QCOMPARE(parsed.error().code, ActionJson::LoadErrorCode::InvalidPath);
+}
+
+void TestActionJson::test_trySave_nullDevice_errorCode()
+{
+    ActionStorage storage;
+    ActionJson json(&storage);
+
+    const auto saved = json.trySave(static_cast<QIODevice *>(nullptr));
+    QVERIFY(!saved.has_value());
+    QCOMPARE(saved.error().code, ActionJson::SaveErrorCode::InvalidDevice);
+}
+
+void TestActionJson::test_trySave_unwritableDevice_errorCode()
+{
+    QByteArray outData;
+    QBuffer out(&outData);
+    out.open(QIODevice::ReadOnly);
+
+    ActionStorage storage;
+    ActionJson json(&storage);
+
+    const auto saved = json.trySave(&out);
+    QVERIFY(!saved.has_value());
+    QCOMPARE(saved.error().code, ActionJson::SaveErrorCode::InvalidDevice);
+}
+
+void TestActionJson::test_trySave_invalidPath_errorCode()
+{
+    ActionStorage storage;
+    ActionJson json(&storage);
+
+    const auto saved = json.trySave(QStringLiteral("/path/that/does/not/exist/actions.json"));
+    QVERIFY(!saved.has_value());
+    QCOMPARE(saved.error().code, ActionJson::SaveErrorCode::InvalidPath);
+}
+
+void TestActionJson::test_trySave_writeFailed_errorCode()
+{
+    class FailingWriteDevice final : public QIODevice
+    {
+    public:
+        bool isSequential() const override { return true; }
+
+    protected:
+        qint64 readData(char *, qint64) override { return -1; }
+        qint64 writeData(const char *, qint64) override { return -1; }
+    };
+
+    FailingWriteDevice out;
+    out.open(QIODevice::WriteOnly);
+
+    ActionStorage storage;
+    ActionJson json(&storage);
+
+    const auto saved = json.trySave(&out);
+    QVERIFY(!saved.has_value());
+    QCOMPARE(saved.error().code, ActionJson::SaveErrorCode::WriteFailed);
 }
 
 QTEST_MAIN(TestActionJson)
