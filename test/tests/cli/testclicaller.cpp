@@ -51,10 +51,10 @@ void TestCLICaller::test_performAction()
 
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> arguments = testutils::takeFirstArgsOrFail(spy, 4);
-    QVERIFY(arguments.at(0).typeId() == QVariant::Uuid);
-    QVERIFY(arguments.at(1).typeId() == QVariant::String);
+    QVERIFY(arguments.at(0).typeId() == QMetaType::QUuid);
+    QVERIFY(arguments.at(1).typeId() == QMetaType::QString);
     QVERIFY(!arguments.at(1).toString().isEmpty());
-    QVERIFY(arguments.at(2).typeId() == QVariant::Bool);
+    QVERIFY(arguments.at(2).typeId() == QMetaType::Bool);
     QCOMPARE(arguments.at(2).toBool(), true);
 
     const auto runInfo = arguments.at(3).value<Action::RunInfo>();

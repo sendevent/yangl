@@ -18,9 +18,9 @@
 #include "testactiontests.h"
 
 #include "actions/action.h"
-#include "testutils.h"
 #include "cli/clicall.h"
 #include "testaction.h"
+#include "testutils.h"
 
 #include <QSignalSpy>
 #include <QTest>
@@ -63,7 +63,7 @@ void TestActionTests::testSetTitle()
     QCOMPARE(action->title(), testValue);
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.at(0).typeId() == QVariant::String);
+    QVERIFY(arguments.at(0).typeId() == QMetaType::QString);
     QVERIFY(arguments.at(0) == testValue);
 }
 
@@ -78,7 +78,7 @@ void TestActionTests::testSetApp()
     QCOMPARE(action->app(), testValue);
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.at(0).typeId() == QVariant::String);
+    QVERIFY(arguments.at(0).typeId() == QMetaType::QString);
     QVERIFY(arguments.at(0) == testValue);
 }
 
@@ -93,7 +93,7 @@ void TestActionTests::testSetArgs()
     QCOMPARE(action->args(), testValue);
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.at(0).typeId() == QVariant::StringList);
+    QVERIFY(arguments.at(0).typeId() == QMetaType::QStringList);
     QVERIFY(arguments.at(0) == testValue);
 }
 
@@ -108,7 +108,7 @@ void TestActionTests::testSetTimeout()
     QCOMPARE(action->timeout(), testValue);
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.at(0).typeId() == QVariant::Int);
+    QVERIFY(arguments.at(0).typeId() == QMetaType::Int);
     QVERIFY(arguments.at(0) == testValue);
 }
 
@@ -123,7 +123,7 @@ void TestActionTests::testSetForcedShow()
     QCOMPARE(action->forcedShow(), testValue);
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.at(0).typeId() == QVariant::Bool);
+    QVERIFY(arguments.at(0).typeId() == QMetaType::Bool);
     QVERIFY(arguments.at(0) == testValue);
 }
 
