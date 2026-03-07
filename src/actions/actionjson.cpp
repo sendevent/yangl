@@ -45,6 +45,38 @@ ActionJson::ActionJson(ActionStorage *storage)
 {
 }
 
+QString ActionJson::errorCodeToString(LoadErrorCode code)
+{
+    switch (code) {
+    case LoadErrorCode::InvalidPath:
+        return QStringLiteral("InvalidPath");
+    case LoadErrorCode::InvalidDevice:
+        return QStringLiteral("InvalidDevice");
+    case LoadErrorCode::EmptyInput:
+        return QStringLiteral("EmptyInput");
+    case LoadErrorCode::InvalidJson:
+        return QStringLiteral("InvalidJson");
+    case LoadErrorCode::InvalidRoot:
+        return QStringLiteral("InvalidRoot");
+    }
+
+    return QStringLiteral("UnknownLoadError");
+}
+
+QString ActionJson::errorCodeToString(SaveErrorCode code)
+{
+    switch (code) {
+    case SaveErrorCode::InvalidPath:
+        return QStringLiteral("InvalidPath");
+    case SaveErrorCode::InvalidDevice:
+        return QStringLiteral("InvalidDevice");
+    case SaveErrorCode::WriteFailed:
+        return QStringLiteral("WriteFailed");
+    }
+
+    return QStringLiteral("UnknownSaveError");
+}
+
 void ActionJson::clear()
 {
     m_json = {};

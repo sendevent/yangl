@@ -58,6 +58,9 @@ public:
 
     using SaveResult = std::expected<void, SaveError>;
 
+    static QString errorCodeToString(LoadErrorCode code);
+    static QString errorCodeToString(SaveErrorCode code);
+
     ActionJson(ActionStorage *storage);
 
     void clear();

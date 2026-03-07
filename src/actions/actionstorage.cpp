@@ -92,14 +92,14 @@ QList<Action::Ptr> ActionStorage::load(const QString &from)
     const auto jsonLoaded = m_json->tryLoad(usedPath);
     if (!jsonLoaded) {
         const auto code = jsonLoaded.error().code;
-        WRN << static_cast<int>(code) << jsonLoaded.error().details;
+        WRN << ActionJson::errorCodeToString(code) << jsonLoaded.error().details;
     }
 
     loadActions();
     if (!jsonLoaded.has_value()) {
         const auto saved = m_json->trySave(usedPath);
         if (!saved) {
-            WRN << static_cast<int>(saved.error().code) << saved.error().details;
+            WRN << ActionJson::errorCodeToString(saved.error().code) << saved.error().details;
         }
     }
 
@@ -119,7 +119,7 @@ void ActionStorage::save(const QString &to)
 
     const auto saved = m_json->trySave(usedPath);
     if (!saved) {
-        WRN << static_cast<int>(saved.error().code) << saved.error().details;
+        WRN << ActionJson::errorCodeToString(saved.error().code) << saved.error().details;
     }
 }
 
@@ -135,7 +135,7 @@ void ActionStorage::save(QIODevice *to)
 
     const auto saved = m_json->trySave(to);
     if (!saved) {
-        WRN << static_cast<int>(saved.error().code) << saved.error().details;
+        WRN << ActionJson::errorCodeToString(saved.error().code) << saved.error().details;
     }
 }
 
