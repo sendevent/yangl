@@ -93,28 +93,32 @@ ActionJson::LoadResult ActionJson::tryLoad(QIODevice *in)
     return {};
 }
 
-void ActionJson::save(const QString &to)
+ActionJson::SaveResult ActionJson::trySave(const QString &to)
 {
     QFile out(to);
     if (!out.open(QFile::WriteOnly | QFile::Text | QFile::Truncate)) {
-        WRN << "failed opening file" << to << out.errorString();
-        return;
+        const QString details = QStringLiteral("failed opening file %1 %2").arg(to, out.errorString());
+        return std::unexpected(SaveError { SaveErrorCode::InvalidPath, details });
     }
 
-    save(&out);
+    return trySave(&out);
 }
 
-void ActionJson::save(QIODevice *out)
+ActionJson::SaveResult ActionJson::trySave(QIODevice *out)
 {
     if (!out || !out->isWritable()) {
-        return;
+        return std::unexpected(
+                SaveError { SaveErrorCode::InvalidDevice, QStringLiteral("Output device is null or not writable") });
     }
 
     const QJsonDocument jDoc(m_json);
     const QByteArray &data = jDoc.toJson();
     if (-1 == out->write(data)) {
-        WRN << "error during file write:" << out->errorString();
+        const QString details = QStringLiteral("error during file write: %1").arg(out->errorString());
+        return std::unexpected(SaveError { SaveErrorCode::WriteFailed, details });
     }
+
+    return {};
 }
 
 void ActionJson::putAction(const Action *action)

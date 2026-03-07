@@ -44,14 +44,28 @@ public:
 
     using LoadResult = std::expected<void, LoadError>;
 
+    enum class SaveErrorCode
+    {
+        InvalidPath,
+        InvalidDevice,
+        WriteFailed,
+    };
+
+    struct SaveError {
+        SaveErrorCode code;
+        QString details;
+    };
+
+    using SaveResult = std::expected<void, SaveError>;
+
     ActionJson(ActionStorage *storage);
 
     void clear();
 
     LoadResult tryLoad(const QString &from);
     LoadResult tryLoad(QIODevice *in);
-    void save(const QString &to);
-    void save(QIODevice *out);
+    SaveResult trySave(const QString &to);
+    SaveResult trySave(QIODevice *out);
 
     void putAction(const Action *action);
     void popAction(const Action *action);

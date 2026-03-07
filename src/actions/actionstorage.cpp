@@ -24,7 +24,6 @@
 #include "cli/clicall.h"
 #include "settings/appsettings.h"
 
-#include <QFile>
 #include <QUuid>
 
 ActionStorage::ActionStorage(QObject *parent)
@@ -98,7 +97,10 @@ QList<Action::Ptr> ActionStorage::load(const QString &from)
 
     loadActions();
     if (!jsonLoaded.has_value()) {
-        m_json->save(usedPath);
+        const auto saved = m_json->trySave(usedPath);
+        if (!saved) {
+            WRN << static_cast<int>(saved.error().code) << saved.error().details;
+        }
     }
 
     return allActions();
@@ -107,13 +109,18 @@ QList<Action::Ptr> ActionStorage::load(const QString &from)
 void ActionStorage::save(const QString &to)
 {
     const auto &usedPath = to.isEmpty() ? ActionJson::jsonFilePath() : to;
-    QFile out(usedPath);
-    if (!out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
-        WRN << "failed opening file:" << usedPath << out.errorString();
-        return;
+
+    m_json->clear();
+    for (const auto &actionsCollection : { yanglActions(), nvpnActions(), userActions() }) {
+        for (const auto &action : actionsCollection) {
+            m_json->putAction(action.get());
+        }
     }
 
-    save(&out);
+    const auto saved = m_json->trySave(usedPath);
+    if (!saved) {
+        WRN << static_cast<int>(saved.error().code) << saved.error().details;
+    }
 }
 
 void ActionStorage::save(QIODevice *to)
@@ -126,7 +133,10 @@ void ActionStorage::save(QIODevice *to)
         }
     }
 
-    return m_json->save(to);
+    const auto saved = m_json->trySave(to);
+    if (!saved) {
+        WRN << static_cast<int>(saved.error().code) << saved.error().details;
+    }
 }
 
 Action::Ptr ActionStorage::createUserAction(QObject *parent)
