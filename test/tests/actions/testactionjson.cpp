@@ -17,8 +17,8 @@
 
 #include "actions/actionjson.h"
 #include "actions/actionstorage.h"
-#include "testutils.h"
 #include "testaction.h"
+#include "testutils.h"
 
 #include <QBuffer>
 #include <QTest>
@@ -38,6 +38,9 @@ private slots:
     void test_load_invalidJson();
     void test_load_emptyInput();
     void test_load_nullDevice();
+    void test_tryLoad_invalidJson_errorCode();
+    void test_tryLoad_emptyInput_errorCode();
+    void test_tryLoad_nullDevice_errorCode();
 
 private:
     static const Action::Id TestId;
@@ -146,11 +149,52 @@ void TestActionJson::test_load_emptyInput()
 
 void TestActionJson::test_load_nullDevice()
 {
+    testutils::ignoreWarning(QStringLiteral("Input device is null or not readable"));
     ActionStorage storage;
     ActionJson json(&storage);
 
     QCOMPARE(json.load(static_cast<QIODevice *>(nullptr)), false);
     QCOMPARE(json.customActionIds(), {});
+}
+
+void TestActionJson::test_tryLoad_invalidJson_errorCode()
+{
+    QByteArray garbage("{ this is not valid json !@#$ }");
+    QBuffer in(&garbage);
+    in.open(QIODevice::ReadOnly);
+
+    ActionStorage storage;
+    ActionJson json(&storage);
+
+    const auto parsed = json.tryLoad(&in);
+    QVERIFY(!parsed.has_value());
+    QCOMPARE(parsed.error().code, ActionJson::LoadErrorCode::InvalidJson);
+    QVERIFY(parsed.error().details.contains(QStringLiteral("error parsing document:")));
+}
+
+void TestActionJson::test_tryLoad_emptyInput_errorCode()
+{
+    QByteArray empty;
+    QBuffer in(&empty);
+    in.open(QIODevice::ReadOnly);
+
+    ActionStorage storage;
+    ActionJson json(&storage);
+
+    const auto parsed = json.tryLoad(&in);
+    QVERIFY(!parsed.has_value());
+    QCOMPARE(parsed.error().code, ActionJson::LoadErrorCode::EmptyInput);
+    QCOMPARE(parsed.error().details, QStringLiteral("No JSON to load"));
+}
+
+void TestActionJson::test_tryLoad_nullDevice_errorCode()
+{
+    ActionStorage storage;
+    ActionJson json(&storage);
+
+    const auto parsed = json.tryLoad(static_cast<QIODevice *>(nullptr));
+    QVERIFY(!parsed.has_value());
+    QCOMPARE(parsed.error().code, ActionJson::LoadErrorCode::InvalidDevice);
 }
 
 QTEST_MAIN(TestActionJson)
