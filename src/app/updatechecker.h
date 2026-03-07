@@ -51,7 +51,8 @@ public:
         InvalidJson,
         MissingTagName,
         EmptyTagName,
-        InvalidVersionTag
+        InvalidVersionTag,
+        ResponseParsingErrorCount
     };
 
     struct ResponseParseResult {

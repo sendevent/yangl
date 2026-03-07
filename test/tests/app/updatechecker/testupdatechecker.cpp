@@ -389,11 +389,28 @@ void TestUpdateChecker::test_live_network()
 
 void TestUpdateChecker::test_errorCodeToString()
 {
-    QCOMPARE(UpdateChecker::errorCodeToString(UpdateChecker::NetworkError), QStringLiteral("NetworkError"));
-    QCOMPARE(UpdateChecker::errorCodeToString(UpdateChecker::InvalidJson), QStringLiteral("InvalidJson"));
-    QCOMPARE(UpdateChecker::errorCodeToString(UpdateChecker::MissingTagName), QStringLiteral("MissingTagName"));
-    QCOMPARE(UpdateChecker::errorCodeToString(UpdateChecker::EmptyTagName), QStringLiteral("EmptyTagName"));
-    QCOMPARE(UpdateChecker::errorCodeToString(UpdateChecker::InvalidVersionTag), QStringLiteral("InvalidVersionTag"));
+    const auto expectedText = [](UpdateChecker::ResponseParsingError code) -> QString {
+        switch (code) {
+        case UpdateChecker::NetworkError:
+            return QStringLiteral("NetworkError");
+        case UpdateChecker::InvalidJson:
+            return QStringLiteral("InvalidJson");
+        case UpdateChecker::MissingTagName:
+            return QStringLiteral("MissingTagName");
+        case UpdateChecker::EmptyTagName:
+            return QStringLiteral("EmptyTagName");
+        case UpdateChecker::InvalidVersionTag:
+            return QStringLiteral("InvalidVersionTag");
+        case UpdateChecker::ResponseParsingErrorCount:
+            return QStringLiteral("ResponseParsingErrorCount");
+        }
+        return QStringLiteral("UnexpectedResponseParsingError");
+    };
+
+    for (int i = 0; i <= UpdateChecker::ResponseParsingErrorCount; ++i) {
+        const auto code = static_cast<UpdateChecker::ResponseParsingError>(i);
+        QCOMPARE(UpdateChecker::errorCodeToString(code), expectedText(code));
+    }
 }
 
 QTEST_MAIN(TestUpdateChecker)

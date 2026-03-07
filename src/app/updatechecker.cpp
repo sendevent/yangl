@@ -42,6 +42,8 @@
         return QStringLiteral("EmptyTagName");
     case InvalidVersionTag:
         return QStringLiteral("InvalidVersionTag");
+    case ResponseParsingErrorCount:
+        return QStringLiteral("ResponseParsingErrorCount");
     }
     return QStringLiteral("UnknownResponseParsingError");
 }
