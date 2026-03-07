@@ -53,41 +53,63 @@ void ActionJson::clear()
 bool ActionJson::load(const QString &from)
 {
     LOG << from;
-    m_json = {};
-
-    QFile in(from);
-    if (!in.open(QFile::ReadOnly | QFile::Text)) {
-        WRN << "failed opening file" << from << in.errorString();
-        return false;
+    const auto result = tryLoad(from);
+    if (!result) {
+        WRN << result.error().details;
     }
-
-    return load(&in);
+    return result.has_value();
 }
 
 bool ActionJson::load(QIODevice *in)
 {
+    const auto result = tryLoad(in);
+    if (!result) {
+        WRN << result.error().details;
+    }
+    return result.has_value();
+}
+
+ActionJson::LoadResult ActionJson::tryLoad(const QString &from)
+{
+    m_json = {};
+
+    QFile in(from);
+    if (!in.open(QFile::ReadOnly | QFile::Text)) {
+        const QString details = QStringLiteral("failed opening file %1 %2").arg(from, in.errorString());
+        return std::unexpected(LoadError { LoadErrorCode::InvalidPath, details });
+    }
+
+    return tryLoad(&in);
+}
+
+ActionJson::LoadResult ActionJson::tryLoad(QIODevice *in)
+{
     m_json = {};
 
     if (!in || !in->isReadable()) {
-        return false;
+        return std::unexpected(LoadError { LoadErrorCode::InvalidDevice,
+                                           QStringLiteral("Input device is null or not readable") });
     }
 
     const QByteArray &data = in->readAll();
     if (data.isEmpty()) {
-        WRN << "No JSON to load";
-        return false;
+        return std::unexpected(LoadError { LoadErrorCode::EmptyInput, QStringLiteral("No JSON to load") });
     }
 
     QJsonParseError err;
     const QJsonDocument &jDoc = QJsonDocument::fromJson(std::move(data), &err);
     if (err.error != QJsonParseError::NoError) {
-        WRN << "error parsing document:" << err.errorString();
-        return false;
+        const QString details = QStringLiteral("error parsing document: %1").arg(err.errorString());
+        return std::unexpected(LoadError { LoadErrorCode::InvalidJson, details });
+    }
+
+    if (!jDoc.isObject()) {
+        return std::unexpected(LoadError { LoadErrorCode::InvalidRoot, QStringLiteral("JSON root is not an object") });
     }
 
     m_json = jDoc.object();
 
-    return true;
+    return {};
 }
 
 void ActionJson::save(const QString &to)
