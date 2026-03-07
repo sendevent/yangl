@@ -176,13 +176,9 @@ void TestCoordinatesResolver::test_requestCoordinates_real_1()
 
         const auto idRequested = m_resolver->requestCoordinates({ pair.first, pair.second });
 
-        if (spy.isEmpty()) {
-            QVERIFY(spy.wait());
-        }
+        testutils::waitForSpyOrFail(spy);
         QCOMPARE(spy.count(), 1);
-        const QList<QVariant> &arguments = spy.takeFirst();
-
-        QVERIFY(arguments.size() == 2);
+        const QList<QVariant> arguments = testutils::takeFirstArgsOrFail(spy, 2);
 
         QVERIFY(arguments.at(0).typeId() == QMetaType::UInt);
 
@@ -220,13 +216,9 @@ void TestCoordinatesResolver::test_requestCoordinates_real_3()
         const PlaceInfo placeRequested = { pair.first, pair.second };
         const auto idRequested = m_resolver->requestCoordinates(placeRequested);
 
-        if (spy.isEmpty()) {
-            QVERIFY(spy.wait());
-        }
+        testutils::waitForSpyOrFail(spy);
         QCOMPARE(spy.count(), 1);
-        const QList<QVariant> &arguments = spy.takeFirst();
-
-        QVERIFY(arguments.size() == 2);
+        const QList<QVariant> arguments = testutils::takeFirstArgsOrFail(spy, 2);
 
         QVERIFY(arguments.at(0).typeId() == QMetaType::UInt);
 
@@ -259,13 +251,9 @@ void TestCoordinatesResolver::test_requestCoordinates_fake()
 
         const auto idRequested = resolver.requestCoordinates({ "Oz", "Emerald City" });
 
-        if (spy.isEmpty()) {
-            QVERIFY(spy.wait());
-        }
+        testutils::waitForSpyOrFail(spy);
         QCOMPARE(spy.count(), 1);
-        const QList<QVariant> &arguments = spy.takeFirst();
-
-        QVERIFY(arguments.size() == 2);
+        const QList<QVariant> arguments = testutils::takeFirstArgsOrFail(spy, 2);
 
         QVERIFY(arguments.at(0).typeId() == QMetaType::UInt);
 
@@ -285,13 +273,9 @@ void TestCoordinatesResolver::test_requestCoordinates_fake()
 
         const auto idRequested = resolver.requestCoordinates("Oz", "Emerald City");
 
-        if (spy.isEmpty()) {
-            QVERIFY(spy.wait());
-        }
+        testutils::waitForSpyOrFail(spy);
         QCOMPARE(spy.count(), 1);
-        const QList<QVariant> &arguments = spy.takeFirst();
-
-        QVERIFY(arguments.size() == 2);
+        const QList<QVariant> arguments = testutils::takeFirstArgsOrFail(spy, 2);
 
         QVERIFY(arguments.at(0).typeId() == QMetaType::UInt);
 

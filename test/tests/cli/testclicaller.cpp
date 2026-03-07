@@ -17,6 +17,7 @@
 
 #include "actions/testaction.h"
 #include "cli/clicaller.h"
+#include "testutils.h"
 
 #include <QSignalSpy>
 #include <QTest>
@@ -46,12 +47,10 @@ void TestCLICaller::test_performAction()
     std::unique_ptr<CLICaller> caller(new CLICaller);
     QVERIFY(caller->runCall(call));
 
-    if (spy.isEmpty()) {
-        QVERIFY(spy.wait());
-    }
+    testutils::waitForSpyOrFail(spy);
 
     QCOMPARE(spy.count(), 1);
-    const QList<QVariant> &arguments = spy.takeFirst();
+    const QList<QVariant> arguments = testutils::takeFirstArgsOrFail(spy, 4);
     QVERIFY(arguments.at(0).typeId() == QVariant::Uuid);
     QVERIFY(arguments.at(1).typeId() == QVariant::String);
     QVERIFY(!arguments.at(1).toString().isEmpty());
@@ -84,12 +83,10 @@ void TestCLICaller::test_performAction_failure()
     CLICaller caller;
     QVERIFY(caller.runCall(call));
 
-    if (spy.isEmpty()) {
-        QVERIFY(spy.wait());
-    }
+    testutils::waitForSpyOrFail(spy);
 
     QCOMPARE(spy.count(), 1);
-    const QList<QVariant> &arguments = spy.takeFirst();
+    const QList<QVariant> arguments = testutils::takeFirstArgsOrFail(spy, 4);
     QCOMPARE(arguments.at(2).toBool(), false);
 
     const auto runInfo = arguments.at(3).value<Action::RunInfo>();

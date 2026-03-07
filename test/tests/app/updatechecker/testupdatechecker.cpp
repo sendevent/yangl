@@ -147,7 +147,7 @@ void TestUpdateChecker::test_update_detected()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.check();
-    QVERIFY(spy.wait(3000));
+    testutils::waitForSpyOrFail(spy);
     QCOMPARE(spy.count(), 1);
 
     const auto emittedParsed = VersionTriplet::fromString(spy.first().at(0).toString());
@@ -165,8 +165,7 @@ void TestUpdateChecker::test_no_update_same_version()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.check();
-    QTest::qWait(500);
-    QCOMPARE(spy.count(), 0);
+    testutils::expectNoSignal(spy);
 }
 
 void TestUpdateChecker::test_no_update_older_version()
@@ -178,8 +177,7 @@ void TestUpdateChecker::test_no_update_older_version()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.check();
-    QTest::qWait(500);
-    QCOMPARE(spy.count(), 0);
+    testutils::expectNoSignal(spy);
 }
 
 void TestUpdateChecker::test_v_prefix_stripped()
@@ -193,7 +191,7 @@ void TestUpdateChecker::test_v_prefix_stripped()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.check();
-    QVERIFY(spy.wait(3000));
+    testutils::waitForSpyOrFail(spy);
     QCOMPARE(spy.first().at(0).toString(), v200.toString());
 }
 
@@ -206,7 +204,7 @@ void TestUpdateChecker::test_V_prefix_case_insensitive()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.check();
-    QVERIFY(spy.wait(3000));
+    testutils::waitForSpyOrFail(spy);
     QCOMPARE(spy.first().at(0).toString(), QStringLiteral("3.1.0"));
 }
 
@@ -221,8 +219,7 @@ void TestUpdateChecker::test_empty_tag_ignored()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.check();
-    QTest::qWait(500);
-    QCOMPARE(spy.count(), 0);
+    testutils::expectNoSignal(spy);
 }
 
 void TestUpdateChecker::test_network_error_suppressed()
@@ -236,8 +233,7 @@ void TestUpdateChecker::test_network_error_suppressed()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.check();
-    QTest::qWait(500);
-    QCOMPARE(spy.count(), 0);
+    testutils::expectNoSignal(spy);
     QVERIFY(!checker.hasPendingUpdate());
 }
 
@@ -252,8 +248,7 @@ void TestUpdateChecker::test_invalid_json_ignored()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.check();
-    QTest::qWait(500);
-    QCOMPARE(spy.count(), 0);
+    testutils::expectNoSignal(spy);
     QVERIFY(!checker.hasPendingUpdate());
 }
 
@@ -269,8 +264,7 @@ void TestUpdateChecker::test_missing_tag_name_ignored()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.check();
-    QTest::qWait(500);
-    QCOMPARE(spy.count(), 0);
+    testutils::expectNoSignal(spy);
     QVERIFY(!checker.hasPendingUpdate());
 }
 
@@ -285,8 +279,7 @@ void TestUpdateChecker::test_invalid_version_format_ignored()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.check();
-    QTest::qWait(500);
-    QCOMPARE(spy.count(), 0);
+    testutils::expectNoSignal(spy);
     QVERIFY(!checker.hasPendingUpdate());
 }
 
@@ -300,8 +293,7 @@ void TestUpdateChecker::test_non_numeric_version_ignored()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.check();
-    QTest::qWait(500);
-    QCOMPARE(spy.count(), 0);
+    testutils::expectNoSignal(spy);
     QVERIFY(!checker.hasPendingUpdate());
 }
 
@@ -317,7 +309,7 @@ void TestUpdateChecker::test_no_overlapping()
     checker.check(); // must be a silent no-op
     checker.check();
 
-    QVERIFY(spy.wait(3000));
+    testutils::waitForSpyOrFail(spy);
     QCOMPARE(nam->requestCount(), 1);
     QCOMPARE(spy.count(), 1);
 }
@@ -331,7 +323,7 @@ void TestUpdateChecker::test_apply_enabled_triggers()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.applyEnabled(true);
-    QVERIFY(spy.wait(3000));
+    testutils::waitForSpyOrFail(spy);
     QCOMPARE(spy.count(), 1);
 }
 
@@ -343,11 +335,11 @@ void TestUpdateChecker::test_apply_enabled_no_double_check()
     TestableUpdateChecker checker(nam);
 
     checker.applyEnabled(true);
-    QTest::qWait(500);
+    QTest::qWait(testutils::kShortWaitMs);
     const int countAfterFirst = nam->requestCount();
 
     checker.applyEnabled(true); // already enabled — must not fire another check
-    QTest::qWait(500);
+    QTest::qWait(testutils::kShortWaitMs);
     QCOMPARE(nam->requestCount(), countAfterFirst);
 }
 
@@ -361,7 +353,7 @@ void TestUpdateChecker::test_pending_state_after_detection()
 
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
     checker.check();
-    QVERIFY(spy.wait(3000));
+    testutils::waitForSpyOrFail(spy);
 
     QVERIFY(checker.hasPendingUpdate());
     QCOMPARE(checker.pendingVersion(), QStringLiteral("10.0.0"));
@@ -378,7 +370,7 @@ void TestUpdateChecker::test_live_network()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
     checker.check();
 
-    if (!spy.wait(15000)) {
+    if (!spy.wait(testutils::kLiveNetworkWaitMs)) {
         QSKIP("Live network test: no updateAvailable within 15 s "
               "(no network or no published release newer than 0.99.1)");
     }

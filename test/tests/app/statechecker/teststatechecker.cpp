@@ -93,9 +93,7 @@ void TestStateChecker::test_active()
     m_checker->setActive(false);
     QCOMPARE(m_checker->isActive(), false);
 
-    if (spy.isEmpty()) {
-        QVERIFY(spy.wait());
-    }
+    testutils::waitForSpyOrFail(spy);
 }
 
 void TestStateChecker::test_no_overlapping_polls()
@@ -118,9 +116,7 @@ void TestStateChecker::test_no_overlapping_polls()
     QVERIFY(m_checker->m_pollInFlight);
 
     // Wait for the single poll to complete.
-    if (spy.isEmpty()) {
-        QVERIFY(spy.wait(CLICall::DefaultTimeoutMSecs));
-    }
+    testutils::waitForSpyOrFail(spy, CLICall::DefaultTimeoutMSecs);
 
     QCOMPARE(m_checker->m_pollInFlight, false);
     QCOMPARE(spy.count(), 1); // exactly one result despite two check() calls
@@ -255,9 +251,7 @@ void TestStateChecker::test_check(NordVpnInfo::Status targetStatus)
 
     m_checker->check();
 
-    if (spy.isEmpty()) {
-        QVERIFY(spy.wait(CLICall::DefaultTimeoutMSecs));
-    }
+    testutils::waitForSpyOrFail(spy, CLICall::DefaultTimeoutMSecs);
 
     QCOMPARE(m_checker->state().status(), targetStatus);
     QVERIFY(spy.count() >= 1);
@@ -288,7 +282,7 @@ void TestStateChecker::test_error_resilience()
 
         m_checker->check();
         if (errorSpy.size() <= i) {
-            QVERIFY(errorSpy.wait(CLICall::DefaultTimeoutMSecs));
+            testutils::waitForSpyOrFail(errorSpy, CLICall::DefaultTimeoutMSecs);
         }
         QCOMPARE(errorSpy.count(), i + 1);
         QCOMPARE(m_checker->m_consecutiveErrors, i + 1); // counter advancing
@@ -299,7 +293,7 @@ void TestStateChecker::test_error_resilience()
     // The Nth error must trip the threshold: counter resets and monitor stops.
     m_checker->check();
     if (errorSpy.size() < StateChecker::MaxConsecutiveErrors) {
-        QVERIFY(errorSpy.wait(CLICall::DefaultTimeoutMSecs));
+        testutils::waitForSpyOrFail(errorSpy, CLICall::DefaultTimeoutMSecs);
     }
 
     QCOMPARE(errorSpy.count(), StateChecker::MaxConsecutiveErrors);
@@ -311,9 +305,7 @@ void TestStateChecker::test_error_resilience()
 
     QSignalSpy stateSpy(m_checker.get(), &StateChecker::stateChanged);
     m_checker->check();
-    if (stateSpy.isEmpty()) {
-        QVERIFY(stateSpy.wait(CLICall::DefaultTimeoutMSecs));
-    }
+    testutils::waitForSpyOrFail(stateSpy, CLICall::DefaultTimeoutMSecs);
 
     QCOMPARE(m_checker->m_consecutiveErrors, 0);
 }

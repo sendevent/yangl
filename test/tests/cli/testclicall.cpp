@@ -18,6 +18,7 @@
 #include "actions/testaction.h"
 #include "cli/clicall.h"
 #include "testutils.h"
+#include "testutils.h"
 
 #include <QSignalSpy>
 #include <QTest>
@@ -46,7 +47,7 @@ void TestCLICall::test_call()
     call->run();
 
     QCOMPARE(spy.count(), 1);
-    const QList<QVariant> &arguments = spy.takeFirst();
+    const QList<QVariant> arguments = testutils::takeFirstArgsOrFail(spy, 1);
     const QString &filesList = arguments.at(0).toString();
     QVERIFY(arguments.at(0).typeId() == QMetaType::QString);
     QCOMPARE(filesList, receivedResult);
