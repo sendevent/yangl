@@ -50,25 +50,6 @@ void ActionJson::clear()
     m_json = {};
 }
 
-bool ActionJson::load(const QString &from)
-{
-    LOG << from;
-    const auto result = tryLoad(from);
-    if (!result) {
-        WRN << result.error().details;
-    }
-    return result.has_value();
-}
-
-bool ActionJson::load(QIODevice *in)
-{
-    const auto result = tryLoad(in);
-    if (!result) {
-        WRN << result.error().details;
-    }
-    return result.has_value();
-}
-
 ActionJson::LoadResult ActionJson::tryLoad(const QString &from)
 {
     m_json = {};

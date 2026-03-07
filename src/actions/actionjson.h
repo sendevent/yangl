@@ -48,8 +48,6 @@ public:
 
     void clear();
 
-    bool load(const QString &from);
-    bool load(QIODevice *in);
     LoadResult tryLoad(const QString &from);
     LoadResult tryLoad(QIODevice *in);
     void save(const QString &to);
