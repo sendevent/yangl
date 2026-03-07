@@ -32,6 +32,8 @@ private slots:
     void test_fromString_invalidStatus();
     void test_fromString_invalidUptime();
     void test_fromString_valid();
+    void test_uptimeParseErrorCodeToString();
+    void test_statusParseErrorCodeToString();
 };
 
 void TestNordVpnInfo::test_fromString_emptyInput()
@@ -81,6 +83,52 @@ void TestNordVpnInfo::test_fromString_valid()
     QCOMPARE(parsed.server(), QString("test.server"));
     QCOMPARE(parsed.country(), QString("Neverland"));
     QCOMPARE(parsed.city(), QString("TestCity"));
+}
+
+void TestNordVpnInfo::test_uptimeParseErrorCodeToString()
+{
+    const auto expectedText = [](NordVpnInfo::UptimeParseError code) -> QString {
+        switch (code) {
+        case NordVpnInfo::UptimeParseError::EmptyInput:
+            return QStringLiteral("EmptyInput");
+        case NordVpnInfo::UptimeParseError::InvalidToken:
+            return QStringLiteral("InvalidToken");
+        case NordVpnInfo::UptimeParseError::UptimeParseErrorCount:
+            return QStringLiteral("UptimeParseErrorCount");
+        }
+        return QStringLiteral("UnexpectedUptimeParseError");
+    };
+
+    for (int i = 0; i <= static_cast<int>(NordVpnInfo::UptimeParseError::UptimeParseErrorCount); ++i) {
+        const auto code = static_cast<NordVpnInfo::UptimeParseError>(i);
+        QCOMPARE(NordVpnInfo::errorCodeToString(code), expectedText(code));
+    }
+}
+
+void TestNordVpnInfo::test_statusParseErrorCodeToString()
+{
+    const auto expectedText = [](NordVpnInfo::StatusParseErrorCode code) -> QString {
+        switch (code) {
+        case NordVpnInfo::StatusParseErrorCode::EmptyInput:
+            return QStringLiteral("EmptyInput");
+        case NordVpnInfo::StatusParseErrorCode::MalformedLine:
+            return QStringLiteral("MalformedLine");
+        case NordVpnInfo::StatusParseErrorCode::MissingStatus:
+            return QStringLiteral("MissingStatus");
+        case NordVpnInfo::StatusParseErrorCode::InvalidStatus:
+            return QStringLiteral("InvalidStatus");
+        case NordVpnInfo::StatusParseErrorCode::InvalidUptime:
+            return QStringLiteral("InvalidUptime");
+        case NordVpnInfo::StatusParseErrorCode::StatusParseErrorCodeCount:
+            return QStringLiteral("StatusParseErrorCodeCount");
+        }
+        return QStringLiteral("UnexpectedStatusParseErrorCode");
+    };
+
+    for (int i = 0; i <= static_cast<int>(NordVpnInfo::StatusParseErrorCode::StatusParseErrorCodeCount); ++i) {
+        const auto code = static_cast<NordVpnInfo::StatusParseErrorCode>(i);
+        QCOMPARE(NordVpnInfo::errorCodeToString(code), expectedText(code));
+    }
 }
 
 QTEST_MAIN(TestNordVpnInfo)

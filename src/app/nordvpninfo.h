@@ -58,6 +58,7 @@ public:
     {
         EmptyInput,
         InvalidToken,
+        UptimeParseErrorCount,
     };
 
     enum class StatusParseErrorCode
@@ -67,6 +68,7 @@ public:
         MissingStatus,
         InvalidStatus,
         InvalidUptime,
+        StatusParseErrorCodeCount,
     };
     static QString errorCodeToString(UptimeParseError code);
     static QString errorCodeToString(StatusParseErrorCode code);

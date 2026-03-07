@@ -193,6 +193,8 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
         return QStringLiteral("EmptyInput");
     case UptimeParseError::InvalidToken:
         return QStringLiteral("InvalidToken");
+    case UptimeParseError::UptimeParseErrorCount:
+        return QStringLiteral("UptimeParseErrorCount");
     }
     return QStringLiteral("UnknownUptimeParseError");
 }
@@ -210,6 +212,8 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
         return QStringLiteral("InvalidStatus");
     case StatusParseErrorCode::InvalidUptime:
         return QStringLiteral("InvalidUptime");
+    case StatusParseErrorCode::StatusParseErrorCodeCount:
+        return QStringLiteral("StatusParseErrorCodeCount");
     }
     return QStringLiteral("UnknownStatusParseError");
 }
