@@ -23,7 +23,9 @@
 #include <QDebug>
 #include <QGeoCoordinate>
 #include <QMetaEnum>
+#include <concepts>
 #include <expected>
+#include <type_traits>
 #include <utility>
 
 #ifndef YANGL_TIMESTAMP
@@ -49,6 +51,12 @@
 namespace utils {
 Q_NAMESPACE
 
+template<typename T>
+concept QtReflectedEnum = std::is_enum_v<T> && requires {
+    QMetaEnum::fromType<T>();
+    std::to_underlying(T {});
+};
+
 inline int oneSecondMs()
 {
     return 1000;
@@ -68,7 +76,7 @@ enum class CoordinateParseError
 using CoordinateParseResult = std::expected<QGeoCoordinate, CoordinateParseError>;
 QString errorCodeToString(CoordinateParseError code);
 
-template<typename SomeQEnum>
+template<QtReflectedEnum SomeQEnum>
 QList<SomeQEnum> allEnum(const QList<SomeQEnum> &excluded = {})
 {
     QList<SomeQEnum> values;
@@ -83,7 +91,7 @@ QList<SomeQEnum> allEnum(const QList<SomeQEnum> &excluded = {})
     return values;
 }
 
-template<typename SomeQEnum>
+template<QtReflectedEnum SomeQEnum>
 QString enumToString(SomeQEnum value, const QString &fallback = {})
 {
     const QMetaEnum me = QMetaEnum::fromType<SomeQEnum>();
@@ -91,7 +99,7 @@ QString enumToString(SomeQEnum value, const QString &fallback = {})
     return key ? QString::fromLatin1(key) : fallback;
 }
 
-template<typename SomeQEnum>
+template<QtReflectedEnum SomeQEnum>
 QString enumToString(int value, const QString &fallback = {})
 {
     const QMetaEnum me = QMetaEnum::fromType<SomeQEnum>();
@@ -99,7 +107,7 @@ QString enumToString(int value, const QString &fallback = {})
     return key ? QString::fromLatin1(key) : fallback;
 }
 
-template<typename SomeQEnum>
+template<QtReflectedEnum SomeQEnum>
 SomeQEnum enumFromString(const QString &from, SomeQEnum fallback)
 {
     if (from.isEmpty()) {
