@@ -86,14 +86,14 @@ private:
     QString m_uptime;
 
     using UptimeResult = std::expected<QString, UptimeParseError>;
-    static UptimeResult tryParseUptime(const QString &from);
+    [[nodiscard]] static UptimeResult tryParseUptime(const QString &from);
 
     struct ParseError {
         StatusParseErrorCode code;
         QString detail;
     };
     using StatusParseResult = std::expected<NordVpnInfo, ParseError>;
-    static StatusParseResult tryFromString(const QString &text);
+    [[nodiscard]] static StatusParseResult tryFromString(const QString &text);
 };
 
 Q_DECLARE_METATYPE(NordVpnInfo::Status)

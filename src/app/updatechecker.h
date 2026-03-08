@@ -87,5 +87,5 @@ private:
     QUrl m_pendingUrl;
 
     using ParseResult = std::expected<VersionTriplet, ResponseParseResult>;
-    ParseResult parseResponse(QNetworkReply *reply);
+    [[nodiscard]] ParseResult parseResponse(QNetworkReply *reply);
 };

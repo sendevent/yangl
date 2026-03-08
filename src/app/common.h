@@ -117,7 +117,7 @@ QString ensureDirExists(const QString &path);
 QString geoToNvpn(const QString &name);
 QString nvpnToGeo(const QString &name);
 
-CoordinateParseResult parseCoordinatesExpected(const QString &latStr, const QString &lonStr);
+[[nodiscard]] CoordinateParseResult parseCoordinatesExpected(const QString &latStr, const QString &lonStr);
 
 bool isValidAppPath(const QString &path, QString *reason = nullptr);
 

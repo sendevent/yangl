@@ -67,10 +67,10 @@ public:
 
     void clear();
 
-    LoadResult tryLoad(const QString &from);
-    LoadResult tryLoad(QIODevice *in);
-    SaveResult trySave(const QString &to);
-    SaveResult trySave(QIODevice *out);
+    [[nodiscard]] LoadResult tryLoad(const QString &from);
+    [[nodiscard]] LoadResult tryLoad(QIODevice *in);
+    [[nodiscard]] SaveResult trySave(const QString &to);
+    [[nodiscard]] SaveResult trySave(QIODevice *out);
 
     void putAction(const Action *action);
     void popAction(const Action *action);

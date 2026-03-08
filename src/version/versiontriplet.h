@@ -20,7 +20,7 @@ public:
     };
 
     using ParseResult = std::expected<VersionTriplet, ParseError>;
-    static ParseResult fromString(const QString &s);
+    [[nodiscard]] static ParseResult fromString(const QString &s);
     static QString errorCodeToString(ParseError code);
     bool operator==(const VersionTriplet &other) const;
     bool operator<(const VersionTriplet &other) const;
