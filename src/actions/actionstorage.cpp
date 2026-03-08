@@ -92,12 +92,11 @@ QList<Action::Ptr> ActionStorage::load(const QString &from)
     const auto &usedPath = from.isEmpty() ? ActionJson::jsonFilePath() : from;
     const auto jsonLoaded = m_json->tryLoad(usedPath);
     if (!jsonLoaded) {
-        const auto code = jsonLoaded.error().code;
-        WRN << ActionJson::errorCodeToString(code) << jsonLoaded.error().details;
+        WRN << ActionJson::errorCodeToString(jsonLoaded.error().code) << jsonLoaded.error().details;
     }
 
     loadActions();
-    if (!jsonLoaded.has_value()) {
+    if (!jsonLoaded) {
         const auto saved = m_json->trySave(usedPath);
         if (!saved) {
             WRN << ActionJson::errorCodeToString(saved.error().code) << saved.error().details;

@@ -63,7 +63,8 @@ void PauseController::pause(Action::NordVPN action)
         duration = std::chrono::minutes(60);
         break;
     default:
-        WRN << "Unexpected pause type:" << std::to_underlying(action);
+        WRN << "pause() called with non-pause action type:" << std::to_underlying(action)
+            << "(expected Pause05, Pause30, Pause60 or PauseCustom)";
         return;
     }
 

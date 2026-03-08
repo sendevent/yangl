@@ -27,6 +27,7 @@ VersionTriplet::VersionTriplet(int maj, int min, int patch)
     , m_minor(min)
     , m_patch(patch)
 {
+    Q_ASSERT(maj >= 0 && min >= 0 && patch >= 0);
 }
 
 QString VersionTriplet::toString() const

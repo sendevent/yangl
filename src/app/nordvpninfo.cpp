@@ -180,12 +180,9 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
 
 /*static*/ QList<NordVpnInfo::Status> NordVpnInfo::allStatuses()
 {
-    QList<Status> statuses;
-    statuses.reserve(std::to_underlying(Status::StatusCount));
-    for (int i = 0; i < std::to_underlying(Status::StatusCount); ++i) {
-        statuses << static_cast<Status>(i);
-    }
-    return statuses;
+    return {
+        Status::Unknown, Status::Disconnected, Status::Connecting, Status::Connected, Status::Disconnecting,
+    };
 }
 
 /*static*/ QString NordVpnInfo::errorCodeToString(UptimeParseError code)
