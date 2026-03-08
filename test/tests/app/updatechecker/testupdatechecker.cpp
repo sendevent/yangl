@@ -408,8 +408,7 @@ void TestUpdateChecker::test_errorCodeToString()
         return QStringLiteral("UnexpectedResponseParsingError");
     };
 
-    for (int i = 0;
-         i <= std::to_underlying(UpdateChecker::ResponseParsingError::ResponseParsingErrorCount); ++i) {
+    for (int i = 0; i <= std::to_underlying(UpdateChecker::ResponseParsingError::ResponseParsingErrorCount); ++i) {
         const auto code = static_cast<UpdateChecker::ResponseParsingError>(i);
         QCOMPARE(UpdateChecker::errorCodeToString(code), expectedText(code));
     }

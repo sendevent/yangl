@@ -36,7 +36,8 @@ CLICall::CLICall(const QString &path, const QStringList &params, Timeout timeout
 
 CLICall::CLICall(const QString &path, const QStringList &params, int timeout, QObject *parent)
     : CLICall(path, params, Timeout(timeout), parent)
-{}
+{
+}
 
 QString CLICall::run()
 {

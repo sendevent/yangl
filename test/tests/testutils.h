@@ -1,10 +1,10 @@
 #pragma once
 
-#include <QSignalSpy>
 #include <QRegularExpression>
-#include <QVariant>
+#include <QSignalSpy>
 #include <QString>
 #include <QTest>
+#include <QVariant>
 #include <chrono>
 
 namespace testutils {

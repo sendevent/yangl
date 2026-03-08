@@ -164,9 +164,8 @@ UpdateChecker::ParseResult UpdateChecker::parseResponse(QNetworkReply *reply)
 
     const auto parsedVersion = VersionTriplet::fromString(tag);
     if (!parsedVersion) {
-        const QString message =
-                QStringLiteral("Update check: invalid version format: '%1' (%2)")
-                        .arg(tag, VersionTriplet::errorCodeToString(parsedVersion.error()));
+        const QString message = QStringLiteral("Update check: invalid version format: '%1' (%2)")
+                                        .arg(tag, VersionTriplet::errorCodeToString(parsedVersion.error()));
         const ResponseParseResult res { ResponseParsingError::InvalidVersionTag, message };
         return std::unexpected(res);
     }

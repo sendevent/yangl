@@ -176,8 +176,7 @@ void ServersChartView::loadSettings()
     if (parsedCoords) {
         m_chartWidget->centerOn(*parsedCoords);
     } else {
-        WRN << "Failed parsing stored map center coordinates:"
-            << utils::errorCodeToString(parsedCoords.error());
+        WRN << "Failed parsing stored map center coordinates:" << utils::errorCodeToString(parsedCoords.error());
     }
 
     bool ok(false);

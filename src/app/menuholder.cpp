@@ -18,6 +18,7 @@
 #include "menuholder.h"
 
 #include "actions/action.h"
+
 #include <ranges>
 
 MenuHolder::MenuHolder(QObject *parent)

@@ -91,8 +91,7 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
     ui->leNVPNPath->setText(AppSettings::Monitor->NVPNPath->read().toString());
 
     const bool isDynamic =
-            AppSettings::Monitor->PollingMode->read().toInt()
-            == std::to_underlying(StateChecker::PollingMode::Dynamic);
+            AppSettings::Monitor->PollingMode->read().toInt() == std::to_underlying(StateChecker::PollingMode::Dynamic);
     ui->rbPollingDynamic->setChecked(isDynamic);
     ui->rbPollingCustom->setChecked(!isDynamic);
     ui->spinBoxInterval->setEnabled(!isDynamic);
@@ -197,9 +196,9 @@ bool SettingsDialog::saveMonitorSettings()
     AppSettings::Monitor->NVPNPath->write(path);
     AppSettings::Tray->MessageDuration->write(ui->spinBoxMsgDuration->value());
     AppSettings::Monitor->Interval->write(ui->spinBoxInterval->value() * utils::oneSecondMs());
-    AppSettings::Monitor->PollingMode->write(
-            std::to_underlying(ui->rbPollingDynamic->isChecked() ? StateChecker::PollingMode::Dynamic
-                                                                 : StateChecker::PollingMode::Custom));
+    AppSettings::Monitor->PollingMode->write(std::to_underlying(ui->rbPollingDynamic->isChecked()
+                                                                        ? StateChecker::PollingMode::Dynamic
+                                                                        : StateChecker::PollingMode::Custom));
     AppSettings::Monitor->Active->write(ui->checkBoxAutoActive->isChecked());
     AppSettings::Tray->IgnoreFirstConnected->write(ui->cbIgnoreFirstConnected->isChecked());
     AppSettings::Tray->MessagePlainText->write(ui->checkBoxMessagePlainText->isChecked());

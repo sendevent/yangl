@@ -18,6 +18,7 @@
 #include "nordvpninfo.h"
 
 #include "common.h"
+
 #include <utility>
 
 NordVpnInfo::NordVpnInfo()
@@ -121,10 +122,9 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
         } else if (name.contains(QLatin1String("uptime"))) {
             const UptimeResult parsedUptime = tryParseUptime(value.simplified());
             if (!parsedUptime) {
-                return std::unexpected(ParseError {
-                        StatusParseErrorCode::InvalidUptime,
-                        QStringLiteral("Failed parsing uptime '%1': %2")
-                                .arg(value, errorCodeToString(parsedUptime.error())) });
+                return std::unexpected(ParseError { StatusParseErrorCode::InvalidUptime,
+                                                    QStringLiteral("Failed parsing uptime '%1': %2")
+                                                            .arg(value, errorCodeToString(parsedUptime.error())) });
             }
             updatedState.m_uptime = parsedUptime.value();
         }

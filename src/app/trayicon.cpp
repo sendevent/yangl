@@ -23,12 +23,10 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QFileInfo>
-#include <QLatin1StringView>
 #include <QPainter>
 #include <QPixmap>
 #include <QSystemTrayIcon>
 #include <QTextDocumentFragment>
-#include <qlatin1stringview.h>
 #include <chrono>
 
 /*static*/ QMap<NordVpnInfo::Status, TrayIcon::IconInfo> TrayIcon::m_allIcons = {};

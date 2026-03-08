@@ -18,7 +18,6 @@
 #include "actions/testaction.h"
 #include "cli/clicall.h"
 #include "testutils.h"
-#include "testutils.h"
 
 #include <QSignalSpy>
 #include <QTest>

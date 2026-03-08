@@ -40,7 +40,8 @@ StateChecker::StateChecker(CLICaller *bus, int intervalMs)
 {
     connect(m_timer, &QTimer::timeout, this, &StateChecker::onTimeout);
 
-    m_uptimeTicker->setInterval(static_cast<int>(std::chrono::duration_cast<Duration>(std::chrono::seconds(1)).count()));
+    m_uptimeTicker->setInterval(
+            static_cast<int>(std::chrono::duration_cast<Duration>(std::chrono::seconds(1)).count()));
     connect(m_uptimeTicker, &QTimer::timeout, this, &StateChecker::onUptimeTick);
 
     m_transitionTimer->setSingleShot(true);

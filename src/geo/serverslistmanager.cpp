@@ -100,7 +100,8 @@ Places ServersListManager::queryGroups() const
 {
     const auto &names = queryList({ JsonConsts::ArgGroups });
     Places groups(names.size());
-    std::ranges::transform(names, groups.begin(), [](const auto &name) { return createPlace(geo::groupsTitle(), name); });
+    std::ranges::transform(names, groups.begin(),
+                           [](const auto &name) { return createPlace(geo::groupsTitle(), name); });
 
     return groups;
 }

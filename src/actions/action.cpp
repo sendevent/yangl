@@ -263,12 +263,8 @@ QString Action::key() const
     static QList<Action::Yangl> actions;
     if (actions.isEmpty()) {
         static constexpr std::array<Action::Yangl, 6> kYanglActions {
-            Action::Yangl::ShowMap,
-            Action::Yangl::ShowSettings,
-            Action::Yangl::ShowLog,
-            Action::Yangl::Activated,
-            Action::Yangl::ShowAbout,
-            Action::Yangl::Quit,
+            Action::Yangl::ShowMap,   Action::Yangl::ShowSettings, Action::Yangl::ShowLog,
+            Action::Yangl::Activated, Action::Yangl::ShowAbout,    Action::Yangl::Quit,
         };
         actions = QList<Action::Yangl>(kYanglActions.begin(), kYanglActions.end());
     }

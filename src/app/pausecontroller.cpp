@@ -69,8 +69,8 @@ void PauseController::pause(Action::NordVPN action)
 
     if (duration == std::chrono::minutes(0)) {
         bool ok(false);
-        const int minutes =
-                QInputDialog::getInt({}, qApp->applicationDisplayName(), tr("Pause VPN for minutes:"), 1, 1, 1440, 1, &ok);
+        const int minutes = QInputDialog::getInt({}, qApp->applicationDisplayName(), tr("Pause VPN for minutes:"), 1, 1,
+                                                 1440, 1, &ok);
         if (!ok) {
             return;
         }
@@ -83,9 +83,8 @@ void PauseController::pause(Action::NordVPN action)
     if (auto disconnect = m_storage->action(Action::NordVPN::Disconnect)) {
         emit requestAction(disconnect.get());
         m_checker->startTransition();
-        m_pauseTimer->start(static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(
-                                                     std::chrono::seconds(1))
-                                                     .count()));
+        m_pauseTimer->start(static_cast<int>(
+                std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds(1)).count()));
     }
 }
 

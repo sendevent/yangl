@@ -20,8 +20,8 @@
 #include "actions/action.h"
 #include "app/nordvpninfo.h"
 
-#include <chrono>
 #include <QObject>
+#include <chrono>
 
 class CLICaller;
 class QTimer;
