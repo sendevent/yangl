@@ -18,6 +18,7 @@
 #include "mapserversmodel.h"
 
 #include "app/common.h"
+#include <ranges>
 
 MapServersModel::MapServersModel(QObject *parent)
     : QAbstractItemModel(parent)
@@ -97,9 +98,10 @@ void MapServersModel::addMarker(const PlaceInfo &place)
 {
     TreeItem *countryItem = nullptr;
 
-    const auto foundCountry =
-            std::find_if(m_root->children.cbegin(), m_root->children.cend(),
-                         [&place](const auto &otherPlace) { return otherPlace->name == place.country; });
+    const auto foundCountry = std::ranges::find_if(m_root->children,
+                                                   [&place](const auto &otherPlace) {
+                                                       return otherPlace->name == place.country;
+                                                   });
     if (foundCountry != m_root->children.cend()) {
         countryItem = foundCountry->get();
     }
@@ -131,8 +133,10 @@ void MapServersModel::addMarker(const PlaceInfo &place)
     }
 
     // Check if the city already exists under this country
-    const auto foundCity = std::find_if(countryItem->children.cbegin(), countryItem->children.cend(),
-                                        [&place](const auto &otherPlace) { return otherPlace->name == place.town; });
+    const auto foundCity = std::ranges::find_if(countryItem->children,
+                                                [&place](const auto &otherPlace) {
+                                                    return otherPlace->name == place.town;
+                                                });
     if (foundCity != countryItem->children.cend()) {
         if (auto child = foundCity->get(); child->data != place) {
             child->data = place; // And just update existing city data

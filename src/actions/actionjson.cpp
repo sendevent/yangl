@@ -25,6 +25,9 @@
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <algorithm>
+#include <ranges>
+#include <utility>
 
 struct JsonAction {
     static constexpr QLatin1String Type { QLatin1String("type") };
@@ -104,8 +107,8 @@ ActionJson::LoadResult ActionJson::tryLoad(QIODevice *in)
     m_json = {};
 
     if (!in || !in->isReadable()) {
-        return std::unexpected(LoadError { LoadErrorCode::InvalidDevice,
-                                           QStringLiteral("Input device is null or not readable") });
+        return std::unexpected(
+                LoadError { LoadErrorCode::InvalidDevice, QStringLiteral("Input device is null or not readable") });
     }
 
     const QByteArray &data = in->readAll();
@@ -221,8 +224,7 @@ Action::Ptr ActionJson::actionFromJson(const QJsonObject &json) const
         QStringList strList;
         const auto &array = json[JsonAction::Args].toArray();
         strList.reserve(array.size());
-        std::transform(array.cbegin(), array.constEnd(), std::back_inserter(strList),
-                       [](const auto &str) { return str.toString(); });
+        std::ranges::transform(array, std::back_inserter(strList), [](const auto &str) { return str.toString(); });
         return strList;
     }();
 
@@ -283,7 +285,7 @@ QList<QString> ActionJson::actionsGroup(const QString &group) const
 
     QList<QString> keys;
     const auto &oldkeys = m_json[group].toObject().keys();
-    std::copy(oldkeys.cbegin(), oldkeys.cend(), std::back_inserter(keys));
+    std::ranges::copy(oldkeys, std::back_inserter(keys));
     return keys;
 }
 

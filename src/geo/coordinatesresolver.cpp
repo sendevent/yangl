@@ -27,6 +27,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 #include <QGeoCodingManager>
 #include <QGeoLocation>
 #include <QtConcurrentRun>
+#include <ranges>
 
 static constexpr QChar CSVSeparator(',');
 static constexpr size_t CSVColumnCount(5);
@@ -164,7 +165,7 @@ PlaceInfo CoordinatesResolver::lookupForPlace(const PlaceInfo &request) const
     if (m_data.contains(countryName)) {
         const auto &country = m_data[countryName];
         if (town.town.isEmpty()) {
-            auto it = std::find_if(country.cbegin(), country.cend(), searchForTheCapital);
+            auto it = std::ranges::find_if(country, searchForTheCapital);
             if (it != country.end()) {
                 town = *it;
                 town.ok = true;

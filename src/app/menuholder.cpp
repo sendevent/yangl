@@ -18,6 +18,7 @@
 #include "menuholder.h"
 
 #include "actions/action.h"
+#include <ranges>
 
 MenuHolder::MenuHolder(QObject *parent)
     : QObject(parent)
@@ -31,7 +32,7 @@ MenuHolder::MenuHolder(QObject *parent)
 QAction *MenuHolder::yanglAction(Action::Yangl act) const
 {
     const auto &collection = m_qActions[Action::Flow::Yangl];
-    const auto found = std::find_if(collection.cbegin(), collection.cend(), [&act](const QAction *qAction) {
+    const auto found = std::ranges::find_if(collection, [&act](const QAction *qAction) {
         const Action *action = qAction->data().value<Action *>();
         return action && static_cast<Action::Yangl>(action->type()) == act;
     });

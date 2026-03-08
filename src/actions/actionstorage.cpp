@@ -25,6 +25,7 @@
 #include "settings/appsettings.h"
 
 #include <QUuid>
+#include <algorithm>
 
 ActionStorage::ActionStorage(QObject *parent)
     : QObject(parent)
@@ -35,8 +36,7 @@ ActionStorage::ActionStorage(QObject *parent)
 QList<Action::Ptr> ActionStorage::sortActionsByTitle(const QList<Action::Ptr> &actions) const
 {
     QList<Action::Ptr> sorted(actions);
-    std::sort(sorted.begin(), sorted.end(),
-              [](const Action::Ptr &a, const Action::Ptr &b) { return a->title() < b->title(); });
+    std::ranges::sort(sorted, [](const Action::Ptr &a, const Action::Ptr &b) { return a->title() < b->title(); });
     return sorted;
 }
 
@@ -63,7 +63,7 @@ QList<Action::Ptr> ActionStorage::allActions() const
 Action::Ptr ActionStorage::action(Action::NordVPN requested) const
 {
     const auto &collection = nvpnActions();
-    auto found = std::find_if(collection.cbegin(), collection.cend(), [&requested](const Action::Ptr &action) {
+    auto found = std::ranges::find_if(collection, [&requested](const Action::Ptr &action) {
         return static_cast<Action::NordVPN>(action->type()) == requested;
     });
     return found == collection.end() ? nullptr : *found;
@@ -72,15 +72,15 @@ Action::Ptr ActionStorage::action(Action::NordVPN requested) const
 Action::Ptr ActionStorage::action(const Action::Id &requested) const
 {
     const auto &collection = userActions();
-    auto found = std::find_if(collection.cbegin(), collection.cend(),
-                              [&requested](const Action::Ptr &action) { return action->id() == requested; });
+    auto found = std::ranges::find_if(collection,
+                                      [&requested](const Action::Ptr &action) { return action->id() == requested; });
     return found == collection.end() ? nullptr : *found;
 }
 
 Action::Ptr ActionStorage::action(Action::Yangl requested) const
 {
     const auto &collection = yanglActions();
-    auto found = std::find_if(collection.cbegin(), collection.cend(), [&requested](const Action::Ptr &action) {
+    auto found = std::ranges::find_if(collection, [&requested](const Action::Ptr &action) {
         return static_cast<Action::Yangl>(action->type()) == requested;
     });
     return found == collection.end() ? nullptr : *found;

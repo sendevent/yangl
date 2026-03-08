@@ -25,6 +25,8 @@
 #include <QThreadPool>
 #include <QTimer>
 #include <QtConcurrentRun>
+#include <algorithm>
+#include <ranges>
 
 struct JsonConsts {
     static constexpr QLatin1String ArgGroups = QLatin1String("groups");
@@ -98,8 +100,7 @@ Places ServersListManager::queryGroups() const
 {
     const auto &names = queryList({ JsonConsts::ArgGroups });
     Places groups(names.size());
-    std::transform(names.begin(), names.end(), groups.begin(),
-                   [](const auto &name) { return createPlace(geo::groupsTitle(), name); });
+    std::ranges::transform(names, groups.begin(), [](const auto &name) { return createPlace(geo::groupsTitle(), name); });
 
     return groups;
 }
@@ -108,8 +109,7 @@ Places ServersListManager::queryCountries() const
 {
     const auto &names = queryList({ JsonConsts::ArgCountries });
     Places countries(names.size());
-    std::transform(names.begin(), names.end(), countries.begin(),
-                   [](const auto &name) { return createPlace(name, {}); });
+    std::ranges::transform(names, countries.begin(), [](const auto &name) { return createPlace(name, {}); });
 
     return countries;
 }
@@ -118,8 +118,7 @@ Places ServersListManager::queryCities(const QString &country) const
 {
     const auto &names = queryList({ JsonConsts::ArgCountry, country });
     Places cities(names.size());
-    std::transform(names.begin(), names.end(), cities.begin(),
-                   [&country](const auto &name) { return createPlace(country, name); });
+    std::ranges::transform(names, cities.begin(), [&country](const auto &name) { return createPlace(country, name); });
 
     return cities;
 }
@@ -168,7 +167,7 @@ void ServersListManager::runSeparated()
 void ServersListManager::notifyPlacesAdded(const Places &cities)
 {
     Places prepared(cities.size());
-    std::transform(cities.cbegin(), cities.cend(), prepared.begin(), [](const PlaceInfo &place) {
+    std::ranges::transform(cities, prepared.begin(), [](const PlaceInfo &place) {
         PlaceInfo edited(place);
         edited.country = utils::nvpnToGeo(place.country);
         edited.town = utils::nvpnToGeo(place.town);
