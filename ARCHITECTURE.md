@@ -110,6 +110,17 @@ sequenceDiagram
 only interface. Settings are grouped into `GroupMonitor`, `GroupTray`, and
 `GroupMap` namespaces.
 
+## Error handling conventions
+
+Core parsing and I/O paths use typed error contracts (`std::expected<T, E>`)
+instead of bool + side-effect logging. Each error enum has an explicit
+`errorCodeToString(...)` mapping for warnings and tests.
+
+For core/domain error enums, avoid Qt meta-object reflection (`Q_ENUM`,
+`QMetaEnum`) unless the type is truly UI/meta-object driven. This keeps
+parsers/storage code independent from QObject/Q_GADGET requirements and makes
+error handling behavior explicit and easier to test.
+
 ## Threading model
 
 All objects live on the main thread. `CLICaller` uses `QtConcurrent::run` to
