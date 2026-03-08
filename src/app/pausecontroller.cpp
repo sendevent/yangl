@@ -25,6 +25,8 @@
 #include <QApplication>
 #include <QInputDialog>
 #include <QTimer>
+#include <chrono>
+#include <utility>
 
 PauseController::PauseController(ActionStorage *storage, StateChecker *checker, QObject *parent)
     : QObject(parent)
@@ -33,8 +35,7 @@ PauseController::PauseController(ActionStorage *storage, StateChecker *checker, 
     , m_pauseTimer(new QTimer(this))
 {
     connect(m_pauseTimer, &QTimer::timeout, this, &PauseController::onPauseTimer);
-    connect(m_checker, &StateChecker::statusChanged, this,
-            [this](NordVpnInfo::Status status) { onStatusChanged(static_cast<int>(status)); });
+    connect(m_checker, &StateChecker::statusChanged, this, &PauseController::onStatusChanged);
 }
 
 bool PauseController::isPaused() const
@@ -48,42 +49,52 @@ void PauseController::pause(Action::NordVPN action)
         return;
     }
 
-    static const QHash<Action::NordVPN, int> durations {
-        { Action::NordVPN::PauseCustom, 0 },
-        { Action::NordVPN::Pause05, 5 },
-        { Action::NordVPN::Pause30, 30 },
-        { Action::NordVPN::Pause60, 60 },
-    };
-
-    int duration = durations.value(action, -1);
-    if (-1 == duration) {
-        WRN << "Unexpected pause type:" << static_cast<int>(action);
+    std::chrono::minutes duration { 0 };
+    switch (action) {
+    case Action::NordVPN::PauseCustom:
+        break;
+    case Action::NordVPN::Pause05:
+        duration = std::chrono::minutes(5);
+        break;
+    case Action::NordVPN::Pause30:
+        duration = std::chrono::minutes(30);
+        break;
+    case Action::NordVPN::Pause60:
+        duration = std::chrono::minutes(60);
+        break;
+    default:
+        WRN << "pause() called with non-pause action type:" << std::to_underlying(action)
+            << "(expected Pause05, Pause30, Pause60 or PauseCustom)";
         return;
     }
 
-    if (0 == duration) {
+    if (duration == std::chrono::minutes(0)) {
         bool ok(false);
-        duration = QInputDialog::getInt({}, qApp->applicationDisplayName(), tr("Pause VPN for minutes:"), 1, 1, 1440, 1,
-                                        &ok);
+        const int minutes = QInputDialog::getInt({}, qApp->applicationDisplayName(), tr("Pause VPN for minutes:"), 1, 1,
+                                                 1440, 1, &ok);
         if (!ok) {
             return;
         }
+        duration = std::chrono::minutes(minutes);
     }
 
-    m_deadline = QDeadlineTimer(qint64(duration) * 60 * utils::oneSecondMs());
+    m_deadline = QDeadlineTimer(
+            static_cast<qint64>(std::chrono::duration_cast<std::chrono::milliseconds>(duration).count()));
 
     if (auto disconnect = m_storage->action(Action::NordVPN::Disconnect)) {
         emit requestAction(disconnect.get());
         m_checker->startTransition();
-        m_pauseTimer->start(utils::oneSecondMs());
+        m_pauseTimer->start(static_cast<int>(
+                std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds(1)).count()));
     }
 }
 
 void PauseController::onPauseTimer()
 {
     if (!m_deadline.hasExpired()) {
-        static const qint64 preReconnectMs = 15 * 1000;
-        if (m_deadline.remainingTime() <= preReconnectMs) {
+        const auto preReconnect = std::chrono::seconds(15);
+        if (m_deadline.remainingTime()
+            <= static_cast<qint64>(std::chrono::duration_cast<std::chrono::milliseconds>(preReconnect).count())) {
             m_checker->startTransition();
         }
         return;
@@ -99,9 +110,9 @@ void PauseController::onPauseTimer()
     }
 }
 
-void PauseController::onStatusChanged(int status)
+void PauseController::onStatusChanged(NordVpnInfo::Status status)
 {
-    if (static_cast<NordVpnInfo::Status>(status) == NordVpnInfo::Status::Connected) {
+    if (status == NordVpnInfo::Status::Connected) {
         if (m_pauseTimer->isActive()) {
             m_pauseTimer->stop();
         }

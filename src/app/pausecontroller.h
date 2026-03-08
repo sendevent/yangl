@@ -18,6 +18,7 @@
 #pragma once
 
 #include "actions/action.h"
+#include "app/nordvpninfo.h"
 
 #include <QDeadlineTimer>
 #include <QObject>
@@ -40,7 +41,7 @@ signals:
 
 private slots:
     void onPauseTimer();
-    void onStatusChanged(int status);
+    void onStatusChanged(NordVpnInfo::Status status);
 
 private:
     ActionStorage *m_storage;

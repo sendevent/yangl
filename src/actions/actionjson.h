@@ -20,6 +20,7 @@
 #include "actions/action.h"
 
 #include <QJsonObject>
+#include <expected>
 
 class QIODevice;
 class ActionStorage;
@@ -27,14 +28,49 @@ class ActionStorage;
 class ActionJson
 {
 public:
+    enum class LoadErrorCode
+    {
+        InvalidPath,
+        InvalidDevice,
+        EmptyInput,
+        InvalidJson,
+        InvalidRoot,
+        LoadErrorCodeCount,
+    };
+
+    struct LoadError {
+        LoadErrorCode code;
+        QString details;
+    };
+
+    using LoadResult = std::expected<void, LoadError>;
+
+    enum class SaveErrorCode
+    {
+        InvalidPath,
+        InvalidDevice,
+        WriteFailed,
+        SaveErrorCodeCount,
+    };
+
+    struct SaveError {
+        SaveErrorCode code;
+        QString details;
+    };
+
+    using SaveResult = std::expected<void, SaveError>;
+
+    static QString errorCodeToString(LoadErrorCode code);
+    static QString errorCodeToString(SaveErrorCode code);
+
     ActionJson(ActionStorage *storage);
 
     void clear();
 
-    bool load(const QString &from);
-    bool load(QIODevice *in);
-    void save(const QString &to);
-    void save(QIODevice *out);
+    [[nodiscard]] LoadResult tryLoad(const QString &from);
+    [[nodiscard]] LoadResult tryLoad(QIODevice *in);
+    [[nodiscard]] SaveResult trySave(const QString &to);
+    [[nodiscard]] SaveResult trySave(QIODevice *out);
 
     void putAction(const Action *action);
     void popAction(const Action *action);

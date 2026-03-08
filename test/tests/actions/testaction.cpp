@@ -23,11 +23,12 @@
 
 #include <QSignalSpy>
 #include <QTest>
+#include <utility>
 
 /*static*/ int TestAction::MetaIdMenuPlace = -1;
 
 TestAction::TestAction(Action::Flow scope, NordVPN action, ActionStorage *parent, const Action::Id &id)
-    : Action(scope, static_cast<int>(action), parent, id)
+    : Action(scope, std::to_underlying(action), parent, id)
 {
     if (-1 == TestAction::MetaIdMenuPlace) {
         TestAction::MetaIdMenuPlace = qRegisterMetaType<Action::MenuPlace>();

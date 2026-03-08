@@ -27,6 +27,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 #include <QGeoCodingManager>
 #include <QGeoLocation>
 #include <QtConcurrentRun>
+#include <ranges>
 
 static constexpr QChar CSVSeparator(',');
 static constexpr size_t CSVColumnCount(5);
@@ -115,14 +116,15 @@ CitiesByCountry CoordinatesResolver::loadData(const QString &path)
                 continue;
             }
 
-            const auto [coord, parsed] = utils::parseCoordinates(parts[3], parts[4]);
-            if (!parsed) {
-                WRN << "Failed parsing lat/lon value:" << parts[3] << parts[4];
+            const auto parsedCoords = utils::parseCoordinatesExpected(parts[3], parts[4]);
+            if (!parsedCoords) {
+                WRN << "Failed parsing lat/lon value:" << parts[3] << parts[4]
+                    << utils::errorCodeToString(parsedCoords.error());
                 continue;
             }
 
             const PlaceInfo place {
-                parts[0], parts[1], coord, parts[2] == "True", true, QString(),
+                parts[0], parts[1], *parsedCoords, parts[2] == "True", true, QString(),
             };
 
             auto &country = loaded[place.country.toLower()];
@@ -163,7 +165,7 @@ PlaceInfo CoordinatesResolver::lookupForPlace(const PlaceInfo &request) const
     if (m_data.contains(countryName)) {
         const auto &country = m_data[countryName];
         if (town.town.isEmpty()) {
-            auto it = std::find_if(country.cbegin(), country.cend(), searchForTheCapital);
+            auto it = std::ranges::find_if(country, searchForTheCapital);
             if (it != country.end()) {
                 town = *it;
                 town.ok = true;

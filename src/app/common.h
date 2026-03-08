@@ -23,6 +23,10 @@
 #include <QDebug>
 #include <QGeoCoordinate>
 #include <QMetaEnum>
+#include <concepts>
+#include <expected>
+#include <type_traits>
+#include <utility>
 
 #ifndef YANGL_TIMESTAMP
 #define YANGL_TIMESTAMP QDateTime::currentDateTime().toString("t hh:mm:ss.zzz:")
@@ -33,11 +37,11 @@
 #endif // YANGL_LOG_PREFIX
 
 #ifndef LOG
-#define LOG qDebug() << YANGL_LOG_PREFIX
+#define LOG qDebug().noquote() << YANGL_LOG_PREFIX
 #endif // LOG
 
 #ifndef WRN
-#define WRN qWarning() << YANGL_LOG_PREFIX
+#define WRN qWarning().noquote() << YANGL_LOG_PREFIX
 #endif // WRN
 
 #ifndef NIY
@@ -47,6 +51,9 @@
 namespace utils {
 Q_NAMESPACE
 
+template<typename T>
+concept QtReflectedEnum = std::is_enum_v<T> && static_cast<bool>(QtPrivate::IsQEnumHelper<T>::Value);
+
 inline int oneSecondMs()
 {
     return 1000;
@@ -54,7 +61,19 @@ inline int oneSecondMs()
 
 constexpr int DefaultLogLinesLimit = 1000;
 
-template<typename SomeQEnum>
+enum class CoordinateParseError
+{
+    MissingLatitude,
+    MissingLongitude,
+    InvalidLatitude,
+    InvalidLongitude,
+    OutOfRange,
+};
+
+using CoordinateParseResult = std::expected<QGeoCoordinate, CoordinateParseError>;
+QString errorCodeToString(CoordinateParseError code);
+
+template<QtReflectedEnum SomeQEnum>
 QList<SomeQEnum> allEnum(const QList<SomeQEnum> &excluded = {})
 {
     QList<SomeQEnum> values;
@@ -69,12 +88,20 @@ QList<SomeQEnum> allEnum(const QList<SomeQEnum> &excluded = {})
     return values;
 }
 
+template<QtReflectedEnum SomeQEnum>
+QString enumToString(SomeQEnum value, const QString &fallback = {})
+{
+    const QMetaEnum me = QMetaEnum::fromType<SomeQEnum>();
+    const char *key = me.valueToKey(std::to_underlying(value));
+    return key ? QString::fromLatin1(key) : fallback;
+}
+
 QString ensureDirExists(const QString &path);
 
 QString geoToNvpn(const QString &name);
 QString nvpnToGeo(const QString &name);
 
-std::tuple<QGeoCoordinate, bool> parseCoordinates(const QString &latStr, const QString &lonStr);
+[[nodiscard]] CoordinateParseResult parseCoordinatesExpected(const QString &latStr, const QString &lonStr);
 
 bool isValidAppPath(const QString &path, QString *reason = nullptr);
 

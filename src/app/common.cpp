@@ -63,24 +63,51 @@ QString nvpnToGeo(const QString &name)
     return QString(name).replace('_', ' ');
 }
 
-std::tuple<QGeoCoordinate, bool> parseCoordinates(const QString &latStr, const QString &lonStr)
+CoordinateParseResult parseCoordinatesExpected(const QString &latStr, const QString &lonStr)
 {
-    bool parsed(false);
-    QGeoCoordinate coordinate;
-
-    if (!latStr.isEmpty() && !lonStr.isEmpty()) {
-
-        const auto lat = latStr.toDouble(&parsed);
-        if (parsed) {
-            const auto lon = lonStr.toDouble(&parsed);
-            if (parsed) {
-                coordinate = QGeoCoordinate(lat, lon);
-            }
-        }
+    if (latStr.isEmpty()) {
+        return std::unexpected(CoordinateParseError::MissingLatitude);
+    }
+    if (lonStr.isEmpty()) {
+        return std::unexpected(CoordinateParseError::MissingLongitude);
     }
 
-    return { coordinate, parsed };
-};
+    bool latParsed(false);
+    const auto lat = latStr.toDouble(&latParsed);
+    if (!latParsed) {
+        return std::unexpected(CoordinateParseError::InvalidLatitude);
+    }
+
+    bool lonParsed(false);
+    const auto lon = lonStr.toDouble(&lonParsed);
+    if (!lonParsed) {
+        return std::unexpected(CoordinateParseError::InvalidLongitude);
+    }
+
+    QGeoCoordinate coordinate(lat, lon);
+    if (!coordinate.isValid()) {
+        return std::unexpected(CoordinateParseError::OutOfRange);
+    }
+
+    return coordinate;
+}
+
+QString errorCodeToString(CoordinateParseError code)
+{
+    switch (code) {
+    case CoordinateParseError::MissingLatitude:
+        return QStringLiteral("MissingLatitude");
+    case CoordinateParseError::MissingLongitude:
+        return QStringLiteral("MissingLongitude");
+    case CoordinateParseError::InvalidLatitude:
+        return QStringLiteral("InvalidLatitude");
+    case CoordinateParseError::InvalidLongitude:
+        return QStringLiteral("InvalidLongitude");
+    case CoordinateParseError::OutOfRange:
+        return QStringLiteral("OutOfRange");
+    }
+    return QStringLiteral("UnknownCoordinateParseError");
+}
 
 bool isValidAppPath(const QString &path, QString *reason)
 {

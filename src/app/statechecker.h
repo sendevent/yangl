@@ -21,6 +21,7 @@
 #include "app/nordvpninfo.h"
 
 #include <QObject>
+#include <chrono>
 
 class CLICaller;
 class QTimer;
@@ -45,6 +46,8 @@ class StateChecker : public QObject
 {
     Q_OBJECT
 public:
+    using Duration = std::chrono::milliseconds;
+
     enum class PollingMode
     {
         Dynamic,
@@ -52,11 +55,15 @@ public:
     };
     Q_ENUM(PollingMode)
 
-    static const int DefaultIntervalMs;
+    static constexpr Duration DefaultInterval = std::chrono::seconds(10);
+    static constexpr int DefaultIntervalMs = static_cast<int>(DefaultInterval.count());
     static const int MaxConsecutiveErrors;
-    static const int DynamicIntervalTransitionalMs;
-    static const int DynamicIntervalStableMs;
-    static const int DynamicTransitionTimeoutMs;
+    static constexpr Duration DynamicIntervalTransitional = std::chrono::seconds(1);
+    static constexpr int DynamicIntervalTransitionalMs = static_cast<int>(DynamicIntervalTransitional.count());
+    static constexpr Duration DynamicIntervalStable = std::chrono::seconds(10);
+    static constexpr int DynamicIntervalStableMs = static_cast<int>(DynamicIntervalStable.count());
+    static constexpr Duration DynamicTransitionTimeout = std::chrono::seconds(30);
+    static constexpr int DynamicTransitionTimeoutMs = static_cast<int>(DynamicTransitionTimeout.count());
 
     using Ptr = QSharedPointer<StateChecker>;
     explicit StateChecker(CLICaller *bus, int intervalMs);
@@ -71,6 +78,7 @@ public:
 
 public slots:
     void setInterval(int msecs);
+    void setInterval(Duration interval);
     void setActive(bool active);
     void setPollingMode(PollingMode mode);
     void startTransition();
@@ -94,7 +102,7 @@ protected:
     QTimer *m_uptimeTicker { nullptr };
     QTimer *m_transitionTimer { nullptr };
     PollingMode m_pollingMode { PollingMode::Dynamic };
-    int m_customIntervalMs { 0 };
+    Duration m_customInterval { 0 };
 
     NordVpnInfo m_state;
     void setState(const NordVpnInfo &state);

@@ -18,11 +18,10 @@
 #pragma once
 
 #include <QObject>
+#include <expected>
 
 class NordVpnInfo
 {
-    Q_GADGET
-
 public:
     enum class Status
     {
@@ -31,8 +30,8 @@ public:
         Connecting,
         Connected,
         Disconnecting,
+        StatusCount,
     };
-    Q_ENUM(Status);
 
     NordVpnInfo();
 
@@ -44,6 +43,7 @@ public:
     static NordVpnInfo fromString(const QString &text);
     static NordVpnInfo::Status textToStatus(const QString &from);
     static QString statusToText(NordVpnInfo::Status from);
+    static QList<NordVpnInfo::Status> allStatuses();
     static QString parseUptime(const QString &from);
 
     NordVpnInfo::Status status() const;
@@ -55,6 +55,25 @@ public:
 
     void tickUptime();
 
+    enum class UptimeParseError
+    {
+        EmptyInput,
+        InvalidToken,
+        UptimeParseErrorCount,
+    };
+
+    enum class StatusParseErrorCode
+    {
+        EmptyInput,
+        MalformedLine,
+        MissingStatus,
+        InvalidStatus,
+        InvalidUptime,
+        StatusParseErrorCodeCount,
+    };
+    static QString errorCodeToString(UptimeParseError code);
+    static QString errorCodeToString(StatusParseErrorCode code);
+
 private:
     Status m_status { Status::Unknown };
     QString m_server;
@@ -65,6 +84,16 @@ private:
     QString m_protocol;
     QString m_traffic;
     QString m_uptime;
+
+    using UptimeResult = std::expected<QString, UptimeParseError>;
+    [[nodiscard]] static UptimeResult tryParseUptime(const QString &from);
+
+    struct ParseError {
+        StatusParseErrorCode code;
+        QString detail;
+    };
+    using StatusParseResult = std::expected<NordVpnInfo, ParseError>;
+    [[nodiscard]] static StatusParseResult tryFromString(const QString &text);
 };
 
 Q_DECLARE_METATYPE(NordVpnInfo::Status)

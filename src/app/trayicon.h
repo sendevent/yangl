@@ -20,6 +20,7 @@
 #include "app/nordvpninfo.h"
 
 #include <QSystemTrayIcon>
+#include <chrono>
 
 class TrayIcon : public QSystemTrayIcon
 {
@@ -30,7 +31,8 @@ public:
     static void reloadIcons();
 
     void setMessageDuration(int durationSecs);
-    int duration() const { return m_duration; }
+    void setMessageDuration(std::chrono::seconds duration);
+    int duration() const { return static_cast<int>(m_duration.count()); }
 
     void updateIcon(NordVpnInfo::Status status);
 
@@ -53,7 +55,7 @@ private:
 
     NordVpnInfo m_state;
     bool m_isFirstChange { true };
-    int m_duration { 0 };
+    std::chrono::milliseconds m_duration { 0 };
 
     static QIcon iconForState(const NordVpnInfo &state);
     static QIcon iconForStatus(const NordVpnInfo::Status &status);

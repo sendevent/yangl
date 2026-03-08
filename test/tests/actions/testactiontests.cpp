@@ -18,13 +18,13 @@
 #include "testactiontests.h"
 
 #include "actions/action.h"
-#include "actions/actionstorage.h"
 #include "cli/clicall.h"
 #include "testaction.h"
+#include "testutils.h"
 
 #include <QSignalSpy>
 #include <QTest>
-#include <memory>
+#include <utility>
 
 void TestActionTests::testCreate_Builtin()
 {
@@ -33,10 +33,10 @@ void TestActionTests::testCreate_Builtin()
         const Action::Id id = Action::Id::createUuid();
 
         const Action::Ptr action(new TestAction(scope, actionType, {}, id));
-        TestAction().checkAction(action, static_cast<int>(actionType), scope, id);
+        TestAction().checkAction(action, std::to_underlying(actionType), scope, id);
 
         const Action::Ptr actionNoId(new TestAction(scope, actionType));
-        TestAction().checkAction(actionNoId, static_cast<int>(actionType), scope);
+        TestAction().checkAction(actionNoId, std::to_underlying(actionType), scope);
     }
 }
 
@@ -47,10 +47,10 @@ void TestActionTests::testCreate_Custom()
     const Action::NordVPN actionType = Action::NordVPN::Unknown;
 
     const Action::Ptr action(new TestAction(scope, actionType, {}, id));
-    TestAction().checkAction(action, static_cast<int>(actionType), scope, id);
+    TestAction().checkAction(action, std::to_underlying(actionType), scope, id);
 
     const Action::Ptr actionNoId(new TestAction(scope, actionType));
-    TestAction().checkAction(actionNoId, static_cast<int>(actionType), scope);
+    TestAction().checkAction(actionNoId, std::to_underlying(actionType), scope);
 }
 
 void TestActionTests::testSetTitle()
@@ -64,7 +64,7 @@ void TestActionTests::testSetTitle()
     QCOMPARE(action->title(), testValue);
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.at(0).typeId() == QVariant::String);
+    QVERIFY(arguments.at(0).typeId() == QMetaType::QString);
     QVERIFY(arguments.at(0) == testValue);
 }
 
@@ -79,7 +79,7 @@ void TestActionTests::testSetApp()
     QCOMPARE(action->app(), testValue);
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.at(0).typeId() == QVariant::String);
+    QVERIFY(arguments.at(0).typeId() == QMetaType::QString);
     QVERIFY(arguments.at(0) == testValue);
 }
 
@@ -94,7 +94,7 @@ void TestActionTests::testSetArgs()
     QCOMPARE(action->args(), testValue);
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.at(0).typeId() == QVariant::StringList);
+    QVERIFY(arguments.at(0).typeId() == QMetaType::QStringList);
     QVERIFY(arguments.at(0) == testValue);
 }
 
@@ -109,7 +109,7 @@ void TestActionTests::testSetTimeout()
     QCOMPARE(action->timeout(), testValue);
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.at(0).typeId() == QVariant::Int);
+    QVERIFY(arguments.at(0).typeId() == QMetaType::Int);
     QVERIFY(arguments.at(0) == testValue);
 }
 
@@ -124,7 +124,7 @@ void TestActionTests::testSetForcedShow()
     QCOMPARE(action->forcedShow(), testValue);
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
-    QVERIFY(arguments.at(0).typeId() == QVariant::Bool);
+    QVERIFY(arguments.at(0).typeId() == QMetaType::Bool);
     QVERIFY(arguments.at(0) == testValue);
 }
 
@@ -140,11 +140,13 @@ void TestActionTests::testSetAnchor()
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
     QCOMPARE(arguments.at(0).value<Action::MenuPlace>(), testValue);
-    QCOMPARE(arguments.at(0).toInt(), static_cast<int>(testValue));
+    QCOMPARE(arguments.at(0).toInt(), std::to_underlying(testValue));
 }
 
 void TestActionTests::testCreateRequest_invalidApp()
 {
+    testutils::ignoreWarning(QStringLiteral("Target binary file not exists: <br><b>`/no/such/binary`</b>"));
+
     const Action::Ptr action(new TestAction(Action::Flow::Custom, Action::NordVPN::Unknown));
     action->setApp("/no/such/binary");
 

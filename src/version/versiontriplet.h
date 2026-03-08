@@ -1,17 +1,27 @@
 #pragma once
 
 #include <QMap>
-#include <QObject>
 #include <QString>
+#include <expected>
 
 class VersionTriplet
 {
-    Q_GADGET
 public:
     VersionTriplet(int maj, int min, int patch);
 
     QString toString() const;
-    static VersionTriplet fromString(const QString &s);
+    enum class ParseError
+    {
+        EmptyInput,
+        WrongPartsCount,
+        EmptyComponent,
+        InvalidComponent,
+        ParseErrorCount,
+    };
+
+    using ParseResult = std::expected<VersionTriplet, ParseError>;
+    [[nodiscard]] static ParseResult fromString(const QString &s);
+    static QString errorCodeToString(ParseError code);
     bool operator==(const VersionTriplet &other) const;
     bool operator<(const VersionTriplet &other) const;
 
@@ -26,7 +36,6 @@ public:
         V_2_0_0,
         V_2_0_1,
     };
-    Q_ENUM(KnownVersion)
 
     static const QMap<VersionTriplet, KnownVersion> KnownVersions;
     static VersionTriplet fromKnown(KnownVersion v);

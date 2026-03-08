@@ -16,10 +16,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 */
 
 #include "geo/coordinatesresolver.h"
+#include "testutils.h"
 
 #include <QSignalSpy>
 #include <QTest>
-#include <qtestcase.h>
 
 class TestCoordinatesResolver : public QObject
 {
@@ -176,13 +176,9 @@ void TestCoordinatesResolver::test_requestCoordinates_real_1()
 
         const auto idRequested = m_resolver->requestCoordinates({ pair.first, pair.second });
 
-        if (spy.isEmpty()) {
-            QVERIFY(spy.wait());
-        }
+        testutils::waitForSpyOrFail(spy);
         QCOMPARE(spy.count(), 1);
-        const QList<QVariant> &arguments = spy.takeFirst();
-
-        QVERIFY(arguments.size() == 2);
+        const QList<QVariant> arguments = testutils::takeFirstArgsOrFail(spy, 2);
 
         QVERIFY(arguments.at(0).typeId() == QMetaType::UInt);
 
@@ -220,13 +216,9 @@ void TestCoordinatesResolver::test_requestCoordinates_real_3()
         const PlaceInfo placeRequested = { pair.first, pair.second };
         const auto idRequested = m_resolver->requestCoordinates(placeRequested);
 
-        if (spy.isEmpty()) {
-            QVERIFY(spy.wait());
-        }
+        testutils::waitForSpyOrFail(spy);
         QCOMPARE(spy.count(), 1);
-        const QList<QVariant> &arguments = spy.takeFirst();
-
-        QVERIFY(arguments.size() == 2);
+        const QList<QVariant> arguments = testutils::takeFirstArgsOrFail(spy, 2);
 
         QVERIFY(arguments.at(0).typeId() == QMetaType::UInt);
 
@@ -253,17 +245,15 @@ void TestCoordinatesResolver::test_requestCoordinates_fake()
     };
 
     {
+        testutils::ignoreWarning(QStringLiteral("No locations found for: `Oz` `Emerald City`"));
+
         QSignalSpy spy(&resolver, &CoordinatesResolver::coordinatesResolved);
 
         const auto idRequested = resolver.requestCoordinates({ "Oz", "Emerald City" });
 
-        if (spy.isEmpty()) {
-            QVERIFY(spy.wait());
-        }
+        testutils::waitForSpyOrFail(spy);
         QCOMPARE(spy.count(), 1);
-        const QList<QVariant> &arguments = spy.takeFirst();
-
-        QVERIFY(arguments.size() == 2);
+        const QList<QVariant> arguments = testutils::takeFirstArgsOrFail(spy, 2);
 
         QVERIFY(arguments.at(0).typeId() == QMetaType::UInt);
 
@@ -277,17 +267,15 @@ void TestCoordinatesResolver::test_requestCoordinates_fake()
     }
 
     {
+        testutils::ignoreWarning(QStringLiteral("No locations found for: `Oz` `Emerald City`"));
+
         QSignalSpy spy(&resolver, &CoordinatesResolver::coordinatesResolved);
 
         const auto idRequested = resolver.requestCoordinates("Oz", "Emerald City");
 
-        if (spy.isEmpty()) {
-            QVERIFY(spy.wait());
-        }
+        testutils::waitForSpyOrFail(spy);
         QCOMPARE(spy.count(), 1);
-        const QList<QVariant> &arguments = spy.takeFirst();
-
-        QVERIFY(arguments.size() == 2);
+        const QList<QVariant> arguments = testutils::takeFirstArgsOrFail(spy, 2);
 
         QVERIFY(arguments.at(0).typeId() == QMetaType::UInt);
 

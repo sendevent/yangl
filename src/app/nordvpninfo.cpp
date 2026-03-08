@@ -19,7 +19,7 @@
 
 #include "common.h"
 
-#include <QMetaEnum>
+#include <utility>
 
 NordVpnInfo::NordVpnInfo()
 {
@@ -65,24 +65,44 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
 
 /*static*/ NordVpnInfo NordVpnInfo::fromString(const QString &text)
 {
-    NordVpnInfo updatedState;
-    if (text.isEmpty()) {
-        return updatedState;
+    const auto &parsed = tryFromString(text);
+    if (!parsed) {
+        const auto &error = parsed.error();
+        WRN << errorCodeToString(error.code) << error.detail;
+        return {};
     }
+    return parsed.value();
+}
+
+/*static*/ NordVpnInfo::StatusParseResult NordVpnInfo::tryFromString(const QString &text)
+{
+    if (text.isEmpty()) {
+        return std::unexpected(ParseError { StatusParseErrorCode::EmptyInput, QStringLiteral("Input is empty") });
+    }
+
+    NordVpnInfo updatedState;
+    bool hasStatus { false };
 
     const QStringList &pairs = text.split('\n', Qt::SkipEmptyParts);
     for (const QString &line : pairs) {
         const int sep = line.indexOf(':');
         if (sep <= 0) {
-            WRN << "Unexpected format:" << line;
-            continue;
+            return std::unexpected(ParseError { StatusParseErrorCode::MalformedLine,
+                                                QStringLiteral("No ':' separator in line: '%1'").arg(line) });
         }
 
         const QString &name = line.left(sep).simplified().toLower();
         const QString &value = line.mid(sep + 1).simplified();
 
         if (name.contains(QLatin1String("status"))) {
-            updatedState.m_status = textToStatus(value);
+            hasStatus = true;
+            const NordVpnInfo::Status parsedStatus = textToStatus(value);
+            if (parsedStatus == NordVpnInfo::Status::Unknown
+                && value.compare(QStringLiteral("Unknown"), Qt::CaseInsensitive) != 0) {
+                return std::unexpected(ParseError { StatusParseErrorCode::InvalidStatus,
+                                                    QStringLiteral("Unrecognized status value: '%1'").arg(value) });
+            }
+            updatedState.m_status = parsedStatus;
         } else if (name.contains(QLatin1String("server")) || name.contains(QLatin1String("hostname"))) {
             updatedState.m_server = value;
         } else if (name.contains(QLatin1String("country"))) {
@@ -100,8 +120,19 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
             updatedState.m_traffic.replace(QStringLiteral("received"), QStringLiteral("↓"));
             updatedState.m_traffic.replace(QStringLiteral("sent"), QStringLiteral("↑"));
         } else if (name.contains(QLatin1String("uptime"))) {
-            updatedState.m_uptime = parseUptime(value.simplified());
+            const UptimeResult parsedUptime = tryParseUptime(value.simplified());
+            if (!parsedUptime) {
+                return std::unexpected(ParseError { StatusParseErrorCode::InvalidUptime,
+                                                    QStringLiteral("Failed parsing uptime '%1': %2")
+                                                            .arg(value, errorCodeToString(parsedUptime.error())) });
+            }
+            updatedState.m_uptime = parsedUptime.value();
         }
+    }
+
+    if (!hasStatus) {
+        return std::unexpected(
+                ParseError { StatusParseErrorCode::MissingStatus, QStringLiteral("No status field found in input") });
     }
 
     return updatedState;
@@ -109,29 +140,102 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
 
 /*static*/ NordVpnInfo::Status NordVpnInfo::textToStatus(const QString &from)
 {
-    if (from.isEmpty()) {
-        return NordVpnInfo::Status::Unknown;
+    const QString normalized = from.trimmed();
+    if (normalized.compare(QStringLiteral("Disconnected"), Qt::CaseInsensitive) == 0) {
+        return Status::Disconnected;
     }
-
-    const QMetaEnum me = QMetaEnum::fromType<NordVpnInfo::Status>();
-    bool found(false);
-    const int enumVal = me.keyToValue(qPrintable(from), &found);
-    return (found ? static_cast<NordVpnInfo::Status>(enumVal) : NordVpnInfo::Status::Unknown);
+    if (normalized.compare(QStringLiteral("Connecting"), Qt::CaseInsensitive) == 0) {
+        return Status::Connecting;
+    }
+    if (normalized.compare(QStringLiteral("Connected"), Qt::CaseInsensitive) == 0) {
+        return Status::Connected;
+    }
+    if (normalized.compare(QStringLiteral("Disconnecting"), Qt::CaseInsensitive) == 0) {
+        return Status::Disconnecting;
+    }
+    if (normalized.compare(QStringLiteral("Unknown"), Qt::CaseInsensitive) == 0) {
+        return Status::Unknown;
+    }
+    return Status::Unknown;
 }
 
 /*static*/ QString NordVpnInfo::statusToText(NordVpnInfo::Status from)
 {
-    const QMetaEnum me = QMetaEnum::fromType<NordVpnInfo::Status>();
-    return me.valueToKey(static_cast<int>(from));
+    switch (from) {
+    case Status::Unknown:
+        return QStringLiteral("Unknown");
+    case Status::Disconnected:
+        return QStringLiteral("Disconnected");
+    case Status::Connecting:
+        return QStringLiteral("Connecting");
+    case Status::Connected:
+        return QStringLiteral("Connected");
+    case Status::Disconnecting:
+        return QStringLiteral("Disconnecting");
+    case Status::StatusCount:
+        return QStringLiteral("StatusCount");
+    }
+    return QStringLiteral("Unknown");
+}
+
+/*static*/ QList<NordVpnInfo::Status> NordVpnInfo::allStatuses()
+{
+    return {
+        Status::Unknown, Status::Disconnected, Status::Connecting, Status::Connected, Status::Disconnecting,
+    };
+}
+
+/*static*/ QString NordVpnInfo::errorCodeToString(UptimeParseError code)
+{
+    switch (code) {
+    case UptimeParseError::EmptyInput:
+        return QStringLiteral("EmptyInput");
+    case UptimeParseError::InvalidToken:
+        return QStringLiteral("InvalidToken");
+    case UptimeParseError::UptimeParseErrorCount:
+        return QStringLiteral("UptimeParseErrorCount");
+    }
+    return QStringLiteral("UnknownUptimeParseError");
+}
+
+/*static*/ QString NordVpnInfo::errorCodeToString(StatusParseErrorCode code)
+{
+    switch (code) {
+    case StatusParseErrorCode::EmptyInput:
+        return QStringLiteral("EmptyInput");
+    case StatusParseErrorCode::MalformedLine:
+        return QStringLiteral("MalformedLine");
+    case StatusParseErrorCode::MissingStatus:
+        return QStringLiteral("MissingStatus");
+    case StatusParseErrorCode::InvalidStatus:
+        return QStringLiteral("InvalidStatus");
+    case StatusParseErrorCode::InvalidUptime:
+        return QStringLiteral("InvalidUptime");
+    case StatusParseErrorCode::StatusParseErrorCodeCount:
+        return QStringLiteral("StatusParseErrorCodeCount");
+    }
+    return QStringLiteral("UnknownStatusParseError");
 }
 
 /*static*/ QString NordVpnInfo::parseUptime(const QString &from)
 {
-    QString result;
-
-    if (from.isEmpty()) {
-        return result;
+    const auto &parsed = tryParseUptime(from);
+    if (!parsed) {
+        auto err = parsed.error();
+        WRN << errorCodeToString(err);
+        return {};
     }
+    return parsed.value();
+}
+
+/*static*/ NordVpnInfo::UptimeResult NordVpnInfo::tryParseUptime(const QString &from)
+{
+    if (from.isEmpty()) {
+        return std::unexpected(UptimeParseError::EmptyInput);
+    }
+
+    QString result;
+    bool hasParsedTokens { false };
 
     auto add = [&result](int value, int width = 2) {
         if (!result.isEmpty()) {
@@ -155,6 +259,11 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
         } else {
             add(value, 2);
         }
+        hasParsedTokens = true;
+    }
+
+    if (!hasParsedTokens) {
+        return std::unexpected(UptimeParseError::InvalidToken);
     }
 
     if (result.count(QChar(':')) <= 2) {

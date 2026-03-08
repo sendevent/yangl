@@ -19,6 +19,7 @@
 #include "app/statechecker.h"
 #include "cli/clicaller.h"
 #include "settings/appsettings.h"
+#include "testutils.h"
 
 #include <QElapsedTimer>
 #include <QObject>
@@ -27,7 +28,6 @@
 #include <QStandardPaths>
 #include <QTest>
 #include <QTimer>
-#include <qtcoreexports.h>
 
 class TestStateChecker : public QObject
 {
@@ -93,9 +93,7 @@ void TestStateChecker::test_active()
     m_checker->setActive(false);
     QCOMPARE(m_checker->isActive(), false);
 
-    if (spy.isEmpty()) {
-        QVERIFY(spy.wait());
-    }
+    testutils::waitForSpyOrFail(spy);
 }
 
 void TestStateChecker::test_no_overlapping_polls()
@@ -118,9 +116,7 @@ void TestStateChecker::test_no_overlapping_polls()
     QVERIFY(m_checker->m_pollInFlight);
 
     // Wait for the single poll to complete.
-    if (spy.isEmpty()) {
-        QVERIFY(spy.wait(CLICall::DefaultTimeoutMSecs));
-    }
+    testutils::waitForSpyOrFail(spy, CLICall::DefaultTimeoutMSecs);
 
     QCOMPARE(m_checker->m_pollInFlight, false);
     QCOMPARE(spy.count(), 1); // exactly one result despite two check() calls
@@ -148,7 +144,7 @@ void TestStateChecker::test_polling_mode_switch()
     // Switch to Custom — timer must use the stored custom interval.
     m_checker->setPollingMode(StateChecker::PollingMode::Custom);
     QCOMPARE(m_checker->m_pollingMode, StateChecker::PollingMode::Custom);
-    QCOMPARE(m_checker->m_timer->interval(), m_checker->m_customIntervalMs);
+    QCOMPARE(m_checker->m_timer->interval(), static_cast<int>(m_checker->m_customInterval.count()));
 
     // setInterval in Custom mode must update the timer immediately.
     static constexpr int newInterval = 7000;
@@ -192,7 +188,7 @@ void TestStateChecker::test_transition_polling()
 
     // In Custom mode a status change must not affect the polling interval.
     m_checker->setPollingMode(StateChecker::PollingMode::Custom);
-    const int savedCustom = m_checker->m_customIntervalMs;
+    const int savedCustom = static_cast<int>(m_checker->m_customInterval.count());
     m_checker->setInterval(7000);
     m_checker->setStatus(NordVpnInfo::Status::Disconnected);
     QCOMPARE(m_checker->m_timer->interval(), 7000);
@@ -255,9 +251,7 @@ void TestStateChecker::test_check(NordVpnInfo::Status targetStatus)
 
     m_checker->check();
 
-    if (spy.isEmpty()) {
-        QVERIFY(spy.wait(CLICall::DefaultTimeoutMSecs));
-    }
+    testutils::waitForSpyOrFail(spy, CLICall::DefaultTimeoutMSecs);
 
     QCOMPARE(m_checker->state().status(), targetStatus);
     QVERIFY(spy.count() >= 1);
@@ -273,6 +267,9 @@ void TestStateChecker::test_error_resilience()
     const Action::Ptr &action = m_storage->action(Action::NordVPN::CheckStatus);
     const QString savedApp = action->app();
 
+    testutils::ignoreWarning(QStringLiteral("Target binary file not exists:"));
+    testutils::ignoreWarning(QStringLiteral("Failed to dispatch status check"));
+
     // Point the action at a non-existent binary to force CLI errors.
     action->setApp(QStringLiteral("/nonexistent/yangl-test-binary"));
 
@@ -280,18 +277,23 @@ void TestStateChecker::test_error_resilience()
 
     // Trigger errors one at a time; monitor must survive the first N-1 of them.
     for (int i = 0; i < StateChecker::MaxConsecutiveErrors - 1; ++i) {
+        testutils::ignoreWarning(QStringLiteral("Target binary file not exists:"));
+        testutils::ignoreWarning(QStringLiteral("Failed to dispatch status check"));
+
         m_checker->check();
         if (errorSpy.size() <= i) {
-            QVERIFY(errorSpy.wait(CLICall::DefaultTimeoutMSecs));
+            testutils::waitForSpyOrFail(errorSpy, CLICall::DefaultTimeoutMSecs);
         }
         QCOMPARE(errorSpy.count(), i + 1);
         QCOMPARE(m_checker->m_consecutiveErrors, i + 1); // counter advancing
     }
 
+    testutils::ignoreWarning(QStringLiteral("Stopping monitor after 3 consecutive errors"));
+
     // The Nth error must trip the threshold: counter resets and monitor stops.
     m_checker->check();
     if (errorSpy.size() < StateChecker::MaxConsecutiveErrors) {
-        QVERIFY(errorSpy.wait(CLICall::DefaultTimeoutMSecs));
+        testutils::waitForSpyOrFail(errorSpy, CLICall::DefaultTimeoutMSecs);
     }
 
     QCOMPARE(errorSpy.count(), StateChecker::MaxConsecutiveErrors);
@@ -303,9 +305,7 @@ void TestStateChecker::test_error_resilience()
 
     QSignalSpy stateSpy(m_checker.get(), &StateChecker::stateChanged);
     m_checker->check();
-    if (stateSpy.isEmpty()) {
-        QVERIFY(stateSpy.wait(CLICall::DefaultTimeoutMSecs));
-    }
+    testutils::waitForSpyOrFail(stateSpy, CLICall::DefaultTimeoutMSecs);
 
     QCOMPARE(m_checker->m_consecutiveErrors, 0);
 }

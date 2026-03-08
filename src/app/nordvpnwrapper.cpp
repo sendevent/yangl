@@ -34,6 +34,8 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QTimer>
+#include <chrono>
+#include <utility>
 
 NordVpnWrapper::NordVpnWrapper(QObject *parent)
     : QObject(parent)
@@ -169,7 +171,7 @@ void NordVpnWrapper::loadSettings()
     m_checker->setInterval(AppSettings::Monitor->Interval->read().toInt());
     m_checker->setPollingMode(
             static_cast<StateChecker::PollingMode>(AppSettings::Monitor->PollingMode->read().toInt()));
-    m_trayIcon->setMessageDuration(AppSettings::Tray->MessageDuration->read().toInt() * utils::oneSecondMs());
+    m_trayIcon->setMessageDuration(std::chrono::seconds(AppSettings::Tray->MessageDuration->read().toInt()));
 
     m_lastCountry = AppSettings::Monitor->LastCountry->read().toString();
     m_lastCity = AppSettings::Monitor->LastCity->read().toString();
@@ -217,8 +219,8 @@ void NordVpnWrapper::onActionTriggered(Action *action)
 
     if (action->scope() != expectedFlow) {
         static const QString wrn("Unexpected Flow: %1 (expected: %2).");
-        WRN << wrn.arg(QString::number(static_cast<int>(action->scope())),
-                       QString::number(static_cast<int>(expectedFlow)))
+        WRN << wrn.arg(QString::number(std::to_underlying(action->scope())),
+                       QString::number(std::to_underlying(expectedFlow)))
             << callerInfo;
         return false;
     }
@@ -262,7 +264,7 @@ void NordVpnWrapper::processYanglAction(Action *action)
         }
     }
     default: {
-        WRN << "Unhandled Yangl action:" << actType;
+        WRN << "Unhandled Yangl action:" << std::to_underlying(actType);
         break;
     }
     }

@@ -24,8 +24,9 @@
 #include "cli/clicall.h"
 #include "settings/appsettings.h"
 
-#include <QFile>
 #include <QUuid>
+#include <algorithm>
+#include <utility>
 
 ActionStorage::ActionStorage(QObject *parent)
     : QObject(parent)
@@ -36,8 +37,7 @@ ActionStorage::ActionStorage(QObject *parent)
 QList<Action::Ptr> ActionStorage::sortActionsByTitle(const QList<Action::Ptr> &actions) const
 {
     QList<Action::Ptr> sorted(actions);
-    std::sort(sorted.begin(), sorted.end(),
-              [](const Action::Ptr &a, const Action::Ptr &b) { return a->title() < b->title(); });
+    std::ranges::sort(sorted, [](const Action::Ptr &a, const Action::Ptr &b) { return a->title() < b->title(); });
     return sorted;
 }
 
@@ -64,7 +64,7 @@ QList<Action::Ptr> ActionStorage::allActions() const
 Action::Ptr ActionStorage::action(Action::NordVPN requested) const
 {
     const auto &collection = nvpnActions();
-    auto found = std::find_if(collection.cbegin(), collection.cend(), [&requested](const Action::Ptr &action) {
+    auto found = std::ranges::find_if(collection, [&requested](const Action::Ptr &action) {
         return static_cast<Action::NordVPN>(action->type()) == requested;
     });
     return found == collection.end() ? nullptr : *found;
@@ -73,15 +73,15 @@ Action::Ptr ActionStorage::action(Action::NordVPN requested) const
 Action::Ptr ActionStorage::action(const Action::Id &requested) const
 {
     const auto &collection = userActions();
-    auto found = std::find_if(collection.cbegin(), collection.cend(),
-                              [&requested](const Action::Ptr &action) { return action->id() == requested; });
+    auto found = std::ranges::find_if(collection,
+                                      [&requested](const Action::Ptr &action) { return action->id() == requested; });
     return found == collection.end() ? nullptr : *found;
 }
 
 Action::Ptr ActionStorage::action(Action::Yangl requested) const
 {
     const auto &collection = yanglActions();
-    auto found = std::find_if(collection.cbegin(), collection.cend(), [&requested](const Action::Ptr &action) {
+    auto found = std::ranges::find_if(collection, [&requested](const Action::Ptr &action) {
         return static_cast<Action::Yangl>(action->type()) == requested;
     });
     return found == collection.end() ? nullptr : *found;
@@ -90,10 +90,17 @@ Action::Ptr ActionStorage::action(Action::Yangl requested) const
 QList<Action::Ptr> ActionStorage::load(const QString &from)
 {
     const auto &usedPath = from.isEmpty() ? ActionJson::jsonFilePath() : from;
-    const bool jsonLoaded = m_json->load(usedPath);
+    const auto jsonLoaded = m_json->tryLoad(usedPath);
+    if (!jsonLoaded) {
+        WRN << ActionJson::errorCodeToString(jsonLoaded.error().code) << jsonLoaded.error().details;
+    }
+
     loadActions();
     if (!jsonLoaded) {
-        m_json->save(usedPath);
+        const auto saved = m_json->trySave(usedPath);
+        if (!saved) {
+            WRN << ActionJson::errorCodeToString(saved.error().code) << saved.error().details;
+        }
     }
 
     return allActions();
@@ -102,13 +109,18 @@ QList<Action::Ptr> ActionStorage::load(const QString &from)
 void ActionStorage::save(const QString &to)
 {
     const auto &usedPath = to.isEmpty() ? ActionJson::jsonFilePath() : to;
-    QFile out(usedPath);
-    if (!out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
-        WRN << "failed opening file:" << usedPath << out.errorString();
-        return;
+
+    m_json->clear();
+    for (const auto &actionsCollection : { yanglActions(), nvpnActions(), userActions() }) {
+        for (const auto &action : actionsCollection) {
+            m_json->putAction(action.get());
+        }
     }
 
-    save(&out);
+    const auto saved = m_json->trySave(usedPath);
+    if (!saved) {
+        WRN << ActionJson::errorCodeToString(saved.error().code) << saved.error().details;
+    }
 }
 
 void ActionStorage::save(QIODevice *to)
@@ -121,7 +133,10 @@ void ActionStorage::save(QIODevice *to)
         }
     }
 
-    return m_json->save(to);
+    const auto saved = m_json->trySave(to);
+    if (!saved) {
+        WRN << ActionJson::errorCodeToString(saved.error().code) << saved.error().details;
+    }
 }
 
 Action::Ptr ActionStorage::createUserAction(QObject *parent)
@@ -263,7 +278,7 @@ Action::Ptr ActionStorage::createYanglAction(Action::Yangl actionType, const QSt
     }
 
     const Action::Flow scope = Action::Flow::Yangl;
-    const int t = static_cast<int>(actionType);
+    const int t = std::to_underlying(actionType);
     const Action::Id &i = QUuid::fromString(id);
     const QString appPath = {};
     const QStringList args = {};
@@ -561,7 +576,7 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
         break;
     }
 
-    const auto &action = createAction(scope, static_cast<int>(actionType), actId, appPath, title, args, forceShow,
+    const auto &action = createAction(scope, std::to_underlying(actionType), actId, appPath, title, args, forceShow,
                                       menuPlace, CLICall::DefaultTimeoutMSecs, this);
     if (!toggleGroup.isEmpty()) {
         action->setToggleGroup(toggleGroup, toggleOn);

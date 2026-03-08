@@ -27,6 +27,7 @@
 #include <QMetaType>
 #include <QSettings>
 #include <QStandardPaths>
+#include <utility>
 
 AppSetting::AppSetting(const QString &name, const QVariant &defaultValue)
     : Name(name)
@@ -75,7 +76,7 @@ GroupMonitor::GroupMonitor()
                            new AppSetting(QString("%1/LastCountry").arg(localName()), QString()),
                            new AppSetting(QString("%1/LastCity").arg(localName()), QString()),
                            new AppSetting(QString("%1/PollingMode").arg(localName()),
-                                          static_cast<int>(StateChecker::PollingMode::Dynamic)),
+                                          std::to_underlying(StateChecker::PollingMode::Dynamic)),
                            new AppSetting(QString("%1/CheckForUpdates").arg(localName()), true),
                    },
                    {})

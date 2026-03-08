@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html
 
 #include "placeinfo.h"
 
-#include <qqml.h>
+#include <QQmlEngine>
 
 static const int registered = []() {
     qmlRegisterUncreatableType<PlaceInfo>("yangl", 2, 0, "placeInfo", "PlaceInfo is used for data only");

@@ -27,6 +27,8 @@
 #include "settings/appsettings.h"
 #include "settings/settingsdialog.h"
 
+#include <utility>
+
 AppUiCoordinator::AppUiCoordinator(NordVpnWrapper *wrapper, ActionStorage *storage, StateChecker *checker,
                                    QObject *parent)
     : QObject(parent)
@@ -83,21 +85,21 @@ void AppUiCoordinator::onTrayIconActivated(QSystemTrayIcon::ActivationReason rea
         return;
     }
     case QSystemTrayIcon::MiddleClick: {
-        int invokeMe = static_cast<int>(Action::NordVPN::Unknown);
+        int invokeMe = std::to_underlying(Action::NordVPN::Unknown);
         switch (m_checker->state().status()) {
         case NordVpnInfo::Status::Connected:
-            invokeMe = static_cast<int>(Action::NordVPN::Disconnect);
+            invokeMe = std::to_underlying(Action::NordVPN::Disconnect);
             break;
         case NordVpnInfo::Status::Disconnected:
-            invokeMe = static_cast<int>(Action::NordVPN::Connect);
+            invokeMe = std::to_underlying(Action::NordVPN::Connect);
             break;
         case NordVpnInfo::Status::Unknown:
-            invokeMe = static_cast<int>(Action::NordVPN::CheckStatus);
+            invokeMe = std::to_underlying(Action::NordVPN::CheckStatus);
             break;
         default:
             return;
         }
-        if (invokeMe != static_cast<int>(Action::NordVPN::Unknown)) {
+        if (invokeMe != std::to_underlying(Action::NordVPN::Unknown)) {
             emit actionRequested(invokeMe);
         }
         return;

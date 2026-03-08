@@ -23,13 +23,11 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QFileInfo>
-#include <QLatin1StringView>
-#include <QMetaEnum>
 #include <QPainter>
 #include <QPixmap>
 #include <QSystemTrayIcon>
 #include <QTextDocumentFragment>
-#include <qlatin1stringview.h>
+#include <chrono>
 
 /*static*/ QMap<NordVpnInfo::Status, TrayIcon::IconInfo> TrayIcon::m_allIcons = {};
 /*static*/ QMap<NordVpnInfo::Status, QIcon> TrayIcon::m_composedIcons = {};
@@ -39,9 +37,7 @@
     m_allIcons.clear();
     m_composedIcons.clear();
 
-    QMetaEnum me = QMetaEnum::fromType<NordVpnInfo::Status>();
-    for (int i = 0; i < me.keyCount(); ++i) {
-        const NordVpnInfo::Status state = static_cast<NordVpnInfo::Status>(me.value(i));
+    for (const auto state : NordVpnInfo::allStatuses()) {
         IconInfo info;
         info.m_status = state;
 
@@ -99,13 +95,14 @@
 TrayIcon::TrayIcon(QObject *parent)
     : QSystemTrayIcon(parent)
     , m_isFirstChange(true)
-    , m_duration(5 * utils::oneSecondMs())
+    , m_duration(std::chrono::seconds(5))
 {
     deployDefaults();
     reloadIcons();
 
     const auto &icon = iconForStatus(NordVpnInfo::Status::Unknown);
-    updateStateText(tr("State: Unknown"), icon);
+    const QString unknownStateText = NordVpnInfo::statusToText(NordVpnInfo::Status::Unknown);
+    updateStateText(tr("State: %1").arg(unknownStateText), icon);
     setIcon(icon);
 }
 
@@ -121,7 +118,12 @@ TrayIcon::TrayIcon(QObject *parent)
 
 void TrayIcon::setMessageDuration(int durationSecs)
 {
-    m_duration = durationSecs;
+    setMessageDuration(std::chrono::seconds(durationSecs));
+}
+
+void TrayIcon::setMessageDuration(std::chrono::seconds duration)
+{
+    m_duration = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
 }
 
 void TrayIcon::updateIcon(NordVpnInfo::Status status)
@@ -218,7 +220,8 @@ void TrayIcon::showUpdateNotification(const QString &version, const QUrl &repoUr
     const QString text = tr("New version %1 is available\n%2").arg(version, repoUrl.toString());
     const QString &tooltip = QTextDocumentFragment::fromHtml(text).toPlainText();
     setToolTip(tooltip);
-    showMessage(qApp->applicationDisplayName(), tooltip, QSystemTrayIcon::Information, m_duration);
+    showMessage(qApp->applicationDisplayName(), tooltip, QSystemTrayIcon::Information,
+                static_cast<int>(m_duration.count()));
 }
 
 void TrayIcon::updateStateText(const QString &message, QSystemTrayIcon::MessageIcon messageType)
@@ -229,7 +232,7 @@ void TrayIcon::updateStateText(const QString &message, QSystemTrayIcon::MessageI
     if (messageType != QSystemTrayIcon::NoIcon) {
         const bool forcePlainText = AppSettings::Tray->MessagePlainText->read().toBool();
         const auto &sanitized = forcePlainText ? tooltip : message;
-        showMessage(qApp->applicationDisplayName(), sanitized, messageType, m_duration);
+        showMessage(qApp->applicationDisplayName(), sanitized, messageType, static_cast<int>(m_duration.count()));
     }
 }
 
@@ -241,6 +244,6 @@ void TrayIcon::updateStateText(const QString &message, const QIcon &icon)
     if (!icon.isNull()) {
         const bool forcePlainText = AppSettings::Tray->MessagePlainText->read().toBool();
         const auto &sanitized = forcePlainText ? tooltip : message;
-        showMessage(qApp->applicationDisplayName(), sanitized, icon, m_duration);
+        showMessage(qApp->applicationDisplayName(), sanitized, icon, static_cast<int>(m_duration.count()));
     }
 }

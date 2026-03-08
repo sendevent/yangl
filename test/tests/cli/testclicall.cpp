@@ -17,6 +17,7 @@
 
 #include "actions/testaction.h"
 #include "cli/clicall.h"
+#include "testutils.h"
 
 #include <QSignalSpy>
 #include <QTest>
@@ -45,9 +46,9 @@ void TestCLICall::test_call()
     call->run();
 
     QCOMPARE(spy.count(), 1);
-    const QList<QVariant> &arguments = spy.takeFirst();
+    const QList<QVariant> arguments = testutils::takeFirstArgsOrFail(spy, 1);
     const QString &filesList = arguments.at(0).toString();
-    QVERIFY(arguments.at(0).typeId() == QVariant::String);
+    QVERIFY(arguments.at(0).typeId() == QMetaType::QString);
     QCOMPARE(filesList, receivedResult);
     QVERIFY(filesList.contains("Test_CLICall"));
 
@@ -59,6 +60,7 @@ void TestCLICall::test_call()
 
 void TestCLICall::test_call_invalidApp()
 {
+    testutils::ignoreWarning(QStringLiteral("Target binary file not exists: <br><b>`/no/such/binary`</b>"));
     const Action::Ptr action(new TestAction());
     action->setApp("/no/such/binary");
 

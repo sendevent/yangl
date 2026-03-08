@@ -19,10 +19,14 @@
 #include "actions/actionstorage.h"
 #include "settings/appsettings.h"
 #include "settings/settingsmanager.h"
+#include "testutils.h"
 
 #include <QFile>
+#include <QJsonDocument>
+#include <QJsonParseError>
 #include <QTemporaryFile>
 #include <QTest>
+#include <utility>
 
 class ActionStorage;
 class TestActionStorage : public QObject
@@ -53,6 +57,7 @@ private slots:
     void test_updateActionsUser();
     void test_toggleGroups();
     void test_toggleGroups_survive_save_load();
+    void test_load_invalidJson_recovers_defaults();
 };
 
 TestActionStorage::TestActionStorage(QObject *parent)
@@ -166,7 +171,7 @@ void TestActionStorage::test_allActions()
     storage.load();
 
     const QVector<Action::Ptr> &knownActions = storage.nvpnActions();
-    QCOMPARE(knownActions.size(), QMetaEnum::fromType<Action::NordVPN>().keyCount() - 1);
+    QCOMPARE(knownActions.size(), Action::nvpnActions().size());
 
     QCOMPARE(storage.userActions().size(), 0);
 
@@ -196,7 +201,7 @@ void TestActionStorage::test_actionBuiltin()
     storage.load();
 
     const QVector<Action::Ptr> &knownActions = storage.nvpnActions();
-    QCOMPARE(knownActions.size(), QMetaEnum::fromType<Action::NordVPN>().keyCount() - 1);
+    QCOMPARE(knownActions.size(), Action::nvpnActions().size());
 
     for (auto i : Action::nvpnActions()) {
         const Action::Ptr &action = storage.action(i);
@@ -258,9 +263,7 @@ void TestActionStorage::test_saveAndLoad()
         storage.load();
 
         const QVector<Action::Ptr> allActions = storage.allActions();
-        QCOMPARE(allActions.size(),
-                 QMetaEnum::fromType<Action::NordVPN>().keyCount() - 1 + UserActionCount
-                         + storage.yanglActions().size());
+        QCOMPARE(allActions.size(), Action::nvpnActions().size() + UserActionCount + storage.yanglActions().size());
 
         for (const Action::Ptr &action : allActions) {
             if (action->scope() == Action::Flow::Yangl) {
@@ -295,18 +298,18 @@ void TestActionStorage::test_updateActionsBuiltin()
     storage.load();
 
     const QVector<Action::Ptr> &actions = storage.nvpnActions();
-    QCOMPARE(actions.size(), QMetaEnum::fromType<Action::NordVPN>().keyCount() - 1);
+    QCOMPARE(actions.size(), Action::nvpnActions().size());
 
     for (int i = 0; i < actions.size(); ++i) {
         const Action::Ptr &action = actions.at(i);
-        action->setTitle(QString("BuiltinAction_%1").arg(static_cast<int>(action->type())));
+        action->setTitle(QString("BuiltinAction_%1").arg(action->type()));
     }
 
     storage.updateActions(actions, Action::Flow::NordVPN);
 
     for (auto i : Action::nvpnActions()) {
         const Action::Ptr &action = storage.action(i);
-        QCOMPARE(action->title(), QString("BuiltinAction_%1").arg(static_cast<int>(action->type())));
+        QCOMPARE(action->title(), QString("BuiltinAction_%1").arg(action->type()));
     }
 }
 
@@ -442,9 +445,29 @@ void TestActionStorage::test_toggleGroups_survive_save_load()
             const Action::Ptr &action = storage.action(t);
             QVERIFY(action);
             QVERIFY2(action->toggleGroup().isEmpty(),
-                     qPrintable(QString("Unexpected toggleGroup on non-toggle action %1").arg(static_cast<int>(t))));
+                     qPrintable(QString("Unexpected toggleGroup on non-toggle action %1").arg(std::to_underlying(t))));
         }
     }
+}
+
+void TestActionStorage::test_load_invalidJson_recovers_defaults()
+{
+    testutils::ignoreWarning(QStringLiteral("InvalidJson error parsing document: unterminated object"));
+    QTemporaryFile tmp;
+    QVERIFY(tmp.open());
+    tmp.write("{ invalid json");
+    tmp.close();
+
+    ActionStorage storage;
+    const QList<Action::Ptr> loaded = storage.load(tmp.fileName());
+    QVERIFY(!loaded.isEmpty());
+
+    QFile in(tmp.fileName());
+    QVERIFY(in.open(QIODevice::ReadOnly | QIODevice::Text));
+    QJsonParseError err;
+    const QJsonDocument doc = QJsonDocument::fromJson(in.readAll(), &err);
+    QCOMPARE(err.error, QJsonParseError::NoError);
+    QVERIFY(doc.isObject());
 }
 
 QTEST_MAIN(TestActionStorage)

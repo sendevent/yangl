@@ -63,9 +63,8 @@ AboutDialog::AboutDialog(QWidget *parent)
     layout()->addWidget(m_statusBar);
     m_statusBar->show();
 
-    static const QMetaEnum me = QMetaEnum::fromType<TabId>();
-    for (int i = 0; i < me.keyCount(); ++i) {
-        createTab(static_cast<TabId>(me.value(i)));
+    for (const auto tabId : utils::allEnum<TabId>()) {
+        createTab(tabId);
     }
 }
 
@@ -102,12 +101,13 @@ void AboutDialog::createTab(TabId tabId)
 {
     const QString &file = AboutDialog::m_tabs[tabId];
     const QStringList nameParts = file.split('.');
+    const QString tabTitle = utils::enumToString(tabId, nameParts.first());
 
     QWidget *tab = new QWidget(ui->tabWidget);
     QVBoxLayout *vBox = new QVBoxLayout(tab);
     QTextBrowser *display = new QTextBrowser(tab);
     vBox->addWidget(display);
-    ui->tabWidget->addTab(tab, nameParts.first());
+    ui->tabWidget->addTab(tab, tabTitle);
 
     display->setOpenLinks(false);
     connect(display, &QTextBrowser::anchorClicked, this, [](const QUrl &url) { QDesktopServices::openUrl(url); });

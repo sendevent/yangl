@@ -171,10 +171,12 @@ void ServersChartView::loadSettings()
 {
     m_searchBox->setText(AppSettings::Map->Filter->read().toString());
 
-    const auto &[coord, parsed] = utils::parseCoordinates(AppSettings::Map->CenterLat->read().toString(),
-                                                          AppSettings::Map->CenterLon->read().toString());
-    if (parsed) {
-        m_chartWidget->centerOn(coord);
+    const auto parsedCoords = utils::parseCoordinatesExpected(AppSettings::Map->CenterLat->read().toString(),
+                                                              AppSettings::Map->CenterLon->read().toString());
+    if (parsedCoords) {
+        m_chartWidget->centerOn(*parsedCoords);
+    } else {
+        WRN << "Failed parsing stored map center coordinates:" << utils::errorCodeToString(parsedCoords.error());
     }
 
     bool ok(false);

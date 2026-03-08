@@ -16,6 +16,7 @@
 */
 
 #include "app/updatechecker.h"
+#include "testutils.h"
 #include "version/versiontriplet.h"
 
 #include <QBuffer>
@@ -27,6 +28,7 @@
 #include <QObject>
 #include <QSignalSpy>
 #include <QTest>
+#include <utility>
 
 class MockReply : public QNetworkReply
 {
@@ -123,11 +125,16 @@ private slots:
     void test_V_prefix_case_insensitive();
     void test_empty_tag_ignored();
     void test_network_error_suppressed();
+    void test_invalid_json_ignored();
+    void test_missing_tag_name_ignored();
+    void test_invalid_version_format_ignored();
+    void test_non_numeric_version_ignored();
     void test_no_overlapping();
     void test_apply_enabled_triggers();
     void test_apply_enabled_no_double_check();
     void test_pending_state_after_detection();
     void test_live_network();
+    void test_errorCodeToString();
 };
 
 void TestUpdateChecker::test_update_detected()
@@ -142,10 +149,12 @@ void TestUpdateChecker::test_update_detected()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.check();
-    QVERIFY(spy.wait(3000));
+    testutils::waitForSpyOrFail(spy);
     QCOMPARE(spy.count(), 1);
 
-    const VersionTriplet emitted = VersionTriplet::fromString(spy.first().at(0).toString());
+    const auto emittedParsed = VersionTriplet::fromString(spy.first().at(0).toString());
+    QVERIFY(emittedParsed.has_value());
+    const VersionTriplet emitted = emittedParsed.value();
     QVERIFY(base < emitted);
 }
 
@@ -158,8 +167,7 @@ void TestUpdateChecker::test_no_update_same_version()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.check();
-    QTest::qWait(500);
-    QCOMPARE(spy.count(), 0);
+    testutils::expectNoSignal(spy);
 }
 
 void TestUpdateChecker::test_no_update_older_version()
@@ -171,8 +179,7 @@ void TestUpdateChecker::test_no_update_older_version()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.check();
-    QTest::qWait(500);
-    QCOMPARE(spy.count(), 0);
+    testutils::expectNoSignal(spy);
 }
 
 void TestUpdateChecker::test_v_prefix_stripped()
@@ -186,7 +193,7 @@ void TestUpdateChecker::test_v_prefix_stripped()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.check();
-    QVERIFY(spy.wait(3000));
+    testutils::waitForSpyOrFail(spy);
     QCOMPARE(spy.first().at(0).toString(), v200.toString());
 }
 
@@ -199,12 +206,14 @@ void TestUpdateChecker::test_V_prefix_case_insensitive()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.check();
-    QVERIFY(spy.wait(3000));
+    testutils::waitForSpyOrFail(spy);
     QCOMPARE(spy.first().at(0).toString(), QStringLiteral("3.1.0"));
 }
 
 void TestUpdateChecker::test_empty_tag_ignored()
 {
+    testutils::ignoreWarning(QStringLiteral("EmptyTagName Update check: empty tag_name in response"));
+
     auto *nam = new MockNAM;
     nam->setNextResponse(makeTagJson(QString()));
 
@@ -212,12 +221,13 @@ void TestUpdateChecker::test_empty_tag_ignored()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.check();
-    QTest::qWait(500);
-    QCOMPARE(spy.count(), 0);
+    testutils::expectNoSignal(spy);
 }
 
 void TestUpdateChecker::test_network_error_suppressed()
 {
+    testutils::ignoreWarning(QStringLiteral("NetworkError Update check failed:"));
+
     auto *nam = new MockNAM;
     nam->setNextResponse(QByteArray(), QNetworkReply::ConnectionRefusedError);
 
@@ -225,8 +235,67 @@ void TestUpdateChecker::test_network_error_suppressed()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.check();
-    QTest::qWait(500);
-    QCOMPARE(spy.count(), 0);
+    testutils::expectNoSignal(spy);
+    QVERIFY(!checker.hasPendingUpdate());
+}
+
+void TestUpdateChecker::test_invalid_json_ignored()
+{
+    testutils::ignoreWarning(QStringLiteral("InvalidJson Update check: JSON parsing error:"));
+
+    auto *nam = new MockNAM;
+    nam->setNextResponse(QByteArrayLiteral("{invalid json"));
+
+    TestableUpdateChecker checker(nam);
+    QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
+
+    checker.check();
+    testutils::expectNoSignal(spy);
+    QVERIFY(!checker.hasPendingUpdate());
+}
+
+void TestUpdateChecker::test_missing_tag_name_ignored()
+{
+    testutils::ignoreWarning(QStringLiteral("MissingTagName Update check: JSON tag not found:"));
+
+    auto *nam = new MockNAM;
+    const QJsonObject obj { { QStringLiteral("name"), QStringLiteral("release-1") } };
+    nam->setNextResponse(QJsonDocument(obj).toJson(QJsonDocument::Compact));
+
+    TestableUpdateChecker checker(nam);
+    QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
+
+    checker.check();
+    testutils::expectNoSignal(spy);
+    QVERIFY(!checker.hasPendingUpdate());
+}
+
+void TestUpdateChecker::test_invalid_version_format_ignored()
+{
+    testutils::ignoreWarning(QStringLiteral("InvalidVersionTag Update check: invalid version format:"));
+
+    auto *nam = new MockNAM;
+    nam->setNextResponse(makeTagJson(QStringLiteral("1.0")));
+
+    TestableUpdateChecker checker(nam);
+    QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
+
+    checker.check();
+    testutils::expectNoSignal(spy);
+    QVERIFY(!checker.hasPendingUpdate());
+}
+
+void TestUpdateChecker::test_non_numeric_version_ignored()
+{
+    testutils::ignoreWarning(QStringLiteral("InvalidVersionTag Update check: invalid version format:"));
+    auto *nam = new MockNAM;
+    nam->setNextResponse(makeTagJson(QStringLiteral("1.x.0")));
+
+    TestableUpdateChecker checker(nam);
+    QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
+
+    checker.check();
+    testutils::expectNoSignal(spy);
     QVERIFY(!checker.hasPendingUpdate());
 }
 
@@ -242,7 +311,7 @@ void TestUpdateChecker::test_no_overlapping()
     checker.check(); // must be a silent no-op
     checker.check();
 
-    QVERIFY(spy.wait(3000));
+    testutils::waitForSpyOrFail(spy);
     QCOMPARE(nam->requestCount(), 1);
     QCOMPARE(spy.count(), 1);
 }
@@ -256,7 +325,7 @@ void TestUpdateChecker::test_apply_enabled_triggers()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
 
     checker.applyEnabled(true);
-    QVERIFY(spy.wait(3000));
+    testutils::waitForSpyOrFail(spy);
     QCOMPARE(spy.count(), 1);
 }
 
@@ -268,11 +337,11 @@ void TestUpdateChecker::test_apply_enabled_no_double_check()
     TestableUpdateChecker checker(nam);
 
     checker.applyEnabled(true);
-    QTest::qWait(500);
+    QTest::qWait(testutils::kShortWaitMs);
     const int countAfterFirst = nam->requestCount();
 
     checker.applyEnabled(true); // already enabled — must not fire another check
-    QTest::qWait(500);
+    QTest::qWait(testutils::kShortWaitMs);
     QCOMPARE(nam->requestCount(), countAfterFirst);
 }
 
@@ -286,7 +355,7 @@ void TestUpdateChecker::test_pending_state_after_detection()
 
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
     checker.check();
-    QVERIFY(spy.wait(3000));
+    testutils::waitForSpyOrFail(spy);
 
     QVERIFY(checker.hasPendingUpdate());
     QCOMPARE(checker.pendingVersion(), QStringLiteral("10.0.0"));
@@ -303,17 +372,46 @@ void TestUpdateChecker::test_live_network()
     QSignalSpy spy(&checker, &UpdateChecker::updateAvailable);
     checker.check();
 
-    if (!spy.wait(15000)) {
+    if (!spy.wait(testutils::kLiveNetworkWaitMs)) {
         QSKIP("Live network test: no updateAvailable within 15 s "
               "(no network or no published release newer than 0.99.1)");
     }
 
     const QString emittedVersion = spy.first().at(0).toString();
-    const VersionTriplet emitted = VersionTriplet::fromString(emittedVersion);
+    const auto emittedParsed = VersionTriplet::fromString(emittedVersion);
+    QVERIFY2(emittedParsed.has_value(),
+             qPrintable(QStringLiteral("Failed parsing emitted version: %1").arg(emittedVersion)));
+    const VersionTriplet emitted = emittedParsed.value();
     const VersionTriplet base = VersionTriplet::fromKnown(VersionTriplet::KnownVersion::V_0_99_1);
     QVERIFY2(base < emitted,
              qPrintable(
                      QStringLiteral("Expected a version newer than %1, got: %2").arg(base.toString(), emittedVersion)));
+}
+
+void TestUpdateChecker::test_errorCodeToString()
+{
+    const auto expectedText = [](UpdateChecker::ResponseParsingError code) -> QString {
+        switch (code) {
+        case UpdateChecker::ResponseParsingError::NetworkError:
+            return QStringLiteral("NetworkError");
+        case UpdateChecker::ResponseParsingError::InvalidJson:
+            return QStringLiteral("InvalidJson");
+        case UpdateChecker::ResponseParsingError::MissingTagName:
+            return QStringLiteral("MissingTagName");
+        case UpdateChecker::ResponseParsingError::EmptyTagName:
+            return QStringLiteral("EmptyTagName");
+        case UpdateChecker::ResponseParsingError::InvalidVersionTag:
+            return QStringLiteral("InvalidVersionTag");
+        case UpdateChecker::ResponseParsingError::ResponseParsingErrorCount:
+            return QStringLiteral("ResponseParsingErrorCount");
+        }
+        return QStringLiteral("UnexpectedResponseParsingError");
+    };
+
+    for (int i = 0; i <= std::to_underlying(UpdateChecker::ResponseParsingError::ResponseParsingErrorCount); ++i) {
+        const auto code = static_cast<UpdateChecker::ResponseParsingError>(i);
+        QCOMPARE(UpdateChecker::errorCodeToString(code), expectedText(code));
+    }
 }
 
 QTEST_MAIN(TestUpdateChecker)

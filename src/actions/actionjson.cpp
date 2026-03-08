@@ -25,6 +25,9 @@
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <algorithm>
+#include <ranges>
+#include <utility>
 
 struct JsonAction {
     static constexpr QLatin1String Type { QLatin1String("type") };
@@ -45,73 +48,116 @@ ActionJson::ActionJson(ActionStorage *storage)
 {
 }
 
+QString ActionJson::errorCodeToString(LoadErrorCode code)
+{
+    switch (code) {
+    case LoadErrorCode::InvalidPath:
+        return QStringLiteral("InvalidPath");
+    case LoadErrorCode::InvalidDevice:
+        return QStringLiteral("InvalidDevice");
+    case LoadErrorCode::EmptyInput:
+        return QStringLiteral("EmptyInput");
+    case LoadErrorCode::InvalidJson:
+        return QStringLiteral("InvalidJson");
+    case LoadErrorCode::InvalidRoot:
+        return QStringLiteral("InvalidRoot");
+    case LoadErrorCode::LoadErrorCodeCount:
+        return QStringLiteral("LoadErrorCodeCount");
+    }
+
+    return QStringLiteral("UnknownLoadError");
+}
+
+QString ActionJson::errorCodeToString(SaveErrorCode code)
+{
+    switch (code) {
+    case SaveErrorCode::InvalidPath:
+        return QStringLiteral("InvalidPath");
+    case SaveErrorCode::InvalidDevice:
+        return QStringLiteral("InvalidDevice");
+    case SaveErrorCode::WriteFailed:
+        return QStringLiteral("WriteFailed");
+    case SaveErrorCode::SaveErrorCodeCount:
+        return QStringLiteral("SaveErrorCodeCount");
+    }
+
+    return QStringLiteral("UnknownSaveError");
+}
+
 void ActionJson::clear()
 {
     m_json = {};
 }
 
-bool ActionJson::load(const QString &from)
+ActionJson::LoadResult ActionJson::tryLoad(const QString &from)
 {
-    LOG << from;
     m_json = {};
 
     QFile in(from);
     if (!in.open(QFile::ReadOnly | QFile::Text)) {
-        WRN << "failed opening file" << from << in.errorString();
-        return false;
+        const QString details = QStringLiteral("failed opening file %1 %2").arg(from, in.errorString());
+        return std::unexpected(LoadError { LoadErrorCode::InvalidPath, details });
     }
 
-    return load(&in);
+    return tryLoad(&in);
 }
 
-bool ActionJson::load(QIODevice *in)
+ActionJson::LoadResult ActionJson::tryLoad(QIODevice *in)
 {
     m_json = {};
 
     if (!in || !in->isReadable()) {
-        return false;
+        return std::unexpected(
+                LoadError { LoadErrorCode::InvalidDevice, QStringLiteral("Input device is null or not readable") });
     }
 
     const QByteArray &data = in->readAll();
     if (data.isEmpty()) {
-        WRN << "No JSON to load";
-        return false;
+        return std::unexpected(LoadError { LoadErrorCode::EmptyInput, QStringLiteral("No JSON to load") });
     }
 
     QJsonParseError err;
     const QJsonDocument &jDoc = QJsonDocument::fromJson(std::move(data), &err);
     if (err.error != QJsonParseError::NoError) {
-        WRN << "error parsing document:" << err.errorString();
-        return false;
+        const QString details = QStringLiteral("error parsing document: %1").arg(err.errorString());
+        return std::unexpected(LoadError { LoadErrorCode::InvalidJson, details });
+    }
+
+    if (!jDoc.isObject()) {
+        return std::unexpected(LoadError { LoadErrorCode::InvalidRoot, QStringLiteral("JSON root is not an object") });
     }
 
     m_json = jDoc.object();
 
-    return true;
+    return {};
 }
 
-void ActionJson::save(const QString &to)
+ActionJson::SaveResult ActionJson::trySave(const QString &to)
 {
     QFile out(to);
     if (!out.open(QFile::WriteOnly | QFile::Text | QFile::Truncate)) {
-        WRN << "failed opening file" << to << out.errorString();
-        return;
+        const QString details = QStringLiteral("failed opening file %1 %2").arg(to, out.errorString());
+        return std::unexpected(SaveError { SaveErrorCode::InvalidPath, details });
     }
 
-    save(&out);
+    return trySave(&out);
 }
 
-void ActionJson::save(QIODevice *out)
+ActionJson::SaveResult ActionJson::trySave(QIODevice *out)
 {
     if (!out || !out->isWritable()) {
-        return;
+        return std::unexpected(
+                SaveError { SaveErrorCode::InvalidDevice, QStringLiteral("Output device is null or not writable") });
     }
 
     const QJsonDocument jDoc(m_json);
     const QByteArray &data = jDoc.toJson();
     if (-1 == out->write(data)) {
-        WRN << "error during file write:" << out->errorString();
+        const QString details = QStringLiteral("error during file write: %1").arg(out->errorString());
+        return std::unexpected(SaveError { SaveErrorCode::WriteFailed, details });
     }
+
+    return {};
 }
 
 void ActionJson::putAction(const Action *action)
@@ -178,8 +224,7 @@ Action::Ptr ActionJson::actionFromJson(const QJsonObject &json) const
         QStringList strList;
         const auto &array = json[JsonAction::Args].toArray();
         strList.reserve(array.size());
-        std::transform(array.cbegin(), array.constEnd(), std::back_inserter(strList),
-                       [](const auto &str) { return str.toString(); });
+        std::ranges::transform(array, std::back_inserter(strList), [](const auto &str) { return str.toString(); });
         return strList;
     }();
 
@@ -203,14 +248,14 @@ QJsonObject ActionJson::actionToJson(const Action *action) const
     }
 
     return {
-        { JsonAction::Scope, static_cast<int>(action->scope()) },
+        { JsonAction::Scope, std::to_underlying(action->scope()) },
         { JsonAction::Type, action->type() },
         { JsonAction::Id, action->id().toString() },
         { JsonAction::App, action->app() },
         { JsonAction::Title, action->title() },
         { JsonAction::Args, QJsonArray::fromStringList(action->args()) },
         { JsonAction::Display, action->forcedShow() },
-        { JsonAction::Anchor, static_cast<int>(action->anchor()) },
+        { JsonAction::Anchor, std::to_underlying(action->anchor()) },
         { JsonAction::Timeout, action->timeout() / utils::oneSecondMs() },
         { JsonAction::ToggleGroup, action->toggleGroup() },
         { JsonAction::ToggleOn, action->isToggleOn() },
@@ -240,7 +285,7 @@ QList<QString> ActionJson::actionsGroup(const QString &group) const
 
     QList<QString> keys;
     const auto &oldkeys = m_json[group].toObject().keys();
-    std::copy(oldkeys.cbegin(), oldkeys.cend(), std::back_inserter(keys));
+    std::ranges::copy(oldkeys, std::back_inserter(keys));
     return keys;
 }
 
