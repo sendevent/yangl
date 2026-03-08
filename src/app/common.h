@@ -52,10 +52,7 @@ namespace utils {
 Q_NAMESPACE
 
 template<typename T>
-concept QtReflectedEnum = std::is_enum_v<T> && requires {
-    QMetaEnum::fromType<T>();
-    std::to_underlying(T {});
-};
+concept QtReflectedEnum = std::is_enum_v<T> && static_cast<bool>(QtPrivate::IsQEnumHelper<T>::Value);
 
 inline int oneSecondMs()
 {
