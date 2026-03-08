@@ -34,6 +34,7 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QTimer>
+#include <chrono>
 #include <utility>
 
 NordVpnWrapper::NordVpnWrapper(QObject *parent)
@@ -170,7 +171,7 @@ void NordVpnWrapper::loadSettings()
     m_checker->setInterval(AppSettings::Monitor->Interval->read().toInt());
     m_checker->setPollingMode(
             static_cast<StateChecker::PollingMode>(AppSettings::Monitor->PollingMode->read().toInt()));
-    m_trayIcon->setMessageDuration(AppSettings::Tray->MessageDuration->read().toInt() * utils::oneSecondMs());
+    m_trayIcon->setMessageDuration(std::chrono::seconds(AppSettings::Tray->MessageDuration->read().toInt()));
 
     m_lastCountry = AppSettings::Monitor->LastCountry->read().toString();
     m_lastCity = AppSettings::Monitor->LastCity->read().toString();

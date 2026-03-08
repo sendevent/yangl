@@ -20,8 +20,9 @@
 #include <QFile>
 
 /*static*/ constexpr int CLICall::DefaultTimeoutMSecs;
+/*static*/ constexpr CLICall::Timeout CLICall::DefaultTimeout;
 
-CLICall::CLICall(const QString &path, const QStringList &params, int timeout, QObject *parent)
+CLICall::CLICall(const QString &path, const QStringList &params, Timeout timeout, QObject *parent)
     : QObject(parent)
     , m_appPath(path)
     , m_params(params)
@@ -32,6 +33,10 @@ CLICall::CLICall(const QString &path, const QStringList &params, int timeout, QO
     , m_exitStatus(QProcess::NormalExit)
 {
 }
+
+CLICall::CLICall(const QString &path, const QStringList &params, int timeout, QObject *parent)
+    : CLICall(path, params, Timeout(timeout), parent)
+{}
 
 QString CLICall::run()
 {
@@ -53,8 +58,10 @@ QString CLICall::run()
 
     proc.start(m_appPath, m_params, QIODevice::ReadOnly);
 
-    if (!proc.waitForStarted(m_timeout)) {
-        return setResult({}, tr("Start timeout (%1) reached for [%2]").arg(QString::number(m_timeout), m_appPath));
+    const int timeoutMs = static_cast<int>(m_timeout.count());
+
+    if (!proc.waitForStarted(timeoutMs)) {
+        return setResult({}, tr("Start timeout (%1) reached for [%2]").arg(QString::number(timeoutMs), m_appPath));
     }
 
     auto stripSpinner = [](QString &in) {
@@ -66,13 +73,13 @@ QString CLICall::run()
     };
 
     QString result, errors;
-    while (proc.waitForReadyRead(m_timeout)) {
+    while (proc.waitForReadyRead(timeoutMs)) {
         QString in(proc.readAllStandardOutput());
         result += stripSpinner(in);
         errors += proc.readAllStandardError();
     }
 
-    proc.waitForFinished(m_timeout);
+    proc.waitForFinished(timeoutMs);
 
     // Read any remaining output after the process has finished
     QString trailing(proc.readAllStandardOutput());

@@ -20,14 +20,18 @@
 #include <QObject>
 #include <QProcess>
 #include <QStringList>
+#include <chrono>
 
 class CLICall : public QObject
 {
     Q_OBJECT
 
 public:
-    static constexpr int DefaultTimeoutMSecs = 30000;
+    using Timeout = std::chrono::milliseconds;
+    static constexpr Timeout DefaultTimeout = std::chrono::seconds(30);
+    static constexpr int DefaultTimeoutMSecs = static_cast<int>(DefaultTimeout.count());
 
+    explicit CLICall(const QString &path, const QStringList &params, Timeout timeout, QObject *parent = {});
     explicit CLICall(const QString &path, const QStringList &params, int timeout, QObject *parent = {});
     ~CLICall() = default;
 
@@ -46,7 +50,7 @@ signals:
 protected:
     const QString m_appPath;
     const QStringList m_params;
-    const int m_timeout;
+    const Timeout m_timeout;
     QString m_result, m_errors;
     int m_exitCode { 0 };
     QProcess::ExitStatus m_exitStatus { QProcess::NormalExit };

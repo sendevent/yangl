@@ -23,11 +23,7 @@
 
 #include <QTimer>
 
-/*static*/ const int StateChecker::DefaultIntervalMs = 10 * utils::oneSecondMs();
 /*static*/ const int StateChecker::MaxConsecutiveErrors = 3;
-/*static*/ const int StateChecker::DynamicIntervalTransitionalMs = 1 * utils::oneSecondMs();
-/*static*/ const int StateChecker::DynamicIntervalStableMs = 10 * utils::oneSecondMs();
-/*static*/ const int StateChecker::DynamicTransitionTimeoutMs = 30 * utils::oneSecondMs();
 
 StateChecker::StateChecker(CLICaller *bus, int intervalMs)
     : QObject()
@@ -39,16 +35,16 @@ StateChecker::StateChecker(CLICaller *bus, int intervalMs)
     , m_uptimeTicker(new QTimer(this))
     , m_transitionTimer(new QTimer(this))
     , m_pollingMode(PollingMode::Dynamic)
-    , m_customIntervalMs(intervalMs)
+    , m_customInterval(Duration(intervalMs))
     , m_state()
 {
     connect(m_timer, &QTimer::timeout, this, &StateChecker::onTimeout);
 
-    m_uptimeTicker->setInterval(utils::oneSecondMs());
+    m_uptimeTicker->setInterval(static_cast<int>(std::chrono::duration_cast<Duration>(std::chrono::seconds(1)).count()));
     connect(m_uptimeTicker, &QTimer::timeout, this, &StateChecker::onUptimeTick);
 
     m_transitionTimer->setSingleShot(true);
-    m_transitionTimer->setInterval(DynamicTransitionTimeoutMs);
+    m_transitionTimer->setInterval(static_cast<int>(DynamicTransitionTimeout.count()));
     connect(m_transitionTimer, &QTimer::timeout, this, &StateChecker::endTransition);
 
     adjustDynamicInterval();
@@ -95,12 +91,17 @@ bool StateChecker::isActive() const
 
 void StateChecker::setInterval(int msecs)
 {
-    m_customIntervalMs = msecs;
+    setInterval(Duration(msecs));
+}
+
+void StateChecker::setInterval(Duration interval)
+{
+    m_customInterval = interval;
 
     if (m_pollingMode == PollingMode::Custom) {
         const bool wasActive = isActive();
         m_timer->stop();
-        m_timer->setInterval(msecs);
+        m_timer->setInterval(static_cast<int>(m_customInterval.count()));
         if (wasActive) {
             m_timer->start();
         }
@@ -121,7 +122,7 @@ void StateChecker::setPollingMode(PollingMode mode)
     } else {
         const bool wasActive = isActive();
         m_timer->stop();
-        m_timer->setInterval(m_customIntervalMs);
+        m_timer->setInterval(static_cast<int>(m_customInterval.count()));
         if (wasActive) {
             m_timer->start();
         }
@@ -130,7 +131,7 @@ void StateChecker::setPollingMode(PollingMode mode)
 
 int StateChecker::interval() const
 {
-    return m_customIntervalMs;
+    return static_cast<int>(m_customInterval.count());
 }
 
 void StateChecker::check()
@@ -266,15 +267,15 @@ void StateChecker::endTransition()
 
 void StateChecker::adjustDynamicInterval()
 {
-    const int newInterval = m_transitionTimer->isActive() ? DynamicIntervalTransitionalMs : DynamicIntervalStableMs;
+    const Duration newInterval = m_transitionTimer->isActive() ? DynamicIntervalTransitional : DynamicIntervalStable;
 
-    if (m_timer->interval() == newInterval) {
+    if (m_timer->interval() == static_cast<int>(newInterval.count())) {
         return;
     }
 
     const bool wasActive = isActive();
     m_timer->stop();
-    m_timer->setInterval(newInterval);
+    m_timer->setInterval(static_cast<int>(newInterval.count()));
     if (wasActive) {
         m_timer->start();
     }

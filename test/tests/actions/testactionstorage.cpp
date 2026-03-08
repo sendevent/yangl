@@ -19,6 +19,7 @@
 #include "actions/actionstorage.h"
 #include "settings/appsettings.h"
 #include "settings/settingsmanager.h"
+#include "testutils.h"
 
 #include <QFile>
 #include <QJsonDocument>
@@ -453,6 +454,7 @@ void TestActionStorage::test_toggleGroups_survive_save_load()
 
 void TestActionStorage::test_load_invalidJson_recovers_defaults()
 {
+    testutils::ignoreWarning(QStringLiteral("InvalidJson error parsing document: unterminated object"));
     QTemporaryFile tmp;
     QVERIFY(tmp.open());
     tmp.write("{ invalid json");

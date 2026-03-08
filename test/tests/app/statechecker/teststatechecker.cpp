@@ -144,7 +144,7 @@ void TestStateChecker::test_polling_mode_switch()
     // Switch to Custom — timer must use the stored custom interval.
     m_checker->setPollingMode(StateChecker::PollingMode::Custom);
     QCOMPARE(m_checker->m_pollingMode, StateChecker::PollingMode::Custom);
-    QCOMPARE(m_checker->m_timer->interval(), m_checker->m_customIntervalMs);
+    QCOMPARE(m_checker->m_timer->interval(), static_cast<int>(m_checker->m_customInterval.count()));
 
     // setInterval in Custom mode must update the timer immediately.
     static constexpr int newInterval = 7000;
@@ -188,7 +188,7 @@ void TestStateChecker::test_transition_polling()
 
     // In Custom mode a status change must not affect the polling interval.
     m_checker->setPollingMode(StateChecker::PollingMode::Custom);
-    const int savedCustom = m_checker->m_customIntervalMs;
+    const int savedCustom = static_cast<int>(m_checker->m_customInterval.count());
     m_checker->setInterval(7000);
     m_checker->setStatus(NordVpnInfo::Status::Disconnected);
     QCOMPARE(m_checker->m_timer->interval(), 7000);
