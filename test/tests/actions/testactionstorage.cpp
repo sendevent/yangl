@@ -171,7 +171,7 @@ void TestActionStorage::test_allActions()
     storage.load();
 
     const QVector<Action::Ptr> &knownActions = storage.nvpnActions();
-    QCOMPARE(knownActions.size(), QMetaEnum::fromType<Action::NordVPN>().keyCount() - 1);
+    QCOMPARE(knownActions.size(), Action::nvpnActions().size());
 
     QCOMPARE(storage.userActions().size(), 0);
 
@@ -201,7 +201,7 @@ void TestActionStorage::test_actionBuiltin()
     storage.load();
 
     const QVector<Action::Ptr> &knownActions = storage.nvpnActions();
-    QCOMPARE(knownActions.size(), QMetaEnum::fromType<Action::NordVPN>().keyCount() - 1);
+    QCOMPARE(knownActions.size(), Action::nvpnActions().size());
 
     for (auto i : Action::nvpnActions()) {
         const Action::Ptr &action = storage.action(i);
@@ -263,9 +263,7 @@ void TestActionStorage::test_saveAndLoad()
         storage.load();
 
         const QVector<Action::Ptr> allActions = storage.allActions();
-        QCOMPARE(allActions.size(),
-                 QMetaEnum::fromType<Action::NordVPN>().keyCount() - 1 + UserActionCount
-                         + storage.yanglActions().size());
+        QCOMPARE(allActions.size(), Action::nvpnActions().size() + UserActionCount + storage.yanglActions().size());
 
         for (const Action::Ptr &action : allActions) {
             if (action->scope() == Action::Flow::Yangl) {
@@ -300,7 +298,7 @@ void TestActionStorage::test_updateActionsBuiltin()
     storage.load();
 
     const QVector<Action::Ptr> &actions = storage.nvpnActions();
-    QCOMPARE(actions.size(), QMetaEnum::fromType<Action::NordVPN>().keyCount() - 1);
+    QCOMPARE(actions.size(), Action::nvpnActions().size());
 
     for (int i = 0; i < actions.size(); ++i) {
         const Action::Ptr &action = actions.at(i);

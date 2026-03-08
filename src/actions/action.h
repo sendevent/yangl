@@ -94,8 +94,6 @@ public:
         TechnologyNordlynx,
     };
 
-    Q_ENUM(NordVPN);
-
     enum class Yangl
     {
         ShowMap,
@@ -105,8 +103,6 @@ public:
         ShowAbout,
         Quit
     };
-    Q_ENUM(Yangl);
-
     enum class MenuPlace
     {
         NoMenu = 0,

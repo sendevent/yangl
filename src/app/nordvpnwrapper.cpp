@@ -264,7 +264,7 @@ void NordVpnWrapper::processYanglAction(Action *action)
         }
     }
     default: {
-        WRN << "Unhandled Yangl action:" << actType;
+        WRN << "Unhandled Yangl action:" << std::to_underlying(actType);
         break;
     }
     }

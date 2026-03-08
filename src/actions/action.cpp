@@ -20,6 +20,7 @@
 #include "app/common.h"
 #include "cli/clicall.h"
 
+#include <array>
 #include <utility>
 
 /*static*/ const QString Action::GroupKeyYangl { QStringLiteral("yangl") };
@@ -261,7 +262,15 @@ QString Action::key() const
 {
     static QList<Action::Yangl> actions;
     if (actions.isEmpty()) {
-        actions = utils::allEnum<Action::Yangl>();
+        static constexpr std::array<Action::Yangl, 6> kYanglActions {
+            Action::Yangl::ShowMap,
+            Action::Yangl::ShowSettings,
+            Action::Yangl::ShowLog,
+            Action::Yangl::Activated,
+            Action::Yangl::ShowAbout,
+            Action::Yangl::Quit,
+        };
+        actions = QList<Action::Yangl>(kYanglActions.begin(), kYanglActions.end());
     }
     return actions;
 }
@@ -270,7 +279,47 @@ QString Action::key() const
 {
     static QList<Action::NordVPN> actions;
     if (actions.isEmpty()) {
-        actions = utils::allEnum<Action::NordVPN>({ Action::NordVPN::Unknown });
+        static constexpr std::array<Action::NordVPN, 38> kNordVpnActions {
+            Action::NordVPN::LogIn,
+            Action::NordVPN::CheckStatus,
+            Action::NordVPN::Connect,
+            Action::NordVPN::Disconnect,
+            Action::NordVPN::Settings,
+            Action::NordVPN::Account,
+            Action::NordVPN::Pause05,
+            Action::NordVPN::Pause30,
+            Action::NordVPN::Pause60,
+            Action::NordVPN::PauseCustom,
+            Action::NordVPN::Rate5,
+            Action::NordVPN::Rate4,
+            Action::NordVPN::Rate3,
+            Action::NordVPN::Rate2,
+            Action::NordVPN::Rate1,
+            Action::NordVPN::SetNotifyOff,
+            Action::NordVPN::SetNotifyOn,
+            Action::NordVPN::KillSwitchOn,
+            Action::NordVPN::KillSwitchOff,
+            Action::NordVPN::ThreatProtectionLiteOn,
+            Action::NordVPN::ThreatProtectionLiteOff,
+            Action::NordVPN::ObfuscateOn,
+            Action::NordVPN::ObfuscateOff,
+            Action::NordVPN::NativeTrayOff,
+            Action::NordVPN::NativeTrayOn,
+            Action::NordVPN::LogOut,
+            Action::NordVPN::AutoconnectOn,
+            Action::NordVPN::AutoconnectOff,
+            Action::NordVPN::FirewallOn,
+            Action::NordVPN::FirewallOff,
+            Action::NordVPN::LanDiscoveryOn,
+            Action::NordVPN::LanDiscoveryOff,
+            Action::NordVPN::VirtualLocationOn,
+            Action::NordVPN::VirtualLocationOff,
+            Action::NordVPN::PostQuantumOn,
+            Action::NordVPN::PostQuantumOff,
+            Action::NordVPN::TechnologyOpenVPN,
+            Action::NordVPN::TechnologyNordlynx,
+        };
+        actions = QList<Action::NordVPN>(kNordVpnActions.begin(), kNordVpnActions.end());
     }
     return actions;
 }
