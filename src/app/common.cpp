@@ -92,6 +92,23 @@ CoordinateParseResult parseCoordinatesExpected(const QString &latStr, const QStr
     return coordinate;
 }
 
+QString errorCodeToString(CoordinateParseError code)
+{
+    switch (code) {
+    case CoordinateParseError::MissingLatitude:
+        return QStringLiteral("MissingLatitude");
+    case CoordinateParseError::MissingLongitude:
+        return QStringLiteral("MissingLongitude");
+    case CoordinateParseError::InvalidLatitude:
+        return QStringLiteral("InvalidLatitude");
+    case CoordinateParseError::InvalidLongitude:
+        return QStringLiteral("InvalidLongitude");
+    case CoordinateParseError::OutOfRange:
+        return QStringLiteral("OutOfRange");
+    }
+    return QStringLiteral("UnknownCoordinateParseError");
+}
+
 bool isValidAppPath(const QString &path, QString *reason)
 {
     if (path.isEmpty()) {

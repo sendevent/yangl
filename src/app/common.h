@@ -63,9 +63,9 @@ enum class CoordinateParseError
     InvalidLongitude,
     OutOfRange,
 };
-Q_ENUM_NS(CoordinateParseError)
 
 using CoordinateParseResult = std::expected<QGeoCoordinate, CoordinateParseError>;
+QString errorCodeToString(CoordinateParseError code);
 
 template<typename SomeQEnum>
 QList<SomeQEnum> allEnum(const QList<SomeQEnum> &excluded = {})

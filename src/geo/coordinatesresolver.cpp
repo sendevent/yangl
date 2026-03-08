@@ -118,7 +118,7 @@ CitiesByCountry CoordinatesResolver::loadData(const QString &path)
             const auto parsedCoords = utils::parseCoordinatesExpected(parts[3], parts[4]);
             if (!parsedCoords) {
                 WRN << "Failed parsing lat/lon value:" << parts[3] << parts[4]
-                    << utils::enumToString(parsedCoords.error(), QStringLiteral("UnknownError"));
+                    << utils::errorCodeToString(parsedCoords.error());
                 continue;
             }
 

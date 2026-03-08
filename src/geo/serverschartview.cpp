@@ -177,7 +177,7 @@ void ServersChartView::loadSettings()
         m_chartWidget->centerOn(*parsedCoords);
     } else {
         WRN << "Failed parsing stored map center coordinates:"
-            << utils::enumToString(parsedCoords.error(), QStringLiteral("UnknownError"));
+            << utils::errorCodeToString(parsedCoords.error());
     }
 
     bool ok(false);
