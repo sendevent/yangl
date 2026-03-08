@@ -18,6 +18,7 @@
 #include "nordvpninfo.h"
 
 #include "common.h"
+#include <utility>
 
 NordVpnInfo::NordVpnInfo()
 {
@@ -180,8 +181,8 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
 /*static*/ QList<NordVpnInfo::Status> NordVpnInfo::allStatuses()
 {
     QList<Status> statuses;
-    statuses.reserve(static_cast<int>(Status::StatusCount));
-    for (int i = 0; i < static_cast<int>(Status::StatusCount); ++i) {
+    statuses.reserve(std::to_underlying(Status::StatusCount));
+    for (int i = 0; i < std::to_underlying(Status::StatusCount); ++i) {
         statuses << static_cast<Status>(i);
     }
     return statuses;

@@ -21,6 +21,7 @@
 
 #include <QBuffer>
 #include <QTest>
+#include <utility>
 
 class TestActionJson : public QObject
 {
@@ -280,7 +281,7 @@ void TestActionJson::test_loadErrorCodeToString()
         return QStringLiteral("UnexpectedLoadErrorCode");
     };
 
-    for (int i = 0; i <= static_cast<int>(ActionJson::LoadErrorCode::LoadErrorCodeCount); ++i) {
+    for (int i = 0; i <= std::to_underlying(ActionJson::LoadErrorCode::LoadErrorCodeCount); ++i) {
         const auto code = static_cast<ActionJson::LoadErrorCode>(i);
         QCOMPARE(ActionJson::errorCodeToString(code), expectedText(code));
     }
@@ -302,7 +303,7 @@ void TestActionJson::test_saveErrorCodeToString()
         return QStringLiteral("UnexpectedSaveErrorCode");
     };
 
-    for (int i = 0; i <= static_cast<int>(ActionJson::SaveErrorCode::SaveErrorCodeCount); ++i) {
+    for (int i = 0; i <= std::to_underlying(ActionJson::SaveErrorCode::SaveErrorCodeCount); ++i) {
         const auto code = static_cast<ActionJson::SaveErrorCode>(i);
         QCOMPARE(ActionJson::errorCodeToString(code), expectedText(code));
     }

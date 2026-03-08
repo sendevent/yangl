@@ -26,6 +26,7 @@
 
 #include <QUuid>
 #include <algorithm>
+#include <utility>
 
 ActionStorage::ActionStorage(QObject *parent)
     : QObject(parent)
@@ -278,7 +279,7 @@ Action::Ptr ActionStorage::createYanglAction(Action::Yangl actionType, const QSt
     }
 
     const Action::Flow scope = Action::Flow::Yangl;
-    const int t = static_cast<int>(actionType);
+    const int t = std::to_underlying(actionType);
     const Action::Id &i = QUuid::fromString(id);
     const QString appPath = {};
     const QStringList args = {};
@@ -576,7 +577,7 @@ Action::Ptr ActionStorage::createNVPNAction(Action::NordVPN actionType, const QS
         break;
     }
 
-    const auto &action = createAction(scope, static_cast<int>(actionType), actId, appPath, title, args, forceShow,
+    const auto &action = createAction(scope, std::to_underlying(actionType), actId, appPath, title, args, forceShow,
                                       menuPlace, CLICall::DefaultTimeoutMSecs, this);
     if (!toggleGroup.isEmpty()) {
         action->setToggleGroup(toggleGroup, toggleOn);

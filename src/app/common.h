@@ -24,6 +24,7 @@
 #include <QGeoCoordinate>
 #include <QMetaEnum>
 #include <expected>
+#include <utility>
 
 #ifndef YANGL_TIMESTAMP
 #define YANGL_TIMESTAMP QDateTime::currentDateTime().toString("t hh:mm:ss.zzz:")
@@ -86,7 +87,7 @@ template<typename SomeQEnum>
 QString enumToString(SomeQEnum value, const QString &fallback = {})
 {
     const QMetaEnum me = QMetaEnum::fromType<SomeQEnum>();
-    const char *key = me.valueToKey(static_cast<int>(value));
+    const char *key = me.valueToKey(std::to_underlying(value));
     return key ? QString::fromLatin1(key) : fallback;
 }
 

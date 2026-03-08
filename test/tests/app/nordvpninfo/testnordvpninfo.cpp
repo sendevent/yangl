@@ -20,6 +20,7 @@
 
 #include <QObject>
 #include <QTest>
+#include <utility>
 
 class TestNordVpnInfo : public QObject
 {
@@ -107,7 +108,7 @@ void TestNordVpnInfo::test_statusToText_loopCoverage()
         return QStringLiteral("UnexpectedStatus");
     };
 
-    for (int i = 0; i <= static_cast<int>(NordVpnInfo::Status::StatusCount); ++i) {
+    for (int i = 0; i <= std::to_underlying(NordVpnInfo::Status::StatusCount); ++i) {
         const auto status = static_cast<NordVpnInfo::Status>(i);
         QCOMPARE(NordVpnInfo::statusToText(status), expectedText(status));
     }
@@ -116,10 +117,10 @@ void TestNordVpnInfo::test_statusToText_loopCoverage()
 void TestNordVpnInfo::test_allStatuses_coversEnumRangeWithoutSentinel()
 {
     const auto all = NordVpnInfo::allStatuses();
-    QCOMPARE(all.size(), static_cast<int>(NordVpnInfo::Status::StatusCount));
+    QCOMPARE(all.size(), std::to_underlying(NordVpnInfo::Status::StatusCount));
     QVERIFY(!all.contains(NordVpnInfo::Status::StatusCount));
 
-    for (int i = 0; i < static_cast<int>(NordVpnInfo::Status::StatusCount); ++i) {
+    for (int i = 0; i < std::to_underlying(NordVpnInfo::Status::StatusCount); ++i) {
         QVERIFY(all.contains(static_cast<NordVpnInfo::Status>(i)));
     }
 }
@@ -138,7 +139,7 @@ void TestNordVpnInfo::test_uptimeParseErrorCodeToString()
         return QStringLiteral("UnexpectedUptimeParseError");
     };
 
-    for (int i = 0; i <= static_cast<int>(NordVpnInfo::UptimeParseError::UptimeParseErrorCount); ++i) {
+    for (int i = 0; i <= std::to_underlying(NordVpnInfo::UptimeParseError::UptimeParseErrorCount); ++i) {
         const auto code = static_cast<NordVpnInfo::UptimeParseError>(i);
         QCOMPARE(NordVpnInfo::errorCodeToString(code), expectedText(code));
     }
@@ -164,7 +165,7 @@ void TestNordVpnInfo::test_statusParseErrorCodeToString()
         return QStringLiteral("UnexpectedStatusParseErrorCode");
     };
 
-    for (int i = 0; i <= static_cast<int>(NordVpnInfo::StatusParseErrorCode::StatusParseErrorCodeCount); ++i) {
+    for (int i = 0; i <= std::to_underlying(NordVpnInfo::StatusParseErrorCode::StatusParseErrorCodeCount); ++i) {
         const auto code = static_cast<NordVpnInfo::StatusParseErrorCode>(i);
         QCOMPARE(NordVpnInfo::errorCodeToString(code), expectedText(code));
     }

@@ -20,23 +20,25 @@
 #include "app/common.h"
 #include "cli/clicall.h"
 
+#include <utility>
+
 /*static*/ const QString Action::GroupKeyYangl { QStringLiteral("yangl") };
 /*static*/ const QString Action::GroupKeyBuiltin { QStringLiteral("builtin") };
 /*static*/ const QString Action::GroupKeyCustom { QStringLiteral("custom") };
 
 size_t qHash(Action::Yangl key, size_t seed)
 {
-    return qHash(static_cast<int>(key), seed);
+    return qHash(std::to_underlying(key), seed);
 }
 
 size_t qHash(Action::NordVPN key, size_t seed)
 {
-    return qHash(static_cast<int>(key), seed);
+    return qHash(std::to_underlying(key), seed);
 }
 
 size_t qHash(Action::Flow key, size_t seed)
 {
-    return qHash(static_cast<int>(key), seed);
+    return qHash(std::to_underlying(key), seed);
 }
 
 Action::Action(Action::Flow scope, int type, QObject *parent, const Action::Id &id)

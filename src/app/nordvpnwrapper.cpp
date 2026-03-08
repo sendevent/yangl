@@ -34,6 +34,7 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QTimer>
+#include <utility>
 
 NordVpnWrapper::NordVpnWrapper(QObject *parent)
     : QObject(parent)
@@ -217,8 +218,8 @@ void NordVpnWrapper::onActionTriggered(Action *action)
 
     if (action->scope() != expectedFlow) {
         static const QString wrn("Unexpected Flow: %1 (expected: %2).");
-        WRN << wrn.arg(QString::number(static_cast<int>(action->scope())),
-                       QString::number(static_cast<int>(expectedFlow)))
+        WRN << wrn.arg(QString::number(std::to_underlying(action->scope())),
+                       QString::number(std::to_underlying(expectedFlow)))
             << callerInfo;
         return false;
     }

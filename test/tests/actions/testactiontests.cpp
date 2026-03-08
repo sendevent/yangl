@@ -24,6 +24,7 @@
 
 #include <QSignalSpy>
 #include <QTest>
+#include <utility>
 
 void TestActionTests::testCreate_Builtin()
 {
@@ -32,10 +33,10 @@ void TestActionTests::testCreate_Builtin()
         const Action::Id id = Action::Id::createUuid();
 
         const Action::Ptr action(new TestAction(scope, actionType, {}, id));
-        TestAction().checkAction(action, static_cast<int>(actionType), scope, id);
+        TestAction().checkAction(action, std::to_underlying(actionType), scope, id);
 
         const Action::Ptr actionNoId(new TestAction(scope, actionType));
-        TestAction().checkAction(actionNoId, static_cast<int>(actionType), scope);
+        TestAction().checkAction(actionNoId, std::to_underlying(actionType), scope);
     }
 }
 
@@ -46,10 +47,10 @@ void TestActionTests::testCreate_Custom()
     const Action::NordVPN actionType = Action::NordVPN::Unknown;
 
     const Action::Ptr action(new TestAction(scope, actionType, {}, id));
-    TestAction().checkAction(action, static_cast<int>(actionType), scope, id);
+    TestAction().checkAction(action, std::to_underlying(actionType), scope, id);
 
     const Action::Ptr actionNoId(new TestAction(scope, actionType));
-    TestAction().checkAction(actionNoId, static_cast<int>(actionType), scope);
+    TestAction().checkAction(actionNoId, std::to_underlying(actionType), scope);
 }
 
 void TestActionTests::testSetTitle()
@@ -139,7 +140,7 @@ void TestActionTests::testSetAnchor()
     QCOMPARE(spy.count(), 1);
     const QList<QVariant> &arguments = spy.takeFirst();
     QCOMPARE(arguments.at(0).value<Action::MenuPlace>(), testValue);
-    QCOMPARE(arguments.at(0).toInt(), static_cast<int>(testValue));
+    QCOMPARE(arguments.at(0).toInt(), std::to_underlying(testValue));
 }
 
 void TestActionTests::testCreateRequest_invalidApp()

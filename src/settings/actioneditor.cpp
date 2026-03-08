@@ -28,6 +28,7 @@
 #include <QSharedPointer>
 #include <QSpinBox>
 #include <QWidget>
+#include <utility>
 
 ActionEditor::ActionEditor(QWidget *parent)
     : QWidget(parent)
@@ -169,7 +170,7 @@ void ActionEditor::setAction(const ActionInfoPtr &actionInfo)
     for (auto iter = anchors.cbegin(); iter != anchors.cend(); ++iter) {
         const Action::MenuPlace anchor = iter.key();
         comboIds[anchor] = m_comboBoxMenu->count();
-        m_comboBoxMenu->addItem(iter.value(), static_cast<int>(anchor));
+        m_comboBoxMenu->addItem(iter.value(), std::to_underlying(anchor));
     }
 
     m_comboBoxMenu->setCurrentIndex(comboIds.value(m_actionInfo->m_menuPlace));

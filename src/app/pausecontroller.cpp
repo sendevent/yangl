@@ -25,6 +25,7 @@
 #include <QApplication>
 #include <QInputDialog>
 #include <QTimer>
+#include <utility>
 
 PauseController::PauseController(ActionStorage *storage, StateChecker *checker, QObject *parent)
     : QObject(parent)
@@ -34,7 +35,7 @@ PauseController::PauseController(ActionStorage *storage, StateChecker *checker, 
 {
     connect(m_pauseTimer, &QTimer::timeout, this, &PauseController::onPauseTimer);
     connect(m_checker, &StateChecker::statusChanged, this,
-            [this](NordVpnInfo::Status status) { onStatusChanged(static_cast<int>(status)); });
+            [this](NordVpnInfo::Status status) { onStatusChanged(std::to_underlying(status)); });
 }
 
 bool PauseController::isPaused() const
@@ -57,7 +58,7 @@ void PauseController::pause(Action::NordVPN action)
 
     int duration = durations.value(action, -1);
     if (-1 == duration) {
-        WRN << "Unexpected pause type:" << static_cast<int>(action);
+        WRN << "Unexpected pause type:" << std::to_underlying(action);
         return;
     }
 

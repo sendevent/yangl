@@ -248,14 +248,14 @@ QJsonObject ActionJson::actionToJson(const Action *action) const
     }
 
     return {
-        { JsonAction::Scope, static_cast<int>(action->scope()) },
+        { JsonAction::Scope, std::to_underlying(action->scope()) },
         { JsonAction::Type, action->type() },
         { JsonAction::Id, action->id().toString() },
         { JsonAction::App, action->app() },
         { JsonAction::Title, action->title() },
         { JsonAction::Args, QJsonArray::fromStringList(action->args()) },
         { JsonAction::Display, action->forcedShow() },
-        { JsonAction::Anchor, static_cast<int>(action->anchor()) },
+        { JsonAction::Anchor, std::to_underlying(action->anchor()) },
         { JsonAction::Timeout, action->timeout() / utils::oneSecondMs() },
         { JsonAction::ToggleGroup, action->toggleGroup() },
         { JsonAction::ToggleOn, action->isToggleOn() },

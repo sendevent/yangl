@@ -18,6 +18,7 @@
 #include "version/versiontriplet.h"
 
 #include <QTest>
+#include <utility>
 
 class TestVersionTriplet : public QObject
 {
@@ -87,7 +88,7 @@ void TestVersionTriplet::test_parseErrorCodeToString()
         return QStringLiteral("UnexpectedParseError");
     };
 
-    for (int i = 0; i <= static_cast<int>(VersionTriplet::ParseError::ParseErrorCount); ++i) {
+    for (int i = 0; i <= std::to_underlying(VersionTriplet::ParseError::ParseErrorCount); ++i) {
         const auto code = static_cast<VersionTriplet::ParseError>(i);
         QCOMPARE(VersionTriplet::errorCodeToString(code), expectedText(code));
     }

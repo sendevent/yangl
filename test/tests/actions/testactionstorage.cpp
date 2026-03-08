@@ -25,6 +25,7 @@
 #include <QJsonParseError>
 #include <QTemporaryFile>
 #include <QTest>
+#include <utility>
 
 class ActionStorage;
 class TestActionStorage : public QObject
@@ -302,14 +303,14 @@ void TestActionStorage::test_updateActionsBuiltin()
 
     for (int i = 0; i < actions.size(); ++i) {
         const Action::Ptr &action = actions.at(i);
-        action->setTitle(QString("BuiltinAction_%1").arg(static_cast<int>(action->type())));
+        action->setTitle(QString("BuiltinAction_%1").arg(action->type()));
     }
 
     storage.updateActions(actions, Action::Flow::NordVPN);
 
     for (auto i : Action::nvpnActions()) {
         const Action::Ptr &action = storage.action(i);
-        QCOMPARE(action->title(), QString("BuiltinAction_%1").arg(static_cast<int>(action->type())));
+        QCOMPARE(action->title(), QString("BuiltinAction_%1").arg(action->type()));
     }
 }
 
@@ -445,7 +446,7 @@ void TestActionStorage::test_toggleGroups_survive_save_load()
             const Action::Ptr &action = storage.action(t);
             QVERIFY(action);
             QVERIFY2(action->toggleGroup().isEmpty(),
-                     qPrintable(QString("Unexpected toggleGroup on non-toggle action %1").arg(static_cast<int>(t))));
+                     qPrintable(QString("Unexpected toggleGroup on non-toggle action %1").arg(std::to_underlying(t))));
         }
     }
 }

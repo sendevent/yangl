@@ -28,6 +28,7 @@
 #include <QObject>
 #include <QSignalSpy>
 #include <QTest>
+#include <utility>
 
 class MockReply : public QNetworkReply
 {
@@ -408,7 +409,7 @@ void TestUpdateChecker::test_errorCodeToString()
     };
 
     for (int i = 0;
-         i <= static_cast<int>(UpdateChecker::ResponseParsingError::ResponseParsingErrorCount); ++i) {
+         i <= std::to_underlying(UpdateChecker::ResponseParsingError::ResponseParsingErrorCount); ++i) {
         const auto code = static_cast<UpdateChecker::ResponseParsingError>(i);
         QCOMPARE(UpdateChecker::errorCodeToString(code), expectedText(code));
     }
