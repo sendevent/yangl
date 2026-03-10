@@ -73,6 +73,7 @@ void StateChecker::setCheckAction(const Action::Ptr &action)
 void StateChecker::setActive(bool active)
 {
     if (m_timer->isActive() != active) {
+        AppSettings::Monitor->Active->write(active);
 
         if (active) {
             check();
@@ -80,8 +81,6 @@ void StateChecker::setActive(bool active)
         } else {
             stopTimer(); // sets Status::Unknown
         }
-
-        AppSettings::Monitor->Active->write(active);
     }
 }
 
