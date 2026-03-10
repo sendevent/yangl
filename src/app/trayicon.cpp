@@ -101,8 +101,7 @@ TrayIcon::TrayIcon(QObject *parent)
     reloadIcons();
 
     const auto &icon = iconForStatus(NordVpnInfo::Status::Unknown);
-    const QString unknownStateText = NordVpnInfo::statusToText(NordVpnInfo::Status::Unknown);
-    updateStateText(tr("State: %1").arg(unknownStateText), icon);
+    updateStateText(textForState(NordVpnInfo()), icon);
     setIcon(icon);
 }
 
@@ -136,7 +135,7 @@ void TrayIcon::updateIcon(NordVpnInfo::Status status)
 
 void TrayIcon::setState(const NordVpnInfo &state)
 {
-    const auto &stateText = state.toString();
+    const auto &stateText = textForState(state);
     bool showPopup = false;
 
     if (m_state.status() != state.status() && !qApp->isSavingSession()) {
@@ -159,6 +158,15 @@ void TrayIcon::setState(const NordVpnInfo &state)
 
     m_state = state;
     m_isFirstChange = false;
+}
+
+QString TrayIcon::textForState(const NordVpnInfo &state) const
+{
+    if (state.status() == NordVpnInfo::Status::Unknown && !AppSettings::Monitor->Active->read().toBool()) {
+        return tr("<b>NordVPN status is unknown</b><br>Enable monitoring for automatic status updates.");
+    }
+
+    return state.toString();
 }
 
 void TrayIcon::deployDefaults() const

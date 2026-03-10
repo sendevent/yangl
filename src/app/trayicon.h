@@ -63,5 +63,6 @@ private:
     static TrayIcon::IconInfo infoPixmaps(const NordVpnInfo::Status forStatus);
     static QIcon generateIcon(const NordVpnInfo::Status forStatus);
 
+    QString textForState(const NordVpnInfo &state) const;
     void deployDefaults() const;
 };
