@@ -1,5 +1,21 @@
 # yangl — Architecture overview
 
+## Overview
+
+- [Module layout](#toc-module-layout)
+- [Key classes](#toc-key-classes)
+  - [NordVpnWrapper (`app/`)](#toc-nordvpnwrapper)
+  - [StateChecker (`app/`)](#toc-statechecker)
+  - [ActionStorage (`actions/`)](#toc-actionstorage)
+  - [CLICaller / CLICall (`cli/`)](#toc-clicaller-clicall)
+  - [UpdateChecker (`app/`)](#toc-updatechecker)
+- [Data flow — status poll cycle](#toc-data-flow-status-poll-cycle)
+- [Data flow — user action (e.g. Connect)](#toc-data-flow-user-action)
+- [Settings persistence](#toc-settings-persistence)
+- [Error handling conventions](#toc-error-handling-conventions)
+- [Threading model](#toc-threading-model)
+
+<a name="toc-module-layout"></a>
 ## Module layout
 
 ```
@@ -25,13 +41,16 @@ graph TD
     settings --> app
 ```
 
+<a name="toc-key-classes"></a>
 ## Key classes
 
+<a name="toc-nordvpnwrapper"></a>
 ### NordVpnWrapper (`app/`)
 The application root. Owns every major subsystem as a member and wires their
 signals together. Constructed once via `NordVpnWrapper::instance()` and lives
 for the entire process lifetime.
 
+<a name="toc-statechecker"></a>
 ### StateChecker (`app/`)
 Periodic VPN state monitor. Dispatches a `CLICall` on a timer, parses the
 output into a `NordVpnInfo`, and emits `stateChanged` / `statusChanged`.
@@ -43,6 +62,7 @@ Supports two polling modes:
 An in-flight guard prevents overlapping polls; after 3 consecutive errors the
 monitor stops.
 
+<a name="toc-actionstorage"></a>
 ### ActionStorage (`actions/`)
 Registry and JSON persistence for all actions. Three flows:
 - **Yangl** — internal controls (Show Map, Quit, …)
@@ -51,17 +71,20 @@ Registry and JSON persistence for all actions. Three flows:
 
 Single source of truth; provides typed lookup by enum value or UUID.
 
+<a name="toc-clicaller-clicall"></a>
 ### CLICaller / CLICall (`cli/`)
 `CLICall` encapsulates one subprocess invocation (path + args + timeout).
 `CLICaller::runCall()` submits it to Qt's global thread pool, keeping the GUI
 thread free. Results are delivered back on the main thread via `Action::performed`.
 
+<a name="toc-updatechecker"></a>
 ### UpdateChecker (`app/`)
 Queries the GitHub Releases API asynchronously and compares the latest tag
 against the running build version. Emits `updateAvailable` once and caches
 the result for late-subscribing widgets. Silently ignores network errors and
 404s.
 
+<a name="toc-data-flow-status-poll-cycle"></a>
 ## Data flow — status poll cycle
 
 ```mermaid
@@ -83,6 +106,7 @@ sequenceDiagram
     SC-->>SC: stateChanged / statusChanged
 ```
 
+<a name="toc-data-flow-user-action"></a>
 ## Data flow — user action (e.g. Connect)
 
 ```mermaid
@@ -103,6 +127,7 @@ sequenceDiagram
     A-->>V: show output (if forcedShow)
 ```
 
+<a name="toc-settings-persistence"></a>
 ## Settings persistence
 
 `AppSettings` is a thin typed wrapper over `QSettings`. Each leaf is a
@@ -110,6 +135,7 @@ sequenceDiagram
 only interface. Settings are grouped into `GroupMonitor`, `GroupTray`, and
 `GroupMap` namespaces.
 
+<a name="toc-error-handling-conventions"></a>
 ## Error handling conventions
 
 Core parsing and I/O paths use typed error contracts (`std::expected<T, E>`)
@@ -121,6 +147,7 @@ For core/domain error enums, avoid Qt meta-object reflection (`Q_ENUM`,
 parsers/storage code independent from QObject/Q_GADGET requirements and makes
 error handling behavior explicit and easier to test.
 
+<a name="toc-threading-model"></a>
 ## Threading model
 
 All objects live on the main thread. `CLICaller` uses `QtConcurrent::run` to
