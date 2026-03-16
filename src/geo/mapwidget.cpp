@@ -67,7 +67,7 @@ MapWidget::MapWidget(const QString &mapPlugin, int mapType, FlatPlaceProxyModel 
     vBox->addWidget(m_quickView);
     vBox->setContentsMargins(0, 0, 0, 0);
 
-    m_updateBanner = UpdateBanner::create(true, NordVpnWrapper::instance()->updateChecker(), this);
+    m_updateBanner = UpdateBanner::create(true, NordVpnWrapper::instance(), this);
 }
 
 MapWidget::~MapWidget() { }

@@ -17,11 +17,13 @@
 
 #include "updatebanner.h"
 
+#include "app/nordvpnwrapper.h"
 #include "app/updatechecker.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <QStringList>
 
 UpdateBanner::UpdateBanner(bool dismissible, QWidget *parent)
     : QFrame(parent)
@@ -51,18 +53,59 @@ UpdateBanner::UpdateBanner(bool dismissible, QWidget *parent)
     hide();
 }
 
-/*static*/ UpdateBanner *UpdateBanner::create(bool dismissible, UpdateChecker *checker, QWidget *parent)
+/*static*/ UpdateBanner *UpdateBanner::create(bool dismissible, NordVpnWrapper *wrapper, QWidget *parent)
 {
     auto *banner = new UpdateBanner(dismissible, parent);
-    connect(checker, &UpdateChecker::updateAvailable, banner, &UpdateBanner::setUpdate);
-    if (checker->hasPendingUpdate()) {
-        banner->setUpdate(checker->pendingVersion(), checker->pendingUrl());
+    if (!wrapper) {
+        return banner;
+    }
+
+    UpdateChecker *checker = wrapper->updateChecker();
+    if (checker) {
+        connect(checker, &UpdateChecker::updateAvailable, banner, &UpdateBanner::setUpdate);
+        if (checker->hasPendingUpdate()) {
+            banner->setUpdate(checker->pendingVersion(), checker->pendingUrl());
+        }
+    }
+
+    connect(wrapper, &NordVpnWrapper::nordVpnUpdateAvailable, banner, &UpdateBanner::setNordVpnUpdate);
+    if (wrapper->hasPendingNordVpnUpdateNotice()) {
+        banner->setNordVpnUpdate(wrapper->nordVpnUpdateUrl());
     }
     return banner;
 }
 
 void UpdateBanner::setUpdate(const QString &version, const QUrl &url)
 {
-    m_label->setText(tr("New version <b>%1</b> is <a href='%2'>available</a>").arg(version, url.toString()));
+    m_appVersion = version;
+    m_appUpdateUrl = url;
+    refreshText();
+}
+
+void UpdateBanner::setNordVpnUpdate(const QUrl &url)
+{
+    m_hasNordVpnUpdate = true;
+    m_nordVpnUpdateUrl = url;
+    refreshText();
+}
+
+void UpdateBanner::refreshText()
+{
+    QStringList segments;
+    if (!m_appVersion.isEmpty() && m_appUpdateUrl.isValid()) {
+        segments.append(
+                tr("New version <b>%1</b> is <a href='%2'>available</a>").arg(m_appVersion, m_appUpdateUrl.toString()));
+    }
+    if (m_hasNordVpnUpdate && m_nordVpnUpdateUrl.isValid()) {
+        segments.append(
+                tr("A new version of NordVPN is <a href='%1'>available</a>").arg(m_nordVpnUpdateUrl.toString()));
+    }
+
+    if (segments.isEmpty()) {
+        hide();
+        return;
+    }
+
+    m_label->setText(segments.join(QStringLiteral(" | ")));
     show();
 }
