@@ -29,6 +29,8 @@ class TestNordVpnInfo : public QObject
 private slots:
     void test_fromString_emptyInput();
     void test_fromString_malformedLine();
+    void test_fromString_noticePrefix();
+    void test_fromString_noticeAbsent();
     void test_fromString_missingStatus();
     void test_fromString_invalidStatus();
     void test_fromString_invalidUptime();
@@ -49,9 +51,30 @@ void TestNordVpnInfo::test_fromString_emptyInput()
 
 void TestNordVpnInfo::test_fromString_malformedLine()
 {
-    testutils::ignoreWarning(QStringLiteral("MalformedLine No ':' separator in line: 'Status Connected'"));
-    const NordVpnInfo parsed = NordVpnInfo::fromString("Status Connected\nServer: srv");
+    testutils::ignoreWarning(QStringLiteral("No status field found in input"));
+    const NordVpnInfo parsed = NordVpnInfo::fromString("Status Connected\nServer: srv\nUnstructured line");
     QCOMPARE(parsed, NordVpnInfo {});
+}
+
+void TestNordVpnInfo::test_fromString_noticePrefix()
+{
+    const QString input =
+            "A new version of NordVPN is available!\nPlease update the app.\n"
+            "Status: Connected\nServer: test.server\nCountry: Neverland\nCity: TestCity\nUptime: 10 seconds";
+    const NordVpnInfo parsed = NordVpnInfo::fromString(input);
+
+    QCOMPARE(parsed.status(), NordVpnInfo::Status::Connected);
+    QCOMPARE(parsed.server(), QString("test.server"));
+    QCOMPARE(parsed.country(), QString("Neverland"));
+    QCOMPARE(parsed.city(), QString("TestCity"));
+    QVERIFY(parsed.hasUpdateNotice());
+}
+
+void TestNordVpnInfo::test_fromString_noticeAbsent()
+{
+    const QString input = "Status: Connected\nServer: test.server\nCountry: Neverland\nCity: TestCity";
+    const NordVpnInfo parsed = NordVpnInfo::fromString(input);
+    QVERIFY(!parsed.hasUpdateNotice());
 }
 
 void TestNordVpnInfo::test_fromString_missingStatus()

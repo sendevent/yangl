@@ -21,6 +21,9 @@
 #include "app/nordvpninfo.h"
 
 #include <QObject>
+#include <QQueue>
+#include <QUrl>
+#include <functional>
 
 class AppUiCoordinator;
 class CLICaller;
@@ -47,12 +50,18 @@ public:
     static void registerAction(Action *act);
 
     UpdateChecker *updateChecker() const;
+    bool hasPendingNordVpnUpdateNotice() const;
+    QUrl nordVpnUpdateUrl() const;
+
+signals:
+    void nordVpnUpdateAvailable(const QUrl &downloadUrl);
 
 private slots:
     void prepareQuit();
 
     void onActionTriggered(Action *action);
     void onStatusChanged(NordVpnInfo::Status status);
+    void onStateChanged(const NordVpnInfo &state);
 
     void notifyError(const QString &errorMessage);
 
@@ -73,6 +82,9 @@ private:
     void initMenu();
     void prependUpdateAction();
     void syncToggleSettings();
+    void notifyNordVpnUpdate();
+    void enqueueUpdateNotification(const std::function<void()> &notification);
+    void processNextUpdateNotification();
 
     void start();
 
@@ -90,4 +102,8 @@ private:
     Action::Ptr m_geoAction;
     Action::Ptr m_settingsSyncAction;
     UpdateChecker *m_updateChecker;
+    bool m_nordVpnUpdateNoticeActive { false };
+    bool m_nordVpnUpdateNoticeNotified { false };
+    QQueue<std::function<void()>> m_updateNotificationQueue;
+    bool m_updateNotificationInFlight { false };
 };
