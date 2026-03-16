@@ -34,6 +34,10 @@ class PauseController;
 class TrayIcon;
 class UpdateChecker;
 
+#ifdef ENABLE_TESTS
+class NordVpnWrapperTestHook;
+#endif
+
 class NordVpnWrapper : public QObject
 {
     Q_OBJECT
@@ -66,6 +70,10 @@ private slots:
     void notifyError(const QString &errorMessage);
 
 private:
+#ifdef ENABLE_TESTS
+    friend class NordVpnWrapperTestHook;
+#endif
+
     explicit NordVpnWrapper(QObject *parent = {});
 
     CLICaller *m_bus;
