@@ -41,6 +41,7 @@ private slots:
     void test_registerAction_noInstance();
     void test_registerAction_nullAction();
     void test_notice_dedupUntilCleared();
+    void test_updateNotificationQueue_serializesCallbacks();
 };
 
 class NordVpnWrapperTestHook
@@ -132,6 +133,36 @@ void TestNordVpnWrapper::test_notice_dedupUntilCleared()
 
     NordVpnWrapperTestHook::onStateChanged(*wrapper, withNotice);
     QCOMPARE(spy.count(), 2); // emitted again after notice disappears and reappears
+}
+
+void TestNordVpnWrapper::test_updateNotificationQueue_serializesCallbacks()
+{
+    ignoreExpectedTrayWarnings();
+
+    auto wrapper = NordVpnWrapperTestHook::create();
+    NordVpnWrapperTestHook::clearQueue(*wrapper);
+    NordVpnWrapperTestHook::setInFlight(*wrapper, false);
+
+    int firstCalls = 0;
+    int secondCalls = 0;
+
+    NordVpnWrapperTestHook::enqueueNotification(*wrapper, [&firstCalls]() { ++firstCalls; });
+    NordVpnWrapperTestHook::enqueueNotification(*wrapper, [&secondCalls]() { ++secondCalls; });
+
+    QCOMPARE(firstCalls, 1);
+    QCOMPARE(secondCalls, 0);
+    QVERIFY(NordVpnWrapperTestHook::inFlight(*wrapper));
+    QCOMPARE(NordVpnWrapperTestHook::queueSize(*wrapper), 1);
+
+    NordVpnWrapperTestHook::processNextNotification(*wrapper);
+    QCOMPARE(firstCalls, 1);
+    QCOMPARE(secondCalls, 1);
+    QVERIFY(NordVpnWrapperTestHook::inFlight(*wrapper));
+    QCOMPARE(NordVpnWrapperTestHook::queueSize(*wrapper), 0);
+
+    NordVpnWrapperTestHook::processNextNotification(*wrapper);
+    QVERIFY(!NordVpnWrapperTestHook::inFlight(*wrapper));
+    QCOMPARE(NordVpnWrapperTestHook::queueSize(*wrapper), 0);
 }
 
 QTEST_MAIN(TestNordVpnWrapper)
