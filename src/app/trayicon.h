@@ -40,6 +40,7 @@ public:
     void updateStateText(const QString &message, QSystemTrayIcon::MessageIcon messageType);
     void updateStateText(const QString &message, const QIcon &icon);
     void showUpdateNotification(const QString &version, const QUrl &repoUrl);
+    void showNordVpnUpdateNotification(const QUrl &downloadUrl);
 
 public slots:
     void setState(const NordVpnInfo &state);

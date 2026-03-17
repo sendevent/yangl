@@ -34,8 +34,13 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QTimer>
+#include <QUrl>
 #include <chrono>
 #include <utility>
+
+namespace {
+const QUrl kNordVpnDownloadUrl(QStringLiteral("https://nordvpn.com/download/linux"));
+}
 
 NordVpnWrapper::NordVpnWrapper(QObject *parent)
     : QObject(parent)
@@ -52,6 +57,7 @@ NordVpnWrapper::NordVpnWrapper(QObject *parent)
     connect(m_pauseCtrl, &PauseController::requestAction, this, &NordVpnWrapper::onActionTriggered);
     connect(m_checker, &StateChecker::stateChanged, m_trayIcon, &TrayIcon::setState);
     connect(m_checker, &StateChecker::statusChanged, this, &NordVpnWrapper::onStatusChanged);
+    connect(m_checker, &StateChecker::stateChanged, this, &NordVpnWrapper::onStateChanged);
     connect(m_checker, &StateChecker::error, this, &NordVpnWrapper::notifyError);
     connect(m_trayIcon, &QSystemTrayIcon::activated, m_uiCoordinator, &AppUiCoordinator::onTrayIconActivated);
     connect(m_menuHolder, &MenuHolder::actionTriggered, this, &NordVpnWrapper::onActionTriggered);
@@ -69,7 +75,8 @@ NordVpnWrapper::NordVpnWrapper(QObject *parent)
 
     connect(m_updateChecker, &UpdateChecker::updateAvailable, this,
             [this](const QString &version, const QUrl &repoUrl) {
-                m_trayIcon->showUpdateNotification(version, repoUrl);
+                enqueueUpdateNotification(
+                        [this, version, repoUrl]() { m_trayIcon->showUpdateNotification(version, repoUrl); });
                 prependUpdateAction();
             });
     QTimer::singleShot(5 * utils::oneSecondMs(), this, [this]() {
@@ -110,6 +117,16 @@ void NordVpnWrapper::initMenu()
 UpdateChecker *NordVpnWrapper::updateChecker() const
 {
     return m_updateChecker;
+}
+
+bool NordVpnWrapper::hasPendingNordVpnUpdateNotice() const
+{
+    return m_nordVpnUpdateNoticeActive;
+}
+
+QUrl NordVpnWrapper::nordVpnUpdateUrl() const
+{
+    return kNordVpnDownloadUrl;
 }
 
 void NordVpnWrapper::prependUpdateAction()
@@ -337,6 +354,59 @@ void NordVpnWrapper::onStatusChanged(NordVpnInfo::Status status)
 
     updateActions(status == NordVpnInfo::Status::Connected);
     syncToggleSettings();
+}
+
+void NordVpnWrapper::onStateChanged(const NordVpnInfo &state)
+{
+    if (state.hasUpdateNotice()) {
+        if (!m_nordVpnUpdateNoticeActive) {
+            m_nordVpnUpdateNoticeActive = true;
+            m_nordVpnUpdateNoticeNotified = false;
+        }
+
+        if (!m_nordVpnUpdateNoticeNotified) {
+            m_nordVpnUpdateNoticeNotified = true;
+            notifyNordVpnUpdate();
+        }
+        return;
+    }
+
+    m_nordVpnUpdateNoticeActive = false;
+    m_nordVpnUpdateNoticeNotified = false;
+}
+
+void NordVpnWrapper::notifyNordVpnUpdate()
+{
+    emit nordVpnUpdateAvailable(kNordVpnDownloadUrl);
+    enqueueUpdateNotification([this]() { m_trayIcon->showNordVpnUpdateNotification(kNordVpnDownloadUrl); });
+}
+
+void NordVpnWrapper::enqueueUpdateNotification(const std::function<void()> &notification)
+{
+    if (m_updateNotificationInFlight) {
+        m_updateNotificationQueue.enqueue(notification);
+        return;
+    }
+
+    m_updateNotificationInFlight = true;
+    notification();
+
+    const int baseDelayMs = qMax(1500, m_trayIcon->duration() + 250);
+    QTimer::singleShot(baseDelayMs, this, &NordVpnWrapper::processNextUpdateNotification);
+}
+
+void NordVpnWrapper::processNextUpdateNotification()
+{
+    if (m_updateNotificationQueue.isEmpty()) {
+        m_updateNotificationInFlight = false;
+        return;
+    }
+
+    const auto notification = m_updateNotificationQueue.dequeue();
+    notification();
+
+    const int baseDelayMs = qMax(1500, m_trayIcon->duration() + 250);
+    QTimer::singleShot(baseDelayMs, this, &NordVpnWrapper::processNextUpdateNotification);
 }
 
 void NordVpnWrapper::updateActions(bool connected)

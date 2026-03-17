@@ -52,6 +52,7 @@ public:
     QString server() const;
     QString country() const;
     QString city() const;
+    bool hasUpdateNotice() const;
 
     void tickUptime();
 
@@ -84,6 +85,7 @@ private:
     QString m_protocol;
     QString m_traffic;
     QString m_uptime;
+    bool m_hasUpdateNotice { false };
 
     using UptimeResult = std::expected<QString, UptimeParseError>;
     [[nodiscard]] static UptimeResult tryParseUptime(const QString &from);

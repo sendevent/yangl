@@ -37,6 +37,7 @@ void NordVpnInfo::clear()
     m_protocol.clear();
     m_traffic.clear();
     m_uptime.clear();
+    m_hasUpdateNotice = false;
 }
 
 NordVpnInfo::Status NordVpnInfo::status() const
@@ -55,7 +56,8 @@ bool NordVpnInfo::operator==(const NordVpnInfo &other) const
 {
     return m_status == other.m_status && m_server == other.m_server && m_country == other.m_country
             && m_city == other.m_city && m_ip == other.m_ip && m_technology == other.m_technology
-            && m_protocol == other.m_protocol && m_traffic == other.m_traffic && m_uptime == other.m_uptime;
+            && m_protocol == other.m_protocol && m_traffic == other.m_traffic && m_uptime == other.m_uptime
+            && m_hasUpdateNotice == other.m_hasUpdateNotice;
 }
 
 bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
@@ -82,13 +84,17 @@ bool NordVpnInfo::operator!=(const NordVpnInfo &other) const
 
     NordVpnInfo updatedState;
     bool hasStatus { false };
+    const QString updateNeedle = QStringLiteral("new version of nordvpn");
 
     const QStringList &pairs = text.split('\n', Qt::SkipEmptyParts);
     for (const QString &line : pairs) {
+        if (line.contains(updateNeedle, Qt::CaseInsensitive)) {
+            updatedState.m_hasUpdateNotice = true;
+        }
+
         const int sep = line.indexOf(':');
         if (sep <= 0) {
-            return std::unexpected(ParseError { StatusParseErrorCode::MalformedLine,
-                                                QStringLiteral("No ':' separator in line: '%1'").arg(line) });
+            continue;
         }
 
         const QString &name = line.left(sep).simplified().toLower();
@@ -383,4 +389,9 @@ QString NordVpnInfo::country() const
 QString NordVpnInfo::city() const
 {
     return m_city;
+}
+
+bool NordVpnInfo::hasUpdateNotice() const
+{
+    return m_hasUpdateNotice;
 }

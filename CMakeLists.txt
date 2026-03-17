@@ -52,6 +52,7 @@ target_include_directories(yangl_lib PUBLIC ${CMAKE_SOURCE_DIR}/src/)
 
 option(ENABLE_TESTS "Enable unit tests" OFF)
 if(ENABLE_TESTS)
+    add_compile_definitions(ENABLE_TESTS)
     add_subdirectory(test)
 endif()
 

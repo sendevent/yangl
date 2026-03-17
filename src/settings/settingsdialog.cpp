@@ -133,7 +133,7 @@ SettingsDialog::SettingsDialog(ActionStorage *actStorage, QWidget *parent)
 
     restoreGeometry(AppSettings::Monitor->SettingsDialog->read().toByteArray());
 
-    m_updateBanner = UpdateBanner::create(true, NordVpnWrapper::instance()->updateChecker(), this);
+    m_updateBanner = UpdateBanner::create(true, NordVpnWrapper::instance(), this);
     qobject_cast<QVBoxLayout *>(layout())->insertWidget(0, m_updateBanner);
 }
 

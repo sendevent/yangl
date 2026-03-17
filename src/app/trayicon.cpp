@@ -232,6 +232,20 @@ void TrayIcon::showUpdateNotification(const QString &version, const QUrl &repoUr
                 static_cast<int>(m_duration.count()));
 }
 
+void TrayIcon::showNordVpnUpdateNotification(const QUrl &downloadUrl)
+{
+    disconnect(this, &QSystemTrayIcon::messageClicked, nullptr, nullptr);
+    connect(
+            this, &QSystemTrayIcon::messageClicked, this, [downloadUrl]() { QDesktopServices::openUrl(downloadUrl); },
+            Qt::SingleShotConnection);
+
+    const QString text = tr("A new version of NordVPN is available\n%1").arg(downloadUrl.toString());
+    const QString &tooltip = QTextDocumentFragment::fromHtml(text).toPlainText();
+    setToolTip(tooltip);
+    showMessage(qApp->applicationDisplayName(), tooltip, QSystemTrayIcon::Information,
+                static_cast<int>(m_duration.count()));
+}
+
 void TrayIcon::updateStateText(const QString &message, QSystemTrayIcon::MessageIcon messageType)
 {
     const QString &tooltip = QTextDocumentFragment::fromHtml(message).toPlainText();

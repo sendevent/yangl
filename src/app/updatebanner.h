@@ -21,7 +21,7 @@
 #include <QUrl>
 
 class QLabel;
-class UpdateChecker;
+class NordVpnWrapper;
 
 class UpdateBanner : public QFrame
 {
@@ -29,10 +29,17 @@ class UpdateBanner : public QFrame
 public:
     explicit UpdateBanner(bool dismissible, QWidget *parent = {});
 
-    static UpdateBanner *create(bool dismissible, UpdateChecker *checker, QWidget *parent);
+    static UpdateBanner *create(bool dismissible, NordVpnWrapper *wrapper, QWidget *parent);
 
     void setUpdate(const QString &version, const QUrl &url);
+    void setNordVpnUpdate(const QUrl &url);
 
 private:
+    void refreshText();
+
     QLabel *m_label { nullptr };
+    QString m_appVersion;
+    QUrl m_appUpdateUrl;
+    bool m_hasNordVpnUpdate { false };
+    QUrl m_nordVpnUpdateUrl;
 };
